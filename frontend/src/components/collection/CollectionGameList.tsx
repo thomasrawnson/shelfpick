@@ -4,6 +4,8 @@ import type {
 } from "../../api/client"
 import ResilientGameArtwork from "../ResilientGameArtwork"
 import { collectionEmptyKind } from "../../ui-empty-state"
+import { Link } from "react-router-dom"
+import { APP_PATHS } from "../../routes"
 
 type Props = {
   games: Game[]
@@ -40,19 +42,12 @@ function CollectionGameList({
             ? "Add an owned game to start picking and tracking plays."
             : "Clear the search and play filter to see your full collection."}
         </p>
-        <button
-          type="button"
-          className="secondary-button"
-          onClick={
-            emptyKind === "empty"
-              ? onAddGame
-              : onClearFilters
-          }
-        >
-          {emptyKind === "empty"
-            ? "Add your first game"
-            : "Clear filters"}
-        </button>
+        <div className="collection-empty-actions">
+          {emptyKind === "empty" ? <>
+            <button type="button" className="primary-button" data-add-game-trigger onClick={onAddGame}>Add game</button>
+            <Link className="secondary-button" to={APP_PATHS.settingsCollectionData}>Import from BGG</Link>
+          </> : <button type="button" className="secondary-button" onClick={onClearFilters}>Clear filters</button>}
+        </div>
       </div>
     )
   }

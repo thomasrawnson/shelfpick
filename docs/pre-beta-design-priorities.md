@@ -139,6 +139,17 @@ themes, including direct navigation, Back, persistence, focus, navigation
 clearance and overflow. SP-PB09 Add game prominence and SP-PB20 wider copy
 cleanup remain separate pending tasks.
 
+SP-PB09 add-game discoverability completed on 28 September 2026. The ambiguous
+Collection plus icon is replaced by a full labelled Forest action on populated
+and filtered-no-match shelves. A genuinely empty shelf gives Add game primary
+placement and keeps BGG import available through Collection & Data. The existing
+inline BoardGameGeek search panel remains the only manual-add flow, with clearer
+focus, status and recovery states; no barcode or new navigation concept was
+introduced. Mocked Playwright covered populated, empty, filtered, search,
+success, duplicate and failure/retry states at 390 and 1440px in both themes,
+including Back/state restoration, keyboard focus, nav clearance and overflow.
+SP-PB20 remains pending.
+
 ### UI-2 — core visual polish
 
 After UI-1 is stable, refine hierarchy, typography, spacing, component

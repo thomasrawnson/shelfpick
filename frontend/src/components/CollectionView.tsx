@@ -43,6 +43,7 @@ import RankGamesView
 
 import SegmentedControl
   from "./ui/SegmentedControl"
+import { mergeGameIntoCollection } from "../collection-state"
 
 export type CollectionSection =
   | "owned"
@@ -158,6 +159,9 @@ function CollectionView({
     addingGame,
     setAddingGame,
   ] = useState(false)
+
+  const addGameButtonRef =
+    useRef<HTMLButtonElement>(null)
 
   const pendingScrollRestore =
     useRef(true)
@@ -802,6 +806,19 @@ function CollectionView({
     onCloseGame()
   }
 
+  function openAddGame() {
+    setAddingGame(true)
+  }
+
+  function closeAddGame() {
+    setAddingGame(false)
+    requestAnimationFrame(() => {
+      const trigger = addGameButtonRef.current
+        ?? document.querySelector<HTMLButtonElement>("[data-add-game-trigger]")
+      trigger?.focus()
+    })
+  }
+
 
   async function removeGame() {
     if (!selectedGame) {
@@ -968,22 +985,17 @@ function CollectionView({
           </p>
         </header>
 
-        <button
+        {games.length > 0 && !addingGame && <button
+          ref={addGameButtonRef}
           type="button"
-          className="collection-add-icon"
-          aria-label={
-            addingGame
-              ? "Close add game"
-              : "Add game"
-          }
-          onClick={() =>
-            setAddingGame(
-              (current) => !current
-            )
-          }
+          className="primary-button collection-add-button"
+          aria-expanded="false"
+          aria-controls="add-game-panel"
+          data-add-game-trigger
+          onClick={openAddGame}
         >
-          {addingGame ? "×" : "+"}
-        </button>
+          Add game
+        </button>}
       </div>
 
       {sectionTabs}
@@ -991,32 +1003,11 @@ function CollectionView({
 
       {addingGame && (
         <AddGameSearch
-          onClose={() =>
-            setAddingGame(
-              false
-            )
-          }
+          onClose={closeAddGame}
           onGameAdded={(
             game,
           ) => {
-            setGames(
-              (current) => {
-                if (
-                  current.some(
-                    (existing) =>
-                      existing.bgg_id
-                      === game.bgg_id
-                  )
-                ) {
-                  return current
-                }
-
-                return [
-                  ...current,
-                  game,
-                ]
-              }
-            )
+            setGames((current) => mergeGameIntoCollection(current, game))
           }}
         />
       )}
@@ -1071,9 +1062,7 @@ function CollectionView({
         onOpenGame={
           openGame
         }
-        onAddGame={() =>
-          setAddingGame(true)
-        }
+        onAddGame={openAddGame}
         onClearFilters={() =>
           onUiStateChange(
             (current) => ({

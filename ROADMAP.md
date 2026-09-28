@@ -72,8 +72,19 @@ unrelated account/profile controls, and both explicit Back and browser Back
 restore focus to the originating overview row. Focused tests and all frontend
 checks passed; mocked Playwright covered navigation, direct routes, persisted
 theme/profile preferences, keyboard focus, nav clearance and overflow at 390
-and 1440px in both themes. Captures are in `docs/screenshots/sp-pb05/`. Add game
-remains SP-PB09 and broader copy cleanup remains SP-PB20.
+and 1440px in both themes. Captures are in `docs/screenshots/sp-pb05/`. That
+slice left Add game to SP-PB09; broader copy cleanup remains SP-PB20.
+
+SP-PB09 add-game discoverability is complete. Collection now presents a
+labelled Add game action on populated and filtered-no-match shelves, plus a
+primary empty-shelf action and the existing Collection & Data BGG-import route.
+The existing search/add API flow is unchanged; it now provides labelled input,
+focus entry/return and explicit success/no-results feedback while retaining
+duplicate and failed-add recovery. Filters, sorting and Collection state survive
+Cancel and browser Back. Forty-two frontend tests and all frontend checks
+passed; mocked Playwright covered the flow at 390 and 1440px in both themes.
+Captures are in `docs/screenshots/sp-pb09/`. Broader proposed filters were not
+pulled into this bounded discoverability slice, and SP-PB20 remains pending.
 
 After SP-PB02 is unblocked, address
 Picker defaults/navigation, UI and Settings, plays/statistics/sharing, ranking
@@ -204,7 +215,8 @@ fallbacks, and do not change the logo or Free/Pro proposition as part of UI-1.
 2. SP-PB02: restore reported Top 100 availability — **BLOCKED** pending an
    authorised official BGG ranked-data source; existing boundary logic verified.
 3. SP-PB03–04: selected-player count and saved play-style defaults.
-4. SP-PB05 Settings navigation — COMPLETE; SP-PB06–09 and SP-PB20 remain pending.
+4. SP-PB05 Settings navigation and SP-PB09 Add game discoverability — COMPLETE;
+   SP-PB06–08 and SP-PB20 remain pending.
 5. SP-PB10–11 and SP-PB14: location, Pro live duration and statistics.
 6. SP-PB12–13: branded play and monthly recap sharing.
 7. SP-PB15–17: Pro ranking recommendations, scanning and avatars.

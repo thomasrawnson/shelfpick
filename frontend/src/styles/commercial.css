@@ -299,25 +299,17 @@ h1 {
   color: var(--sp-green);
 }
 
-.collection-add-icon {
-  width: 34px;
-  height: 34px;
-  display: grid;
-  place-items: center;
+.collection-add-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex: 0 0 auto;
-  margin-top: 8px;
-  padding: 0;
-  color: var(--color-accent-text);
-  background: transparent;
-  border: 0;
-  border-radius: 8px;
-  font-size: 24px;
-  line-height: 1;
+  min-height: var(--target-min);
+  width: auto;
+  margin-top: 4px;
+  padding-inline: var(--space-4);
+  white-space: nowrap;
   cursor: pointer;
-}
-
-.collection-add-icon:hover {
-  background: var(--color-brand-primary-soft);
 }
 
 .collection-section-tabs {

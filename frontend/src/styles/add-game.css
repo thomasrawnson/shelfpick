@@ -1,9 +1,3 @@
-.collection-add-button {
-  margin:
-    14px 0 18px;
-}
-
-
 .add-game-panel {
   display: grid;
   gap: 14px;
@@ -19,6 +13,29 @@
   border-radius: 18px;
 }
 
+.add-game-status,
+.add-game-no-results,
+.add-game-import {
+  margin: 0;
+  font-size: var(--text-support);
+}
+
+.add-game-no-results,
+.add-game-import {
+  color: var(--text-secondary);
+}
+
+.add-game-import {
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+}
+
+.add-game-import a {
+  color: var(--color-brand-primary);
+  font-weight: 700;
+  text-underline-offset: 3px;
+}
+
 
 .add-game-header {
   display: flex;
@@ -30,6 +47,11 @@
 
 .add-game-header h2 {
   margin: 0;
+}
+
+.add-game-header .ghost-button {
+  width: auto;
+  flex: 0 0 auto;
 }
 
 

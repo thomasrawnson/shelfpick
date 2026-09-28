@@ -1,6 +1,7 @@
 import {
   useState,
 } from "react"
+import { Link } from "react-router-dom"
 
 import {
   addGameToCollection,
@@ -8,6 +9,7 @@ import {
   type BGGSearchResult,
   type Game,
 } from "../../api/client"
+import { APP_PATHS } from "../../routes"
 
 
 type Props = {
@@ -51,6 +53,9 @@ function AddGameSearch({
     setError,
   ] = useState("")
 
+  const [status, setStatus] = useState("")
+  const [hasSearched, setHasSearched] = useState(false)
+
 
   async function search() {
     const cleaned =
@@ -62,6 +67,7 @@ function AddGameSearch({
 
     setSearching(true)
     setError("")
+    setStatus("")
 
     try {
       const found =
@@ -72,6 +78,7 @@ function AddGameSearch({
       setResults(
         found
       )
+      setHasSearched(true)
     } catch (err) {
       setError(
         err instanceof Error
@@ -92,6 +99,7 @@ function AddGameSearch({
     )
 
     setError("")
+    setStatus("")
 
     try {
       const game =
@@ -102,6 +110,8 @@ function AddGameSearch({
       onGameAdded(
         game
       )
+
+      setStatus(`${game.name} added to your collection.`)
 
       setResults(
         (current) =>
@@ -131,14 +141,10 @@ function AddGameSearch({
 
 
   return (
-    <section className="add-game-panel">
+    <section className="add-game-panel" id="add-game-panel" aria-labelledby="add-game-heading">
       <div className="add-game-header">
         <div>
-          <p className="eyebrow">
-            Add a game
-          </p>
-
-          <h2>
+          <h2 id="add-game-heading">
             Search BoardGameGeek
           </h2>
         </div>
@@ -153,10 +159,13 @@ function AddGameSearch({
       </div>
 
 
-      <div className="add-game-search-row">
+      <form className="add-game-search-row" onSubmit={(event) => { event.preventDefault(); void search() }}>
+        <label className="sr-only" htmlFor="add-game-query">Game title</label>
         <input
+          id="add-game-query"
           className="setup-input"
           type="search"
+          autoFocus
           value={query}
           placeholder="e.g. Heat: Pedal to the Metal"
           onChange={(event) =>
@@ -164,39 +173,34 @@ function AddGameSearch({
               event.target.value
             )
           }
-          onKeyDown={(event) => {
-            if (
-              event.key
-              === "Enter"
-            ) {
-              void search()
-            }
-          }}
         />
 
         <button
-          type="button"
+          type="submit"
           className="primary-button"
           disabled={
             searching
             || query.trim()
               .length < 2
           }
-          onClick={() =>
-            void search()
-          }
         >
           {searching
             ? "Searching..."
             : "Search"}
         </button>
-      </div>
+      </form>
 
 
       {error && (
-        <p className="error-message">
+        <p className="error-message" role="alert">
           {error}
         </p>
+      )}
+
+      {status && <p className="setup-success add-game-status" role="status">{status}</p>}
+
+      {hasSearched && !searching && results.length === 0 && !error && (
+        <p className="add-game-no-results">No BoardGameGeek games matched that title. Try another search.</p>
       )}
 
 
@@ -248,6 +252,10 @@ function AddGameSearch({
           ),
         )}
       </div>
+
+      <p className="add-game-import">
+        Adding a whole shelf? <Link to={APP_PATHS.settingsCollectionData}>Import from BoardGameGeek</Link>
+      </p>
     </section>
   )
 }

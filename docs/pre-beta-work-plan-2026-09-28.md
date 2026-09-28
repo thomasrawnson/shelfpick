@@ -137,9 +137,31 @@ Reduce excess card/section padding and empty space while preserving artwork, rea
 
 ### SP-PB09 — Expand Collection filters and strengthen Add game
 
-**Status:** NOT STARTED. **Workstream:** Collection UI. **Access:** Existing access.
+**Status:** COMPLETE (28 September 2026, add-game discoverability scope). **Workstream:** Collection UI. **Access:** Existing access.
 
 Audit existing filters first; proposed additions are player count, duration, complexity, cooperative/competitive and recorded/unrecorded play history, only where data supports truthful filtering. Combine filters, show active count, clear/reset and no-match recovery; retain independent Owned/Want to Play state and scroll. Make Add game a prominent labelled action on populated and empty views. Tom confirmed that Add game is currently not obvious. Use a visible labelled Add game action rather than relying on an ambiguous icon or an empty-state-only entry. When barcode scanning ships, offer Search and Scan barcode from this entry.
+
+The confirmed add-game discoverability scope is complete. Populated and
+filtered-no-match Owned views now keep a prominent labelled **Add game** action;
+the genuinely empty shelf has its own primary Add game action plus a route to
+the existing Collection & Data BGG import. The action reuses the existing
+BoardGameGeek search/add panel, now with an associated search label, initial
+keyboard focus, restored trigger focus on Close, explicit success/no-results
+feedback and a Collection & Data import link. Existing duplicate disabling,
+API validation/error recovery, filters, sorting, independent Collection UI
+state and browser-Back restoration are preserved. Barcode scanning and the
+proposed broader filter expansion were not introduced.
+
+Validation: 42 frontend tests passed, including focused empty/filtered recovery,
+single-merge duplicate prevention and reuse of the existing search/import flow.
+Build, lint, colour-token guard, PWA checks and `git diff --check` passed.
+Mocked Playwright verified populated, empty, filtered and add-search states at
+390 and 1440px in light/dark, plus search → add → visible result, duplicate
+handling, failed-add retry with retained input, Cancel focus, Collection
+search/sort preservation, browser Back, keyboard access, bottom-nav clearance
+and overflow. Before/after captures are in `docs/screenshots/sp-pb09/`. No live
+account, backend or database data was used. SP-PB20 remains pending, SP-PB02
+remains blocked and beta remains on hold.
 
 ### SP-PB10 — Add optional play location
 

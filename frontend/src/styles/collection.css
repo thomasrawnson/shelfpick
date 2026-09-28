@@ -289,6 +289,32 @@
   margin: 8px auto 16px;
 }
 
+.collection-empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.collection-empty-actions a {
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+@media (max-width: 380px) {
+  .collection-heading-row {
+    align-items: stretch;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .collection-add-button {
+    align-self: flex-start;
+    margin-top: 0;
+  }
+}
+
 .collection-back {
   align-self: flex-start;
 

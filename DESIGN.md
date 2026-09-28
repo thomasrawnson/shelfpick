@@ -140,6 +140,17 @@ BGG sync and BG Stats import together without unrelated account controls and
 retains BoardGameGeek attribution. This structure does not add a primary-nav
 destination or change Free/Pro access.
 
+## Collection Add game update — 28 September 2026
+
+Owned Collection keeps Add game visible as a labelled Forest action when games
+are present or filters have no matches. The genuinely empty shelf uses the same
+action as its primary next step and offers BGG import through Collection & Data.
+Manual addition remains an inline, focused BoardGameGeek search panel: opening
+moves focus to its labelled query, Close returns focus to the trigger, and
+success, no-result and failure states remain visible without discarding the
+query. Collection filters, sorting and navigation state remain outside and
+unchanged by the add task.
+
 ## Overview
 
 **Creative North Star: "The Considered Game Shelf"**
