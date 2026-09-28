@@ -16,6 +16,7 @@ const freeBenefits = [
 const proBenefits = [
   "Get For You recommendations shaped by your shelf",
   "Use your play patterns and preferences to find a better fit",
+  "Let guests vote from their phones on a Game Night shortlist",
 ]
 
 const features: ComparisonFeature[] = [
@@ -24,6 +25,7 @@ const features: ComparisonFeature[] = [
   { name: "Play tracking", detail: "Log and review your plays", free: true, pro: true },
   { name: "Discover", detail: "Hot and Top 100", free: true, pro: true },
   { name: "Game Night", detail: "Basic group picker", free: true, pro: true },
+  { name: "Phone voting", detail: "Guest voting for Game Night", free: false, pro: true },
   { name: "For You", detail: "Personalised recommendations", free: false, pro: true },
 ]
 

@@ -75,6 +75,46 @@ export interface PickerMatch {
   ai_explanation?: string | null
 }
 
+export interface GameNightVotingCandidate {
+  bgg_id: number
+  name: string
+  thumbnail_url: string | null
+}
+
+export interface GameNightVotingResults {
+  counts: { bgg_id: number; votes: number }[]
+  abstain_count: number
+  total_ballots: number
+  winner_bgg_ids: number[]
+  outcome: "winner" | "tie" | "no_votes"
+}
+
+export interface GameNightVotingGuest {
+  display_name: string
+  current_vote: number | null
+  has_submitted: boolean
+}
+
+export interface GameNightVotingState {
+  status: "open" | "closed" | "expired"
+  candidates: GameNightVotingCandidate[]
+  participant_count: number
+  ballots_submitted: number
+  results: GameNightVotingResults | null
+}
+
+export interface GameNightVotingHostState extends GameNightVotingState {
+  session_id: string
+  expires_at: string
+  participant_names: string[]
+  join_url?: string
+}
+
+export interface GameNightVotingPublicState extends GameNightVotingState {
+  guest: GameNightVotingGuest | null
+  guest_credential?: string
+}
+
 export interface PickerNoMatchGuidance {
   owned_game_count: number
   player_count_exclusions: number
@@ -1111,6 +1151,94 @@ export async function getGameNightRecommendations(
     throw new Error(`Game Night request failed: ${response.status}`)
   }
 
+  return response.json()
+}
+
+export async function openGameNightVoting(
+  candidateBggIds: number[],
+): Promise<GameNightVotingHostState> {
+  const response = await apiFetch("/game-night/voting", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ candidate_bgg_ids: candidateBggIds }),
+  })
+  if (!response.ok) {
+    throw await responseError(response, "Couldn't open phone voting.")
+  }
+  return response.json()
+}
+
+export async function getGameNightVotingHostState(
+  sessionId: string,
+): Promise<GameNightVotingHostState> {
+  const response = await apiFetch(`/game-night/voting/sessions/${sessionId}`)
+  if (!response.ok) {
+    throw await responseError(response, "Couldn't refresh voting.")
+  }
+  return response.json()
+}
+
+export async function closeGameNightVoting(
+  sessionId: string,
+): Promise<GameNightVotingHostState> {
+  const response = await apiFetch(
+    `/game-night/voting/sessions/${sessionId}/close`,
+    { method: "POST" },
+  )
+  if (!response.ok) {
+    throw await responseError(response, "Couldn't close voting.")
+  }
+  return response.json()
+}
+
+function guestVotingHeaders(credential?: string | null): HeadersInit {
+  return credential ? { "X-Game-Night-Guest": credential } : {}
+}
+
+export async function getGameNightVotingGuestState(
+  joinToken: string,
+  credential?: string | null,
+): Promise<GameNightVotingPublicState> {
+  const response = await apiFetch(`/game-night/voting/${joinToken}`, {
+    headers: guestVotingHeaders(credential),
+  })
+  if (!response.ok) {
+    throw await responseError(response, "Couldn't load this voting session.")
+  }
+  return response.json()
+}
+
+export async function joinGameNightVoting(
+  joinToken: string,
+  displayName: string,
+): Promise<GameNightVotingPublicState> {
+  const response = await apiFetch(`/game-night/voting/${joinToken}/join`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ display_name: displayName }),
+  })
+  if (!response.ok) {
+    throw await responseError(response, "Couldn't join this voting session.")
+  }
+  return response.json()
+}
+
+export async function submitGameNightBallot(
+  joinToken: string,
+  credential: string,
+  candidateBggId: number | null,
+): Promise<GameNightVotingPublicState> {
+  const response = await apiFetch(`/game-night/voting/${joinToken}/ballot`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...guestVotingHeaders(credential),
+    },
+    body: JSON.stringify({ candidate_bgg_id: candidateBggId }),
+  })
+  if (!response.ok) {
+    throw await responseError(response, "Couldn't save your vote.")
+  }
   return response.json()
 }
 

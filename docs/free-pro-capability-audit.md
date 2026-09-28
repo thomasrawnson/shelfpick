@@ -29,7 +29,7 @@ entitlement, purchase claim or billing behavior changed. Beta remains on hold.
 | Branded play sharing | Previews and exports a persisted play as a ShelfPick-branded PNG, with native file sharing where supported and download fallback. Names, scores and location are explicit privacy choices. | Free and Pro | The saved-play action has no frontend tier check and needs no new backend endpoint; it consumes the already authenticated, user-scoped play history response. | Collection-history plays only. No public upload, public play URL, automatic posting, recipient selection or social integration. Native OS sharing and physical-device rendering remain pre-beta checks. |
 | Live play duration | One recoverable timer per account with Start, Pause, Resume, Finish, an app-wide indicator and explicit play review before save. | Pro only | Frontend exposes controls only with `live_play_enhancements`; every timer endpoint independently enforces the same capability. Persisted user ownership and a unique account timer isolate sessions. | In-app PWA only. No lock-screen/Live Activity, ongoing notification, notification permission request or guaranteed background execution. |
 | Insights | Collection, play, monthly, game and group facts, including valid facts from one recorded play. | Free and Pro | Frontend route is always available. Backend service is authenticated/user-scoped; no Pro capability check. | `advanced_stats` is an entitlement name only; there is no separately implemented advanced Insights surface. |
-| Game Night | Builds a 3–5 game shortlist from the host’s owned collection using attendees, time, exact-player suitability, general play history and exact-group history. | Basic Game Night is Free and Pro | Frontend checks `game_night_basic`. Backend independently checks the same capability and validates player IDs against the current user. | `game_night_enhanced` is an entitlement name only; no enhanced mode is implemented. |
+| Game Night | Builds a 3–5 game shortlist from the host’s owned collection using attendees, time, exact-player suitability, general play history and exact-group history. A Pro host can open session-scoped phone voting for that shortlist; guests join without registration, keep one editable browser ballot and see shared closed results. | Basic Game Night is Free and Pro; phone voting is Pro | Frontend checks `game_night_basic` for the core flow and `game_night_enhanced` for the host voting action. Backend independently enforces both boundaries, restricts voting controls to the owner and exposes only token-scoped shortlist/vote state to guests. | Guest-browser identity cannot guarantee one real person across browsers/devices. Physical QR scanning and real cross-network/deployed-origin use remain pre-beta validation. No invitations, chat, push, vetoes or attendee-identity verification. |
 
 ## For You evidence
 
@@ -81,11 +81,11 @@ entitlement, purchase claim or billing behavior changed. Beta remains on hold.
    current disabled action is truthful.
 2. **Entitlement contract still overstates some implementation:**
    `advanced_recommendations` now independently enables the Picker personal-
-   ranking signal and `live_play_enhancements` enables the timer. Pro still
-   receives `advanced_stats` and `game_night_enhanced` although no corresponding
-   behaviour is enforced or exposed. Before sale, expose only implemented
-   capabilities or explicitly separate planned capability identifiers from
-   granted entitlements.
+   ranking signal, `live_play_enhancements` enables the timer and
+   `game_night_enhanced` enables owner-controlled phone voting. Pro still
+   receives `advanced_stats` although no corresponding behaviour is enforced
+   or exposed. Before sale, expose only implemented capabilities or explicitly
+   separate planned capability identifiers from granted entitlements.
 3. **For You resilience is process-local:** persist a last-known-good candidate
    snapshot, define freshness, and verify restart behaviour. Candidate metadata
    also needs an intentional failure/fallback policy.
@@ -118,6 +118,21 @@ Acceptance criteria:
   £3.99 one-off checkout remains the subsequent commercial implementation.
 
 ## Validation record
+
+SP-PB18 addendum (28 September): 40 focused backend tests covered owner and
+join-token scope, Pro enforcement, one idempotent ballot per guest, changed and
+abstaining votes, browser credential recovery, ties/no-vote results, expiry,
+closed-session rejection, rate-limit regressions and join-token log redaction.
+The additive migration upgraded a fresh isolated PostgreSQL 16 database,
+`alembic check` found no drift and a separate database session restored and
+changed one persisted ballot before close. Eleven focused frontend tests,
+ESLint, the production build and `git diff --check` passed. A mocked host/guest
+390×844 Chrome flow covered open, join, vote, reload, change, close and shared
+results; macOS Vision decoded the QR to the exact displayed join URL. No
+production data or deployment was used. Physical-phone scanning, two real
+devices/networks and a deployed configured origin remain pre-beta validation.
+SP-PB02 remains blocked, photo upload remains post-beta and beta remains on
+hold.
 
 SP-PB15 addendum (28 September): 30 focused backend tests covered deterministic
 recommendations with and without ranking affinity, the +3.0 cap, sparse/tied

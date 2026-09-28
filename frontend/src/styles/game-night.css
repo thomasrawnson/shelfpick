@@ -80,6 +80,151 @@
   margin-top: 0;
 }
 
+.game-night-voting-upsell,
+.game-night-guest-results {
+  padding: var(--space-3);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.game-night-voting-upsell p,
+.game-night-guest-results p {
+  margin: 0 0 var(--space-2);
+}
+
+.game-night-qr {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-3);
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.game-night-qr svg {
+  width: min(220px, 100%);
+  height: auto;
+}
+
+.game-night-join-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-2);
+}
+
+.game-night-join-link input,
+.game-night-join-link .secondary-button {
+  margin: 0;
+}
+
+.game-night-participation {
+  margin: 0;
+  padding: var(--space-3);
+  text-align: center;
+  font-weight: 700;
+  background: var(--color-forest-soft);
+  border-radius: var(--radius-md);
+}
+
+.game-night-join-form,
+.game-night-ballot {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.game-night-join-form label,
+.game-night-ballot legend {
+  font-weight: 700;
+}
+
+.game-night-ballot fieldset {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.game-night-ballot legend {
+  margin-bottom: var(--space-2);
+}
+
+.game-night-ballot-option {
+  display: grid;
+  grid-template-columns: auto 48px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 56px;
+  padding: var(--space-2);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.game-night-ballot-option:has(input:checked) {
+  background: var(--color-forest-soft);
+  border-color: var(--color-forest);
+}
+
+.game-night-ballot-option img {
+  width: 48px;
+  height: 56px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+}
+
+.game-night-abstain-option {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.game-night-vote-results {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.game-night-vote-results li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.game-night-vote-results li > div,
+.game-night-vote-results li > span:first-child {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.game-night-result-label {
+  color: var(--color-gold-text);
+  font-size: var(--text-support);
+  font-weight: 700;
+}
+
+.game-night-guest-screen > .brand-logo {
+  align-self: center;
+}
+
+@media (max-width: 390px) {
+  .game-night-join-link {
+    grid-template-columns: 1fr;
+  }
+
+  .game-night-vote-results li {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
 @media (max-width: 360px) {
   .game-night-shortlist li {
     grid-template-columns: 60px minmax(0, 1fr);

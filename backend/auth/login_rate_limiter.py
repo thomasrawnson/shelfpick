@@ -100,13 +100,19 @@ login_rate_limiter = (
 
 
 class AuthRequestRateLimiter:
-    def __init__(self):
+    def __init__(
+        self,
+        max_requests: int = MAX_AUTH_REQUESTS,
+        window_seconds: int = AUTH_REQUEST_WINDOW_SECONDS,
+    ):
         self._requests: dict[
             str,
             deque[float],
         ] = defaultdict(deque)
 
         self._lock = Lock()
+        self.max_requests = max_requests
+        self.window_seconds = window_seconds
 
 
     def is_limited(
@@ -124,7 +130,7 @@ class AuthRequestRateLimiter:
 
             return (
                 len(requests)
-                >= MAX_AUTH_REQUESTS
+                >= self.max_requests
             )
 
 
@@ -153,13 +159,13 @@ class AuthRequestRateLimiter:
             self._requests.clear()
 
 
-    @staticmethod
     def _prune(
+        self,
         requests: deque[float],
     ) -> None:
         cutoff = (
             time.monotonic()
-            - AUTH_REQUEST_WINDOW_SECONDS
+            - self.window_seconds
         )
 
         while (
@@ -176,4 +182,11 @@ verification_request_rate_limiter = (
 
 password_reset_request_rate_limiter = (
     AuthRequestRateLimiter()
+)
+
+game_night_join_rate_limiter = (
+    AuthRequestRateLimiter(
+        max_requests=30,
+        window_seconds=15 * 60,
+    )
 )

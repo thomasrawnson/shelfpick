@@ -73,3 +73,20 @@ def test_game_night_endpoint_uses_entitlement_and_picker_rules():
     assert len(data) == 5
     assert all(item["game"]["bgg_id"] != 99 for item in data)
     assert all("From your collection" in item["reasons"] for item in data)
+
+
+def test_free_host_cannot_open_enhanced_phone_voting():
+    app.dependency_overrides[get_current_user] = lambda: SimpleNamespace(
+        id=1, tier="FREE",
+    )
+
+    try:
+        response = client.post(
+            "/game-night/voting",
+            json={"candidate_bgg_ids": [1, 2, 3]},
+        )
+    finally:
+        app.dependency_overrides.clear()
+
+    assert response.status_code == 403
+    assert response.json()["detail"] == "Phone voting requires ShelfPick Pro."

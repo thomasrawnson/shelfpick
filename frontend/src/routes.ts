@@ -22,6 +22,7 @@ export const APP_PATHS = {
   collectionRanking:
     "/collection/ranking",
   gameNight: "/game-night",
+  gameNightJoin: "/game-night/join",
   liveTimer: "/live-timer",
   rankings: "/rankings",
   discover: "/discover",
@@ -37,6 +38,19 @@ export const APP_PATHS = {
   settingsAbout: "/settings/about",
   settingsPro: "/settings/pro",
 } as const
+
+
+export function gameNightJoinToken(pathname: string): string | null {
+  const prefix = `${APP_PATHS.gameNightJoin}/`
+  if (!pathname.startsWith(prefix)) return null
+  const token = pathname.slice(prefix.length)
+  if (!token || token.includes("/")) return null
+  try {
+    return decodeURIComponent(token)
+  } catch {
+    return token
+  }
+}
 
 
 export function collectionPath(

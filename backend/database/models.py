@@ -753,6 +753,91 @@ class PickerEvent(Base):
     )
 
 
+class GameNightVotingSession(Base):
+    __tablename__ = "game_night_voting_sessions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    public_id: Mapped[str] = mapped_column(
+        String(36), unique=True, nullable=False, index=True,
+    )
+    join_token_hash: Mapped[str] = mapped_column(
+        String(64), unique=True, nullable=False, index=True,
+    )
+    host_user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True,
+    )
+    status: Mapped[str] = mapped_column(
+        String(12), nullable=False, default="open", server_default="open",
+    )
+    candidates: Mapped[list[dict]] = mapped_column(JSON, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False,
+    )
+    closed_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True,
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(),
+    )
+
+
+class GameNightGuest(Base):
+    __tablename__ = "game_night_guests"
+
+    __table_args__ = (
+        UniqueConstraint(
+            "session_id", "credential_hash",
+            name="uq_game_night_guest_session_credential",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    public_id: Mapped[str] = mapped_column(
+        String(36), unique=True, nullable=False, index=True,
+    )
+    session_id: Mapped[int] = mapped_column(
+        ForeignKey("game_night_voting_sessions.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    credential_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    display_name: Mapped[str] = mapped_column(String(40), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(),
+    )
+
+
+class GameNightBallot(Base):
+    __tablename__ = "game_night_ballots"
+
+    __table_args__ = (
+        UniqueConstraint(
+            "session_id", "guest_id",
+            name="uq_game_night_ballot_session_guest",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    session_id: Mapped[int] = mapped_column(
+        ForeignKey("game_night_voting_sessions.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    guest_id: Mapped[int] = mapped_column(
+        ForeignKey("game_night_guests.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    candidate_bgg_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(),
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+
 class GameRanking(Base):
     __tablename__ = "game_rankings"
 

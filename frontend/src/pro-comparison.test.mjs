@@ -69,6 +69,7 @@ test("comparison lists only available features with accessible inclusion labels"
   const row = name => markup.match(new RegExp(`<tr><th scope="row"><span>${name}<\\/span>.*?<\\/th>(.*?)<\\/tr>`))?.[1]
   assert.match(row("Collection"), /Included.*Included/)
   assert.match(row("Game Night"), /Included.*Included/)
+  assert.match(row("Phone voting"), /Not included.*Included/)
   assert.match(row("For You"), /Not included.*Included/)
   assert.match(markup, /ShelfPick Free and Pro feature comparison/)
   assert.match(markup, /Only features already available in ShelfPick are listed here/)

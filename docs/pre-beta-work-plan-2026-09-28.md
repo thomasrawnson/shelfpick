@@ -479,9 +479,42 @@ SP-PB02 remains blocked and beta remains on hold.
 
 ### SP-PB18 — Make Game Night a group decision with voting
 
-**Status:** NOT STARTED. **Workstream:** Group feature. **Access:** Enhanced voting tier to confirm; basic Game Night stays Free.
+**Status:** COMPLETE — SP-PB18A/B/C phone-voting scope, 28 September 2026.
+**Workstream:** Group feature. **Access:** Pro via the existing
+`game_night_enhanced` entitlement; basic Game Night stays Free.
 
 Keep Game Night separate from Picker: attendees and constraints → eligible 3–5 game shortlist with group reasons → votes → clear winner/tie resolution → reveal → log play. Voting must affect the result, with at most one current ballot per attendee, editable choices and explicit abstention/tie handling. Confirmed joining flow: the host displays a session QR code; attendees scan it and vote on their own phones. Split into SP-PB18A session/membership and vote rules, SP-PB18B host QR and mobile guest voting, and SP-PB18C cross-device results/recovery. Propose guest participation without mandatory account creation, with host-confirmed attendee slots and session-scoped credentials; QR possession must not expose the host's account or grant host controls. Store ballots authoritatively on the server; prevent duplicate ballots for the same admitted participant, scope all writes to that session and avoid claiming anonymous access is identity-proof. Support refresh/reconnect, voting-open/closed/expired states, host close/revoke, invalid links, concurrent votes and shared winner display. QR sharing must work across different networks through the deployed app URL, not a localhost URL. Provide a copyable join-link fallback. Verify two independent phone/browser contexts plus host. Polling is acceptable if it meets the UX; do not assume WebSockets are required. Reset/reconfirm ballots when shortlist or attendance changes. Never fabricate attendee-owned collections or group preferences. Split session/vote rules and UI integration into separate tasks.
+
+Delivered behaviour: the selected shortlist is snapshotted when its Pro host
+opens voting and cannot silently change beneath existing ballots. The backend
+stores only necessary candidate fields, hashes 32-byte URL-safe join and guest
+credentials, scopes host controls to the owner, caps a session at 20 guests and
+expires it after 12 hours. Guest joins reuse the bounded request limiter. A
+unique session/guest constraint and idempotent PUT keep one editable ballot per
+guest identity, including abstention; closed sessions reject writes. Request
+logs redact join tokens. Modest four-second polling runs only on visible host
+and guest voting screens. Results distinguish winner, tie and no-vote outcomes,
+then preserve the host's existing final selection, reveal and play entry.
+
+The implemented guest model uses a display name and session-scoped browser
+credential without registration. Refresh/reconnect restores that browser's
+identity and current ballot. It deliberately does not claim one real person
+across different browsers/devices; host-confirmed reusable attendee identity,
+explicit participant revocation, vetoes and invitations remain outside this
+slice. No wider host collection, account details or play history are public.
+
+Evidence: 40 focused backend service/API/entitlement/auth/logging tests passed.
+An additive migration upgraded a fresh isolated PostgreSQL 16 database,
+`alembic check` reported no drift, and a second database session restored and
+changed exactly one persisted ballot before close. Eleven focused frontend
+tests, ESLint, production build and `git diff --check` passed. A mocked two-
+context Chrome flow at 390×844 covered open → join → vote → reload → change →
+close → results with no horizontal overflow. macOS Vision decoded the rendered
+QR payload to the exact displayed configured-origin join link. The
+representative capture is `docs/screenshots/sp-pb18/game-night-phone-voting.png`.
+Physical-phone scanning, two real devices/networks and a deployed origin remain
+pre-beta checks. SP-PB02 remains blocked, photo upload remains post-beta and
+beta remains on hold.
 
 ### SP-PB19 — Add play challenges
 

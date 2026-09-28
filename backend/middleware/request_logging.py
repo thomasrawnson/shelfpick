@@ -13,6 +13,18 @@ logger = logging.getLogger(
 )
 
 
+def safe_request_path(path: str) -> str:
+    prefix = "/game-night/voting/"
+    if not path.startswith(prefix):
+        return path
+    remainder = path[len(prefix):]
+    if remainder.startswith("sessions/"):
+        return path
+    parts = remainder.split("/", 1)
+    suffix = f"/{parts[1]}" if len(parts) > 1 else ""
+    return f"{prefix}[join-token]{suffix}"
+
+
 class RequestLoggingMiddleware(
     BaseHTTPMiddleware
 ):
@@ -57,7 +69,7 @@ class RequestLoggingMiddleware(
                 ),
                 request_id,
                 request.method,
-                request.url.path,
+                safe_request_path(request.url.path),
                 duration_ms,
             )
 
@@ -83,7 +95,7 @@ class RequestLoggingMiddleware(
             ),
             request_id,
             request.method,
-            request.url.path,
+            safe_request_path(request.url.path),
             response.status_code,
             duration_ms,
         )

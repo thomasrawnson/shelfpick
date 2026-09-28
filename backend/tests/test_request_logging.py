@@ -3,9 +3,19 @@ from fastapi.testclient import (
 )
 
 from api.main import app
+from middleware.request_logging import safe_request_path
 
 
 client = TestClient(app)
+
+
+def test_game_night_join_tokens_are_redacted_from_request_paths():
+    assert safe_request_path(
+        "/game-night/voting/secret-token/ballot"
+    ) == "/game-night/voting/[join-token]/ballot"
+    assert safe_request_path(
+        "/game-night/voting/sessions/host-session"
+    ) == "/game-night/voting/sessions/host-session"
 
 
 def test_response_contains_request_id():

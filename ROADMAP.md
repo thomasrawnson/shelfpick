@@ -261,7 +261,8 @@ fallbacks, and do not change the logo or Free/Pro proposition as part of UI-1.
 7. SP-PB15 Pro ranking recommendations are COMPLETE; SP-PB16 scanning remains pending;
    SP-PB17 preset avatars are complete. Photo upload is a post-beta follow-up,
    not a beta blocker.
-8. SP-PB18–19: Game Night voting and Pro challenges.
+8. SP-PB18 Game Night phone voting — COMPLETE; SP-PB19 Pro challenges remain
+   pending.
 9. Reconcile Free/Pro claims, complete validation and existing release gates.
 10. Resume private beta only after Tom's explicit decision, then public launch.
 
@@ -667,10 +668,10 @@ Private Beta without overbuilding it.
 
 ### Coming after MVP / beta validation
 
-- Guest invite links.
+- Guest invite links and phone voting — delivered by SP-PB18.
 - Saved regular groups.
-- Voting and vetoes.
-- Shared reveal across devices.
+- Single-choice voting and shared results — delivered by SP-PB18; vetoes remain
+  future work.
 - Better cross-user collection linking.
 - Group preference learning.
 - Game Night history and recaps.
@@ -678,6 +679,31 @@ Private Beta without overbuilding it.
 - Group-specific statistics.
 - Scheduling and recurring Game Nights.
 - Club and cafe hosting tools.
+
+### SP-PB18 follow-up — COMPLETE, 28 September 2026
+
+Pro hosts can explicitly open phone voting for the existing immutable 3–5 game
+shortlist. ShelfPick creates a 12-hour, unguessable session-scoped join token,
+builds the join URL from the configured frontend origin and renders that exact
+URL as an accessible QR code with a copy fallback. Guests need only a bounded
+display name. A hashed browser credential restores that guest's single
+authoritative ballot after refresh and supports idempotent retries, vote
+changes and explicit abstention while voting remains open.
+
+The backend restricts open/status/close controls to the authenticated owner and
+the existing `game_night_enhanced` Pro entitlement. Public session responses
+contain only the shortlist and voting state, never collection, account or play
+history. Sessions accept at most 20 guests; joins reuse the established bounded
+request limiter. The host sees participation rather than live tally influence,
+closes voting explicitly, then receives truthful winner, tie or no-vote
+results and still confirms the final game through the existing reveal/log flow.
+Basic Game Night remains Free through `game_night_basic`.
+
+Guest identity is intentionally browser/session scoped: it cannot prove one
+real person has not joined from a different browser or device. No account
+registration, chat, invitations, push, public directory, WebSocket or new
+navigation was added. SP-PB02 remains BLOCKED, photo upload remains post-beta
+and beta remains on hold.
 
 ### Acceptance criteria
 

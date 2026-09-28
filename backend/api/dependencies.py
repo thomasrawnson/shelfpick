@@ -5,6 +5,7 @@ from bgg.client import BGGClient
 from database.connection import get_db
 from database.models import User
 from repositories.game_repository import GameRepository
+from repositories.game_night_voting_repository import GameNightVotingRepository
 from repositories.insights_repository import InsightsRepository
 from repositories.play_repository import PlayRepository
 from repositories.picker_analytics_repository import (
@@ -46,6 +47,12 @@ def get_game_service(
         repository,
         user_id=current_user.id,
     )
+
+
+def get_game_night_voting_repository(
+    db: Session = Depends(get_db),
+) -> GameNightVotingRepository:
+    return GameNightVotingRepository(db)
 
 
 def get_collection_service(

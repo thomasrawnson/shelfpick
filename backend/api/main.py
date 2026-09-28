@@ -67,6 +67,7 @@ app.add_middleware(
     allow_headers=[
     "Authorization",
     "Content-Type",
+    "X-Game-Night-Guest",
     "X-Request-ID",
     ],
     expose_headers=[

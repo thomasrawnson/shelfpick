@@ -6,6 +6,7 @@ import {
   appViewForPath,
   collectionGamePath,
   collectionPath,
+  gameNightJoinToken,
   safeReturnPath,
   wishlistGamePath,
 } from "./routes.ts"
@@ -29,6 +30,20 @@ test("collection routes represent section and game selection", () => {
   assert.equal(
     wishlistGamePath(42),
     "/collection/want-to-play/42",
+  )
+})
+
+
+test("Game Night guest links remain public session-scoped routes", () => {
+  assert.equal(
+    gameNightJoinToken("/game-night/join/guest-token"),
+    "guest-token",
+  )
+  assert.equal(gameNightJoinToken("/game-night"), null)
+  assert.equal(gameNightJoinToken("/game-night/join/"), null)
+  assert.equal(
+    safeReturnPath("/game-night/join/guest-token"),
+    null,
   )
 })
 

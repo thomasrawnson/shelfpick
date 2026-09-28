@@ -206,6 +206,23 @@ logic, the BoardGameGeek Not Recommended >=30% exclusion, routes, deep links,
 browser Back behaviour, collection state and scroll restoration. Logo work and
 the Free/Pro proposition are separate pre-beta priorities.
 
+### Game Night phone voting — 28 September 2026
+
+The host explicitly opens voting from an existing shortlist. The host screen
+centres an accessible QR code, provides the same URL in a copyable field and
+shows joined/submitted progress without revealing live tallies. The mobile
+guest surface is a narrow public session view with ShelfPick branding, a
+bounded display-name join step, large single-choice ballot rows, explicit
+abstention and accurate saved/error states. It never exposes the host's wider
+collection, account or play history.
+
+After closure, host and guests see the same winner, tie or no-vote facts. The
+host retains the established **Choose this game** confirmation before reveal
+and play logging. Copy explains that a session-scoped browser identity restores
+one ballot but cannot guarantee one real person across multiple browsers or
+devices. Invalid and expired links explain that the session is unavailable;
+closed links show final results.
+
 ## Colors
 
 **The Forest Means Action Rule.** Use Forest Green for primary actions, selected controls, active navigation, focus rings and interactive affordances that move the user forward.

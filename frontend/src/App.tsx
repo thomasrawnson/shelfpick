@@ -36,6 +36,7 @@ import DiscoverView from "./components/DiscoverView";
 import InsightsView from "./components/InsightsView";
 
 import GameNightView from "./components/GameNightView";
+import GameNightGuestVotingView from "./components/GameNightGuestVotingView";
 
 import OnboardingView from "./components/OnboardingView";
 
@@ -64,6 +65,7 @@ import {
   collectionGamePath,
   collectionPath,
   isProtectedAppPath,
+  gameNightJoinToken,
   safeReturnPath,
   wishlistGamePath,
 } from "./routes";
@@ -395,6 +397,12 @@ function App() {
     navigate(collectionGamePath(bggId));
   }
 
+  const guestVotingToken = gameNightJoinToken(location.pathname);
+
+  if (guestVotingToken) {
+    return pageShell(<GameNightGuestVotingView joinToken={guestVotingToken} />);
+  }
+
   if (location.pathname === APP_PATHS.forgotPassword) {
     return pageShell(<ForgotPasswordView />);
   }
@@ -516,6 +524,7 @@ function App() {
                 <GameNightView
                   defaultTime={user.preferred_play_time}
                   enabled={user.entitlements.includes("game_night_basic")}
+                  votingEnabled={user.entitlements.includes("game_night_enhanced")}
                   onBack={() => navigate(APP_PATHS.picker)}
                   onViewGame={openOwnedCollectionGame}
                   onUnlockPro={() => navigate(APP_PATHS.settingsPro)}
