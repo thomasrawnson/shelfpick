@@ -160,8 +160,8 @@ Mocked Playwright verified populated, empty, filtered and add-search states at
 handling, failed-add retry with retained input, Cancel focus, Collection
 search/sort preservation, browser Back, keyboard access, bottom-nav clearance
 and overflow. Before/after captures are in `docs/screenshots/sp-pb09/`. No live
-account, backend or database data was used. SP-PB20 remains pending, SP-PB02
-remains blocked and beta remains on hold.
+account, backend or database data was used. SP-PB20 is recorded complete below;
+SP-PB02 remains blocked and beta remains on hold.
 
 ### SP-PB10 — Add optional play location
 
@@ -225,9 +225,30 @@ Proposed MVP: a personal goal for total recorded plays and a play-X-distinct-gam
 
 ### SP-PB20 — Simplify supporting text beneath headings
 
-**Status:** NOT STARTED. **Workstream:** UI copy cleanup. **Access:** All users.
+**Status:** COMPLETE (28 September 2026). **Workstream:** UI copy cleanup. **Access:** All users.
 
 Audit subtitles and supporting paragraphs beneath headings across Picker, Collection, Discover, Rankings, Insights, Game Night and Settings. Working interpretation of Tom's request: remove repetitive/redundant text that merely restates the heading; shorten useful instructions and move longer optional explanations into contextual help. Keep meaningful personalised/fallback explanations, units, error recovery, empty-state guidance, entitlement limitations and accessibility labels. Do not fill the released space with new filler copy. Capture before/after examples and verify mobile/desktop light/dark wrapping and screen-reader context. Complete alongside SP-PB05–09.
+
+Picker, Collection, Discover, Rankings, Insights, Game Night and Settings now
+use one clear page heading in the validated primary states. Repeated category
+eyebrows and generic subtitles were removed; Ranking's duplicated page headings
+were consolidated under **Rank your games**, and Insights loading/error states
+now retain **Insights** as their stable page heading with state copy beneath it.
+The remaining supporting copy changes the user's decision or explains scope:
+Picker still says choices come from the collection, Game Night explains the
+headcount/history input, and Ranking explains how choices improve the list.
+Personalisation/fallback explanations, units, actionable empty/error recovery,
+validation, entitlement limitations, BGG attribution and accessible names were
+deliberately retained. No routes, behaviour, state, scoring, access or backend
+contracts changed.
+
+Validation: all 42 frontend tests, build, lint, colour-token guard, PWA checks
+and `git diff --check` passed. Mocked Playwright inspected all seven scoped
+screens at 390 and 1440px in light/dark, asserted exactly one `h1`, exercised
+keyboard focus, checked bottom-navigation clearance and found no horizontal
+overflow. Twenty-eight before and 28 after captures are stored in
+`docs/screenshots/sp-pb20/`. No live account, API, backend or database data was
+used. SP-PB02 remains blocked and beta remains on hold.
 
 ## Shared definition of done
 

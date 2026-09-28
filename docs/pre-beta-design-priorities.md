@@ -148,7 +148,18 @@ focus, status and recovery states; no barcode or new navigation concept was
 introduced. Mocked Playwright covered populated, empty, filtered, search,
 success, duplicate and failure/retry states at 390 and 1440px in both themes,
 including Back/state restoration, keyboard focus, nav clearance and overflow.
-SP-PB20 remains pending.
+SP-PB20 is recorded complete below.
+
+SP-PB20 heading and supporting-copy cleanup completed on 28 September 2026.
+Across Picker, Collection, Discover, Rankings, Insights, Game Night and Settings,
+the primary states now have one page heading and supporting text appears only
+when it adds scope, instruction or recovery. Repeated eyebrows, generic taglines
+and the duplicated Ranking page heading were removed. Personalisation and
+fallback context, empty/error actions, validation, units, Free/Pro explanations,
+BGG attribution and accessible names remain because they change understanding
+or support recovery. Mocked Playwright verified all seven screens at 390 and
+1440px in light/dark, including heading semantics, keyboard focus, navigation
+clearance and overflow; captures are in `docs/screenshots/sp-pb20/`.
 
 ### UI-2 — core visual polish
 

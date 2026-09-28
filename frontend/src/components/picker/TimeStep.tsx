@@ -25,16 +25,14 @@ function TimeStep({
   onSelect,
   onFindGame,
   onBack,
-  supportingCopy = "One last choice, then we'll find the best fit from your collection.",
+  supportingCopy,
   actionLabel = "Find a game",
 }: Props) {
   return (
     <section className="screen picker-step-screen time-step-screen">
       <header>
         <h1>How much time is available?</h1>
-        <p className="subtitle">
-          {supportingCopy}
-        </p>
+        {supportingCopy && <p className="subtitle">{supportingCopy}</p>}
       </header>
 
       <div className="picker-step-centered">

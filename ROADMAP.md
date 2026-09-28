@@ -73,7 +73,8 @@ restore focus to the originating overview row. Focused tests and all frontend
 checks passed; mocked Playwright covered navigation, direct routes, persisted
 theme/profile preferences, keyboard focus, nav clearance and overflow at 390
 and 1440px in both themes. Captures are in `docs/screenshots/sp-pb05/`. That
-slice left Add game to SP-PB09; broader copy cleanup remains SP-PB20.
+slice left Add game to SP-PB09 and broader copy cleanup to SP-PB20; both are
+recorded complete below.
 
 SP-PB09 add-game discoverability is complete. Collection now presents a
 labelled Add game action on populated and filtered-no-match shelves, plus a
@@ -84,7 +85,19 @@ duplicate and failed-add recovery. Filters, sorting and Collection state survive
 Cancel and browser Back. Forty-two frontend tests and all frontend checks
 passed; mocked Playwright covered the flow at 390 and 1440px in both themes.
 Captures are in `docs/screenshots/sp-pb09/`. Broader proposed filters were not
-pulled into this bounded discoverability slice, and SP-PB20 remains pending.
+pulled into this bounded discoverability slice; SP-PB20 is recorded complete
+below.
+
+SP-PB20 is complete. Picker, Collection, Discover, Rankings, Insights, Game
+Night and Settings now use one clear page heading in their validated primary
+states, without repeated category eyebrows or generic subtitles. Ranking's two
+page headings were consolidated, and Insights keeps a stable heading while
+loading or reporting an error. Decision-supporting, personalised/fallback,
+empty/error recovery, entitlement, attribution, validation and accessibility
+copy remains intact. All 42 frontend tests and checks passed; mocked Playwright
+covered all seven screens at 390 and 1440px in both themes with one `h1`, visible
+keyboard focus, navigation clearance and no overflow. Captures are in
+`docs/screenshots/sp-pb20/`.
 
 After SP-PB02 is unblocked, address
 Picker defaults/navigation, UI and Settings, plays/statistics/sharing, ranking
@@ -215,8 +228,8 @@ fallbacks, and do not change the logo or Free/Pro proposition as part of UI-1.
 2. SP-PB02: restore reported Top 100 availability — **BLOCKED** pending an
    authorised official BGG ranked-data source; existing boundary logic verified.
 3. SP-PB03–04: selected-player count and saved play-style defaults.
-4. SP-PB05 Settings navigation and SP-PB09 Add game discoverability — COMPLETE;
-   SP-PB06–08 and SP-PB20 remain pending.
+4. SP-PB05 Settings navigation, SP-PB09 Add game discoverability and SP-PB20
+   heading/copy cleanup — COMPLETE; SP-PB06–08 remain pending.
 5. SP-PB10–11 and SP-PB14: location, Pro live duration and statistics.
 6. SP-PB12–13: branded play and monthly recap sharing.
 7. SP-PB15–17: Pro ranking recommendations, scanning and avatars.

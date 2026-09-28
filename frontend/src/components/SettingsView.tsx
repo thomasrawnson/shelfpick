@@ -41,7 +41,6 @@ function SettingsView({ user, onLogout }: { user: AuthUser; onLogout: () => void
   return <section className="screen settings-screen" aria-labelledby="settings-heading">
     <header className="settings-heading">
       <h1 id="settings-heading">Settings</h1>
-      <p>Manage your account, shelf and app.</p>
     </header>
 
     {groups.map(({ title, entries }) => {

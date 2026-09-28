@@ -194,13 +194,8 @@ function InsightsView({
   if (loading) {
     return (
       <section className="screen insights-screen">
-        <p className="eyebrow">
-          Your shelf
-        </p>
-
-        <h1>
-          Crunching the numbers...
-        </h1>
+        <h1>Insights</h1>
+        <p className="subtitle" role="status">Crunching the numbers...</p>
       </section>
     )
   }
@@ -212,13 +207,7 @@ function InsightsView({
   ) {
     return (
       <section className="screen insights-screen">
-        <p className="eyebrow">
-          Your shelf
-        </p>
-
-        <h1>
-          Collection insights
-        </h1>
+        <h1>Insights</h1>
 
         <p className="error-message">
           {error}
@@ -235,14 +224,7 @@ function InsightsView({
   return (
     <section className="screen insights-screen">
       <header>
-        <h1>
-          Insights
-        </h1>
-
-        <p className="subtitle">
-          Your collection, plays,
-          groups and memorable months.
-        </p>
+        <h1>Insights</h1>
       </header>
 
 

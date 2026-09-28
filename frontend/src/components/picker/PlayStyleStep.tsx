@@ -41,18 +41,9 @@ function PlayStyleStep({
   return (
     <section className="screen picker-selection-screen">
       <header>
-        <p className="eyebrow">
-          Preferences
-        </p>
-
         <h1>
           Pick a play style
         </h1>
-
-        <p className="subtitle">
-          Choose the kind of game
-          you feel like playing.
-        </p>
       </header>
 
 

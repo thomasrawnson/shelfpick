@@ -41,10 +41,6 @@ function ThemeStep({
   return (
     <section className="screen picker-selection-screen">
       <header>
-        <p className="eyebrow">
-          Preferences
-        </p>
-
         <h1>
           Pick a theme
         </h1>

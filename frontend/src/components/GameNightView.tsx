@@ -65,7 +65,6 @@ function GameNightView({ enabled, defaultTime = null, onBack, onViewGame, onUnlo
   if (!enabled) {
     return (
       <section className="screen game-night-screen game-night-locked">
-        <p className="eyebrow">Game Night</p>
         <h1>Game Night isn’t included</h1>
         <p>Compare plans to see what’s available with your ShelfPick access.</p>
         <button type="button" className="secondary-button" onClick={onUnlockPro}>
@@ -107,7 +106,6 @@ function GameNightView({ enabled, defaultTime = null, onBack, onViewGame, onUnlo
     return (
       <section className="screen game-night-screen">
         <header>
-          <p className="eyebrow">Game Night</p>
           <h1>Your shortlist</h1>
           <p className="subtitle">Choose one game to reveal for the group.</p>
         </header>
@@ -191,10 +189,9 @@ function GameNightView({ enabled, defaultTime = null, onBack, onViewGame, onUnlo
       </button>
 
       <header>
-        <p className="eyebrow">Game Night</p>
         <h1>Who's playing?</h1>
         <p className="subtitle">
-          Choose everyone at the table. Their exact headcount and shared history shape the shortlist.
+          Choose everyone at the table. Headcount and shared history shape the shortlist.
         </p>
       </header>
 

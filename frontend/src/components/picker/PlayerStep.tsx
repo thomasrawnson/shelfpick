@@ -134,7 +134,7 @@ function PlayerStep({
       <header>
         <h1>What should we play?</h1>
         <p className="subtitle">
-          Choose players, complexity and time. We'll pick from your collection.
+          Set the table and any limits. We’ll choose from your collection.
         </p>
       </header>
 

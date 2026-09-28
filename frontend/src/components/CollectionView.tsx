@@ -857,9 +857,9 @@ function CollectionView({
     return (
       <section className="screen collection-screen">
         <header>
-          <h1>Ranking</h1>
+          <h1>Rank your games</h1>
           <p className="subtitle">
-            Build your personal shelf ranking.
+            Choose the game you'd rather play. Each choice sharpens your ranking.
           </p>
         </header>
 
@@ -882,9 +882,6 @@ function CollectionView({
       <section className="screen collection-screen">
         <header>
           <h1>Want to Play</h1>
-          <p className="subtitle">
-            Games you have saved for later.
-          </p>
         </header>
 
         {sectionTabs}

@@ -230,9 +230,9 @@ function RankGamesView({
           </button>
         )}
 
-        <h1>
+        <p className="subtitle" role="status">
           <LoadingMessage />
-        </h1>
+        </p>
       </section>
     )
   }
@@ -251,16 +251,6 @@ function RankGamesView({
         </button>
       )}
 
-      <header>
-        <h1>
-          Rank your games
-        </h1>
-
-        <p className="subtitle">
-          Pick the game you'd rather play. Your ranking gets sharper with every choice.
-        </p>
-      </header>
-
       {error && (
         <p className="error-message">
           {error}
@@ -270,9 +260,9 @@ function RankGamesView({
       <div className="ranking-compare-view">
         {matchup.length === 2 ? (
           <>
-            <p className="ranking-question">
+            <h2 className="ranking-question">
               Which would you rather play?
-            </p>
+            </h2>
 
             <div className="ranking-matchup">
               {matchup.map((game) => (

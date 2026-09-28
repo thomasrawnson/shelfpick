@@ -121,18 +121,9 @@ function PlayerSelectionStep({
       </button>
 
       <header>
-        <p className="eyebrow">
-          Players
-        </p>
-
         <h1>
           Who's playing?
         </h1>
-
-        <p className="subtitle">
-          Pick everyone who's at
-          the table.
-        </p>
       </header>
 
 

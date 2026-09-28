@@ -151,6 +151,17 @@ success, no-result and failure states remain visible without discarding the
 query. Collection filters, sorting and navigation state remain outside and
 unchanged by the add task.
 
+## Heading and supporting-copy update — 28 September 2026
+
+Primary Picker, Collection, Discover, Rankings, Insights, Game Night and
+Settings states use one page-level heading. Category eyebrows and subtitles are
+omitted when they only rename or restate that heading. Supporting copy sits
+immediately beneath the heading only when it explains scope, input consequences
+or the next decision. Personalisation/fallback context, units, recovery,
+validation, entitlement limitations, BGG attribution and accessible names are
+functional copy and must not be removed for visual minimalism. Loading and
+error states retain the same stable page heading as their completed screen.
+
 ## Overview
 
 **Creative North Star: "The Considered Game Shelf"**
