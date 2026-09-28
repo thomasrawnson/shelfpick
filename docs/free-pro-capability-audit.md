@@ -8,6 +8,13 @@ The agreed launch offer remains a **£3.99 one-off purchase**, not a
 subscription. No price is technically configured, checkout is not implemented,
 and purchasing remains disabled.
 
+## SP-PB01 access confirmation — 28 September 2026
+
+The dedicated Picker play-entry screen preserves existing Free access. It
+changes routing and presentation only: the existing play API, validation,
+participant persistence and Picker conversion link remain in use. No Pro
+entitlement, purchase claim or billing behavior changed. Beta remains on hold.
+
 ## Verified capability matrix
 
 | Feature | Implemented behaviour | Current access | Frontend and backend enforcement | Limitations or planned-only functionality |

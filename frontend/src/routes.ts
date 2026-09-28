@@ -14,6 +14,7 @@ export const APP_PATHS = {
   verifyEmail: "/verify-email",
   onboarding: "/onboarding",
   picker: "/picker",
+  pickerPlay: "/picker/log-play",
   collection: "/collection",
   collectionOwned: "/collection/owned",
   collectionWishlist:
@@ -105,6 +106,9 @@ export function isProtectedAppPath(
 ): boolean {
   return (
     pathname === APP_PATHS.picker
+    || pathname.startsWith(
+      `${APP_PATHS.picker}/`,
+    )
     || pathname === APP_PATHS.collection
     || pathname.startsWith(
       `${APP_PATHS.collection}/`,

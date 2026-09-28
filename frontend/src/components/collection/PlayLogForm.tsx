@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useRef,
   useState,
 } from "react"
 
@@ -25,9 +26,16 @@ type PlayerForm = {
 
 type Props = {
   game: Game
-  onSaved: () => Promise<void>
+  onSaved: (result: SavedPlayResult) => Promise<void>
   initialPlayerCount?: number
+  initialPlayerNames?: string[]
   pickerSessionId?: string | null
+  presentation?: "inline" | "dedicated"
+  onCancel?: () => void
+}
+
+export type SavedPlayResult = {
+  bgStatsUrl: string | null
 }
 
 function todayValue() {
@@ -54,6 +62,7 @@ function todayValue() {
 
 function createPlayerForms(
   count: number,
+  names: string[] = [],
 ): PlayerForm[] {
   return Array.from(
     {
@@ -62,8 +71,8 @@ function createPlayerForms(
         count,
       ),
     },
-    () => ({
-      name: "",
+    (_, index) => ({
+      name: names[index] ?? "",
       score: "",
       isWinner: false,
     }),
@@ -74,10 +83,14 @@ function PlayLogForm({
   game,
   onSaved,
   initialPlayerCount = 1,
+  initialPlayerNames = [],
   pickerSessionId = null,
+  presentation = "inline",
+  onCancel,
 }: Props) {
+  const isDedicated = presentation === "dedicated"
   const [open, setOpen] =
-    useState(false)
+    useState(isDedicated)
 
   const [
     playDate,
@@ -97,6 +110,7 @@ function PlayLogForm({
   ] = useState<PlayerForm[]>(
     createPlayerForms(
       initialPlayerCount,
+      initialPlayerNames,
     ),
   )
 
@@ -126,6 +140,8 @@ function PlayLogForm({
   ] = useState<string | null>(
     null,
   )
+
+  const savePending = useRef(false)
 
 
   useEffect(() => {
@@ -234,6 +250,10 @@ function PlayLogForm({
 
 
   async function savePlay() {
+    if (savePending.current) {
+      return
+    }
+
     const participants =
       players.map(
         (
@@ -331,9 +351,12 @@ function PlayLogForm({
       return
     }
 
+    savePending.current = true
     setSaving(true)
     setError("")
     setSaved(false)
+
+    let url: string | null = null
 
     try {
       const playedAt =
@@ -350,7 +373,7 @@ function PlayLogForm({
           pickerSessionId,
         )
 
-      const url =
+      url =
         createBGStatsPlayUrl(
           game,
           savedPlay,
@@ -358,19 +381,6 @@ function PlayLogForm({
           durationMinutes,
         )
 
-      setBGStatsUrl(
-        url,
-      )
-
-      resetForm()
-
-      setOpen(false)
-      setSaved(true)
-
-      await Promise.all([
-        onSaved(),
-        refreshPlayers(),
-      ])
     } catch (err) {
       console.error(err)
 
@@ -378,8 +388,31 @@ function PlayLogForm({
         "Couldn't save this play.",
       )
     } finally {
+      savePending.current = false
       setSaving(false)
     }
+
+    if (url === null) {
+      return
+    }
+
+    setBGStatsUrl(url)
+    setSaved(true)
+
+    if (!isDedicated) {
+      resetForm()
+      setOpen(false)
+    }
+
+    try {
+      await onSaved({
+        bgStatsUrl: url,
+      })
+    } catch (err) {
+      console.error(err)
+    }
+
+    void refreshPlayers()
   }
 
 
@@ -396,32 +429,44 @@ function PlayLogForm({
         )}
       </datalist>
 
-      <button
-        type="button"
-        className={
-          saved && !open
-            ? "secondary-button log-play-button"
-            : "primary-button log-play-button"
-        }
-        onClick={() => {
-          setOpen(
-            !open,
-          )
+      {!isDedicated && (
+        <button
+          type="button"
+          className={
+            saved && !open
+              ? "secondary-button log-play-button"
+              : "primary-button log-play-button"
+          }
+          onClick={() => {
+            setOpen(
+              !open,
+            )
 
-          setError("")
-          setSaved(false)
-          setBGStatsUrl(null)
-        }}
-      >
-        {open
-          ? "Cancel"
-          : saved
-            ? "Log another play"
-            : "Log a play"}
-      </button>
+            setError("")
+            setSaved(false)
+            setBGStatsUrl(null)
+          }}
+        >
+          {open
+            ? "Cancel"
+            : saved
+              ? "Log another play"
+              : "Log a play"}
+        </button>
+      )}
 
       {open && (
-        <div className="play-form">
+        <form
+          className={
+            isDedicated
+              ? "play-form play-form-dedicated"
+              : "play-form"
+          }
+          onSubmit={(event) => {
+            event.preventDefault()
+            void savePlay()
+          }}
+        >
           <div className="play-form-heading">
             <div>
               <p className="preference-label">
@@ -635,21 +680,30 @@ function PlayLogForm({
             </p>
           )}
 
-          <button
-            type="button"
-            className="primary-button save-play-button"
-            disabled={
-              saving
-            }
-            onClick={
-              savePlay
-            }
-          >
-            {saving
-              ? "Saving..."
-              : "Save play"}
-          </button>
-        </div>
+          <div className="play-form-actions">
+            <button
+              type="submit"
+              className="primary-button save-play-button"
+              disabled={saving}
+              aria-busy={saving}
+            >
+              {saving
+                ? "Saving..."
+                : "Save play"}
+            </button>
+
+            {isDedicated && onCancel && (
+              <button
+                type="button"
+                className="ghost-button cancel-play-button"
+                onClick={onCancel}
+                disabled={saving}
+              >
+                Cancel
+              </button>
+            )}
+          </div>
+        </form>
       )}
 
       {saved && (

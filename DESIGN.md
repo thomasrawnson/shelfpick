@@ -115,6 +115,20 @@ components:
     rounded: "{rounded.lg}"
 ---
 
+## Pre-beta play-entry update — 28 September 2026
+
+Picker play logging uses a dedicated narrow task screen rather than expanding
+inside the recommendation card. It keeps the selected game's contained artwork,
+title and participant summary ahead of the existing play fields, with one
+Forest Save action and quiet Back/Cancel actions. Named Picker participants are
+prefilled; count-only sessions retain separate blank participant rows. The
+screen uses the established input, card, spacing, focus and bottom-navigation
+clearance rules in both themes and at the existing responsive widths.
+
+Beta testing remains on hold. `docs/pre-beta-work-plan-2026-09-28.md` defines
+the remaining requested work; existing tokens below remain the implemented
+baseline until a later scoped task changes them.
+
 ## Overview
 
 **Creative North Star: "The Considered Game Shelf"**

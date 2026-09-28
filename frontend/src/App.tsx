@@ -487,7 +487,7 @@ function App() {
         <div className="app-content">
           <Routes>
             <Route
-              path={APP_PATHS.picker}
+              path={`${APP_PATHS.picker}/*`}
               element={<PickerView onViewGame={openOwnedCollectionGame}
                 onViewCollection={() => navigate(APP_PATHS.collectionOwned)}
                 defaultPlayers={user.preferred_player_count}

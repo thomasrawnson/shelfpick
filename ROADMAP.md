@@ -21,7 +21,38 @@ product work below is the current engineering priority.
 - Update the status in this roadmap when a slice is completed.
 - Do not mark a slice complete until its tests and required validation pass.
 
-## Current priority
+## Current priority — beta on hold (28 September 2026)
+
+**External beta testing is ON HOLD at Tom's request.** The requested pre-beta
+backlog and acceptance criteria are in `docs/pre-beta-work-plan-2026-09-28.md`.
+Complete SP-PB01–20 in the documented sequence, resolve the marked decisions,
+and validate the work before asking Tom to resume beta. Internal testing
+continues. This instruction supersedes older immediate-beta and post-launch
+timing below; existing completed slices remain historical implementation facts.
+
+SP-PB01 is complete. Picker Log a play now opens a dedicated `/picker/log-play`
+screen while the parent Picker route remains mounted, preserving its selected
+game, named players or count-only rows, criteria, recommendation set and result
+position for Cancel and browser Back. The shared play form and API remain in
+use. Save is single-submit guarded, retains values on validation/network errors,
+returns to the same result with confirmation, and direct navigation without an
+active result offers a safe route back to Picker.
+
+Evidence: focused frontend route/render tests, lint, build and colour checks
+passed; mocked Playwright covered prefill, validation and network recovery,
+rapid duplicate clicks, one-save confirmation, Cancel/Back restoration, direct
+navigation, keyboard focus, action reachability, navigation clearance and no
+horizontal overflow at 390, 768, 1024 and 1440px in light/dark. The configured
+non-production PostgreSQL repository/API checks passed with isolated test data.
+Screenshots are in `docs/screenshots/sp-pb01/`. Beta remains on hold.
+
+Continue with SP-PB02 (reported Top 100 availability failure). Then address
+Picker defaults/navigation, UI and Settings, plays/statistics/sharing, ranking
+intelligence, scanning, avatars, Game Night voting and Pro challenges. New Pro
+scope is live duration, ranking-based recommendation enhancements and challenges.
+Picker scoring use is optional pending Discover evaluation; other new access
+boundaries are not silently changed. Keep purchase claims limited to working
+features.
 
 **Pre-beta priority 1 — UI/layout redesign (UI-1, UI-2A and UI-2B complete)**
 
@@ -140,15 +171,19 @@ fallbacks, and do not change the logo or Free/Pro proposition as part of UI-1.
 
 ## Delivery order
 
-1. Game Night MVP + entitlement scaffolding
-2. Discover v3
-3. Onboarding + Player Profiles
-4. Settings + Pro foundations
-5. Private Beta readiness
-6. Public launch
-7. Live Plays
-8. Challenges
-9. Advanced Pro intelligence
+1. SP-PB01 dedicated Picker play logging — COMPLETE.
+2. SP-PB02: restore reported Top 100 availability.
+3. SP-PB03–04: selected-player count and saved play-style defaults.
+4. SP-PB05–09 and SP-PB20: Settings, typography, Rankings, spacing, Collection and heading copy.
+5. SP-PB10–11 and SP-PB14: location, Pro live duration and statistics.
+6. SP-PB12–13: branded play and monthly recap sharing.
+7. SP-PB15–17: Pro ranking recommendations, scanning and avatars.
+8. SP-PB18–19: Game Night voting and Pro challenges.
+9. Reconcile Free/Pro claims, complete validation and existing release gates.
+10. Resume private beta only after Tom's explicit decision, then public launch.
+
+See `docs/pre-beta-work-plan-2026-09-28.md` for dependencies, acceptance criteria
+and unresolved choices. Historical slice numbers below are retained.
 
 ## Foundation — Core Picker improvements
 
@@ -522,7 +557,7 @@ In addition:
 
 ## Slice 5 — Private Beta readiness
 
-**Status:** IN PROGRESS — client instrumentation foundation complete; beta operations remain open
+**Status:** ON HOLD — external beta paused 28 September 2026; client instrumentation foundation complete, internal validation continues
 
 T01 production configuration and Apple Silicon setup is complete in the
 repository: local, CI and Render runtimes align on Python 3.12 and Node 22,
@@ -530,7 +565,8 @@ production requires a server-side BoardGameGeek token, and native arm64 setup
 is documented. Live Render configuration and verification remain operational
 steps rather than repository work.
 
-Run Private Beta immediately after the Game Night MVP. Before inviting users,
+Do not invite beta testers yet. Complete the requested SP-PB backlog, resolve
+its open decisions and obtain Tom's decision to resume. Before inviting users,
 complete the production deployment, migration, email and backup/recovery checks
 in `docs/production-runbook.md`.
 

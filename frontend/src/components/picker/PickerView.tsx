@@ -4,6 +4,10 @@ import {
   useRef,
   useState,
 } from "react";
+import {
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 
 import {
   getPickerMatches,
@@ -23,7 +27,9 @@ import ThemeStep from "./ThemeStep";
 import PlayStyleStep from "./PlayStyleStep";
 import PickerResult from "./PickerResult";
 import PickerNoMatch from "./PickerNoMatch";
+import PickerPlayEntry from "./PickerPlayEntry";
 import { timeBand, trackEvent } from "../../telemetry";
+import { APP_PATHS } from "../../routes";
 
 type Step =
   | "players"
@@ -42,6 +48,8 @@ type Props = {
 };
 
 function PickerView({ onViewGame, onViewCollection, defaultPlayers = null, defaultTime = null }: Props) {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [step, setStep] = useState<Step>("players");
   const [selectedPlayerIds, setSelectedPlayerIds] = useState<number[]>([]);
   const [selectedPlayerNames, setSelectedPlayerNames] = useState<string[]>([]);
@@ -64,6 +72,7 @@ function PickerView({ onViewGame, onViewCollection, defaultPlayers = null, defau
   const [pickerSessionId, setPickerSessionId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [playSavedMessage, setPlaySavedMessage] = useState("");
   const pending = useRef(false);
   const [optionsError, setOptionsError] = useState("");
   const [optionsLoading, setOptionsLoading] = useState(true);
@@ -242,6 +251,7 @@ function PickerView({ onViewGame, onViewCollection, defaultPlayers = null, defau
     setError("");
     setNoMatchGuidance(null);
     setPickerSessionId(null);
+    setPlaySavedMessage("");
   }
 
   function clearFineTune() {
@@ -266,6 +276,42 @@ function PickerView({ onViewGame, onViewCollection, defaultPlayers = null, defau
   }
 
   const progressStep = step === "time" ? 1 : 0;
+  const isPlayEntry = location.pathname === APP_PATHS.pickerPlay;
+
+  if (isPlayEntry) {
+    if (!match || step !== "reveal" || players === null) {
+      return (
+        <section className="screen picker-play-entry-missing">
+          <h1>Choose a game first</h1>
+          <p>
+            This play-entry link needs an active Picker result.
+            Your next pick will open here ready to log.
+          </p>
+          <button
+            type="button"
+            className="primary-button"
+            onClick={() => navigate(APP_PATHS.picker, { replace: true })}
+          >
+            Go to Picker
+          </button>
+        </section>
+      );
+    }
+
+    return (
+      <PickerPlayEntry
+        match={match}
+        playerCount={players}
+        playerNames={selectedPlayerNames}
+        pickerSessionId={pickerSessionId}
+        onCancel={() => navigate(-1)}
+        onSaved={async () => {
+          setPlaySavedMessage(`Play saved for ${match.game.name}.`);
+          navigate(-1);
+        }}
+      />
+    );
+  }
 
   return (
     <>
@@ -393,11 +439,15 @@ function PickerView({ onViewGame, onViewCollection, defaultPlayers = null, defau
             totalMatches={matches.length}
             mode={mode}
             playerCount={players ?? 1}
-            pickerSessionId={pickerSessionId}
             hasMoreMatches={hasMoreMatches}
             onTryAnother={tryAnother}
             onViewGame={viewGame}
             onStartOver={startOver}
+            onLogPlay={() => {
+              setPlaySavedMessage("");
+              navigate(APP_PATHS.pickerPlay);
+            }}
+            playSavedMessage={playSavedMessage}
           />
         </div>
       )}

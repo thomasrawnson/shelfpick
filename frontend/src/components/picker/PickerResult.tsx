@@ -9,9 +9,6 @@ import type {
   PickerMode,
 } from "../../api/client"
 
-import PlayLogForm
-  from "../collection/PlayLogForm"
-
 import Disclosure
   from "../ui/Disclosure"
 
@@ -22,11 +19,12 @@ type Props = {
   totalMatches: number
   mode: PickerMode
   playerCount: number
-  pickerSessionId: string | null
   hasMoreMatches: boolean
   onTryAnother: () => void
   onViewGame: () => void
   onStartOver: () => void
+  onLogPlay: () => void
+  playSavedMessage?: string
 }
 
 
@@ -83,11 +81,12 @@ function PickerResult({
   totalMatches,
   mode,
   playerCount,
-  pickerSessionId,
   hasMoreMatches,
   onTryAnother,
   onViewGame,
   onStartOver,
+  onLogPlay,
+  playSavedMessage = "",
 }: Props) {
   const [shareMessage, setShareMessage] =
     useState("")
@@ -364,14 +363,20 @@ function PickerResult({
       )}
 
       <div className="picker-primary-action">
-        <PlayLogForm
-          key={game.bgg_id}
-          game={game}
-          initialPlayerCount={playerCount}
-          pickerSessionId={pickerSessionId}
-          onSaved={async () => {}}
-        />
+        <button
+          type="button"
+          className="primary-button log-play-button"
+          onClick={onLogPlay}
+        >
+          Log a play
+        </button>
       </div>
+
+      {playSavedMessage && (
+        <p className="play-confirmation" role="status">
+          {playSavedMessage}
+        </p>
+      )}
 
       <div className="picker-result-footer">
         <button

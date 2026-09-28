@@ -1,5 +1,17 @@
 # Pre-beta design priorities
 
+## SP-PB01 complete — 28 September 2026
+
+Picker Log a play now uses a dedicated route and readable task layout with the
+selected game and players prefilled. Save is the single primary action;
+Back/Cancel restore the intact Picker result. Mocked Playwright verified the
+screen at 390, 768, 1024 and 1440px in light/dark, including focus, reachable
+actions, fixed-navigation clearance and horizontal overflow. Before/after
+evidence is in `docs/screenshots/sp-pb01/`. External beta remains on hold.
+
+The remaining 28 September backlog and sequence are recorded in
+`docs/pre-beta-work-plan-2026-09-28.md`; SP-PB02 is next.
+
 The agreed pre-beta priorities are:
 
 1. UI/layout redesign;

@@ -46,11 +46,11 @@ function renderResult() {
     totalMatches: 3,
     mode: "best_match",
     playerCount: 2,
-    pickerSessionId: null,
     hasMoreMatches: true,
     onTryAnother: () => {},
     onViewGame: () => {},
     onStartOver: () => {},
+    onLogPlay: () => {},
   }))
 }
 
