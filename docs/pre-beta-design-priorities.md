@@ -214,6 +214,18 @@ endpoints are gated but the existing active or finished timer row is retained
 for restored access rather than silently discarded. SP-PB02 remains blocked
 and beta remains on hold.
 
+SP-PB12 branded saved-play sharing completed on 28 September with existing Free
+access. Each persisted play in Collection history has a labelled Share play
+action that opens a state-preserving preview and returns focus on Close or
+Escape. The portrait export uses the approved ShelfPick logo and established
+Forest/Gold styling, with the same renderer feeding preview, native file share
+and PNG download. Names, scores and location are opt-in and hidden by default;
+email-like labels are always redacted. Missing artwork/CORS failures use the
+branded fallback, while missing scores and recorded cooperative, tie and shared outcomes
+remain truthful. A focused mocked mobile pass and inspected exports are recorded
+under `docs/screenshots/sp-pb12/`. Native OS sharing and physical-device output
+remain pre-beta checks. SP-PB02 remains blocked and beta remains on hold.
+
 ### UI-2 — core visual polish
 
 After UI-1 is stable, refine hierarchy, typography, spacing, component

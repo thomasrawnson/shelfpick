@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
   deletePlay,
   type Game,
+  type GamePlay,
   type GameHistory as GameHistoryData,
 } from "../../api/client";
 
 import { createBGStatsHistoryUrl } from "../../utils/bgstats";
 
 import LoadingMessage from "../ui/LoadingMessage";
+import PlayShareDialog from "./PlayShareDialog";
 
 type Props = {
   game: Game;
@@ -27,6 +29,25 @@ function GameHistory({ game, history, loading, onPlayDeleted }: Props) {
   );
 
   const [deleteError, setDeleteError] = useState("");
+  const [sharingPlay, setSharingPlay] = useState<GamePlay | null>(null);
+  const shareButtons = useRef(new Map<number, HTMLButtonElement>());
+  const shareReturnPlayId = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (sharingPlay !== null || shareReturnPlayId.current === null) return;
+    const playId = shareReturnPlayId.current;
+    shareReturnPlayId.current = null;
+    window.requestAnimationFrame(() => shareButtons.current.get(playId)?.focus());
+  }, [sharingPlay]);
+
+  function openShare(play: GamePlay) {
+    shareReturnPlayId.current = play.id;
+    setSharingPlay(play);
+  }
+
+  function closeShare() {
+    setSharingPlay(null);
+  }
 
   function requestDeletePlay(playId: number) {
     setDeleteErrorPlayId(null);
@@ -163,16 +184,29 @@ function GameHistory({ game, history, loading, onPlayDeleted }: Props) {
                     </div>
                   )}
 
-                  {play.source !== "bgstats" && (
-                    <a
-                      className="bgstats-history-link"
-                      href={createBGStatsHistoryUrl(game, play)}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                  <div className="recent-play-actions">
+                    <button
+                      ref={(element) => {
+                        if (element) shareButtons.current.set(play.id, element);
+                        else shareButtons.current.delete(play.id);
+                      }}
+                      type="button"
+                      className="secondary-button"
+                      onClick={() => openShare(play)}
                     >
-                      Send to BG Stats
-                    </a>
-                  )}
+                      Share play
+                    </button>
+                    {play.source !== "bgstats" && (
+                      <a
+                        className="bgstats-history-link"
+                        href={createBGStatsHistoryUrl(game, play)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Send to BG Stats
+                      </a>
+                    )}
+                  </div>
                   {confirmingPlayId === play.id ? (
                     <div className="delete-play-confirm">
                       <span>Delete this play?</span>
@@ -223,6 +257,9 @@ function GameHistory({ game, history, loading, onPlayDeleted }: Props) {
         </>
       ) : (
         <p className="history-empty">Play history unavailable.</p>
+      )}
+      {sharingPlay && (
+        <PlayShareDialog game={game} play={sharingPlay} onClose={closeShare} />
       )}
     </div>
   );

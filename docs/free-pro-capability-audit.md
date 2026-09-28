@@ -26,6 +26,7 @@ entitlement, purchase claim or billing behavior changed. Beta remains on hold.
 | Owned collection | Sync, search/add, browse, detail and ownership-aware Picker input. | Free and Pro | No frontend tier gate. Backend dependencies authenticate and scope ownership by current user. | BGG sync/search/add still depend on upstream availability; no Pro behaviour exists. |
 | Want to Play | Separate user-scoped list, add/remove/detail, and atomic move to Owned. | Free and Pro | No frontend tier gate. Backend service is authenticated and user-scoped. | Discovery metadata/add operations can depend on BGG; no Pro behaviour exists. |
 | Play logging | Records and deletes user-scoped plays with participants, manual duration and optional location; feeds history, Picker and Game Night signals. | Free and Pro | No tier gate for ordinary play logging or location. Backend play service and repositories are authenticated/user-scoped. | Existing plays cannot currently be edited; location is editable during creation/retry and displayed in recent history. |
+| Branded play sharing | Previews and exports a persisted play as a ShelfPick-branded PNG, with native file sharing where supported and download fallback. Names, scores and location are explicit privacy choices. | Free and Pro | The saved-play action has no frontend tier check and needs no new backend endpoint; it consumes the already authenticated, user-scoped play history response. | Collection-history plays only. No public upload, public play URL, automatic posting, recipient selection or social integration. Native OS sharing and physical-device rendering remain pre-beta checks. |
 | Live play duration | One recoverable timer per account with Start, Pause, Resume, Finish, an app-wide indicator and explicit play review before save. | Pro only | Frontend exposes controls only with `live_play_enhancements`; every timer endpoint independently enforces the same capability. Persisted user ownership and a unique account timer isolate sessions. | In-app PWA only. No lock-screen/Live Activity, ongoing notification, notification permission request or guaranteed background execution. |
 | Insights | Collection, play, monthly, game and group facts, including valid facts from one recorded play. | Free and Pro | Frontend route is always available. Backend service is authenticated/user-scoped; no Pro capability check. | `advanced_stats` is an entitlement name only; there is no separately implemented advanced Insights surface. |
 | Game Night | Builds a 3–5 game shortlist from the host’s owned collection using attendees, time, exact-player suitability, general play history and exact-group history. | Basic Game Night is Free and Pro | Frontend checks `game_night_basic`. Backend independently checks the same capability and validates player IDs against the current user. | `game_night_enhanced` is an entitlement name only; no enhanced mode is implemented. |
@@ -104,6 +105,15 @@ Acceptance criteria:
   £3.99 one-off checkout remains the subsequent commercial implementation.
 
 ## Validation record
+
+SP-PB12 addendum (28 September): seven focused share-card tests, the production
+frontend build, changed-file lint and `git diff --check` passed. A mocked
+390×844 Chrome pass covered private defaults, privacy toggles, preview/download,
+Close/Escape focus return, origin-state preservation, missing-artwork fallback
+and generation retry; normal and long-title/fallback 1200×1500 PNGs were
+inspected. This was not a live account, native share sheet, real cross-origin
+artwork host or physical-device test. Sharing remains Free, SP-PB02 remains
+blocked and beta remains on hold.
 
 SP-PB10/SP-PB11 addendum (28 September): the complete backend suite passed with
 236 tests and one pre-existing Starlette `TestClient`/httpx deprecation warning.

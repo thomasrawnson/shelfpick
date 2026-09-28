@@ -309,9 +309,39 @@ pre-beta commitment unless it is explicitly reprioritised.
 
 ### SP-PB12 — Share a recorded play with ShelfPick branding
 
-**Status:** NOT STARTED. **Workstream:** Sharing. **Access:** Proposed Free marketing feature.
+**Status:** COMPLETE (28 September 2026). **Workstream:** Sharing. **Access:** Free; no new gate.
 
 Generate a preview/downloadable share card with game artwork, play facts and the approved ShelfPick logo. Share via device share support with image-download fallback. Missing artwork must not break export. Player names/photos and location are excluded by default or explicitly selected in preview. Sharing must not post automatically or expose account identifiers. Reuse a single export renderer for monthly recaps.
+
+Saved plays in Collection history now have a labelled Share play action. It
+opens a modal preview without navigating away or resetting the game-detail
+screen, and Close or Escape restores focus to the originating play. The same
+1200×1500 canvas renderer drives the preview, native file share and PNG
+download, so privacy choices cannot diverge from the exported image. The card
+uses the approved ShelfPick logo and Forest/Gold identity, includes title and
+date plus meaningful duration/result data, and falls back to a branded initials
+panel when artwork is absent or cannot be read safely through CORS.
+
+Player names, scores and location are independent opt-ins; names and location
+start hidden. Missing scores remain blank, winner flags remain authoritative,
+cooperative/shared wins are labelled without inferring results, email-like
+cooperative wins, scored ties and shared wins are labelled without inventing a
+result, email-like participant labels are redacted, and no account identifier, private note, URL
+or QR code is rendered. Native sharing runs only from Share image, treats an
+`AbortError` as cancellation, and does not claim ShelfPick posted anything.
+Download image remains available when file sharing is unsupported.
+
+Validation: seven focused share-card tests passed for privacy defaults, exact
+selected content, email redaction, cooperative/shared results, artwork fallback,
+generation failure and native-share cancellation. The production frontend build
+and changed-file lint passed. One mocked 390×844 Chrome pass covered preview,
+all privacy toggles, two PNG downloads, Close and Escape focus return, preserved
+origin route, missing-artwork/long-title fallback and generation retry without
+horizontal overflow. The inspected 1200×1500 exports and mobile captures are in
+`docs/screenshots/sp-pb12/`. Native OS share-sheet behavior, real cross-origin
+artwork hosts and physical-device rendering remain pre-beta checks. The existing
+timer-after-Pro-loss and real-phone background/reopen checks remain on that
+checklist. SP-PB02 remains BLOCKED and beta remains on hold.
 
 ### SP-PB13 — Share This month in games
 

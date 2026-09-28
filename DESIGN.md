@@ -291,6 +291,25 @@ existing play form for review; it never records a play automatically. Failed
 saves retain the draft and finished timer, while success removes timer state in
 the same transaction as the one play record. Discard is explicit and confirmed.
 
+### Branded saved-play sharing
+
+SP-PB12 adds Share play only to persisted Collection history. The preview is a
+modal layer over the unchanged game-detail screen; Close and Escape return
+focus to the originating play action. Its portrait image uses the approved
+ShelfPick logo, cream canvas, Forest structure and restrained Gold emphasis.
+Game artwork leads when safely available, while a calm initials panel handles
+missing images and CORS failures without blocking export. Long titles and names
+wrap or truncate within the card rather than reducing text below readable sizes.
+
+Title and play date are always included. Positive duration and recorded result
+flags may add context, but missing scores are never displayed as zero and the
+card never infers a winner; cooperative wins and scored ties use existing game
+mechanics, winner flags and non-missing scores. Player names, scores and location are independent
+preview controls; names, scores and location begin hidden, and email-like
+participant labels are always redacted. The preview and output use the same
+renderer. Native file sharing and PNG download require explicit actions, and
+the interface never claims that ShelfPick posted or uploaded the result.
+
 ## Do's and Don'ts
 
 ### Do:

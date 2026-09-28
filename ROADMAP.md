@@ -256,7 +256,8 @@ fallbacks, and do not change the logo or Free/Pro proposition as part of UI-1.
    heading/copy cleanup — COMPLETE; SP-PB06–08 remain pending.
 5. SP-PB10–11 location and Pro live duration — COMPLETE; SP-PB14 statistics
    remains pending.
-6. SP-PB12–13: branded play and monthly recap sharing.
+6. SP-PB12 branded saved-play sharing — COMPLETE; SP-PB13 monthly recap
+   sharing remains pending.
 7. SP-PB15–17: Pro ranking recommendations, scanning and avatars.
 8. SP-PB18–19: Game Night voting and Pro challenges.
 9. Reconcile Free/Pro claims, complete validation and existing release gates.
@@ -284,6 +285,19 @@ account/game scoping and retention across tier loss. A real-phone
 background/reopen check remains on the pre-beta checklist. Outside-app timer
 and notification work remains separate. SP-PB02 remains BLOCKED and beta
 remains on hold.
+
+SP-PB12 completed on 28 September 2026 with existing Free access. Persisted
+plays now expose a labelled Share play action and an accessible preview that
+preserves Collection detail state and returns focus on Close or Escape. One
+1200×1500 canvas renderer supplies the preview, native file share and PNG
+download; it uses the approved ShelfPick logo, defaults names/location/scores
+to private choices, redacts email-like labels, preserves missing scores and
+recorded cooperative, tie and shared-win results, and substitutes a branded fallback when
+artwork is missing or CORS-blocked. Focused tests, build, changed-file lint and
+a mocked 390×844 browser pass passed; actual normal and long-title/fallback PNGs
+were inspected. Native OS sharing, real artwork hosts and physical-device
+rendering remain pre-beta validation. SP-PB13 remains separate, SP-PB02 remains
+BLOCKED and beta remains on hold.
 
 ## Foundation — Core Picker improvements
 
