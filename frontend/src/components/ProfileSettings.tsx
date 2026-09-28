@@ -2,10 +2,9 @@ import { useState } from "react"
 import { saveProfile } from "../api/client"
 import type { AuthUser } from "../auth"
 import type { PickerPlayStyle } from "../api/client"
-import PlayerAvatar from "./ui/PlayerAvatar"
+import AvatarPicker from "./ui/AvatarPicker"
 
 type Props = { user: AuthUser; onChange: (user: AuthUser) => void; mode?: "all" | "profile" | "preferences" }
-const avatars = ["forest", "gold", "clay"] as const
 const times = [30, 60, 90, 120, 0]
 const playStyles: Array<{ value: PickerPlayStyle; label: string }> = [
   { value: "any", label: "No preference" },
@@ -65,17 +64,8 @@ function ProfileSettings({ user, onChange, mode = "all" }: Props) {
     <label className="setup-label" htmlFor="profile-name">Player name</label>
     <input id="profile-name" className="setup-input" value={name} maxLength={100}
       onChange={(event) => setName(event.target.value)} />
-    <fieldset className="onboarding-fieldset">
-      <legend>Avatar</legend>
-      <div className="onboarding-avatars">
-        {avatars.map((choice) => <button key={choice} type="button"
-          className={avatar === choice ? "onboarding-avatar-choice selected" : "onboarding-avatar-choice"}
-          aria-label={choice + " avatar"} aria-pressed={avatar === choice}
-          onClick={() => setAvatar(choice)}>
-          <PlayerAvatar name={name || user.email} variant={choice} />
-        </button>)}
-      </div>
-    </fieldset>
+    <AvatarPicker inputName="profile-avatar" name={name || user.email} value={avatar}
+      onChange={setAvatar} disabled={saving} />
     </>}
     {showPreferences && <>
     <p className="settings-field-note settings-preferences-intro">Used when a new Picker session starts. You can still change each choice for one session.</p>

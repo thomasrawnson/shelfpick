@@ -226,6 +226,17 @@ remain truthful. A focused mocked mobile pass and inspected exports are recorded
 under `docs/screenshots/sp-pb12/`. Native OS sharing and physical-device output
 remain pre-beta checks. SP-PB02 remains blocked and beta remains on hold.
 
+The bounded SP-PB17 preset-avatar subtask completed on 28 September using the
+existing authenticated Profile access. Settings → Profile and onboarding now
+share a labelled three-column radio grid with visible selection and native
+keyboard behavior. Forest, Gold and Clay keep their stored IDs; Dice teal,
+Meeple rust and Card blue use the approved semantic palette and small tabletop
+motifs while keeping initials legible in navigation and named-player Picker
+rows. A mocked 390×844 browser pass covered keyboard selection, failed-save
+retention, successful save/reload and Picker rendering; the capture is in
+`docs/screenshots/sp-pb17/`. Photo upload/storage is still pending, SP-PB02
+remains blocked and beta remains on hold.
+
 ### UI-2 — core visual polish
 
 After UI-1 is stable, refine hierarchy, typography, spacing, component

@@ -48,7 +48,7 @@ class UserResponse(BaseModel):
 
 class ProfileUpdateRequest(BaseModel):
     player_name: str | None = Field(default=None, min_length=1, max_length=100)
-    avatar_key: Literal["forest", "gold", "clay"] | None = None
+    avatar_key: Literal["forest", "gold", "clay", "dice", "meeple", "cards"] | None = None
     preferred_player_count: int | None = Field(default=None, ge=1, le=12)
     preferred_play_time: Literal[0, 15, 30, 60, 90, 120] | None = None
     preferred_play_style: Literal["any", "cooperative", "competitive"] | None = None

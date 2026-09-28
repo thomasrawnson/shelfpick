@@ -140,6 +140,19 @@ BGG sync and BG Stats import together without unrelated account controls and
 retains BoardGameGeek attribution. This structure does not add a primary-nav
 destination or change Free/Pro access.
 
+## Preset avatar update — 28 September 2026
+
+Settings → Profile and onboarding use one shared three-column avatar selector.
+Each choice is a native radio with a visible descriptive label, selected border
+and check, keeping browser keyboard behavior and the product focus ring. Forest,
+Gold and Clay retain their existing IDs and treatments. Dice teal, Meeple rust
+and Card blue add restrained board-game motifs using the existing semantic
+palette; initials remain the foreground identity at compact sizes in navigation
+and named-player selection. The catalogue is available wherever the shared
+picker or `PlayerAvatar` renderer is used. This bounded update adds no image
+hosting, upload controls, navigation or entitlement gate; photo upload remains
+separate SP-PB17 work.
+
 ## Collection Add game update — 28 September 2026
 
 Owned Collection keeps Add game visible as a labelled Forest action when games

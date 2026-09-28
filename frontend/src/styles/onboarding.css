@@ -206,14 +206,32 @@
 .onboarding-results li span { min-width: 0; overflow-wrap: anywhere; }
 .onboarding-fieldset { border: 0; padding: 0; margin: 16px 0 0; min-width: 0; }
 .onboarding-fieldset legend { color: var(--text-primary); font-weight: 700; margin-bottom: 10px; }
-.onboarding-choices, .onboarding-avatars { display: flex; flex-wrap: wrap; gap: 8px; }
+.onboarding-choices { display: flex; flex-wrap: wrap; gap: 8px; }
 .onboarding-choice { min-height: 44px; min-width: 44px; padding: 8px 12px; color: var(--text-primary); background: var(--color-surface); border: 1px solid var(--line); border-radius: 12px; font: inherit; cursor: pointer; }
-.onboarding-choice.selected, .onboarding-avatar-choice.selected { color: var(--color-brand-primary); background: var(--color-brand-primary-soft); border-color: var(--color-brand-primary); }
-.onboarding-avatar-choice { min-width: 52px; min-height: 52px; display: grid; place-items: center; padding: 4px; background: var(--color-surface); border: 1px solid var(--line); border-radius: 12px; cursor: pointer; }
-.player-avatar { display: inline-grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 50%; font-size: 13px; font-weight: 800; line-height: 1; }
+.onboarding-choice.selected { color: var(--color-brand-primary); background: var(--color-brand-primary-soft); border-color: var(--color-brand-primary); }
+.avatar-choice-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.avatar-choice { position: relative; min-width: 0; min-height: 78px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 8px 5px; color: var(--text-primary); background: var(--color-surface); border: 1px solid var(--line); border-radius: 12px; cursor: pointer; }
+.avatar-choice:hover { border-color: var(--color-brand-primary); }
+.avatar-choice:has(input:focus-visible) { outline: 2px solid var(--color-brand-primary); outline-offset: 2px; }
+.avatar-choice.selected { color: var(--color-brand-primary); background: var(--color-brand-primary-soft); border-color: var(--color-brand-primary); box-shadow: inset 0 0 0 1px var(--color-brand-primary); }
+.avatar-choice .player-avatar { width: 40px; height: 40px; font-size: 14px; }
+.avatar-choice-copy { min-width: 0; max-width: 100%; }
+.avatar-choice-label { display: block; overflow: hidden; font-size: var(--text-meta); font-weight: 800; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+.avatar-choice-check { position: absolute; top: 5px; right: 7px; color: var(--color-brand-primary); font-size: 12px; font-weight: 900; opacity: 0; }
+.avatar-choice.selected .avatar-choice-check { opacity: 1; }
+.avatar-picker-fieldset:disabled .avatar-choice { cursor: wait; opacity: .7; }
+.player-avatar { position: relative; display: inline-grid; place-items: center; width: 34px; height: 34px; flex: none; overflow: hidden; border-radius: 50%; font-size: 13px; font-weight: 800; line-height: 1; }
+.player-avatar-initials { position: relative; z-index: 1; }
+.player-avatar-motif { position: absolute; right: 1px; bottom: 1px; width: 15px; height: 15px; opacity: .58; }
+.player-avatar-motif svg { display: block; width: 100%; height: 100%; fill: currentColor; }
+.player-avatar-motif-dice rect, .player-avatar-motif-cards rect { fill: none; stroke: currentColor; stroke-width: 1.5; }
+.player-avatar-dice .player-avatar-initials, .player-avatar-meeple .player-avatar-initials, .player-avatar-cards .player-avatar-initials { transform: translate(-2px, -2px); }
 .player-avatar-forest { color: var(--color-brand-primary); background: var(--color-brand-primary-soft); }
 .player-avatar-gold { color: var(--color-accent-text); background: var(--color-brand-accent-soft); }
 .player-avatar-clay { color: var(--text-primary); background: var(--color-surface-raised); box-shadow: inset 0 0 0 1px var(--line); }
+.player-avatar-dice { color: var(--color-text-inverse); background: var(--color-success); }
+.player-avatar-meeple { color: var(--color-text-inverse); background: var(--color-accent-text); }
+.player-avatar-cards { color: var(--color-text-inverse); background: var(--color-info); }
 .dice-menu-button .player-avatar { width: 34px; height: 34px; }
 .picker-selection-person { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
 .profile-settings { margin-bottom: 20px; }

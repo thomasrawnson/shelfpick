@@ -2,13 +2,13 @@ import { useEffect, useRef, useState } from "react"
 import { addGameToCollection, completeOnboarding, searchBGGGames, syncBGGCollection, type BGGSearchResult } from "../api/client"
 import type { AuthUser } from "../auth"
 import BrandLogo from "./ui/BrandLogo"
-import PlayerAvatar from "./ui/PlayerAvatar"
+import AvatarPicker from "./ui/AvatarPicker"
+import type { AvatarId } from "../avatar-catalog"
 import { timeBand, trackEvent } from "../telemetry"
 
 type Props = { displayName: string | null; onComplete: (user: AuthUser) => void }
 const counts = [1, 2, 3, 4, 5, 6]
 const times = [30, 60, 90, 120, 0]
-const avatars = ["forest", "gold", "clay"] as const
 
 function OnboardingView({ displayName, onComplete }: Props) {
   const screenRef = useRef<HTMLElement>(null)
@@ -26,7 +26,7 @@ function OnboardingView({ displayName, onComplete }: Props) {
   const [playerCount, setPlayerCount] = useState<number | null>(null)
   const [playTime, setPlayTime] = useState<number | null>(null)
   const [name, setName] = useState(displayName ?? "")
-  const [avatar, setAvatar] = useState<(typeof avatars)[number]>("forest")
+  const [avatar, setAvatar] = useState<AvatarId>("forest")
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState("")
 
@@ -158,13 +158,8 @@ function OnboardingView({ displayName, onComplete }: Props) {
       <label className="setup-label" htmlFor="onboarding-name">Player name</label>
       <input id="onboarding-name" className="setup-input" maxLength={100} value={name}
         onChange={(event) => setName(event.target.value)} />
-      <fieldset className="onboarding-fieldset"><legend>Avatar</legend>
-        <div className="onboarding-avatars">{avatars.map((choice) => <button key={choice} type="button"
-          aria-label={choice + " avatar"} aria-pressed={avatar === choice}
-          className={avatar === choice ? "onboarding-avatar-choice selected" : "onboarding-avatar-choice"}
-          onClick={() => setAvatar(choice)}>
-          <PlayerAvatar name={name || "You"} variant={choice} /></button>)}</div>
-      </fieldset>
+      <AvatarPicker inputName="onboarding-avatar" name={name || "You"} value={avatar}
+        onChange={setAvatar} disabled={busy} />
       <button type="button" className="primary-button onboarding-next" disabled={busy}
         onClick={() => void finish()}>{busy ? "Finishing..." : "Start picking"}</button>
     </div>}

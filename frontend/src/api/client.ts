@@ -5,6 +5,7 @@ import {
   type AuthResult,
   type AuthUser,
 } from "../auth"
+import type { AvatarId } from "../avatar-catalog"
 
 
 export interface Game {
@@ -231,7 +232,7 @@ export interface CollectionGameStats {
 export interface Player {
   id: number
   name: string
-  avatar_key: "forest" | "gold" | "clay"
+  avatar_key: AvatarId
 }
 
 export interface PlayerStatsGame {
@@ -1333,7 +1334,7 @@ export async function addGameToCollection(
 
 export type ProfileChanges = {
   player_name?: string
-  avatar_key?: "forest" | "gold" | "clay"
+  avatar_key?: AvatarId
   preferred_player_count?: number | null
   preferred_play_time?: number | null
   preferred_play_style?: PickerPlayStyle | null

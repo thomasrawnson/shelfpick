@@ -258,7 +258,8 @@ fallbacks, and do not change the logo or Free/Pro proposition as part of UI-1.
    remains pending.
 6. SP-PB12 branded saved-play sharing — COMPLETE; SP-PB13 monthly recap
    sharing remains pending.
-7. SP-PB15–17: Pro ranking recommendations, scanning and avatars.
+7. SP-PB15–17: Pro ranking recommendations and scanning remain pending;
+   SP-PB17 preset avatars are complete while photo upload remains pending.
 8. SP-PB18–19: Game Night voting and Pro challenges.
 9. Reconcile Free/Pro claims, complete validation and existing release gates.
 10. Resume private beta only after Tom's explicit decision, then public launch.
@@ -298,6 +299,19 @@ a mocked 390×844 browser pass passed; actual normal and long-title/fallback PNG
 were inspected. Native OS sharing, real artwork hosts and physical-device
 rendering remain pre-beta validation. SP-PB13 remains separate, SP-PB02 remains
 BLOCKED and beta remains on hold.
+
+The bounded SP-PB17 preset-avatar subtask completed on 28 September 2026 with
+the existing authenticated-user access and no new entitlement. The three
+stored avatar IDs remain valid; a shared accessible radio grid adds three
+board-game-themed token treatments and feeds the existing initials renderer in
+Profile, onboarding, navigation and named-player surfaces. The unchanged
+profile save flow retains a new choice after failure and preserves unrelated
+preferences. Focused frontend/backend tests, build, changed-file lint, mocked
+mobile keyboard/save/reload/Picker checks and `git diff --check` passed; the
+capture is under `docs/screenshots/sp-pb17/`. The database schema did not
+change. SP-PB17 remains IN PROGRESS overall because photo upload and its image
+storage/security acceptance criteria were deliberately not implemented.
+SP-PB02 remains BLOCKED and beta remains on hold.
 
 ## Foundation — Core Picker improvements
 

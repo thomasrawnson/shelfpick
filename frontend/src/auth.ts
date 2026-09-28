@@ -1,3 +1,5 @@
+import type { AvatarId } from "./avatar-catalog"
+
 export interface AuthUser {
   id: number
   email: string
@@ -9,7 +11,7 @@ export interface AuthUser {
   preferred_play_style?: "any" | "cooperative" | "competitive" | null
   profile_player_id: number | null
   player_name: string
-  avatar_key: "forest" | "gold" | "clay"
+  avatar_key: AvatarId
   email_verified: boolean
   tier: "FREE" | "PRO"
   entitlements: string[]

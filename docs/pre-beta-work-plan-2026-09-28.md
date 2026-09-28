@@ -369,9 +369,34 @@ Confirmed scope: scan retail EAN/UPC barcodes on game boxes. Split into SP-PB16A
 
 ### SP-PB17 — Expand avatars and support photo upload
 
-**Status:** NOT STARTED. **Workstream:** Profile. **Access:** Tier not specified.
+**Status:** IN PROGRESS — preset-avatar subtask complete 28 September 2026;
+photo upload pending. **Workstream:** Profile. **Access:** Existing access for
+all authenticated users; no new gate.
 
 Offer more selectable avatars and a separate upload-photo slice with crop/preview/replace/remove. Validate image type and size server-side, re-encode accepted images, strip metadata, scope access/storage and delete replaced assets. Preserve historical player identities, initials fallback and consistent rendering across Profile, selected players and Game Night. Do not assume a reusable player identity is an authenticated account.
+
+The bounded preset subtask expands the existing `avatar_key` catalogue from
+Forest, Gold and Clay to six choices, retaining all three stored IDs and adding
+Dice teal, Meeple rust and Card blue. One shared labelled radio grid is used by
+Settings → Profile and onboarding; existing `PlayerAvatar` rendering carries
+the same selection into app navigation, named-player Picker selection and
+other current avatar surfaces. The existing profile endpoint/save flow is
+unchanged apart from accepting the three additional bounded keys. Profile-only
+saves do not resubmit preferences, and failed saves leave the controlled name
+and avatar choice available for retry.
+
+Evidence: five focused frontend catalogue/render tests and six backend
+profile/API tests passed, as did the production frontend build, changed-file
+lint and `git diff --check`. A mocked 390×844 Chrome pass selected Card blue by
+keyboard, proved the choice survived an intentional failed save, saved it,
+reloaded it from mock-server state and found the same small avatar in Picker.
+The representative capture is
+`docs/screenshots/sp-pb17/preset-avatar-profile-mobile.png`. Existing
+SQLite-backed API persistence coverage was used because the database column and
+schema did not change; the browser save/reload evidence is mocked, not a real
+account or production check. Photo upload, crop/preview/replace/remove, image
+storage and server-side upload validation remain a separate pending subtask.
+SP-PB02 remains blocked and beta remains on hold.
 
 ### SP-PB18 — Make Game Night a group decision with voting
 

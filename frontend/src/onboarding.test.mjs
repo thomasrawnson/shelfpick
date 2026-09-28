@@ -8,12 +8,16 @@ let server
 let OnboardingView
 let ProfileSettings
 let PlayerAvatar
+let AvatarPicker
+let avatarCatalog
 
 before(async () => {
   server = await createServer({ server: { middlewareMode: true }, appType: "custom" })
   OnboardingView = (await server.ssrLoadModule("/src/components/OnboardingView.tsx")).default
   ProfileSettings = (await server.ssrLoadModule("/src/components/ProfileSettings.tsx")).default
   PlayerAvatar = (await server.ssrLoadModule("/src/components/ui/PlayerAvatar.tsx")).default
+  AvatarPicker = (await server.ssrLoadModule("/src/components/ui/AvatarPicker.tsx")).default
+  avatarCatalog = await server.ssrLoadModule("/src/avatar-catalog.ts")
 })
 
 after(async () => { await server?.close() })
@@ -40,8 +44,26 @@ test("profile shows the saved identity and preferences", () => {
     user, onChange: () => {},
   }))
   assert.match(markup, /value="Morgan Reed"/)
-  assert.match(markup, /gold avatar" aria-pressed="true"/)
+  assert.match(markup, /checked="" value="gold"/)
+  assert.match(markup, /Gold/)
   assert.match(markup, /Save profile/)
+})
+
+test("avatar catalogue keeps legacy IDs and offers labelled board-game choices", () => {
+  assert.deepEqual(avatarCatalog.AVATAR_IDS.slice(0, 3), ["forest", "gold", "clay"])
+  assert.deepEqual(avatarCatalog.AVATAR_IDS.slice(3), ["dice", "meeple", "cards"])
+  for (const choice of avatarCatalog.AVATAR_CATALOG) {
+    assert.ok(choice.label)
+    assert.ok(choice.description)
+  }
+
+  const markup = renderToStaticMarkup(React.createElement(AvatarPicker, {
+    inputName: "test-avatar", name: "Morgan Reed", value: "cards", onChange: () => {},
+  }))
+  assert.match(markup, /role="radiogroup"|type="radio"/)
+  assert.match(markup, /checked="" value="cards"/)
+  assert.match(markup, /Card blue/)
+  assert.match(markup, /Blue token with a card motif/)
 })
 
 test("avatar uses initials without an uploaded image", () => {
@@ -49,5 +71,14 @@ test("avatar uses initials without an uploaded image", () => {
     name: "Morgan Reed", variant: "forest",
   }))
   assert.match(markup, /player-avatar-forest/)
-  assert.match(markup, />MR<\/span>/)
+  assert.match(markup, /player-avatar-initials">MR<\/span>/)
+})
+
+test("new avatar motifs retain legible initials", () => {
+  const markup = renderToStaticMarkup(React.createElement(PlayerAvatar, {
+    name: "A Very Long Player Name", variant: "meeple",
+  }))
+  assert.match(markup, /player-avatar-meeple/)
+  assert.match(markup, /player-avatar-motif-meeple/)
+  assert.match(markup, /player-avatar-initials">AV<\/span>/)
 })

@@ -101,6 +101,31 @@ def test_profile_update_changes_identity_and_clears_defaults(account):
     assert client.get("/auth/me", headers=headers).json()["player_name"] == "Morgan R"
 
 
+def test_profile_update_accepts_new_avatar_without_changing_other_fields(account):
+    client, _, _, headers = account
+    original = client.post("/auth/onboarding/complete", headers=headers, json={
+        "player_name": "Morgan", "avatar_key": "gold",
+        "preferred_player_count": 4, "preferred_play_time": 90,
+        "preferred_play_style": "cooperative",
+    }).json()
+
+    response = client.put("/auth/profile", headers=headers, json={"avatar_key": "dice"})
+
+    assert response.status_code == 200
+    profile = response.json()
+    assert profile["avatar_key"] == "dice"
+    assert profile["player_name"] == original["player_name"]
+    assert profile["preferred_player_count"] == original["preferred_player_count"]
+    assert profile["preferred_play_time"] == original["preferred_play_time"]
+    assert profile["preferred_play_style"] == original["preferred_play_style"]
+    assert client.get("/auth/me", headers=headers).json()["avatar_key"] == "dice"
+    players = client.get("/players", headers=headers).json()
+    assert any(
+        player["id"] == profile["profile_player_id"] and player["avatar_key"] == "dice"
+        for player in players
+    )
+
+
 def test_preference_only_update_preserves_identity_and_rejects_invalid_style(account):
     client, _, _, headers = account
     client.post("/auth/onboarding/complete", headers=headers, json={
