@@ -13,6 +13,13 @@ Resume beta only after requested work, validation, operational gates and
 Tom's decision. A completed Top 100 rank filter does not establish live
 ranked-source availability.
 
+Confirmed on 28 September: use personal game rankings for the Pro recommendation
+enhancement; scan retail EAN/UPC box barcodes; attendees scan the host's QR and
+vote on their own phones; make Add game prominent. Rankings placement remains
+open because the navigation bar is crowded. SP-PB20 adds cleanup of repeated
+text beneath headings, retaining useful guidance and moving longer optional
+explanations into contextual help.
+
 ## Prior priorities and completed work
 
 The agreed pre-beta priorities are:
