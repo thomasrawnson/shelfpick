@@ -119,8 +119,8 @@ class RankingRepository:
             for game, ranking in rows
         ]
 
-    def get_discover_affinity_games(self) -> list[dict]:
-        """Return compared owned games for Discover affinity."""
+    def get_compared_owned_games(self) -> list[dict]:
+        """Return current compared games for personal recommendation signals."""
         rows = (
             self.db.query(Game, GameRanking)
             .join(

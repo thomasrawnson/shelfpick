@@ -19,7 +19,7 @@ entitlement, purchase claim or billing behavior changed. Beta remains on hold.
 
 | Feature | Implemented behaviour | Current access | Frontend and backend enforcement | Limitations or planned-only functionality |
 | --- | --- | --- | --- | --- |
-| Picker | Ranks owned, non-expansion games by player count, time, complexity, age, play style, category/mechanic preferences and play history. Best match, Different and Surprise are implemented; selected players add exact-group history. Optional mood reranking has a deterministic fallback. | Free and Pro | Frontend exposes the flow without a tier check. Backend endpoints are authenticated and dependencies scope games, plays and analytics to the current user; there is no Pro capability check. | `advanced_recommendations` is an entitlement name only. Mood AI depends on server configuration and is not a Pro boundary. |
+| Picker | Ranks owned, non-expansion games by player count, time, complexity, age, play style, category/mechanic preferences and play history. Best match, Different and Surprise are implemented; selected players add exact-group history. Optional mood reranking has a deterministic fallback. Pro count-based sessions additionally apply a bounded direct signal from current personal ShelfPick rankings. | Core Picker is Free and Pro; personal-ranking influence is Pro | Frontend exposes the core flow without a tier check. Backend endpoints are authenticated and dependencies scope games, plays and analytics to the current user. The backend independently checks `advanced_recommendations` before loading personal rankings; Free and named-player sessions do not receive the signal. | Ranking influence needs four compared games with a non-zero spread and is bounded to -5 through +5 points. Mood AI depends on server configuration and is not a Pro boundary. |
 | Discover Hot | Returns unowned games in BoardGameGeek Hot order with source explanations and Want to Play state. | Free and Pro | Frontend tab is always available. Backend is authenticated/user-scoped and requests only the Hot source; no Pro check. | Requires candidate metadata from BoardGameGeek. A 24-hour in-memory candidate cache can serve stale IDs after a source failure, but does not survive a process restart. |
 | Discover Top 100 | Returns unowned games whose original ranked-source position is 1–100, without backfilling from lower ranks. | Free and Pro | Frontend tab is always available. Backend is authenticated/user-scoped and limits the ranked source to positions 1–100; no Pro check. | Ranked-page failure with no in-process stale cache makes this ranked-only mode unavailable. |
 | Discover For You | Scores unowned Hot and ranked candidates using shelf categories/mechanics, per-owned-game play counts, preferred or observed player count, preferred or median play time, rating, BGG player-count evidence and a bounded affinity derived from the user's personal ShelfPick rankings. Explanations are derived from the signals that actually contribute. | Pro only | Frontend checks `personalized_discover` before requesting results and shows a locked state otherwise. Backend independently returns 403 for Free before calling the service. Ranking creation and viewing remain Free. | Ranking affinity requires four explicitly compared games and a non-zero personal-rating spread, and is capped at +3.0 points. Empty/no-signal accounts fall back to popular source candidates rather than personalised evidence. Only the first 30 merged candidates receive metadata/scoring. Source caches are in-process and metadata remains a live dependency. |
@@ -79,12 +79,13 @@ entitlement, purchase claim or billing behavior changed. Beta remains on hold.
 1. **Checkout blocker:** configure the agreed £3.99 one-off price, implement
    checkout, grant/reconcile Pro idempotently, and add purchase recovery. The
    current disabled action is truthful.
-2. **Entitlement contract still overstates some implementation:** Pro currently
-   receives `advanced_recommendations`, `advanced_stats` and
-   `game_night_enhanced`, although no corresponding behaviour is enforced or
-   exposed. `live_play_enhancements` is now implemented and independently
-   enforced. Before sale, expose only implemented capabilities or explicitly
-   separate planned capability identifiers from granted entitlements.
+2. **Entitlement contract still overstates some implementation:**
+   `advanced_recommendations` now independently enables the Picker personal-
+   ranking signal and `live_play_enhancements` enables the timer. Pro still
+   receives `advanced_stats` and `game_night_enhanced` although no corresponding
+   behaviour is enforced or exposed. Before sale, expose only implemented
+   capabilities or explicitly separate planned capability identifiers from
+   granted entitlements.
 3. **For You resilience is process-local:** persist a last-known-good candidate
    snapshot, define freshness, and verify restart behaviour. Candidate metadata
    also needs an intentional failure/fallback policy.
@@ -127,8 +128,21 @@ Chrome signal/no-signal pass and `git diff --check` passed. This was isolated
 and mocked evidence; no live BoardGameGeek source, production account or
 production data was accessed. The blocked ranked-source retrieval can reduce
 For You candidate breadth but is separate from the implemented personal-score
-logic. Picker ranking integration remains separate, SP-PB02 remains blocked
-and beta remains on hold.
+logic.
+
+SP-PB15 Picker follow-up (28 September): Pro count-based Picker requests reuse
+the existing `advanced_recommendations` entitlement and current user-scoped
+ShelfPick Elo rows. At least four compared owned games and a non-zero spread
+are required; each directly ranked candidate receives a signed, confidence-
+weighted contribution bounded to -5 through +5 on Picker's 0–100 scale.
+Unranked, sparse and tied data is neutral. Free Picker does not query the
+signal, and the existing Free ranking feature remains available. Named-player
+sessions omit the owner-only signal rather than describing it as group input.
+The concise high/low ranking reason is emitted only when the final clamped
+score changes. Ninety focused backend tests, the frontend production build, a
+mocked 390x844 explanation/overflow check and `git diff --check` passed. No live
+account, production data or schema change was involved. SP-PB02 remains
+blocked, photo upload remains post-beta and beta remains on hold.
 
 SP-PB12 addendum (28 September): seven focused share-card tests, the production
 frontend build, changed-file lint and `git diff --check` passed. A mocked

@@ -8,6 +8,7 @@ from services.entitlements import (
     resolve_tier,
 )
 from api.routers.auth import user_response
+from api.dependencies import get_picker_personal_rankings
 
 
 def test_free_is_safe_default_for_missing_or_unknown_tier():
@@ -53,3 +54,26 @@ def test_frontend_user_response_uses_the_same_entitlement_rules():
 
     assert response.tier == "FREE"
     assert response.entitlements == [Feature.GAME_NIGHT_BASIC.value]
+
+
+def test_picker_personal_rankings_are_loaded_for_pro_only():
+    class RankingRepository:
+        def __init__(self):
+            self.calls = 0
+
+        def get_compared_owned_games(self):
+            self.calls += 1
+            return [{"bgg_id": 1, "rating": 1512, "comparisons_count": 1}]
+
+    repository = RankingRepository()
+
+    assert get_picker_personal_rankings(
+        SimpleNamespace(tier="FREE"),
+        repository,
+    ) == []
+    assert repository.calls == 0
+    assert get_picker_personal_rankings(
+        SimpleNamespace(tier="PRO"),
+        repository,
+    )[0]["bgg_id"] == 1
+    assert repository.calls == 1

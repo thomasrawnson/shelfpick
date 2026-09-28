@@ -51,7 +51,7 @@ class FakeRankingRepository:
     def __init__(self, games=None):
         self.games = games or []
 
-    def get_discover_affinity_games(self):
+    def get_compared_owned_games(self):
         return self.games
 
 
@@ -145,7 +145,7 @@ def make_service(play_repository=None, repository=None, ranking_repository=None)
 
 def test_hot_and_top100_do_not_read_personal_rankings():
     class RankingsMustNotBeRead:
-        def get_discover_affinity_games(self):
+        def get_compared_owned_games(self):
             raise AssertionError("source modes must not query personal rankings")
 
     service = make_service(ranking_repository=RankingsMustNotBeRead())

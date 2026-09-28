@@ -326,8 +326,15 @@ Free personal ranking, Hot and Top 100 behavior is unchanged. Hard ownership,
 player/time and exact-count Not Recommended safeguards remain ahead of this
 ranking refinement. Focused backend and frontend tests, build, changed-file
 lint, mocked mobile copy validation and `git diff --check` passed. Picker
-ranking integration remains separately tracked. No live ranked-source claim is
-made; SP-PB02 remains BLOCKED and beta remains on hold.
+ranking integration then completed as the bounded SP-PB15 follow-up: Pro
+count-based Picker requests apply each owned candidate's current ShelfPick Elo
+rating directly, require at least four compared games with a non-zero spread,
+and add at most -5 to +5 points on Picker's 0–100 scale. Unranked, sparse and
+tied data is neutral; Free Picker does not query the signal, and named-player
+sessions do not apply it. Hard suitability checks remain authoritative,
+and the ranking explanation appears only when the final score actually changes.
+No live ranked-source claim is made; SP-PB02 remains BLOCKED, photo upload is
+post-beta and beta remains on hold.
 
 ## Foundation — Core Picker improvements
 

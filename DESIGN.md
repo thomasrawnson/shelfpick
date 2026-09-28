@@ -278,6 +278,15 @@ rerenders and dedicated play entry preserve explicit session choices. Start over
 begins a new session and reapplies the latest defaults. Saving Settings affects
 the next fresh session and never silently rewrites an active Picker session.
 
+### Picker personal-ranking explanation — 28 September 2026
+
+When a Pro count-based Picker result's final score is changed by the account
+owner's personal ShelfPick ranking, the result may state **Higher in your
+personal rankings** or **Lower in your personal rankings**. Do not show this
+copy for neutral, missing, sparse or tied data, or when score clamping removes
+the effect. Named-player sessions omit the owner-only ranking signal entirely;
+never present it as a shared preference or imply rankings for other players.
+
 ### Live play details and active-timer indicator
 
 The shared play form accepts an optional Free-form location label and keeps

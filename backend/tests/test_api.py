@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 
+import pytest
 from fastapi.testclient import TestClient
 
 from api.main import (
@@ -14,7 +15,10 @@ from api.main import (
 from api.current_user import (
     get_current_user,
 )
-from api.dependencies import get_live_timer_service
+from api.dependencies import (
+    get_live_timer_service,
+    get_picker_personal_rankings,
+)
 from database.models import User
 from models.game import Game
 from models.game import PlayerCountPoll
@@ -22,6 +26,18 @@ from models.play import Play
 
 
 client = TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def neutral_picker_rankings():
+    app.dependency_overrides[
+        get_picker_personal_rankings
+    ] = lambda: []
+    yield
+    app.dependency_overrides.pop(
+        get_picker_personal_rankings,
+        None,
+    )
 
 
 class FakeLiveTimerService:
@@ -325,6 +341,69 @@ def test_picker_returns_ranked_matches():
             "recommendation_bgg_ids"
         ]
         == [2, 1]
+    )
+
+
+def test_picker_uses_personal_rankings_only_without_named_players():
+    class FakeGameService:
+        def get_games(self):
+            return [
+                Game(
+                    bgg_id=bgg_id,
+                    name=name,
+                    min_players=1,
+                    max_players=4,
+                    owned=True,
+                )
+                for bgg_id, name in [
+                    (1, "Alpha low"),
+                    (2, "Zulu high"),
+                    (3, "Middle high"),
+                    (4, "Middle low"),
+                ]
+            ]
+
+    class FakePlayRepository:
+        def get_players(self):
+            return [{"id": 9, "name": "Morgan"}]
+
+        def get_group_game_play_stats(self, player_ids):
+            return {}
+
+        def get_game_play_stats(self):
+            return {}
+
+    ranking_rows = [
+        {"bgg_id": 2, "rating": 1600, "comparisons_count": 3},
+        {"bgg_id": 3, "rating": 1530, "comparisons_count": 3},
+        {"bgg_id": 4, "rating": 1470, "comparisons_count": 3},
+        {"bgg_id": 1, "rating": 1400, "comparisons_count": 3},
+    ]
+    app.dependency_overrides[get_game_service] = lambda: FakeGameService()
+    app.dependency_overrides[get_picker_play_repository] = lambda: FakePlayRepository()
+    app.dependency_overrides[
+        get_picker_analytics_repository
+    ] = lambda: FakePickerAnalyticsRepository()
+    app.dependency_overrides[
+        get_picker_personal_rankings
+    ] = lambda: ranking_rows
+
+    try:
+        personal = client.get("/picker", params={"players": 2})
+        named = client.get(
+            "/picker",
+            params={"players": 1, "player_ids": 9},
+        )
+    finally:
+        app.dependency_overrides.clear()
+
+    assert personal.status_code == 200
+    assert personal.json()[0]["game"]["bgg_id"] == 2
+    assert "Higher in your personal rankings" in personal.json()[0]["reasons"]
+    assert named.status_code == 200
+    assert all(
+        not any("personal rankings" in reason for reason in match["reasons"])
+        for match in named.json()
     )
 
 

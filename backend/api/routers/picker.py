@@ -10,6 +10,7 @@ from fastapi import (
 from api.dependencies import (
     get_game_service,
     get_picker_analytics_repository,
+    get_picker_personal_rankings,
     get_play_repository,
 )
 from api.schemas.picker_analytics import (
@@ -145,6 +146,9 @@ def pick_games(
     analytics_repository: PickerAnalyticsRepository = Depends(
         get_picker_analytics_repository
     ),
+    personal_rankings: list[dict] = Depends(
+        get_picker_personal_rankings
+    ),
     mood: str | None = Query(
         None,
         max_length=300,
@@ -238,6 +242,11 @@ def pick_games(
             play_stats=play_stats,
             group_play_stats=(
                 group_play_stats
+            ),
+            personal_rankings=(
+                []
+                if player_ids
+                else personal_rankings
             ),
         )
     )

@@ -1,8 +1,13 @@
 from models.game import Game
 from models.game import PlayerCountPoll
-from services.picker_service import PickerCriteria, PickerService
+from services.picker_service import (
+    MAX_PERSONAL_RANKING_INFLUENCE,
+    PickerCriteria,
+    PickerService,
+)
 from datetime import datetime, timedelta, timezone
 from models.game_play_stats import GamePlayStats
+from unittest.mock import patch
 
 
 def test_filters_games_by_player_count_and_play_time():
@@ -179,6 +184,170 @@ def test_rank_matches_returns_highest_score_first():
 
     assert matches[0].game.bgg_id == 2
     assert matches[0].score > matches[1].score
+
+
+def _personal_rankings(high_bgg_id=2, low_bgg_id=1):
+    return [
+        {"bgg_id": high_bgg_id, "rating": 1600, "comparisons_count": 3},
+        {"bgg_id": 3, "rating": 1530, "comparisons_count": 3},
+        {"bgg_id": 4, "rating": 1470, "comparisons_count": 3},
+        {"bgg_id": low_bgg_id, "rating": 1400, "comparisons_count": 3},
+    ]
+
+
+def _ranking_candidate(bgg_id, name):
+    return Game(
+        bgg_id=bgg_id,
+        name=name,
+        min_players=2,
+        max_players=4,
+        max_play_time=60,
+        complexity=2.5,
+        owned=True,
+    )
+
+
+def test_personal_ranking_is_direct_bounded_and_explainable():
+    games = [
+        _ranking_candidate(1, "Alpha low"),
+        _ranking_candidate(2, "Zulu high"),
+        _ranking_candidate(3, "Middle high"),
+        _ranking_candidate(4, "Middle low"),
+        _ranking_candidate(5, "Unranked"),
+    ]
+    criteria = PickerCriteria(players=2)
+    baseline = PickerService().rank_matches(games, criteria)
+    ranked = PickerService().rank_matches(
+        games,
+        criteria,
+        personal_rankings=_personal_rankings(),
+    )
+    baseline_by_id = {match.game.bgg_id: match for match in baseline}
+    ranked_by_id = {match.game.bgg_id: match for match in ranked}
+
+    assert baseline[0].game.bgg_id == 1
+    assert ranked[0].game.bgg_id == 2
+    assert (
+        ranked_by_id[2].score - baseline_by_id[2].score
+        == MAX_PERSONAL_RANKING_INFLUENCE
+    )
+    assert (
+        ranked_by_id[1].score - baseline_by_id[1].score
+        == -MAX_PERSONAL_RANKING_INFLUENCE
+    )
+    assert "Higher in your personal rankings" in ranked_by_id[2].reasons
+    assert "Lower in your personal rankings" in ranked_by_id[1].reasons
+    assert ranked_by_id[5].score == baseline_by_id[5].score
+    assert not any("personal rankings" in reason for reason in ranked_by_id[5].reasons)
+
+
+def test_sparse_tied_and_missing_personal_rankings_are_neutral():
+    games = [
+        _ranking_candidate(1, "First"),
+        _ranking_candidate(2, "Second"),
+    ]
+    criteria = PickerCriteria(players=2)
+    baseline = PickerService().rank_matches(games, criteria)
+    sparse = PickerService().rank_matches(
+        games,
+        criteria,
+        personal_rankings=_personal_rankings()[:3],
+    )
+    tied = PickerService().rank_matches(
+        games,
+        criteria,
+        personal_rankings=[
+            {**ranking, "rating": 1500}
+            for ranking in _personal_rankings()
+        ],
+    )
+
+    def summary(matches):
+        return [
+            (match.game.bgg_id, match.score, match.reasons)
+            for match in matches
+        ]
+
+    assert summary(sparse) == summary(baseline)
+    assert summary(tied) == summary(baseline)
+    assert summary(PickerService().rank_matches(games, criteria)) == summary(baseline)
+
+
+def test_subsequent_picks_use_edited_personal_ranking_order():
+    games = [
+        _ranking_candidate(1, "Alpha"),
+        _ranking_candidate(2, "Zulu"),
+        _ranking_candidate(3, "Middle high"),
+        _ranking_candidate(4, "Middle low"),
+    ]
+    service = PickerService()
+    first = service.rank_matches(
+        games,
+        PickerCriteria(players=2),
+        personal_rankings=_personal_rankings(2, 1),
+    )
+    edited = service.rank_matches(
+        games,
+        PickerCriteria(players=2),
+        personal_rankings=_personal_rankings(1, 2),
+    )
+
+    assert first[0].game.bgg_id == 2
+    assert edited[0].game.bgg_id == 1
+
+
+def test_personal_rankings_do_not_override_repeat_avoidance_or_hard_exclusions():
+    now = datetime.now(timezone.utc)
+    recent_favourite = _ranking_candidate(2, "Recent favourite")
+    never_played = _ranking_candidate(5, "Never played")
+    rejected_favourite = _ranking_candidate(6, "Rejected favourite")
+    rejected_favourite.player_count_poll = [
+        PlayerCountPoll(2, 2, 5, 3, 10)
+    ]
+    rankings = [
+        {"bgg_id": 2, "rating": 1600, "comparisons_count": 3},
+        {"bgg_id": 6, "rating": 1580, "comparisons_count": 3},
+        {"bgg_id": 3, "rating": 1450, "comparisons_count": 3},
+        {"bgg_id": 4, "rating": 1400, "comparisons_count": 3},
+    ]
+
+    matches = PickerService().rank_matches(
+        [recent_favourite, never_played, rejected_favourite],
+        PickerCriteria(players=2),
+        play_stats={
+            2: GamePlayStats(
+                bgg_id=2,
+                play_count=10,
+                last_played_at=now - timedelta(days=2),
+            ),
+        },
+        personal_rankings=rankings,
+    )
+
+    assert matches[0].game.bgg_id == 5
+    assert all(match.game.bgg_id != 6 for match in matches)
+
+
+def test_surprise_keeps_random_selection_with_personal_rankings():
+    games = [
+        _ranking_candidate(1, "First"),
+        _ranking_candidate(2, "Second"),
+        _ranking_candidate(3, "Third"),
+        _ranking_candidate(4, "Fourth"),
+    ]
+
+    with patch("services.picker_service.random.shuffle") as shuffle:
+        matches = PickerService().rank_matches(
+            games,
+            PickerCriteria(
+                players=2,
+                mode="surprise",
+            ),
+            personal_rankings=_personal_rankings(),
+        )
+
+    shuffle.assert_called_once()
+    assert len(matches) == 4
 
 
 def test_rank_match_contains_explanation():

@@ -32,6 +32,7 @@ from services.discover_sources import (
     RankedDiscoverSource,
 )
 from services.wishlist_service import WishlistService
+from services.entitlements import Feature, can_use
 
 def get_game_service(
     db: Session = Depends(get_db),
@@ -99,18 +100,41 @@ def get_picker_analytics_repository(
     )
 
 
-def get_ranking_service(
+def get_ranking_repository(
     db: Session = Depends(get_db),
     current_user: User = Depends(
         get_current_user
     ),
-) -> RankingService:
-    return RankingService(
-        RankingRepository(
-            db,
-            user_id=current_user.id,
-        )
+) -> RankingRepository:
+    return RankingRepository(
+        db,
+        user_id=current_user.id,
     )
+
+
+def get_ranking_service(
+    repository: RankingRepository = Depends(
+        get_ranking_repository
+    ),
+) -> RankingService:
+    return RankingService(repository)
+
+
+def get_picker_personal_rankings(
+    current_user: User = Depends(
+        get_current_user
+    ),
+    repository: RankingRepository = Depends(
+        get_ranking_repository
+    ),
+) -> list[dict]:
+    if not can_use(
+        current_user,
+        Feature.ADVANCED_RECOMMENDATIONS,
+    ):
+        return []
+
+    return repository.get_compared_owned_games()
 
 
 def get_insights_service(
@@ -146,16 +170,16 @@ def get_discover_service(
     play_repository: PlayRepository = Depends(
         get_play_repository
     ),
+    ranking_repository: RankingRepository = Depends(
+        get_ranking_repository
+    ),
 ) -> DiscoverService:
     bgg_client = BGGClient()
 
     return DiscoverService(
         repository=GameRepository(db),
         play_repository=play_repository,
-        ranking_repository=RankingRepository(
-            db,
-            user_id=current_user.id,
-        ),
+        ranking_repository=ranking_repository,
         bgg_client=bgg_client,
         candidate_provider=(
             DiscoverCandidateProvider(

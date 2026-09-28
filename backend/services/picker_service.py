@@ -23,6 +23,9 @@ MIN_PLAYER_COUNT_POLL_VOTES = 10
 # A reliable exact-count poll at or above this percentage is ineligible.
 # Keep the policy centralized so it can be tuned without changing storage.
 PLAYER_COUNT_EXCLUSION_PERCENT = 30
+MIN_PERSONAL_RANKED_GAMES = 4
+PERSONAL_RANKING_CONFIDENCE_COMPARISONS = 3
+MAX_PERSONAL_RANKING_INFLUENCE = 5
 
 
 @dataclass
@@ -218,6 +221,7 @@ class PickerService:
             GamePlayStats,
         ]
         | None = None,
+        personal_rankings: list[dict] | None = None,
     ) -> list[PickerMatch]:
         play_stats = play_stats or {}
 
@@ -230,6 +234,10 @@ class PickerService:
             criteria,
         )
 
+        ranking_scores = self._personal_ranking_scores(
+            personal_rankings or []
+        )
+
         ranked = [
             self._score_game(
                 game,
@@ -239,6 +247,10 @@ class PickerService:
                 ),
                 group_play_stats.get(
                     game.bgg_id
+                ),
+                ranking_scores.get(
+                    game.bgg_id,
+                    0,
                 ),
             )
             for game in eligible_games
@@ -263,6 +275,7 @@ class PickerService:
         criteria: PickerCriteria,
         play_stats: GamePlayStats | None = None,
         group_play_stats: GamePlayStats | None = None,
+        personal_ranking_score: int = 0,
     ) -> PickerMatch:
         score = 35
 
@@ -381,6 +394,25 @@ class PickerService:
                 group_reasons
             )
 
+        score_without_ranking = max(
+            0,
+            min(score, 100),
+        )
+        score_with_ranking = max(
+            0,
+            min(
+                score + personal_ranking_score,
+                100,
+            ),
+        )
+        if score_with_ranking != score_without_ranking:
+            score = score_with_ranking
+            reasons.append(
+                "Higher in your personal rankings"
+                if personal_ranking_score > 0
+                else "Lower in your personal rankings"
+            )
+
         if criteria.mode == "different":
             reasons.insert(
                 0,
@@ -407,6 +439,49 @@ class PickerService:
             ),
             reasons=reasons,
         )
+
+    @staticmethod
+    def _personal_ranking_scores(
+        ranked_games: list[dict],
+    ) -> dict[int, int]:
+        if len(ranked_games) < MIN_PERSONAL_RANKED_GAMES:
+            return {}
+
+        ratings = [float(game["rating"]) for game in ranked_games]
+        lowest = min(ratings)
+        highest = max(ratings)
+        if highest <= lowest:
+            return {}
+
+        midpoint = (highest + lowest) / 2
+        half_span = (highest - lowest) / 2
+        scores: dict[int, int] = {}
+
+        for game in ranked_games:
+            confidence = min(
+                int(game["comparisons_count"])
+                / PERSONAL_RANKING_CONFIDENCE_COMPARISONS,
+                1.0,
+            )
+            normalized = (
+                (float(game["rating"]) - midpoint)
+                / half_span
+            )
+            contribution = round(
+                normalized
+                * confidence
+                * MAX_PERSONAL_RANKING_INFLUENCE
+            )
+            if contribution != 0:
+                scores[int(game["bgg_id"])] = max(
+                    -MAX_PERSONAL_RANKING_INFLUENCE,
+                    min(
+                        contribution,
+                        MAX_PERSONAL_RANKING_INFLUENCE,
+                    ),
+                )
+
+        return scores
 
     @staticmethod
     def _score_group_history(

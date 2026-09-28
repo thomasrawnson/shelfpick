@@ -152,7 +152,7 @@ class DiscoverService:
         source_by_id = {candidate.bgg_id: candidate for candidate in source_candidates}
         signals: set[str] = set()
         category_rank_affinity, mechanic_rank_affinity = self._ranking_affinities(
-            self.ranking_repository.get_discover_affinity_games()
+            self.ranking_repository.get_compared_owned_games()
         )
 
         category_weights: Counter[str] = Counter()

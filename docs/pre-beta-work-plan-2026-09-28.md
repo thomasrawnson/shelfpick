@@ -393,7 +393,43 @@ lint, a mocked 390×844 Chrome signal/no-signal check and `git diff --check`
 passed. No live BoardGameGeek retrieval or production account was used. The
 known ranked-source availability issue can reduce the candidate pool but does
 not change the implemented scoring; SP-PB02 remains blocked. Picker ranking
-integration remains a separate optional future slice. Beta remains on hold.
+integration was subsequently completed as the approved bounded follow-up.
+
+#### Picker personal-ranking follow-up — COMPLETE, 28 September 2026
+
+Pro count-based Picker requests now use the current personal ShelfPick Elo
+rating of each owned candidate directly; they do not use BoardGameGeek rank or
+rating and do not copy Discover's category/mechanic affinity. The signal
+requires at least four explicitly compared owned, non-expansion games and a
+non-zero rating spread. A candidate's rating is normalised around the current
+range midpoint, confidence ramps to full after three comparisons, and the
+rounded contribution is bounded to **-5 to +5 points** on Picker's existing
+0–100 score. Unranked candidates and sparse or tied sets remain neutral, so
+missing data preserves the prior result.
+
+Eligibility, player/time/play-style constraints and exact-count BoardGameGeek
+Not Recommended filtering run before scoring. Existing history, variety and
+repeat-avoidance contributions remain unchanged, as does surprise-mode
+shuffling. The reasons **Higher in your personal rankings** and **Lower in your
+personal rankings** appear only when the contribution changes the final
+clamped score. Current rows are read for every request, so a subsequent pick
+reflects ranking edits without a cache. The existing backend
+`advanced_recommendations` entitlement enables the signal for Pro; Free Picker
+does not query it and Free ranking entry remains unchanged. Named-player
+sessions deliberately omit the account owner's signal so it is not represented
+as a shared group preference. Saved defaults, authoritative player counts and
+dedicated play entry are unchanged.
+
+Evidence: 90 focused backend service/API/repository/entitlement and regression
+tests passed, covering deterministic influence, the +/-5 bound, neutral
+unranked/sparse/tied cases, edited ranking order, Free/Pro enforcement,
+account scoping, named-player omission, hard exclusions, repeat avoidance and
+surprise-mode shuffling. The frontend production build passed; no frontend
+source file changed, so there was no changed frontend file to lint. A mocked
+390x844 mobile Chrome pass verified the contributed explanation and absence of
+horizontal overflow; `git diff --check` passed. No live account, production
+data or external ranking source was used, and no schema changed. SP-PB02
+remains blocked, photo upload remains post-beta and beta remains on hold.
 
 ### SP-PB16 — Add retail barcode scanning
 
