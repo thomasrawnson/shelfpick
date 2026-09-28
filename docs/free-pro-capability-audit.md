@@ -8,6 +8,26 @@ The agreed launch offer remains a **£3.99 one-off purchase**, not a
 subscription. No price is technically configured, checkout is not implemented,
 and purchasing remains disabled.
 
+## Planned scope update — 28 September 2026
+
+External beta is on hold. `docs/pre-beta-work-plan-2026-09-28.md` now governs delivery.
+The matrix below remains the 26 September audit of shipped behaviour.
+
+Explicit new Pro requirements: SP-PB11 live duration, SP-PB15 ranking-based
+recommendations and SP-PB19 challenges. Do not grant or advertise these until
+implemented and independently enforced. Discover scoring precedes optional
+Picker scoring; confirm the ranking input first. Preserve existing Free
+logging, Picker, Collection, Hot/Top 100, Insights and basic Game Night.
+Free branded sharing is proposed; other new feature tiers are undecided.
+The £3.99 one-off model and disabled checkout remain unchanged.
+
+The reported Top 100 failure is reopened as SP-PB02; rank-boundary correction
+does not establish current source reliability. The For You final verification
+report records three play-repository tests, four Discover API tests and 33
+frontend tests passing, browser-visible CORS headers and commit
+8f7117607b39a4b738e4f3c7e3c02eb5010cf731. The original audit validation below
+is historical and is not overwritten.
+
 ## Verified capability matrix
 
 | Feature | Implemented behaviour | Current access | Frontend and backend enforcement | Limitations or planned-only functionality |
@@ -73,7 +93,7 @@ and purchasing remains disabled.
 5. **Operational proof remains absent:** no live BoardGameGeek or production-like
    availability check was run in this audit.
 
-## Recommended next slice: Pro entitlement and For You readiness
+## Retained hardening requirements (sequenced by the 28 September plan)
 
 Complete a pre-checkout hardening slice before implementing billing.
 
