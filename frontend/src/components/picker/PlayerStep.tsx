@@ -141,54 +141,75 @@ function PlayerStep({
       <div className="picker-step-centered">
         <p className="picker-essential-label">Who is playing?</p>
 
-        <button
-          type="button"
-          className="picker-navigation-card"
-          onClick={onChoosePlayers}
-        >
-          <span>
-            <strong>Choose specific players</strong>
-            <small>
-              {selectedPlayerIds.length > 0
-                ? selectedPlayerNames.join(", ")
-                : "Use known player preferences and play history"}
-            </small>
-          </span>
-          <span className="picker-navigation-chevron" aria-hidden="true">›</span>
-        </button>
-
-        <p className="player-or">or choose a group size</p>
-
-        <div className="player-grid">
-          {playerOptions.map((option) => (
+        {selectedPlayerIds.length > 0 ? (
+          <div className="picker-named-player-selection">
             <button
-              key={option}
               type="button"
-              className={
-                players === option && selectedPlayerIds.length === 0
-                  ? option === 1
-                    ? "player-chip solo selected"
-                    : "player-chip selected"
-                  : option === 1
-                    ? "player-chip solo"
-                    : "player-chip"
-              }
-              aria-label={
-                option === 1
-                  ? "Solo"
-                  : `${option === 6 ? "6 or more" : option} players`
-              }
-              aria-pressed={
-                players === option && selectedPlayerIds.length === 0
-              }
-              onClick={() => onSelectCount(option)}
+              className="picker-navigation-card"
+              onClick={onChoosePlayers}
             >
-              <strong>
-                {option === 1 ? "Solo" : option === 6 ? "6+" : option}
-              </strong>
+              <span>
+                <strong>
+                  {selectedPlayerIds.length} named {selectedPlayerIds.length === 1 ? "player" : "players"}
+                </strong>
+                <small>{selectedPlayerNames.join(", ")}</small>
+              </span>
+              <span className="picker-navigation-action">Edit players</span>
             </button>
-          ))}
-        </div>
+            <button
+              type="button"
+              className="picker-count-mode-switch"
+              onClick={() => onSelectCount(null)}
+            >
+              Use group size instead
+            </button>
+          </div>
+        ) : (
+          <>
+            <button
+              type="button"
+              className="picker-navigation-card"
+              onClick={onChoosePlayers}
+            >
+              <span>
+                <strong>Choose specific players</strong>
+                <small>Use known player preferences and play history</small>
+              </span>
+              <span className="picker-navigation-chevron" aria-hidden="true">›</span>
+            </button>
+
+            <p className="player-or">or choose a group size</p>
+
+            <div className="player-grid">
+              {playerOptions.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  className={
+                    players === option
+                      ? option === 1
+                        ? "player-chip solo selected"
+                        : "player-chip selected"
+                      : option === 1
+                        ? "player-chip solo"
+                        : "player-chip"
+                  }
+                  aria-label={
+                    option === 1
+                      ? "Solo"
+                      : `${option === 6 ? "6 or more" : option} players`
+                  }
+                  aria-pressed={players === option}
+                  onClick={() => onSelectCount(option)}
+                >
+                  <strong>
+                    {option === 1 ? "Solo" : option === 6 ? "6+" : option}
+                  </strong>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
 
         <div className="preference-section player-complexity-section">
           <p className="preference-label">Complexity</p>

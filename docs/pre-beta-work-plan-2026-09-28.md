@@ -81,9 +81,29 @@ authorised official dump for a persistent ingestion path.
 
 ### SP-PB03 — Make selected players authoritative in Picker
 
-**Status:** NOT STARTED. **Workstream:** Flow correction. **Access:** Existing Free access.
+**Status:** COMPLETE — 28 September 2026. **Workstream:** Flow correction. **Access:** Existing Free access.
 
 When named players are selected, derive count from that selection and remove the duplicate editable count control on the preceding criteria screen. Show a read-only count summary with Edit players. Preserve count-only use when no named players are selected. Test Back/forward, removing players and reset without contradictory counts. This is the provisional interpretation of the user's back-navigation report; reproduce before implementation.
+
+The reproduced criteria screen showed both the selected named-player group and
+the editable numeric count grid. Named-player mode now shows one derived count,
+the selected names, Edit players and an explicit Use group size instead action;
+the numeric choices render only in count-only mode. Editing names immediately
+updates the derived count, removing every name returns to an unselected
+count-only state, and Start over retains its existing defaults. Picker criteria,
+recommendation requests, Back/forward state and SP-PB01 play-entry prefill use
+the same authoritative count.
+
+Evidence: 44 frontend tests passed, including focused named/count-only rendering
+coverage and the existing named/count-only play-entry tests. Build, lint,
+colour-token guard, PWA checks and `git diff --check` passed. Mocked Playwright
+verified selecting, adding and removing named players, criteria Back/forward,
+switching to a numeric count, keyboard focus, bottom-navigation clearance and
+overflow at 390 and 1440px in light/dark. It also verified that named players
+prefill the dedicated play-entry screen and browser Back restores the result.
+Before/after captures are in `docs/screenshots/sp-pb03/`. No live API or
+database persistence was exercised because SP-PB03 changes client session state
+only. SP-PB04 remains not started.
 
 ### SP-PB04 — Default play style from preferences
 

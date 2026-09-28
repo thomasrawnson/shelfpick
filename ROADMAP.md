@@ -99,6 +99,18 @@ covered all seven screens at 390 and 1440px in both themes with one `h1`, visibl
 keyboard focus, navigation clearance and no overflow. Captures are in
 `docs/screenshots/sp-pb20/`.
 
+SP-PB03 is complete. The Picker no longer presents an editable numeric count
+alongside a named-player selection. Named-player mode derives and displays one
+authoritative count, keeps the selected names available through Edit players,
+and offers an explicit switch to count-only mode; the numeric control remains
+available when no names are selected. Forward/Back navigation, recommendation
+requests and the SP-PB01 play-entry prefill continue to consume that same
+session state. Forty-four frontend tests and all frontend checks passed.
+Mocked Playwright covered the state transitions, play-entry prefill and result
+restoration at 390 and 1440px in light/dark; captures are in
+`docs/screenshots/sp-pb03/`. SP-PB04 remains pending, SP-PB02 remains blocked
+and beta remains on hold.
+
 After SP-PB02 is unblocked, address
 Picker defaults/navigation, UI and Settings, plays/statistics/sharing, ranking
 intelligence, scanning, avatars, Game Night voting and Pro challenges. New Pro

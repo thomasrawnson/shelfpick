@@ -1343,6 +1343,36 @@
   font-size: 24px;
 }
 
+.picker-navigation-action {
+  flex: 0 0 auto;
+  margin-inline-start: 12px;
+  color: var(--color-accent-text);
+  font-size: var(--text-support);
+  font-weight: 800;
+}
+
+.picker-named-player-selection {
+  width: 100%;
+}
+
+.picker-count-mode-switch {
+  display: block;
+  min-height: 44px;
+  margin: 2px auto 0;
+  padding: 8px 12px;
+  border: 0;
+  background: transparent;
+  color: var(--color-accent-text);
+  font: inherit;
+  font-size: var(--text-support);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.picker-count-mode-switch:hover {
+  color: var(--color-brand-primary-hover);
+}
+
 .preference-link-list {
   display: grid;
 

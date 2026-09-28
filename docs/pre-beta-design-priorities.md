@@ -161,6 +161,17 @@ or support recovery. Mocked Playwright verified all seven screens at 390 and
 1440px in light/dark, including heading semantics, keyboard focus, navigation
 clearance and overflow; captures are in `docs/screenshots/sp-pb20/`.
 
+SP-PB03 selected-player authority completed on 28 September 2026. The Picker
+criteria screen now treats named selection and numeric group size as distinct
+modes: named players produce one derived count with their names and Edit players,
+while an explicit Use group size instead action returns to the unchanged numeric
+control. This removes the contradictory editable count without reducing
+count-only access. Mocked Playwright covered editing names, switching modes,
+forward/Back retention and dedicated play-entry prefill at 390 and 1440px in
+light/dark; captures are in `docs/screenshots/sp-pb03/`. SP-PB04 saved
+play-style defaults remain pending, SP-PB02 remains blocked and beta remains on
+hold.
+
 ### UI-2 — core visual polish
 
 After UI-1 is stable, refine hierarchy, typography, spacing, component

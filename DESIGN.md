@@ -241,6 +241,16 @@ Cards use tonal separation and a border before elevation. Recommendation cards g
 
 Filter tabs use a Forest label and short underline for the active state. Segmented controls place the selected option on Forest-soft. The bottom navigation currently uses five equal targets with 24px icons, short labels and a Forest-soft active tile, including the usable host-led Game Night flow. Dialogs use the surface color, the established 16px–18px radius range, a clear close action and the stronger overlay shadow.
 
+### Picker participant modes — 28 September 2026
+
+Picker participant selection has two mutually exclusive presentations. With
+named players selected, show their derived count and names as a read-only
+summary with an Edit players action; do not show the numeric count grid beside
+it. Provide a quiet, explicit Use group size instead action for changing modes.
+When no named players are selected, retain the existing numeric control so an
+anonymous or count-only group can continue. Recommendation criteria and play
+entry must consume the same active-mode count.
+
 ## Do's and Don'ts
 
 ### Do:
