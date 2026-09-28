@@ -25,7 +25,7 @@ product work below is the current engineering priority.
 
 **External beta testing is ON HOLD at Tom's request.** The requested pre-beta
 backlog and acceptance criteria are in `docs/pre-beta-work-plan-2026-09-28.md`.
-Complete SP-PB01–19 in the documented sequence, resolve the marked decisions,
+Complete SP-PB01–20 in the documented sequence, resolve the marked decisions,
 and validate the work before asking Tom to resume beta. Internal testing
 continues. This instruction supersedes older immediate-beta and post-launch
 timing below; existing completed slices remain historical implementation facts.
@@ -37,6 +37,13 @@ Game Night voting and Pro challenges. New Pro scope is live duration,
 ranking-based recommendation enhancements and challenges. Picker scoring use
 is optional pending Discover evaluation; other new access boundaries are not
 silently changed. Keep purchase claims limited to working features.
+
+Confirmed on 28 September: use personal game rankings for the Pro recommendation
+enhancement; scan retail EAN/UPC box barcodes; attendees scan the host's QR and
+vote on their own phones; make Add game prominent. Rankings placement remains
+open because the navigation bar is crowded. SP-PB20 adds cleanup of repeated
+text beneath headings, retaining useful guidance and moving longer optional
+explanations into contextual help.
 
 ## Completed pre-beta work and prior sequence
 
@@ -159,7 +166,7 @@ fallbacks, and do not change the logo or Free/Pro proposition as part of UI-1.
 
 1. SP-PB01–02: fix Picker play logging and Top 100 availability.
 2. SP-PB03–04: selected-player count and saved play-style defaults.
-3. SP-PB05–09: Settings, typography, Rankings placement, spacing and Collection.
+3. SP-PB05–09 and SP-PB20: Settings, typography, Rankings, spacing, Collection and heading copy.
 4. SP-PB10–11 and SP-PB14: location, Pro live duration and statistics.
 5. SP-PB12–13: branded play and monthly recap sharing.
 6. SP-PB15–17: Pro ranking recommendations, scanning and avatars.
@@ -501,8 +508,9 @@ Private Beta without overbuilding it.
 
 ### Historical post-MVP candidates (voting moved before beta)
 
-SP-PB18 now brings voting forward before beta. Remote invitations and shared
-live state remain decisions to scope; this does not reopen the completed MVP.
+SP-PB18 now requires QR joining and voting on participants' own phones before
+beta. Session membership, guest votes and cross-device state belong to this
+new task; the original completed MVP remains a historical baseline.
 
 - Guest invite links.
 - Saved regular groups.
@@ -607,5 +615,5 @@ plan. Broader challenge systems remain later work.
 
 SP-PB15 brings a focused Pro ranking-signal improvement to Discover before
 beta, with possible Picker use in a separate evaluated sub-slice. Confirm the
-meaning of ranking score first. SP-PB14 adds requested statistics with access
+mapping of the confirmed personal ranking data first. SP-PB14 adds requested statistics with access
 to be decided. Broader intelligence remains later work.
