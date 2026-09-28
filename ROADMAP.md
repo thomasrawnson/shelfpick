@@ -258,8 +258,9 @@ fallbacks, and do not change the logo or Free/Pro proposition as part of UI-1.
    remains pending.
 6. SP-PB12 branded saved-play sharing — COMPLETE; SP-PB13 monthly recap
    sharing remains pending.
-7. SP-PB15–17: Pro ranking recommendations and scanning remain pending;
-   SP-PB17 preset avatars are complete while photo upload remains pending.
+7. SP-PB15 Pro ranking recommendations are COMPLETE; SP-PB16 scanning remains pending;
+   SP-PB17 preset avatars are complete. Photo upload is a post-beta follow-up,
+   not a beta blocker.
 8. SP-PB18–19: Game Night voting and Pro challenges.
 9. Reconcile Free/Pro claims, complete validation and existing release gates.
 10. Resume private beta only after Tom's explicit decision, then public launch.
@@ -309,9 +310,24 @@ profile save flow retains a new choice after failure and preserves unrelated
 preferences. Focused frontend/backend tests, build, changed-file lint, mocked
 mobile keyboard/save/reload/Picker checks and `git diff --check` passed; the
 capture is under `docs/screenshots/sp-pb17/`. The database schema did not
-change. SP-PB17 remains IN PROGRESS overall because photo upload and its image
-storage/security acceptance criteria were deliberately not implemented.
+change. SP-PB17 is complete for its pre-beta preset scope. Photo upload and its
+image storage/security acceptance criteria remain recorded as post-beta work
+and do not block beta.
 SP-PB02 remains BLOCKED and beta remains on hold.
+
+SP-PB15 completed on 28 September 2026. Pro For You now reuses current
+per-user Elo-style ranking rows to derive a category/mechanic affinity from at
+least four explicitly compared owned games. Low-ranked affinities cancel
+high-ranked ones, sparse/tied/unranked data is neutral, and one combined
+positive contribution is capped at +3.0 points. A ranking reason and response
+signal appear only when that bounded contribution affects a returned result.
+The existing backend `personalized_discover` entitlement remains authoritative;
+Free personal ranking, Hot and Top 100 behavior is unchanged. Hard ownership,
+player/time and exact-count Not Recommended safeguards remain ahead of this
+ranking refinement. Focused backend and frontend tests, build, changed-file
+lint, mocked mobile copy validation and `git diff --check` passed. Picker
+ranking integration remains separately tracked. No live ranked-source claim is
+made; SP-PB02 remains BLOCKED and beta remains on hold.
 
 ## Foundation — Core Picker improvements
 

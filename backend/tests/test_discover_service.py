@@ -1,7 +1,7 @@
 from models.game import Game
 from models.game_play_stats import GamePlayStats
 from bgg.client import BGGSourceUnavailableError
-from services.discover_service import DiscoverService
+from services.discover_service import DiscoverService, MAX_RANKING_INFLUENCE
 from services.discover_sources import DiscoverCandidate, DiscoverCandidateProvider
 
 
@@ -47,6 +47,14 @@ class FakePlayRepository:
         return self.profile
 
 
+class FakeRankingRepository:
+    def __init__(self, games=None):
+        self.games = games or []
+
+    def get_discover_affinity_games(self):
+        return self.games
+
+
 class FakeCandidateProvider:
     candidates = [
         DiscoverCandidate(1, {"hot", "ranked"}, 1),
@@ -89,7 +97,9 @@ class FakeBGGClient:
         for bgg_id in bgg_ids:
             category = (
                 '<link type="boardgamecategory" value="Strategy"/>'
-                if bgg_id == 1
+                if bgg_id in {1, 4}
+                else '<link type="boardgamecategory" value="Party"/>'
+                if bgg_id == 3
                 else ""
             )
             mechanic = (
@@ -122,14 +132,26 @@ class FakeBGGClient:
         return "<items>" + "".join(items) + "</items>"
 
 
-def make_service(play_repository=None, repository=None):
+def make_service(play_repository=None, repository=None, ranking_repository=None):
     return DiscoverService(
         repository=repository or FakeRepository(),
         play_repository=play_repository or FakePlayRepository(),
+        ranking_repository=ranking_repository or FakeRankingRepository(),
         bgg_client=FakeBGGClient(),
         candidate_provider=FakeCandidateProvider(),
         user_id=7,
     )
+
+
+def test_hot_and_top100_do_not_read_personal_rankings():
+    class RankingsMustNotBeRead:
+        def get_discover_affinity_games(self):
+            raise AssertionError("source modes must not query personal rankings")
+
+    service = make_service(ranking_repository=RankingsMustNotBeRead())
+
+    assert service.get_recommendations(mode="hot")
+    assert service.get_recommendations(mode="top100")
 
 
 def test_hot_and_top100_keep_sources_order_and_wishlist_state():
@@ -235,6 +257,7 @@ def test_for_you_stays_personalised_with_hot_only_source_fallback():
     service = DiscoverService(
         repository=FakeRepository(),
         play_repository=FakePlayRepository(),
+        ranking_repository=FakeRankingRepository(),
         bgg_client=FakeBGGClient(),
         candidate_provider=DiscoverCandidateProvider([
             HotSource(),
@@ -260,3 +283,135 @@ def test_for_you_keeps_ranked_candidates_beyond_top_100():
         and item["source_rank"] == 150
         for item in results
     )
+
+
+def ranking_games(strategy_high=True):
+    high_name, low_name = (
+        ("Strategy", "Party")
+        if strategy_high
+        else ("Party", "Strategy")
+    )
+    return [
+        {
+            "rating": rating,
+            "comparisons_count": 3,
+            "categories": [category],
+            "mechanics": [],
+        }
+        for rating, category in [
+            (1600, high_name),
+            (1550, high_name),
+            (1450, low_name),
+            (1400, low_name),
+        ]
+    ]
+
+
+def test_for_you_personal_rankings_add_a_bounded_explainable_affinity():
+    play_repository = FakePlayRepository(
+        player_count=None,
+        play_time=None,
+        play_count=0,
+    )
+    repository = FakeRepository(owned=False)
+    baseline = make_service(
+        play_repository,
+        repository,
+    ).get_recommendation_result(mode="for_you")
+    ranked = make_service(
+        play_repository,
+        repository,
+        FakeRankingRepository(ranking_games()),
+    ).get_recommendation_result(mode="for_you")
+
+    baseline_by_id = {
+        item["game"].bgg_id: item
+        for item in baseline.recommendations
+    }
+    ranked_by_id = {
+        item["game"].bgg_id: item
+        for item in ranked.recommendations
+    }
+    influence = ranked_by_id[1]["score"] - baseline_by_id[1]["score"]
+
+    assert 0 < influence <= MAX_RANKING_INFLUENCE
+    assert DiscoverService._ranking_influence(
+        ranked_by_id[1]["game"],
+        {"Strategy": 10.0},
+        {},
+    ) == MAX_RANKING_INFLUENCE
+    assert "Similar to games you rank highly" in ranked_by_id[1]["reasons"]
+    assert "Similar to games you rank highly" not in ranked_by_id[3]["reasons"]
+    assert ranked.personalisation == "personalised"
+    assert ranked.signals == ("rankings",)
+    assert all("_ranking_contributed" not in item for item in ranked.recommendations)
+
+
+def test_for_you_sparse_or_tied_rankings_are_neutral():
+    play_repository = FakePlayRepository(
+        player_count=None,
+        play_time=None,
+        play_count=0,
+    )
+    repository = FakeRepository(owned=False)
+    baseline = make_service(
+        play_repository,
+        repository,
+    ).get_recommendation_result(mode="for_you")
+    sparse = make_service(
+        play_repository,
+        repository,
+        FakeRankingRepository(ranking_games()[:3]),
+    ).get_recommendation_result(mode="for_you")
+    tied = make_service(
+        play_repository,
+        repository,
+        FakeRankingRepository([
+            {**game, "rating": 1500}
+            for game in ranking_games()
+        ]),
+    ).get_recommendation_result(mode="for_you")
+
+    def summary(result):
+        return [
+            (item["game"].bgg_id, item["score"], item["reasons"])
+            for item in result.recommendations
+        ]
+
+    assert summary(sparse) == summary(baseline)
+    assert summary(tied) == summary(baseline)
+    assert "rankings" not in sparse.signals
+    assert "rankings" not in tied.signals
+
+
+def test_for_you_reads_current_ranking_order_without_caching_old_affinity():
+    play_repository = FakePlayRepository(
+        player_count=None,
+        play_time=None,
+        play_count=0,
+    )
+    ranking_repository = FakeRankingRepository(ranking_games())
+    service = make_service(
+        play_repository,
+        FakeRepository(owned=False),
+        ranking_repository,
+    )
+
+    first = service.get_recommendation_result(mode="for_you")
+    ranking_repository.games = ranking_games(strategy_high=False)
+    edited = service.get_recommendation_result(mode="for_you")
+
+    assert first.recommendations[0]["game"].bgg_id == 1
+    assert edited.recommendations[0]["game"].bgg_id == 3
+    assert (
+        "Similar to games you rank highly"
+        in edited.recommendations[0]["reasons"]
+    )
+
+
+def test_ranking_affinity_cannot_restore_player_count_exclusions():
+    ranked = make_service(
+        ranking_repository=FakeRankingRepository(ranking_games()),
+    ).get_recommendation_result(mode="for_you")
+
+    assert all(item["game"].bgg_id not in {2, 4} for item in ranked.recommendations)

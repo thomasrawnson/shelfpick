@@ -23,7 +23,7 @@ class FakeDiscoverService:
             personalisation=(
                 "personalised" if mode == "for_you" else "not_applicable"
             ),
-            signals=("preferences",) if mode == "for_you" else (),
+            signals=("preferences", "rankings") if mode == "for_you" else (),
         )
 
 
@@ -58,7 +58,7 @@ def test_pro_user_can_load_personalized_discover():
     assert response.status_code == 200
     assert service.calls == [("for_you", 10)]
     assert response.headers["x-shelfpick-personalisation"] == "personalised"
-    assert response.headers["x-shelfpick-personalisation-signals"] == "preferences"
+    assert response.headers["x-shelfpick-personalisation-signals"] == "preferences,rankings"
     exposed_headers = {
         header.strip().lower()
         for header in response.headers["access-control-expose-headers"].split(",")

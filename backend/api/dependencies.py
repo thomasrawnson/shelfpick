@@ -152,6 +152,10 @@ def get_discover_service(
     return DiscoverService(
         repository=GameRepository(db),
         play_repository=play_repository,
+        ranking_repository=RankingRepository(
+            db,
+            user_id=current_user.id,
+        ),
         bgg_client=bgg_client,
         candidate_provider=(
             DiscoverCandidateProvider(

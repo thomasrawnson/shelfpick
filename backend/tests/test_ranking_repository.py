@@ -127,6 +127,11 @@ def test_rankings_are_user_scoped_and_reversible():
             {"name": "Drafting", "count": 1}
         ]
 
+        affinity_games = repository.get_discover_affinity_games()
+        assert [game["bgg_id"] for game in affinity_games] == [101, 102]
+        assert affinity_games[0]["categories"] == ["Strategy"]
+        assert affinity_games[0]["mechanics"] == ["Drafting"]
+
         limited_summary = repository.get_rankings(
             summary_limit=1
         )["summary"]
@@ -145,6 +150,11 @@ def test_rankings_are_user_scoped_and_reversible():
             101,
             True,
         ) is True
+
+        assert [
+            game["bgg_id"]
+            for game in repository.get_discover_affinity_games()
+        ] == [102]
 
         rankings = repository.get_rankings()
         assert [
@@ -175,6 +185,7 @@ def test_rankings_are_user_scoped_and_reversible():
             ]
             == []
         )
+        assert other_repository.get_discover_affinity_games() == []
 
 
 def test_played_only_requires_one_recorded_play():

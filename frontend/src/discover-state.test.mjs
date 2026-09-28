@@ -41,6 +41,14 @@ test("For You distinguishes truthful personalised and popular fallback copy", ()
     },
   )
   assert.deepEqual(
+    discoverPersonalisationCopy("personalised", ["rankings"]),
+    {
+      title: "Picked for how you play",
+      body: "These matches use your personal ShelfPick rankings.",
+      actionLabel: null,
+    },
+  )
+  assert.deepEqual(
     discoverPersonalisationCopy("popular_fallback", []),
     {
       title: "Popular picks to get you started",

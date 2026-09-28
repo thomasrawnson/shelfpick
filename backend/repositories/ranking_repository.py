@@ -119,6 +119,44 @@ class RankingRepository:
             for game, ranking in rows
         ]
 
+    def get_discover_affinity_games(self) -> list[dict]:
+        """Return compared owned games for Discover affinity."""
+        rows = (
+            self.db.query(Game, GameRanking)
+            .join(
+                GameRanking,
+                and_(
+                    GameRanking.game_id == Game.id,
+                    GameRanking.user_id == self.user_id,
+                ),
+            )
+            .join(
+                UserGame,
+                and_(
+                    UserGame.game_id == Game.id,
+                    UserGame.user_id == self.user_id,
+                ),
+            )
+            .filter(
+                Game.is_expansion.is_(False),
+                GameRanking.excluded.is_(False),
+                GameRanking.comparisons_count > 0,
+            )
+            .order_by(GameRanking.rating.desc(), Game.name)
+            .all()
+        )
+
+        return [
+            {
+                "bgg_id": game.bgg_id,
+                "rating": ranking.rating,
+                "comparisons_count": ranking.comparisons_count,
+                "categories": [category.name for category in game.categories],
+                "mechanics": [mechanic.name for mechanic in game.mechanics],
+            }
+            for game, ranking in rows
+        ]
+
     @staticmethod
     def _top_values(
         games: list[Game],

@@ -357,9 +357,43 @@ Show clearly labelled total plays and H-index: the largest h for which at least 
 
 ### SP-PB15 — Use ranking scores in recommendations
 
-**Status:** NOT STARTED. **Workstream:** Recommendation change. **Access:** Pro — explicitly requested.
+**Status:** COMPLETE — 28 September 2026. **Workstream:** Recommendation change. **Access:** Pro — explicitly requested.
 
 Use the user's personal ShelfPick game ranking, confirmed by Tom. Audit its current representation (ordered rank versus numeric score) and existing rating contributions before defining a formula; do not substitute global BGG ranking. In Discover, use ranked-known-game affinities to help score unseen candidates rather than expecting an unowned candidate to have a personal rank. Document how positive and low-ranked preferences are derived; an unranked game is unknown, not disliked. Test sparse rankings, ties where supported, edits and absent affinity metadata. Avoid double counting correlated shelf/history inputs. Implement a bounded, explainable contribution in Discover For You with neutral missing-data behaviour and regression examples. Preserve all hard eligibility, exact-player suitability and BGG Not Recommended >=30% exclusions; no global Hot/Top 100 reordering. Picker use is a separate optional sub-slice after evaluating Discover results, not an assumed approved scoring formula. Add genuine Free/Pro enforcement without gating existing Free scoring.
+
+ShelfPick personal rankings are stored as per-user Elo-style numeric ratings,
+then presented as an ordered list; they are not BoardGameGeek rank or average
+rating. For You now reads only owned, non-expansion games with an explicit
+comparison and derives signed category/mechanic affinity from their current
+rating range. At least four compared games and a non-zero rating spread are
+required. Each game's signed weight is confidence-limited until three
+comparisons; low-ranked metadata cancels matching high-ranked metadata. A
+candidate receives only positive net affinity, averaged once across matching
+categories/mechanics and capped at **+3.0 points**, so correlated metadata does
+not receive separate unbounded boosts. Unranked, tied, sparse and missing
+metadata remain neutral rather than negative.
+
+The concise reason **Similar to games you rank highly** is added only when the
+candidate received a positive ranking contribution. The response advertises
+the `rankings` personalisation signal only when such a candidate survives the
+final result limit. Current ranking edits are read on each For You request;
+there is no affinity cache. Player-count filtering and its exact-count BGG
+Not Recommended threshold run before ranking influence, while ownership and
+source exclusions remain unchanged. Hot and Top 100 do not query or apply the
+ranking signal. The existing backend `personalized_discover` capability still
+returns 403 for Free before recommendation work; Free ranking entry and Free
+Hot/Top 100 remain unchanged.
+
+Evidence: 30 focused backend service/API/repository/entitlement tests passed, covering
+bounded influence, deterministic with/without comparisons, sparse and tied
+fallback, edited order, user-scoped current data, Free 403/Pro access, ranked
+candidates beyond the Top 100 boundary and player-count/Not Recommended
+exclusions. Three focused frontend copy tests, production build, changed-file
+lint, a mocked 390×844 Chrome signal/no-signal check and `git diff --check`
+passed. No live BoardGameGeek retrieval or production account was used. The
+known ranked-source availability issue can reduce the candidate pool but does
+not change the implemented scoring; SP-PB02 remains blocked. Picker ranking
+integration remains a separate optional future slice. Beta remains on hold.
 
 ### SP-PB16 — Add retail barcode scanning
 
@@ -367,13 +401,16 @@ Use the user's personal ShelfPick game ranking, confirmed by Tom. Audit its curr
 
 Confirmed scope: scan retail EAN/UPC barcodes on game boxes. Split into SP-PB16A catalogue feasibility and SP-PB16B scan/add integration. First establish a permitted barcode-to-game/edition data source, actual coverage on representative boxes, commercial terms, costs and canonical BGG ID mapping; do not assume existing BGG endpoints supply this mapping. Then implement camera scan or manual code entry → matched game/edition preview → user confirmation → add to Owned/Want to Play. Handle ambiguous editions, no match, duplicate ownership, unsupported camera, permission denial and lookup failure with manual-search fallback. A successful camera decode alone does not complete this task. Game-link QR scanning is not a substitute for retail barcode support.
 
-### SP-PB17 — Expand avatars and support photo upload
+### SP-PB17 — Expand preset avatars
 
-**Status:** IN PROGRESS — preset-avatar subtask complete 28 September 2026;
-photo upload pending. **Workstream:** Profile. **Access:** Existing access for
+**Status:** COMPLETE — 28 September 2026. Photo upload deferred until after
+beta and is not a beta blocker. **Workstream:** Profile. **Access:** Existing access for
 all authenticated users; no new gate.
 
-Offer more selectable avatars and a separate upload-photo slice with crop/preview/replace/remove. Validate image type and size server-side, re-encode accepted images, strip metadata, scope access/storage and delete replaced assets. Preserve historical player identities, initials fallback and consistent rendering across Profile, selected players and Game Night. Do not assume a reusable player identity is an authenticated account.
+Offer more selectable preset avatars while preserving historical player
+identities, initials fallback and consistent rendering across Profile, selected
+players and Game Night. Do not assume a reusable player identity is an
+authenticated account.
 
 The bounded preset subtask expands the existing `avatar_key` catalogue from
 Forest, Gold and Clay to six choices, retaining all three stored IDs and adding
@@ -394,8 +431,14 @@ The representative capture is
 `docs/screenshots/sp-pb17/preset-avatar-profile-mobile.png`. Existing
 SQLite-backed API persistence coverage was used because the database column and
 schema did not change; the browser save/reload evidence is mocked, not a real
-account or production check. Photo upload, crop/preview/replace/remove, image
-storage and server-side upload validation remain a separate pending subtask.
+account or production check.
+
+**Post-beta follow-up — photo upload:** Crop/preview/replace/remove, image
+storage and upload controls are deliberately deferred until after beta. That
+future slice must validate image type and size server-side, re-encode accepted
+images, strip metadata, scope access/storage and delete replaced assets. The
+original requirements are retained here, but this follow-up is not part of
+SP-PB17 completion and must not block beta.
 SP-PB02 remains blocked and beta remains on hold.
 
 ### SP-PB18 — Make Game Night a group decision with voting

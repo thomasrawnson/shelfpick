@@ -56,6 +56,7 @@ export function discoverPersonalisationCopy(
     signals.includes("collection") ? "games on your Owned shelf" : null,
     signals.includes("play_history") ? "your recorded plays" : null,
     signals.includes("preferences") ? "your saved play preferences" : null,
+    signals.includes("rankings") ? "your personal ShelfPick rankings" : null,
   ].filter((source): source is string => source !== null)
 
   let body = "These matches use your ShelfPick signals."

@@ -150,8 +150,8 @@ and Card blue add restrained board-game motifs using the existing semantic
 palette; initials remain the foreground identity at compact sizes in navigation
 and named-player selection. The catalogue is available wherever the shared
 picker or `PlayerAvatar` renderer is used. This bounded update adds no image
-hosting, upload controls, navigation or entitlement gate; photo upload remains
-separate SP-PB17 work.
+hosting, upload controls, navigation or entitlement gate. Preset-avatar work is
+complete; photo upload is retained as post-beta work and is not a beta blocker.
 
 ## Collection Add game update — 28 September 2026
 

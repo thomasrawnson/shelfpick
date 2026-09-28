@@ -324,6 +324,7 @@ export type DiscoverPersonalisationSignal =
   | "collection"
   | "play_history"
   | "preferences"
+  | "rankings"
 
 export interface DiscoverRecommendationResult {
   recommendations: DiscoverRecommendation[]
@@ -1159,6 +1160,7 @@ Promise<DiscoverRecommendationResult> {
     "collection",
     "play_history",
     "preferences",
+    "rankings",
   ])
   const signals = (response.headers.get("X-ShelfPick-Personalisation-Signals") ?? "")
     .split(",")

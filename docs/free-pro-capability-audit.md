@@ -22,7 +22,7 @@ entitlement, purchase claim or billing behavior changed. Beta remains on hold.
 | Picker | Ranks owned, non-expansion games by player count, time, complexity, age, play style, category/mechanic preferences and play history. Best match, Different and Surprise are implemented; selected players add exact-group history. Optional mood reranking has a deterministic fallback. | Free and Pro | Frontend exposes the flow without a tier check. Backend endpoints are authenticated and dependencies scope games, plays and analytics to the current user; there is no Pro capability check. | `advanced_recommendations` is an entitlement name only. Mood AI depends on server configuration and is not a Pro boundary. |
 | Discover Hot | Returns unowned games in BoardGameGeek Hot order with source explanations and Want to Play state. | Free and Pro | Frontend tab is always available. Backend is authenticated/user-scoped and requests only the Hot source; no Pro check. | Requires candidate metadata from BoardGameGeek. A 24-hour in-memory candidate cache can serve stale IDs after a source failure, but does not survive a process restart. |
 | Discover Top 100 | Returns unowned games whose original ranked-source position is 1–100, without backfilling from lower ranks. | Free and Pro | Frontend tab is always available. Backend is authenticated/user-scoped and limits the ranked source to positions 1–100; no Pro check. | Ranked-page failure with no in-process stale cache makes this ranked-only mode unavailable. |
-| Discover For You | Scores unowned Hot and ranked candidates using shelf categories/mechanics, per-owned-game play counts, preferred or observed player count, preferred or median play time, rating and BGG player-count evidence. Explanations are derived from the matching signals. | Pro only | Frontend checks `personalized_discover` before requesting results and shows a locked state otherwise. Backend independently returns 403 for Free before calling the service. | Empty/no-signal accounts fall back to popular source candidates rather than personalised evidence. Only the first 30 merged candidates receive metadata/scoring. Source caches are in-process and metadata remains a live dependency. |
+| Discover For You | Scores unowned Hot and ranked candidates using shelf categories/mechanics, per-owned-game play counts, preferred or observed player count, preferred or median play time, rating, BGG player-count evidence and a bounded affinity derived from the user's personal ShelfPick rankings. Explanations are derived from the signals that actually contribute. | Pro only | Frontend checks `personalized_discover` before requesting results and shows a locked state otherwise. Backend independently returns 403 for Free before calling the service. Ranking creation and viewing remain Free. | Ranking affinity requires four explicitly compared games and a non-zero personal-rating spread, and is capped at +3.0 points. Empty/no-signal accounts fall back to popular source candidates rather than personalised evidence. Only the first 30 merged candidates receive metadata/scoring. Source caches are in-process and metadata remains a live dependency. |
 | Owned collection | Sync, search/add, browse, detail and ownership-aware Picker input. | Free and Pro | No frontend tier gate. Backend dependencies authenticate and scope ownership by current user. | BGG sync/search/add still depend on upstream availability; no Pro behaviour exists. |
 | Want to Play | Separate user-scoped list, add/remove/detail, and atomic move to Owned. | Free and Pro | No frontend tier gate. Backend service is authenticated and user-scoped. | Discovery metadata/add operations can depend on BGG; no Pro behaviour exists. |
 | Play logging | Records and deletes user-scoped plays with participants, manual duration and optional location; feeds history, Picker and Game Night signals. | Free and Pro | No tier gate for ordinary play logging or location. Backend play service and repositories are authenticated/user-scoped. | Existing plays cannot currently be edited; location is editable during creation/retry and displayed in recent history. |
@@ -42,6 +42,15 @@ entitlement, purchase claim or billing behavior changed. Beta remains on hold.
 - Candidate rating contributes a base score. BGG Best/Recommended counts,
   session duration fit and Hot/ranked source membership add score and matching
   explanations.
+- Personal ShelfPick rankings use the existing per-user Elo-style rating rows,
+  not BGG rank or BGG average rating. Four compared owned, non-expansion games
+  with a non-zero rating spread are required. Signed category/mechanic weights
+  are confidence-limited until three comparisons; low-ranked metadata cancels
+  high-ranked metadata. Positive net affinity is averaged once and capped at
+  +3.0 points. Unranked, sparse, tied or absent metadata stays neutral.
+- **Similar to games you rank highly** appears only on a candidate that received
+  a positive ranking contribution. The response-level `rankings` signal is
+  emitted only when one of those candidates remains in the returned list.
 - Want to Play membership is returned for UI state but does not change ranking.
 - Explanations inspected in tests correspond to actual scoring inputs. No
   explanation claims ranked status when the ranked source is absent.
@@ -50,6 +59,9 @@ entitlement, purchase claim or billing behavior changed. Beta remains on hold.
 
 - A single recorded play can produce collection, usual-session and usual-player
   explanations; one play is not discarded as insufficient history.
+- Fewer than four personally ranked games, an all-tied rating range or no
+  matching ranked metadata produces exactly the existing non-ranking score and
+  copy. Ranking edits are read fresh for each For You request.
 - With an empty shelf and no profile/history signals, For You can still return
   popular Hot/ranked candidates with source-only explanations. This is useful
   fallback behaviour, but it is not materially personalised.
@@ -105,6 +117,18 @@ Acceptance criteria:
   £3.99 one-off checkout remains the subsequent commercial implementation.
 
 ## Validation record
+
+SP-PB15 addendum (28 September): 30 focused backend tests covered deterministic
+recommendations with and without ranking affinity, the +3.0 cap, sparse/tied
+neutral fallback, edited ranking order, repository user scoping, Free 403/Pro
+access and the existing player-count/Not Recommended exclusions. Three focused
+frontend copy tests, production build, changed-file lint, a mocked 390×844
+Chrome signal/no-signal pass and `git diff --check` passed. This was isolated
+and mocked evidence; no live BoardGameGeek source, production account or
+production data was accessed. The blocked ranked-source retrieval can reduce
+For You candidate breadth but is separate from the implemented personal-score
+logic. Picker ranking integration remains separate, SP-PB02 remains blocked
+and beta remains on hold.
 
 SP-PB12 addendum (28 September): seven focused share-card tests, the production
 frontend build, changed-file lint and `git diff --check` passed. A mocked
