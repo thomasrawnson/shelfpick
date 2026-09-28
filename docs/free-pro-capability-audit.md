@@ -16,10 +16,13 @@ The matrix below remains the 26 September audit of shipped behaviour.
 Explicit new Pro requirements: SP-PB11 live duration, SP-PB15 ranking-based
 recommendations and SP-PB19 challenges. Do not grant or advertise these until
 implemented and independently enforced. Discover scoring precedes optional
-Picker scoring; confirm the ranking input first. Preserve existing Free
+Picker scoring; the input is confirmed as personal game rankings. Preserve existing Free
 logging, Picker, Collection, Hot/Top 100, Insights and basic Game Night.
 Free branded sharing is proposed; other new feature tiers are undecided.
 The £3.99 one-off model and disabled checkout remain unchanged.
+Retail barcode scanning and QR-joined remote voting are confirmed product
+requirements; their tier remains undecided. Existing personal ranking entry
+must not become Pro-only merely because its recommendation use is Pro.
 
 The reported Top 100 failure is reopened as SP-PB02; rank-boundary correction
 does not establish current source reliability. The For You final verification
