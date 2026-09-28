@@ -159,6 +159,7 @@ def user_response(
         onboarding_completed=user.onboarding_completed,
         preferred_player_count=user.preferred_player_count,
         preferred_play_time=user.preferred_play_time,
+        preferred_play_style=user.preferred_play_style,
         profile_player_id=user.profile_player_id,
         player_name=(
             player.name if player

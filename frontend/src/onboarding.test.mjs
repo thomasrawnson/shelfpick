@@ -32,7 +32,8 @@ test("profile shows the saved identity and preferences", () => {
   const user = {
     id: 1, email: "morgan@example.com", display_name: "Morgan", bgg_username: null,
     email_verified: false, tier: "FREE", entitlements: [], onboarding_completed: true,
-    preferred_player_count: 3, preferred_play_time: 90, profile_player_id: 8,
+    preferred_player_count: 3, preferred_play_time: 90,
+    preferred_play_style: "competitive", profile_player_id: 8,
     player_name: "Morgan Reed", avatar_key: "gold",
   }
   const markup = renderToStaticMarkup(React.createElement(ProfileSettings, {

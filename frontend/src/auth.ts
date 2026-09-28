@@ -6,6 +6,7 @@ export interface AuthUser {
   onboarding_completed: boolean
   preferred_player_count: number | null
   preferred_play_time: number | null
+  preferred_play_style?: "any" | "cooperative" | "competitive" | null
   profile_player_id: number | null
   player_name: string
   avatar_key: "forest" | "gold" | "clay"

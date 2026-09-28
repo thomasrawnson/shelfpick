@@ -11,7 +11,7 @@ type SettingsEntry = { id: string; label: string; detail: string; to: string }
 const groups: { title: string; entries: SettingsEntry[] }[] = [
   { title: "Your account", entries: [
     { id: "profile", label: "Profile", detail: "Name and avatar", to: APP_PATHS.settingsProfile },
-    { id: "preferences", label: "Preferences", detail: "Usual players and play time", to: APP_PATHS.settingsPreferences },
+    { id: "preferences", label: "Preferences", detail: "Picker players, time and play style", to: APP_PATHS.settingsPreferences },
   ] },
   { title: "Your ShelfPick", entries: [
     { id: "appearance", label: "Appearance", detail: "Theme", to: APP_PATHS.settingsAppearance },

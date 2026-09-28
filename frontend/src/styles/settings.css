@@ -201,6 +201,10 @@
   font-size: var(--text-support);
 }
 
+.settings-preferences-intro {
+  margin-top: 0;
+}
+
 .setup-screen-compact {
   display: flex;
   flex-direction: column;

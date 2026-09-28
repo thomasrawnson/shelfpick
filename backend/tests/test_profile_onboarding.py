@@ -48,6 +48,7 @@ def test_onboarding_persists_profile_preferences_and_player(account):
     response = client.post("/auth/onboarding/complete", headers=headers, json={
         "player_name": "Morgan Reed", "avatar_key": "gold",
         "preferred_player_count": 3, "preferred_play_time": 90,
+        "preferred_play_style": "cooperative",
     })
     assert response.status_code == 200
     profile = response.json()
@@ -56,6 +57,7 @@ def test_onboarding_persists_profile_preferences_and_player(account):
     assert profile["avatar_key"] == "gold"
     assert profile["preferred_player_count"] == 3
     assert profile["preferred_play_time"] == 90
+    assert profile["preferred_play_style"] == "cooperative"
     assert profile["profile_player_id"] is not None
     assert client.get("/auth/me", headers=headers).json()["profile_player_id"] == profile["profile_player_id"]
     players = client.get("/players", headers=headers).json()
@@ -75,6 +77,7 @@ def test_skipped_preferences_and_partial_completion_are_safe(account):
     assert response.json()["player_name"] == "Morgan"
     assert response.json()["preferred_player_count"] is None
     assert response.json()["preferred_play_time"] is None
+    assert response.json()["preferred_play_style"] is None
     assert response.json()["bgg_username"] is None
     assert client.post("/auth/onboarding/complete", headers=headers, json={}).json()["profile_player_id"] == response.json()["profile_player_id"]
 
@@ -87,13 +90,42 @@ def test_profile_update_changes_identity_and_clears_defaults(account):
     response = client.put("/auth/profile", headers=headers, json={
         "player_name": "Morgan R", "avatar_key": "clay",
         "preferred_player_count": None, "preferred_play_time": 0,
+        "preferred_play_style": "competitive",
     })
     assert response.status_code == 200
     assert response.json()["player_name"] == "Morgan R"
     assert response.json()["avatar_key"] == "clay"
     assert response.json()["preferred_player_count"] is None
     assert response.json()["preferred_play_time"] == 0
+    assert response.json()["preferred_play_style"] == "competitive"
     assert client.get("/auth/me", headers=headers).json()["player_name"] == "Morgan R"
+
+
+def test_preference_only_update_preserves_identity_and_rejects_invalid_style(account):
+    client, _, _, headers = account
+    client.post("/auth/onboarding/complete", headers=headers, json={
+        "player_name": "Morgan", "avatar_key": "gold",
+    })
+
+    response = client.put("/auth/profile", headers=headers, json={
+        "preferred_player_count": 5,
+        "preferred_play_time": 120,
+        "preferred_play_style": "cooperative",
+    })
+    assert response.status_code == 200
+    profile = response.json()
+    assert profile["player_name"] == "Morgan"
+    assert profile["avatar_key"] == "gold"
+    assert profile["preferred_player_count"] == 5
+    assert profile["preferred_play_time"] == 120
+    assert profile["preferred_play_style"] == "cooperative"
+    assert client.get("/auth/me", headers=headers).json()["preferred_play_style"] == "cooperative"
+
+    invalid = client.put("/auth/profile", headers=headers, json={
+        "preferred_play_style": "sometimes",
+    })
+    assert invalid.status_code == 422
+    assert client.get("/auth/me", headers=headers).json()["preferred_play_style"] == "cooperative"
 
 
 def test_existing_participant_is_not_silently_linked(account):

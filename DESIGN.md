@@ -251,6 +251,20 @@ When no named players are selected, retain the existing numeric control so an
 anonymous or count-only group can continue. Recommendation criteria and play
 entry must consume the same active-mode count.
 
+### Saved Picker defaults — 28 September 2026
+
+Settings → Preferences presents usual player count, preferred play style and
+usual play time as three related default groups with one Save action and clear
+saving, success and failure feedback. The page explains once that defaults seed
+a new Picker session while each session remains editable. No preference is the
+neutral play-style choice; missing legacy data resolves to the same state.
+
+A fresh Picker snapshots the latest saved defaults. Count applies only to
+count-only mode, because named players remain authoritative. Forward/Back,
+rerenders and dedicated play entry preserve explicit session choices. Start over
+begins a new session and reapplies the latest defaults. Saving Settings affects
+the next fresh session and never silently rewrites an active Picker session.
+
 ## Do's and Don'ts
 
 ### Do:

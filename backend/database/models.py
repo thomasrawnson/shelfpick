@@ -98,6 +98,7 @@ class User(Base):
     )
     preferred_player_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     preferred_play_time: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    preferred_play_style: Mapped[str | None] = mapped_column(String(16), nullable=True)
     profile_player_id: Mapped[int | None] = mapped_column(
         ForeignKey(
             "players.id", ondelete="SET NULL", use_alter=True,

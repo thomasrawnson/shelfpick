@@ -103,13 +103,45 @@ overflow at 390 and 1440px in light/dark. It also verified that named players
 prefill the dedicated play-entry screen and browser Back restores the result.
 Before/after captures are in `docs/screenshots/sp-pb03/`. No live API or
 database persistence was exercised because SP-PB03 changes client session state
-only. SP-PB04 remains not started.
+only. SP-PB04 is recorded complete below.
 
-### SP-PB04 — Default play style from preferences
+### SP-PB04 — Apply consistent saved Picker defaults
 
-**Status:** NOT STARTED. **Workstream:** Flow correction. **Access:** Existing access.
+**Status:** COMPLETE — 28 September 2026. **Workstream:** Flow correction. **Access:** Existing access.
 
-Persist cooperative / competitive / no preference and initialise Picker from that saved value. A session override must remain possible without silently overwriting the profile. Back navigation retains the session choice. Existing users with no saved value use no preference. Audit which other flows already consume this preference before extending them.
+Expanded scope: persist cooperative / competitive / no preference alongside the
+existing usual player count and preferred play time, and initialise a fresh
+Picker session from all three values. A session override remains possible
+without silently overwriting the profile. Back and play-entry navigation retain
+the session choices. Existing users with missing or legacy play-style values use
+no preference.
+
+Settings → Preferences now groups the three defaults and saves only preference
+fields, preserving hidden profile identity fields. Saving has disabled/loading,
+success and recoverable error states; a failed request leaves all selections in
+place. Player-count and play-time storage, validation and filtering already
+worked and were retained. The profile/API contract adds one nullable,
+backward-compatible `preferred_play_style` field using the Picker's existing
+`any`, `cooperative` and `competitive` values.
+
+Session rules: a fresh Picker mount snapshots the latest saved defaults. Named
+players override the saved count under SP-PB03. Session edits remain authoritative
+through rerenders, forward/Back and SP-PB01 play entry, and do not update saved
+preferences. Browser-restored routes keep their mounted Picker state. Start over
+is a genuine new session and reapplies the latest default props. A Settings save
+therefore affects the next fresh session, not an already mounted one.
+
+Evidence: 47 frontend tests and 19 affected backend profile/API tests passed, as
+did the frontend build, lint, colour-token guard, PWA checks and
+`git diff --check`. The migration applied from an empty isolated PostgreSQL
+database and `alembic check` found no schema drift. An isolated user then passed
+onboarding → preference save → `/auth/me` reload for all three defaults while
+retaining name/avatar; its records and temporary database were removed.
+Mocked Playwright covered delayed profile loading, failed-save recovery, exact
+preference-only payloads, fresh defaults, overrides, Back, reset, outgoing
+recommendation criteria, named-player precedence and play-entry restoration at
+390 and 1440px in light/dark. Captures are in
+`docs/screenshots/sp-pb04/`. SP-PB02 remains blocked and beta remains on hold.
 
 ### SP-PB05 — Restructure Settings navigation
 

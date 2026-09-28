@@ -12,7 +12,7 @@
     "check:pwa": "node scripts/check-pwa-assets.mjs",
     "check:colors": "node scripts/check-colors.mjs",
     "lint": "eslint .",
-    "test": "node --test src/routes.test.ts src/auth-validation.test.ts src/api/request.test.ts src/collection-add-game.test.mjs src/discover-state.test.mjs src/ui-empty-state.test.ts src/onboarding.test.mjs src/picker-presentation.test.mjs src/picker-player-mode.test.mjs src/picker-play-entry.test.mjs src/pro-comparison.test.mjs src/settings-navigation.test.mjs src/telemetry.test.mjs scripts/theme.test.mjs",
+    "test": "node --test src/routes.test.ts src/auth-validation.test.ts src/api/request.test.ts src/collection-add-game.test.mjs src/discover-state.test.mjs src/ui-empty-state.test.ts src/onboarding.test.mjs src/picker-defaults.test.mjs src/picker-presentation.test.mjs src/picker-player-mode.test.mjs src/picker-play-entry.test.mjs src/pro-comparison.test.mjs src/settings-navigation.test.mjs src/telemetry.test.mjs scripts/theme.test.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

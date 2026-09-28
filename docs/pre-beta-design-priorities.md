@@ -168,9 +168,20 @@ while an explicit Use group size instead action returns to the unchanged numeric
 control. This removes the contradictory editable count without reducing
 count-only access. Mocked Playwright covered editing names, switching modes,
 forward/Back retention and dedicated play-entry prefill at 390 and 1440px in
-light/dark; captures are in `docs/screenshots/sp-pb03/`. SP-PB04 saved
-play-style defaults remain pending, SP-PB02 remains blocked and beta remains on
-hold.
+light/dark; captures are in `docs/screenshots/sp-pb03/`. SP-PB04 is recorded
+complete below; SP-PB02 remains blocked and beta remains on hold.
+
+SP-PB04 consistent saved Picker defaults completed on 28 September 2026.
+Settings → Preferences now groups player count, play time and the existing
+neutral/cooperative/competitive play-style values. All three seed fresh Picker
+sessions, while explicit session choices survive Back, rerenders and dedicated
+play entry. SP-PB03 named players continue to override saved count, and Start
+over reapplies the latest saved defaults. Failed saves retain selections and
+preference-only requests preserve unrelated profile fields. Mocked Playwright
+covered the responsive Settings/Picker flow at 390 and 1440px in light/dark;
+captures are in `docs/screenshots/sp-pb04/`. Isolated PostgreSQL save/reload and
+migration checks passed and all temporary data was removed. SP-PB02 remains
+blocked and beta remains on hold.
 
 ### UI-2 — core visual polish
 

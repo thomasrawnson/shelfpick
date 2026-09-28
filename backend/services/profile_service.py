@@ -49,6 +49,8 @@ def update_profile(
         user.preferred_player_count = changes.preferred_player_count
     if "preferred_play_time" in fields:
         user.preferred_play_time = changes.preferred_play_time
+    if "preferred_play_style" in fields:
+        user.preferred_play_style = changes.preferred_play_style
     if complete_onboarding:
         user.onboarding_completed = True
 

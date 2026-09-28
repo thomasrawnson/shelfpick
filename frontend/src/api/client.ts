@@ -1288,6 +1288,7 @@ export type ProfileChanges = {
   avatar_key?: "forest" | "gold" | "clay"
   preferred_player_count?: number | null
   preferred_play_time?: number | null
+  preferred_play_style?: PickerPlayStyle | null
 }
 
 export async function completeOnboarding(changes: ProfileChanges = {}):

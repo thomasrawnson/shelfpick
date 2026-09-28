@@ -45,9 +45,20 @@ type Props = {
   onViewCollection: () => void;
   defaultPlayers?: number | null;
   defaultTime?: number | null;
+  defaultPlayStyle?: PickerPlayStyle | null;
 };
 
-function PickerView({ onViewGame, onViewCollection, defaultPlayers = null, defaultTime = null }: Props) {
+function savedPlayStyleOrFallback(value: PickerPlayStyle | null | undefined): PickerPlayStyle {
+  return value === "cooperative" || value === "competitive" ? value : "any";
+}
+
+function PickerView({
+  onViewGame,
+  onViewCollection,
+  defaultPlayers = null,
+  defaultTime = null,
+  defaultPlayStyle = null,
+}: Props) {
   const location = useLocation();
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>("players");
@@ -59,7 +70,9 @@ function PickerView({ onViewGame, onViewCollection, defaultPlayers = null, defau
     useState<PickerComplexityBand | null>(null);
   const [youngestPlayerAge, setYoungestPlayerAge] =
     useState<number | null>(null);
-  const [playStyle, setPlayStyle] = useState<PickerPlayStyle>("any");
+  const [playStyle, setPlayStyle] = useState<PickerPlayStyle>(() =>
+    savedPlayStyleOrFallback(defaultPlayStyle),
+  );
   const [preferredCategories, setPreferredCategories] = useState<string[]>([]);
   const [preferredMechanics, setPreferredMechanics] = useState<string[]>([]);
   const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
@@ -199,7 +212,7 @@ function PickerView({ onViewGame, onViewCollection, defaultPlayers = null, defau
   function relaxComplexity() {
     setComplexityBand(null);
     setYoungestPlayerAge(null);
-    setPlayStyle("any");
+    setPlayStyle(savedPlayStyleOrFallback(defaultPlayStyle));
     void loadMatches(maxPlayTime, null, null, "any");
   }
 

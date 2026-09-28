@@ -1,17 +1,28 @@
 import { useState } from "react"
 import { saveProfile } from "../api/client"
 import type { AuthUser } from "../auth"
+import type { PickerPlayStyle } from "../api/client"
 import PlayerAvatar from "./ui/PlayerAvatar"
 
 type Props = { user: AuthUser; onChange: (user: AuthUser) => void; mode?: "all" | "profile" | "preferences" }
 const avatars = ["forest", "gold", "clay"] as const
 const times = [30, 60, 90, 120, 0]
+const playStyles: Array<{ value: PickerPlayStyle; label: string }> = [
+  { value: "any", label: "No preference" },
+  { value: "cooperative", label: "Cooperative" },
+  { value: "competitive", label: "Competitive" },
+]
+
+function savedPlayStyleOrFallback(value: AuthUser["preferred_play_style"]): PickerPlayStyle {
+  return value === "cooperative" || value === "competitive" ? value : "any"
+}
 
 function ProfileSettings({ user, onChange, mode = "all" }: Props) {
   const [name, setName] = useState(user.player_name)
   const [avatar, setAvatar] = useState(user.avatar_key)
   const [players, setPlayers] = useState(user.preferred_player_count)
   const [time, setTime] = useState(user.preferred_play_time)
+  const [playStyle, setPlayStyle] = useState<PickerPlayStyle>(() => savedPlayStyleOrFallback(user.preferred_play_style))
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")
   const [saved, setSaved] = useState(false)
@@ -21,10 +32,22 @@ function ProfileSettings({ user, onChange, mode = "all" }: Props) {
     setError("")
     setSaved(false)
     try {
-      onChange(await saveProfile({
-        player_name: name.trim(), avatar_key: avatar,
-        preferred_player_count: players, preferred_play_time: time,
-      }))
+      const changes = mode === "preferences"
+        ? {
+            preferred_player_count: players,
+            preferred_play_time: time,
+            preferred_play_style: playStyle,
+          }
+        : {
+            player_name: name.trim(),
+            avatar_key: avatar,
+            ...(mode === "all" ? {
+              preferred_player_count: players,
+              preferred_play_time: time,
+              preferred_play_style: playStyle,
+            } : {}),
+          }
+      onChange(await saveProfile(changes))
       setSaved(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save profile.")
@@ -55,6 +78,7 @@ function ProfileSettings({ user, onChange, mode = "all" }: Props) {
     </fieldset>
     </>}
     {showPreferences && <>
+    <p className="settings-field-note settings-preferences-intro">Used when a new Picker session starts. You can still change each choice for one session.</p>
     <fieldset className="onboarding-fieldset">
       <legend>Usual player count</legend>
       <div className="onboarding-choices">
@@ -65,6 +89,16 @@ function ProfileSettings({ user, onChange, mode = "all" }: Props) {
         </button>)}
         <button type="button" className={players === null ? "onboarding-choice selected" : "onboarding-choice"}
           aria-pressed={players === null} onClick={() => setPlayers(null)}>No default</button>
+      </div>
+    </fieldset>
+    <fieldset className="onboarding-fieldset">
+      <legend>Preferred play style</legend>
+      <div className="onboarding-choices">
+        {playStyles.map((choice) => <button key={choice.value} type="button"
+          className={playStyle === choice.value ? "onboarding-choice selected" : "onboarding-choice"}
+          aria-pressed={playStyle === choice.value} onClick={() => setPlayStyle(choice.value)}>
+          {choice.label}
+        </button>)}
       </div>
     </fieldset>
     <fieldset className="onboarding-fieldset">
@@ -79,7 +113,6 @@ function ProfileSettings({ user, onChange, mode = "all" }: Props) {
           aria-pressed={time === null} onClick={() => setTime(null)}>No default</button>
       </div>
     </fieldset>
-    {mode === "preferences" && <p className="settings-field-note">Picker and Game Night can still be changed each time.</p>}
     </>}
     <button type="button" className="primary-button" disabled={saving || !name.trim()}
       onClick={() => void save()}>{saving ? "Saving..." : mode === "preferences" ? "Save preferences" : "Save profile"}</button>

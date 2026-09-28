@@ -12,7 +12,8 @@ let SettingsSectionView
 const user = {
   id: 1, email: "morgan@example.com", display_name: "Morgan Account", bgg_username: "morganbgg",
   email_verified: true, onboarding_completed: true, preferred_player_count: 4,
-  preferred_play_time: 60, profile_player_id: 1, player_name: "Morgan Player",
+  preferred_play_time: 60, preferred_play_style: "cooperative",
+  profile_player_id: 1, player_name: "Morgan Player",
   avatar_key: "forest", tier: "FREE", entitlements: ["game_night_basic"],
 }
 
@@ -47,7 +48,20 @@ test("profile and preferences render only their selected controls", () => {
   const preferences = render(SettingsSectionView, { section: "preferences", user, onUserChange: () => {} }, "/settings/preferences")
   assert.match(preferences, /Usual player count/)
   assert.match(preferences, /Usual play time/)
+  assert.match(preferences, /Preferred play style/)
+  assert.match(preferences, /Cooperative/)
+  assert.match(preferences, /Used when a new Picker session starts/)
   assert.doesNotMatch(preferences, /Player name/)
+})
+
+test("legacy preferences without play style use the neutral option", () => {
+  const preferences = render(SettingsSectionView, {
+    section: "preferences",
+    user: { ...user, preferred_play_style: undefined },
+    onUserChange: () => {},
+  }, "/settings/preferences")
+
+  assert.match(preferences, /aria-pressed="true">No preference</)
 })
 
 test("Collection and Data keeps import controls separate from profile and account controls", () => {

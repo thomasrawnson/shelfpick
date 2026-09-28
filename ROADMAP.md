@@ -108,8 +108,20 @@ requests and the SP-PB01 play-entry prefill continue to consume that same
 session state. Forty-four frontend tests and all frontend checks passed.
 Mocked Playwright covered the state transitions, play-entry prefill and result
 restoration at 390 and 1440px in light/dark; captures are in
-`docs/screenshots/sp-pb03/`. SP-PB04 remains pending, SP-PB02 remains blocked
-and beta remains on hold.
+`docs/screenshots/sp-pb03/`. SP-PB04 is recorded complete below; SP-PB02
+remains blocked and beta remains on hold.
+
+SP-PB04 is complete with its scope expanded to all saved Picker defaults.
+Settings → Preferences persists usual player count, preferred play time and
+play style through the existing profile endpoint; preference-only saves no
+longer resubmit hidden identity fields. A fresh Picker snapshots the latest
+saved values, named players remain authoritative, session overrides survive
+forward/Back and play entry without changing the profile, and Start over
+reapplies the latest defaults. Missing/legacy play style falls back to no
+preference. Frontend and focused backend tests/checks passed. The new nullable
+column migrated cleanly and save/reload was verified with isolated PostgreSQL
+data that was removed afterward. Mocked responsive browser evidence is in
+`docs/screenshots/sp-pb04/`. SP-PB02 remains blocked and beta remains on hold.
 
 After SP-PB02 is unblocked, address
 Picker defaults/navigation, UI and Settings, plays/statistics/sharing, ranking

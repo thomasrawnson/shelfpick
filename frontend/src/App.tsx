@@ -490,7 +490,8 @@ function App() {
               element={<PickerView onViewGame={openOwnedCollectionGame}
                 onViewCollection={() => navigate(APP_PATHS.collectionOwned)}
                 defaultPlayers={user.preferred_player_count}
-                defaultTime={user.preferred_play_time} />}
+                defaultTime={user.preferred_play_time}
+                defaultPlayStyle={user.preferred_play_style} />}
             />
 
             <Route

@@ -40,6 +40,7 @@ class UserResponse(BaseModel):
     onboarding_completed: bool
     preferred_player_count: int | None
     preferred_play_time: int | None
+    preferred_play_style: Literal["any", "cooperative", "competitive"] | None
     profile_player_id: int | None
     player_name: str
     avatar_key: str
@@ -50,6 +51,7 @@ class ProfileUpdateRequest(BaseModel):
     avatar_key: Literal["forest", "gold", "clay"] | None = None
     preferred_player_count: int | None = Field(default=None, ge=1, le=12)
     preferred_play_time: Literal[0, 15, 30, 60, 90, 120] | None = None
+    preferred_play_style: Literal["any", "cooperative", "competitive"] | None = None
 
 
 class AuthResponse(BaseModel):
@@ -77,4 +79,3 @@ class ResetPasswordRequest(
 
 class MessageResponse(BaseModel):
     message: str
-
