@@ -52,9 +52,32 @@ play persistence and Picker conversion linkage. Before/after captures are in
 
 ### SP-PB02 — Restore Discover Top 100
 
-**Status:** NOT STARTED. **Workstream:** Fix • first. **Access:** Existing Free access.
+**Status:** BLOCKED (28 September 2026) — authorised ranked source unavailable. **Workstream:** Fix • first. **Access:** Existing Free access.
 
 Reproduce the reported failure and distinguish API/source errors, cold-cache availability, metadata failure and client rendering. Keep original BGG positions 1–100, ownership filtering and truthful empty/error states. Never substitute Hot games under a Top 100 label or backfill ranks >100. Verify cold start, warm/stale cache and restart behaviour; record source provenance and freshness. The previous rank-boundary implementation stays complete; user-facing availability is reopened. Use a permitted source; do not bypass upstream restrictions.
+
+Investigation traced the failure to source retrieval. The only runtime Top 100
+source is BoardGameGeek's ranked browse page, which returns HTTP 403 on a cold
+request. BGG documents its ranks CSV data dump as the permitted bulk-rank
+source, but the configured non-production application token receives the data
+page without download access. The downstream implementation is intact: valid
+integer ranks 1–100 are filtered before the 30-candidate metadata limit;
+ownership does not cause lower ranks to backfill; source failure remains
+distinct from a genuine empty result; and Hot's cache/cooldown plus For You's
+broader ranked pool and personalisation are unchanged.
+
+Validation evidence: 38 focused backend tests passed across ranked-source
+fresh/warm/stale behaviour, rank boundaries, ownership/filter ordering,
+source-unavailable versus empty responses, Hot cooldown and Discover API/service
+paths. All 35 frontend tests, build, lint, colour-token guard and PWA checks
+passed. Mocked Playwright covered valid #1/#100 rendering and the unavailable
+source retry state at 390 and 1440px in light/dark, including overflow checks;
+screenshots are in `docs/screenshots/sp-pb02/`. This is mocked browser coverage,
+not live-source or database verification. The required live cold start,
+warm/stale cache and process-restart sequence cannot pass without authorised
+official ranked data, so this slice is not complete. Unblock by granting the
+configured application official BGG ranks-dump access or supplying an
+authorised official dump for a persistent ingestion path.
 
 ### SP-PB03 — Make selected players authoritative in Picker
 

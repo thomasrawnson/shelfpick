@@ -116,6 +116,17 @@ fresh, warm-cache, stale-fallback, boundary, invalid-rank, ownership and
 failure-versus-empty behavior. BoardGameGeek's ranked-page 403 remains an
 external availability issue. UI-1B and UI-1C remain separate.
 
+SP-PB02 reopened user-facing Top 100 availability on 28 September 2026 without
+reopening the completed boundary correction. The investigation verified the
+existing rank, ordering, ownership, error/empty, Hot-cache and For You
+behaviour, but confirmed that cold retrieval still fails at the upstream source:
+the ranked browse page returns HTTP 403 and the configured development
+application token lacks access to BGG's official ranks dump. SP-PB02 is therefore
+blocked, not complete; substituting Hot, admitting ranks above 100 or bypassing
+the upstream restriction would make the product label misleading. Mocked
+responsive captures of the verified result and retry states are stored in
+`docs/screenshots/sp-pb02/`.
+
 ### UI-2 — core visual polish
 
 After UI-1 is stable, refine hierarchy, typography, spacing, component

@@ -46,7 +46,25 @@ horizontal overflow at 390, 768, 1024 and 1440px in light/dark. The configured
 non-production PostgreSQL repository/API checks passed with isolated test data.
 Screenshots are in `docs/screenshots/sp-pb01/`. Beta remains on hold.
 
-Continue with SP-PB02 (reported Top 100 availability failure). Then address
+SP-PB02 is blocked on an authorised ranked-data source. Investigation confirmed
+that the existing implementation already enforces original BGG ranks 1–100
+before ownership filtering and candidate limiting, preserves Hot and For You
+cache/scoring behaviour, and reports an unavailable ranked source as an error
+rather than an empty list. The remaining live failure is source retrieval: the
+runtime ranked-page request returns HTTP 403, while the configured development
+BGG application token is not authorised to download BGG's official ranks data
+dump. No Hot substitution, rank >100 backfill or unpermitted scraper was added.
+
+Evidence: 38 focused backend tests and 35 frontend tests passed, as did the
+frontend build, lint, colour-token guard and PWA checks. Mocked Playwright
+covered the Top 100 boundary result and source-error/retry states at 390 and
+1440px in light/dark with no horizontal overflow; captures are in
+`docs/screenshots/sp-pb02/`. Cold live retrieval remains unavailable, so the
+required cold/warm/stale/restart acceptance sequence cannot pass and SP-PB02 is
+not complete. Resume it when the configured application receives official BGG
+ranks-dump access or an authorised official dump is supplied for ingestion.
+
+After SP-PB02 is unblocked, address
 Picker defaults/navigation, UI and Settings, plays/statistics/sharing, ranking
 intelligence, scanning, avatars, Game Night voting and Pro challenges. New Pro
 scope is live duration, ranking-based recommendation enhancements and challenges.
@@ -172,7 +190,8 @@ fallbacks, and do not change the logo or Free/Pro proposition as part of UI-1.
 ## Delivery order
 
 1. SP-PB01 dedicated Picker play logging — COMPLETE.
-2. SP-PB02: restore reported Top 100 availability.
+2. SP-PB02: restore reported Top 100 availability — **BLOCKED** pending an
+   authorised official BGG ranked-data source; existing boundary logic verified.
 3. SP-PB03–04: selected-player count and saved play-style defaults.
 4. SP-PB05–09 and SP-PB20: Settings, typography, Rankings, spacing, Collection and heading copy.
 5. SP-PB10–11 and SP-PB14: location, Pro live duration and statistics.
