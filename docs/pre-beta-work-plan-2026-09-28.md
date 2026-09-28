@@ -9,7 +9,7 @@ This is an implementation backlog, not a claim that features are shipped. All ta
 ## Delivery sequence
 
 1. Repair SP-PB01–02, then Picker flow SP-PB03–04.
-2. Settings and presentation SP-PB05–09.
+2. Settings and presentation SP-PB05–09, plus heading-copy cleanup SP-PB20.
 3. Play foundation SP-PB10–11, statistics SP-PB14, then sharing SP-PB12–13.
 4. Recommendation SP-PB15; scanning SP-PB16 and avatars SP-PB17 can proceed independently once decisions are resolved.
 5. Game Night SP-PB18 and challenges SP-PB19.
@@ -19,10 +19,11 @@ Task IDs are new backlog IDs and do not replace historical roadmap slice IDs. Im
 
 ## Decisions and provisional interpretations
 
-- Confirm which ranking score is intended and which Rankings surface feels misplaced.
-- Confirm QR game links versus retail barcode scanning.
-- Confirm host-device voting versus remote participant voting for Game Night.
-- The final Collection bullet is incomplete; provisionally treat it as making Add game more prominent.
+- Confirmed: recommendation input is the user's personal game ranking, not global BGG rank/rating. Rankings placement is still open; Tom feels it deserves navigation visibility but the bar is crowded. Review a prominent My Rankings destination within Collection plus contextual game-detail access against a revised primary-navigation layout. Do not add another crowded bottom-bar item without evaluating the whole navigation.
+- Confirmed: scan retail barcodes on game boxes; EAN/UPC-to-game catalogue matching is an implementation dependency.
+- Confirmed: participants scan a QR code displayed on the host's phone and vote on their own phones. Remote guest voting is required, not a pass-and-play substitute.
+- Confirmed: Add game must be more obvious/prominent.
+- New SP-PB20: tidy repeated/redundant text under headings. Working interpretation: remove repetition; move useful longer explanations into contextual help rather than repeating the heading.
 - Location as optional text, Inter, suggested filters, Free branded sharing and the challenge templates below are proposed implementations, not additional user-confirmed requirements.
 - Only live duration, ranking-based recommendation enhancements and challenges are explicitly newly designated Pro. Preserve current access for other functionality until a tier decision is made.
 
@@ -68,7 +69,7 @@ Prepare and implement a consistent Inter-led direction across app headings, body
 
 **Status:** NOT STARTED. **Workstream:** UI decision then implementation. **Access:** Existing access.
 
-Inspect the current Rankings route and user journey. Compare contextual access from Collection/game detail with placement inside Insights, then select a coherent home without inventing a new top-level navigation destination by default. Preserve saved rankings, deep links and Back. Clarify whether the report concerns the Rankings screen, ranking input or score placement before structural changes.
+The feature is the user's personal game ranking. Tom feels it merits primary-navigation visibility but the current bar is crowded; placement remains a design decision. Compare (A) a prominent My Rankings destination within Collection with a Rank this game action on game details, and (B) a revised primary-navigation structure with Rankings, accounting for all displaced destinations. Keep Game Night distinct and readily accessible. Recommend one using mobile/desktop mockups and findability evidence before structural implementation. Preserve existing rankings, ranking input, deep links, Back and collection state. Navigation changes must not make the new Pro recommendation signal gate existing ranking entry.
 
 ### SP-PB08 — Reduce Friends' favourites padding
 
@@ -80,7 +81,7 @@ Reduce excess card/section padding and empty space while preserving artwork, rea
 
 **Status:** NOT STARTED. **Workstream:** Collection UI. **Access:** Existing access.
 
-Audit existing filters first; proposed additions are player count, duration, complexity, cooperative/competitive and recorded/unrecorded play history, only where data supports truthful filtering. Combine filters, show active count, clear/reset and no-match recovery; retain independent Owned/Want to Play state and scroll. Make Add game a prominent labelled action on populated and empty views. 'More prominent' is provisional because the user's final bullet was truncated.
+Audit existing filters first; proposed additions are player count, duration, complexity, cooperative/competitive and recorded/unrecorded play history, only where data supports truthful filtering. Combine filters, show active count, clear/reset and no-match recovery; retain independent Owned/Want to Play state and scroll. Make Add game a prominent labelled action on populated and empty views. Tom confirmed that Add game is currently not obvious. Use a visible labelled Add game action rather than relying on an ambiguous icon or an empty-state-only entry. When barcode scanning ships, offer Search and Scan barcode from this entry.
 
 ### SP-PB10 — Add optional play location
 
@@ -116,13 +117,13 @@ Show clearly labelled total plays and H-index: the largest h for which at least 
 
 **Status:** NOT STARTED. **Workstream:** Recommendation change. **Access:** Pro — explicitly requested.
 
-First identify whether the requested signal is personal ShelfPick rankings, user ratings or global BGG rank/rating; these must not be conflated. Audit existing rating contributions to avoid double counting. Implement a bounded, explainable contribution in Discover For You with neutral missing-data behaviour and regression examples. Preserve all hard eligibility, exact-player suitability and BGG Not Recommended >=30% exclusions; no global Hot/Top 100 reordering. Picker use is a separate optional sub-slice after evaluating Discover results, not an assumed approved scoring formula. Add genuine Free/Pro enforcement without gating existing Free scoring.
+Use the user's personal ShelfPick game ranking, confirmed by Tom. Audit its current representation (ordered rank versus numeric score) and existing rating contributions before defining a formula; do not substitute global BGG ranking. In Discover, use ranked-known-game affinities to help score unseen candidates rather than expecting an unowned candidate to have a personal rank. Document how positive and low-ranked preferences are derived; an unranked game is unknown, not disliked. Test sparse rankings, ties where supported, edits and absent affinity metadata. Avoid double counting correlated shelf/history inputs. Implement a bounded, explainable contribution in Discover For You with neutral missing-data behaviour and regression examples. Preserve all hard eligibility, exact-player suitability and BGG Not Recommended >=30% exclusions; no global Hot/Top 100 reordering. Picker use is a separate optional sub-slice after evaluating Discover results, not an assumed approved scoring formula. Add genuine Free/Pro enforcement without gating existing Free scoring.
 
-### SP-PB16 — Add game scanning
+### SP-PB16 — Add retail barcode scanning
 
-**Status:** NOT STARTED. **Workstream:** New feature / format decision. **Access:** Tier not specified.
+**Status:** NOT STARTED. **Workstream:** Barcode lookup and collection entry. **Access:** Tier not specified.
 
-Confirm QR containing BGG/ShelfPick game links versus retail EAN/UPC barcode scanning. Proposed first scope: supported game-link QR → resolved game preview → confirm Owned/Want to Play, with duplicate detection, permission-denied handling and manual-search fallback. Reject unsupported payloads safely without arbitrary URL fetching. Retail barcode lookup is a distinct dependency requiring a reliable game catalogue mapping; do not promise it as equivalent to QR.
+Confirmed scope: scan retail EAN/UPC barcodes on game boxes. Split into SP-PB16A catalogue feasibility and SP-PB16B scan/add integration. First establish a permitted barcode-to-game/edition data source, actual coverage on representative boxes, commercial terms, costs and canonical BGG ID mapping; do not assume existing BGG endpoints supply this mapping. Then implement camera scan or manual code entry → matched game/edition preview → user confirmation → add to Owned/Want to Play. Handle ambiguous editions, no match, duplicate ownership, unsupported camera, permission denial and lookup failure with manual-search fallback. A successful camera decode alone does not complete this task. Game-link QR scanning is not a substitute for retail barcode support.
 
 ### SP-PB17 — Expand avatars and support photo upload
 
@@ -134,13 +135,19 @@ Offer more selectable avatars and a separate upload-photo slice with crop/previe
 
 **Status:** NOT STARTED. **Workstream:** Group feature. **Access:** Enhanced voting tier to confirm; basic Game Night stays Free.
 
-Keep Game Night separate from Picker: attendees and constraints → eligible 3–5 game shortlist with group reasons → votes → clear winner/tie resolution → reveal → log play. Voting must affect the result, with at most one current ballot per attendee, editable choices and explicit abstention/tie handling. Proposed MVP is host-device pass-and-play; remote guest voting is a separate sub-slice pending confirmation, requiring session membership and persisted votes. Reset/reconfirm ballots when shortlist or attendance changes. Never fabricate attendee-owned collections or group preferences. Split session/vote rules and UI integration into separate tasks.
+Keep Game Night separate from Picker: attendees and constraints → eligible 3–5 game shortlist with group reasons → votes → clear winner/tie resolution → reveal → log play. Voting must affect the result, with at most one current ballot per attendee, editable choices and explicit abstention/tie handling. Confirmed joining flow: the host displays a session QR code; attendees scan it and vote on their own phones. Split into SP-PB18A session/membership and vote rules, SP-PB18B host QR and mobile guest voting, and SP-PB18C cross-device results/recovery. Propose guest participation without mandatory account creation, with host-confirmed attendee slots and session-scoped credentials; QR possession must not expose the host's account or grant host controls. Store ballots authoritatively on the server; prevent duplicate ballots for the same admitted participant, scope all writes to that session and avoid claiming anonymous access is identity-proof. Support refresh/reconnect, voting-open/closed/expired states, host close/revoke, invalid links, concurrent votes and shared winner display. QR sharing must work across different networks through the deployed app URL, not a localhost URL. Provide a copyable join-link fallback. Verify two independent phone/browser contexts plus host. Polling is acceptable if it meets the UX; do not assume WebSockets are required. Reset/reconfirm ballots when shortlist or attendance changes. Never fabricate attendee-owned collections or group preferences. Split session/vote rules and UI integration into separate tasks.
 
 ### SP-PB19 — Add play challenges
 
 **Status:** NOT STARTED. **Workstream:** New feature. **Access:** Pro — explicitly requested.
 
 Proposed MVP: a personal goal for total recorded plays and a play-X-distinct-games-Y-times challenge, with date range, progress and completion. Progress derives from real play records and recalculates after edit/delete/import; existing plays in the chosen range count consistently. Include create/view/archive, empty/error states and backend/frontend Pro enforcement. Define timezone and quantity counting; no leaderboards or reward economy in this slice. Depends on play-data reliability and SP-PB14 counting semantics.
+
+### SP-PB20 — Simplify supporting text beneath headings
+
+**Status:** NOT STARTED. **Workstream:** UI copy cleanup. **Access:** All users.
+
+Audit subtitles and supporting paragraphs beneath headings across Picker, Collection, Discover, Rankings, Insights, Game Night and Settings. Working interpretation of Tom's request: remove repetitive/redundant text that merely restates the heading; shorten useful instructions and move longer optional explanations into contextual help. Keep meaningful personalised/fallback explanations, units, error recovery, empty-state guidance, entitlement limitations and accessibility labels. Do not fill the released space with new filler copy. Capture before/after examples and verify mobile/desktop light/dark wrapping and screen-reader context. Complete alongside SP-PB05–09.
 
 ## Shared definition of done
 
