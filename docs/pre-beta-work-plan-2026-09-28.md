@@ -13,9 +13,41 @@ This is an implementation backlog, not a claim that features are shipped. All ta
 3. Play foundation SP-PB10–11, statistics SP-PB14, then sharing SP-PB12–13.
 4. Recommendation SP-PB15; scanning SP-PB16 and avatars SP-PB17 can proceed independently once decisions are resolved.
 5. Game Night SP-PB18 and challenges SP-PB19.
-6. Reconcile shipped Free/Pro claims and entitlements; validate all new work and existing operational release gates. Ask Tom to resume beta; do not resume automatically.
+6. Reconcile shipped Free/Pro claims and entitlements — presentation complete;
+   the `advanced_stats` contract discrepancy and commercial checkout remain.
+   Validate all new work and existing operational release gates. Ask Tom to
+   resume beta; do not resume automatically.
 
 Task IDs are new backlog IDs and do not replace historical roadmap slice IDs. Implement one bounded sub-slice per reviewable change; split larger data/UI work further when needed.
+
+## Roadmap Slice 4 — Free versus Pro presentation reconciliation
+
+**Status:** COMPLETE (28 September 2026). **Task ID:** Roadmap Slice 4,
+Settings + Pro foundations; this reconciliation is not assigned a new SP-PB
+number. **Access:** Presentation only; existing backend entitlements remain
+authoritative.
+
+The comparison leads with the three implemented Pro benefits: personal For You
+and count-based Picker influence, live timing with an in-app indicator, and
+host-created phone voting. Activity groups retain Free Collection, core Picker,
+manual duration/location logging, personal rankings, branded play sharing and
+basic Game Night. Copy distinguishes the Pro host from guests, who need neither
+an account nor Pro, and states that owner rankings do not influence named-player
+Picker groups. Top 100 is identified as Free by policy but unavailable while
+SP-PB02 is blocked. Photo upload, outside-app timer behaviour and notifications
+are not presented as available.
+
+No entitlement, route or Free functionality changed. The agreed one-off model
+is retained, but checkout and a technically configured price do not exist, so
+the comparison contains no price or Buy/unlock control. Seven focused rendering
+tests, changed-file ESLint, the production build and `git diff --check` passed.
+A mocked Chrome pass covered Free and Pro at 390×844, keyboard focus, bottom-nav
+clearance and overflow, plus a 1280×900 desktop layout check. The screenshot is
+`docs/screenshots/free-pro-presentation/free-plan-mobile.png`. No live account,
+purchase, backend, production data or production service was used. The
+unmarketed `advanced_stats` entitlement still has no separate shipped surface;
+checkout remains pending. SP-PB02 remains BLOCKED, photo upload remains
+post-beta and beta remains on hold.
 
 ## Decisions and provisional interpretations
 

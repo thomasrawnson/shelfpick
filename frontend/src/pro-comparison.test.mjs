@@ -39,20 +39,23 @@ test("Settings Pro entry opens the comparison route", () => {
   delete globalThis.window
 })
 
-test("Free plan explains the useful free product and an unavailable one-off action", () => {
+test("Free plan leads with the three implemented Pro benefits and accurate boundaries", () => {
   const markup = render(ProComparisonView, { user })
-  assert.match(markup, /Free gives you the full shelf/)
-  assert.match(markup, /ShelfPick is free to use/)
+  assert.match(markup, /Free covers the essentials/)
+  assert.match(markup, /More personal recommendations/)
+  assert.match(markup, /Live play timing/)
+  assert.match(markup, /Game Night voting from friends’ phones/)
+  assert.match(markup, /count-based sessions, not named-player groups/)
+  assert.match(markup, /Lock-screen timers and notifications are not included/)
+  assert.match(markup, /Guests join in their browser without an account or Pro/)
+  assert.match(markup, /You’re on Free/)
   assert.match(markup, /Free<\/h2><span class="pro-plan-state">Your plan/)
-  assert.match(markup, /basic group picker/i)
-  assert.match(markup, /Discover Hot and Top 100/)
-  assert.match(markup, /For You/)
   assert.match(markup, /One-off unlock/)
-  assert.match(markup, /one-off price will be shown before you pay/i)
-  assert.match(markup, /disabled=""[^>]*>Unlock ShelfPick Pro/)
   assert.match(markup, /Purchases are not available yet/)
-  assert.doesNotMatch(markup, /monthly|subscription/i)
-  assert.doesNotMatch(markup, /Advanced recommendations|Richer statistics|Enhanced Game Night/)
+  assert.match(markup, /not a subscription/)
+  assert.match(markup, /No price or Buy action is shown/)
+  assert.doesNotMatch(markup, /<button[^>]*>.*(?:Buy|Unlock ShelfPick Pro)/s)
+  assert.doesNotMatch(markup, /£3\.99|photo upload/i)
 })
 
 test("Pro plan is current without a purchase action", () => {
@@ -60,28 +63,47 @@ test("Pro plan is current without a purchase action", () => {
     user: { ...user, tier: "PRO", entitlements: ["game_night_basic", "personalized_discover"] },
   })
   assert.match(markup, /Pro<\/h2><span class="pro-plan-state">Your plan/)
-  assert.match(markup, /Pro is active on your account/)
+  assert.match(markup, /Pro is active/)
+  assert.match(markup, /Your Pro access is active/)
   assert.doesNotMatch(markup, /Unlock ShelfPick Pro/)
 })
 
-test("comparison lists only available features with accessible inclusion labels", () => {
+test("comparison groups activities and retains confirmed Free capabilities", () => {
   const markup = render(ProComparisonView, { user })
   const row = name => markup.match(new RegExp(`<tr><th scope="row"><span>${name}<\\/span>.*?<\\/th>(.*?)<\\/tr>`))?.[1]
   assert.match(row("Collection"), /Included.*Included/)
-  assert.match(row("Game Night"), /Included.*Included/)
-  assert.match(row("Phone voting"), /Not included.*Included/)
-  assert.match(row("For You"), /Not included.*Included/)
+  assert.match(row("Personal rankings"), /Included.*Included/)
+  assert.match(row("Core Picker"), /Included.*Included/)
+  assert.match(row("Manual play logging"), /Included.*Included/)
+  assert.match(row("Branded play sharing"), /Included.*Included/)
+  assert.match(row("Basic Game Night"), /Included.*Included/)
+  assert.match(markup, /Build your shelf/)
+  assert.match(markup, /Choose a game/)
+  assert.match(markup, /Record and share a play/)
+  assert.match(markup, /Plan together/)
   assert.match(markup, /ShelfPick Free and Pro feature comparison/)
-  assert.match(markup, /Only features already available in ShelfPick are listed here/)
 })
 
-test("Discover and the Free comparison use the same Top 100 label", () => {
+test("comparison distinguishes Pro gates, guest access and blocked source availability", () => {
+  const markup = render(ProComparisonView, { user })
+  const row = name => markup.match(new RegExp(`<tr><th scope="row"><span>${name}<\\/span>.*?<\\/th>(.*?)<\\/tr>`))?.[1]
+  assert.match(row("Picker ranking influence"), /Not included.*Included/)
+  assert.match(row("Discover For You"), /Not included.*Included/)
+  assert.match(row("Live play timer"), /Not included.*Included/)
+  assert.match(row("Open phone voting"), /Not included.*Included/)
+  assert.match(row("Join a friend’s vote"), /No plan needed.*No plan needed/)
+  assert.match(row("Discover Top 100"), /Unavailable.*Unavailable/)
+  assert.match(markup, /Free by policy; ranked source is currently blocked/)
+})
+
+test("Discover continues to use the Top 100 label while comparison records its limitation", () => {
   const discover = renderToStaticMarkup(React.createElement(DiscoverView, {
     personalized: false, onViewWishlist: () => {}, onUnlockPro: () => {}, onPersonalize: () => {},
   }))
   const comparison = render(ProComparisonView, { user })
   assert.match(discover, /role="tab"[^>]*>Top 100<\/button>/)
-  assert.match(comparison, /Discover Hot and Top 100/)
+  assert.match(comparison, /Discover Top 100/)
+  assert.match(comparison, /ranked source is currently blocked/)
 })
 
 test("locked feature presentations use the comparison-screen language", () => {

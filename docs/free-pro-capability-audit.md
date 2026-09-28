@@ -1,8 +1,9 @@
 # Free and Pro capability audit
 
-Verified through 28 September 2026 from frontend and backend code, isolated fixtures,
-and focused automated tests. No live account, purchase, database mutation or
-live BoardGameGeek request was used.
+Verified through 28 September 2026 from frontend and backend code, isolated
+fixtures, focused automated tests and the reconciled Roadmap Slice 4 comparison.
+No live account, purchase, database mutation or live BoardGameGeek request was
+used.
 
 The agreed launch offer remains a **£3.99 one-off purchase**, not a
 subscription. No price is technically configured, checkout is not implemented,
@@ -77,8 +78,8 @@ entitlement, purchase claim or billing behavior changed. Beta remains on hold.
 ## Pro readiness findings and follow-ups
 
 1. **Checkout blocker:** configure the agreed £3.99 one-off price, implement
-   checkout, grant/reconcile Pro idempotently, and add purchase recovery. The
-   current disabled action is truthful.
+   checkout, grant/reconcile Pro idempotently, and add purchase recovery. Until
+   then the comparison shows no price and no Buy/unlock action.
 2. **Entitlement contract still overstates some implementation:**
    `advanced_recommendations` now independently enables the Picker personal-
    ranking signal, `live_play_enhancements` enables the timer and
@@ -118,6 +119,22 @@ Acceptance criteria:
   £3.99 one-off checkout remains the subsequent commercial implementation.
 
 ## Validation record
+
+Roadmap Slice 4 Free/Pro presentation reconciliation (28 September): the
+comparison was checked against the backend entitlement paths for For You,
+count-based Picker ranking influence, the live timer and host phone voting.
+Seven focused frontend tests cover benefit copy, confirmed Free capabilities,
+count-only and guest-access qualifications, Top 100 unavailability, plan state
+and the absence of a fake purchase action. Changed-file ESLint, the production
+build and `git diff --check` passed. A mocked Chrome pass covered Free and Pro
+states at 390×844, keyboard focus, fixed-navigation clearance and horizontal
+overflow, with a 1280×900 desktop inspection of the benefit layout. Evidence is
+in `docs/screenshots/free-pro-presentation/free-plan-mobile.png`. This was UI
+fixture evidence, not a live purchase, account, BoardGameGeek or production
+test. The marketed and enforced capabilities align except that Top 100 remains
+Free by policy but source-blocked, and the unmarketed `advanced_stats`
+entitlement still has no separate shipped surface. SP-PB02 remains BLOCKED,
+photo upload remains post-beta and beta remains on hold.
 
 SP-PB18 addendum (28 September): 40 focused backend tests covered owner and
 join-token scope, Pro enforcement, one idempotent ballot per guest, changed and

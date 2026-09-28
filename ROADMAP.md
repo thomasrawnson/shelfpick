@@ -203,23 +203,25 @@ overflow, both list → detail → browser Back paths, and independent Owned/Wan
 to Play scroll restoration. No live account or backend data was used or
 changed.
 
-The bounded Free versus Pro presentation pass is complete. The comparison now
-leads with the useful Free product and lists only implemented capabilities;
-personalised Discover is the sole current Pro-only outcome. Locked feature
-states use the same comparison language and route directly to `/settings/pro`.
-Entitlement checks and purchase behaviour are unchanged. The agreed launch
-price is £3.99 as a one-off purchase, not a subscription. Technically, no price
-is configured and checkout is not implemented, so the unlock action stays
-explicitly unavailable and no price is displayed in the app.
+The Roadmap Slice 4 Free versus Pro presentation reconciliation completed on
+28 September 2026. The comparison now leads with three implemented Pro
+benefits: more personal For You and count-based Picker recommendations, live
+play timing with an in-app indicator, and host-created Game Night phone voting.
+It keeps Collection, core Picker, manual play logging/duration, locations,
+personal rankings, branded play sharing and basic Game Night visibly Free.
+Creating a phone-voting session is Pro; joining one as a browser guest does not
+require an account or Pro. Picker ranking influence is described accurately as
+count-based only, not a named-player group preference.
 
-The implementation audit is recorded in
-`docs/free-pro-capability-audit.md`. It verifies that personalised Discover
-`For You` is the only implemented Pro-only behaviour. Picker modes, collection,
-Want to Play, play logging, Insights and basic Game Night are Free. The audit
-also records that the Pro entitlement response currently includes planned
-capability names without corresponding shipped behaviour, and that For You’s
-source cache is process-local. The recommended next slice is Pro entitlement
-and For You readiness hardening before £3.99 one-off checkout implementation.
+The presentation also records current limitations rather than marketing around
+them. Top 100 remains a Free capability by policy but is labelled unavailable
+while SP-PB02's authorised ranked source is blocked. Timer copy is limited to
+the in-app experience; photo upload is not claimed. The agreed launch model
+remains a £3.99 one-off purchase, not a subscription, but no price is configured
+and checkout is not implemented. The app therefore shows neither a price nor a
+fake Buy/unlock action. Entitlement checks and purchase behaviour are unchanged.
+`advanced_stats` remains a granted Pro capability name without a corresponding
+separate product surface and is deliberately not marketed.
 
 The truthful For You personalisation-state slice completed on 26 September
 2026. The unchanged recommendation path now reports whether collection matches,
@@ -541,12 +543,12 @@ group features.
 
 ## Slice 4 — Settings + Pro foundations
 
-**Status:** NOT STARTED
+**Status:** IN PROGRESS — comparison presentation complete; checkout and remaining commercial foundations pending
 
-The shared FREE/PRO tier resolution, frontend-facing entitlement list and
-central feature-capability checks are complete. The agreed launch price is
-£3.99 as a one-off purchase, but no price is configured and checkout is not
-implemented; the full Settings presentation remains incomplete.
+The shared FREE/PRO tier resolution, frontend-facing entitlement list, central
+feature-capability checks and truthful Free/Pro comparison are complete. The
+agreed launch price is £3.99 as a one-off purchase, but no price is configured
+and checkout is not implemented; purchase and recovery work remains pending.
 
 The launch offer is a useful Free version plus a £3.99 one-off ShelfPick Pro
 unlock. Pro is not a subscription.

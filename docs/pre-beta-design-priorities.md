@@ -28,23 +28,28 @@ social-profile exports. A matching simplified shelf-and-meeple mark, small
 favicon and light/dark ShelfPick wordmarks replace the earlier generic mark.
 BoardGameGeek attribution remains separate and unchanged.
 
-The bounded Free versus Pro presentation pass completed on 26 September 2026.
-Free is explained as a useful product across shelf management, Pick, play
-tracking, Discover Hot/Top 100 and basic Game Night. The current Pro benefit is
-limited to personalised For You recommendations; planned recommendation,
-statistics and enhanced Game Night candidates are not presented as available.
-Locked states route directly to the comparison with consistent language.
-The agreed launch price is £3.99 as a one-off purchase, not a subscription.
-Technically, no price is configured and checkout is not implemented, so the
-purchase control remains honestly unavailable.
+The initial bounded Free versus Pro pass completed on 26 September 2026 and was
+reconciled with subsequent shipped work on 28 September. Roadmap Slice 4's
+comparison now leads with three benefit cards: more personal recommendations,
+live in-app timing and Game Night voting from friends' phones. The account's
+current plan is explicit. The detailed matrix is grouped around building a
+shelf, choosing a game, recording/sharing a play and planning together rather
+than presenting an undifferentiated feature list.
 
-The implementation audit in `docs/free-pro-capability-audit.md` verifies that
-For You is currently the only implemented Pro-only behaviour. All Picker modes,
-Owned and Want to Play, play logging, Insights, Discover Hot/Top 100 and basic
-Game Night are Free. Before checkout work, the recommended next slice is to
-align granted entitlement names with shipped capabilities and harden For You’s
-cold-start and source-failure behaviour. The agreed commercial decision remains
-£3.99 as a one-off purchase, not a subscription.
+Free remains a useful product: Collection, core Picker, manual duration and
+location logging, personal rankings, branded sharing and basic Game Night are
+retained. Pro hosts can open phone voting, while guests need neither Pro nor an
+account. Picker ranking influence is count-based only and is not described as a
+named-player group preference. Top 100 is marked Free by policy but unavailable
+while SP-PB02's source is blocked. Timer copy promises only ShelfPick's in-app
+timer and indicator; photo upload is absent. The one-off purchase model remains,
+but without configured checkout the screen has no price or fake Buy action.
+
+The 390×844 layout uses one-column benefit and plan cards with the comparison
+remaining horizontally contained above the fixed navigation. At 1280×900 the
+three benefit cards form a readable row. Mocked Free and Pro browser states,
+keyboard focus, navigation clearance and overflow passed; the representative
+capture is `docs/screenshots/free-pro-presentation/free-plan-mobile.png`.
 
 Truthful For You personalisation states completed on 26 September 2026. The UI
 now distinguishes results influenced by the user’s matching Owned shelf,
