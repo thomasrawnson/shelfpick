@@ -135,8 +135,12 @@ work. Existing tokens below describe the implemented baseline until changed.
 - Design live timer, location, avatars/photo upload, scan preview, voting and
   challenge states. Keep Game Night distinct, with votes affecting selection.
 
-Ranking placement, scan format, voting mode and truncated Add game wording
-remain explicit decisions. Preserve responsive layouts, light/dark, keyboard
+Confirmed on 28 September: use personal game rankings for the Pro recommendation
+enhancement; scan retail EAN/UPC box barcodes; attendees scan the host's QR and
+vote on their own phones; make Add game prominent. Rankings placement remains
+open because the navigation bar is crowded. SP-PB20 adds cleanup of repeated
+text beneath headings, retaining useful guidance and moving longer optional
+explanations into contextual help. Preserve responsive layouts, light/dark, keyboard
 access, truthful missing data, routes, Back and collection saved/scroll state.
 
 ## Overview
