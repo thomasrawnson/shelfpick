@@ -207,8 +207,12 @@ Mocked responsive checks at 390 and 1440px in light/dark verified the indicator,
 full controls, focus, navigation clearance and overflow; captures are in
 `docs/screenshots/sp-pb10-11/`. Controlled-clock and real local PostgreSQL
 checks cover lifecycle/recovery and persistence respectively. No real-device
-background or lock-screen behavior is claimed. SP-PB02 remains blocked and beta
-remains on hold.
+background or lock-screen behavior is claimed. A real-phone background/reopen
+check remains on the pre-beta checklist; outside-app timer/notification work is
+still the separate future task described above. If Pro access is lost, timer
+endpoints are gated but the existing active or finished timer row is retained
+for restored access rather than silently discarded. SP-PB02 remains blocked
+and beta remains on hold.
 
 ### UI-2 — core visual polish
 

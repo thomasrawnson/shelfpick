@@ -262,19 +262,33 @@ explicit confirmed discard. The timer public ID makes a lost-response retry
 idempotent, so it returns the already-created play instead of duplicating it.
 Manual duration entry remains Free and unchanged.
 
-Validation evidence: 18 focused backend service/API tests passed, including a
-controlled clock for pause/resume, background gaps, repeated actions, account
-isolation and cleanup. The configured development PostgreSQL migration upgraded
-to `b04c8f13a2d7`; `alembic check` reported no drift. An isolated real database
-round trip verified location/duration read-write, timer cleanup and one-play
-idempotent retry, then deleted its test records. Frontend tests (49), build,
-lint, colour-token guard and PWA checks passed. Mocked Playwright covered
+If Pro access is lost while a timer is active or awaiting save, all timer read
+and control endpoints return 403 and the in-app Pro controls are unavailable.
+The persisted timer is not deleted or reassigned: restoring Pro restores access
+to the same timer. A finished timer may still be submitted through ordinary
+manual play logging with its account-scoped session ID; successful save remains
+the only implicit cleanup. This preserves captured data without weakening the
+Pro gate or silently creating a play.
+
+Validation evidence: the complete backend suite passed with 236 tests and one
+pre-existing Starlette `TestClient`/httpx deprecation warning. Five focused
+tests against a disposable local PostgreSQL database verified concurrent Start
+produces one account timer,
+concurrent and repeated save produces one play, another account cannot read,
+control, discard or save a timer, finished timers reject the wrong game on both
+first save and retry, and tier loss retains active/finished timer rows. The
+database was removed after the run. A second disposable PostgreSQL database
+migrated from empty to `b04c8f13a2d7`; `alembic check` reported no new upgrade
+operations. Frontend tests (49), build, lint, colour-token guard and PWA checks passed.
+Mocked Playwright covered
 Start/Pause/Resume/Finish, navigation indicator, failure retention/retry,
 keyboard focus, bottom-navigation clearance and overflow at 390 and 1440px in
 light/dark. Before/after captures are in `docs/screenshots/sp-pb10-11/`.
-No real mobile device/background-process test was run; timestamp recovery is
-proved by controlled-clock and browser refresh/navigation coverage. SP-PB02
-remains BLOCKED and beta remains on hold.
+No real-phone background/reopen test has yet been run; it remains an explicit
+pre-beta checklist item. Timestamp recovery is proved by controlled-clock and
+browser refresh/navigation coverage, but those checks are not a device
+substitute. Outside-app timer/notification work remains the separate future
+task below. SP-PB02 remains BLOCKED and beta remains on hold.
 
 ### Future Pro timer task — outside-app visibility
 

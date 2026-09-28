@@ -194,6 +194,11 @@ Complete this checklist against production before inviting testers:
 - Confirm browser developer tools show no CORS, mixed-content or failed API
   requests.
 - Install the PWA on a phone and reopen it from the home screen.
+- On a real phone, start a Pro timer, background the PWA long enough to make
+  drift visible, reopen it, and verify the same timer and timestamp-derived
+  elapsed time survive. Repeat once with a paused timer and once after Finish
+  but before saving the play. This is an in-app recovery check; outside-app
+  timer surfaces and notifications remain a separate future task.
 
 Record the commit SHA, deployment time and result in the release log at the
 end of this file. Never paste API keys, tokens or database URLs into the log.

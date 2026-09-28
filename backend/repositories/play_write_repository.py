@@ -46,6 +46,8 @@ class PlayWriteRepository:
             )
             if existing is not None:
                 game = self.db.get(DatabaseGame, existing.game_id)
+                if game.bgg_id != bgg_id:
+                    raise ValueError("Finished timer not found for this game.")
                 return DomainPlay(
                     id=existing.id,
                     bgg_id=game.bgg_id,
@@ -100,7 +102,33 @@ class PlayWriteRepository:
             database_play.played_at = played_at
 
         self.db.add(database_play)
-        self.db.flush()
+        try:
+            self.db.flush()
+        except IntegrityError:
+            self.db.rollback()
+            if timer_session_id is None:
+                raise
+            existing = (
+                self.db.query(DatabasePlay)
+                .filter(
+                    DatabasePlay.user_id == self.user_id,
+                    DatabasePlay.timer_session_id == timer_session_id,
+                )
+                .first()
+            )
+            if existing is None:
+                raise
+            game = self.db.get(DatabaseGame, existing.game_id)
+            if game.bgg_id != bgg_id:
+                raise ValueError("Finished timer not found for this game.")
+            return DomainPlay(
+                id=existing.id,
+                bgg_id=game.bgg_id,
+                player_count=existing.player_count,
+                played_at=existing.played_at,
+                duration_minutes=existing.duration_minutes,
+                location=existing.location,
+            )
 
         for participant in participants:
             player = (

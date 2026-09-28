@@ -44,6 +44,7 @@ def test_frontend_user_response_uses_the_same_entitlement_rules():
         onboarding_completed=True,
         preferred_player_count=None,
         preferred_play_time=None,
+        preferred_play_style="any",
         profile_player_id=None,
         profile_player=None,
     )

@@ -278,8 +278,12 @@ Free and shared by existing play-entry routes. The Pro timer is account-scoped,
 timestamp-derived and recoverable across navigation/refresh, with one persistent
 in-app indicator and explicit review before save. Local migration/schema checks,
 isolated PostgreSQL persistence, focused frontend/backend tests and mocked
-responsive browser validation passed. No real-device outside-app timer claim is
-made. SP-PB02 remains BLOCKED and beta remains on hold.
+responsive browser validation passed. Follow-up PostgreSQL concurrency checks
+also proved one active timer per account, one play per timer session, strict
+account/game scoping and retention across tier loss. A real-phone
+background/reopen check remains on the pre-beta checklist. Outside-app timer
+and notification work remains separate. SP-PB02 remains BLOCKED and beta
+remains on hold.
 
 ## Foundation — Core Picker improvements
 

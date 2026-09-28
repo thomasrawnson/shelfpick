@@ -681,6 +681,14 @@ def test_live_timer_requires_pro_and_passes_draft_context():
         app.dependency_overrides[get_current_user] = lambda: User(id=1, email="free@example.com", tier="FREE")
         denied = client.post("/play-timer/start", json={"bgg_id": 13})
         assert denied.status_code == 403
+        for method, path in (
+            (client.get, "/play-timer"),
+            (client.post, "/play-timer/pause"),
+            (client.post, "/play-timer/resume"),
+            (client.post, "/play-timer/finish"),
+            (client.delete, "/play-timer"),
+        ):
+            assert method(path).status_code == 403
 
         app.dependency_overrides[get_current_user] = lambda: User(id=2, email="pro@example.com", tier="PRO")
         allowed = client.post(

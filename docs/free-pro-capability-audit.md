@@ -105,13 +105,20 @@ Acceptance criteria:
 
 ## Validation record
 
-SP-PB10/SP-PB11 addendum (28 September): 18 focused backend tests and 49
-frontend tests passed. The development PostgreSQL migration reached
-`b04c8f13a2d7` with no Alembic drift; temporary records proved location and
-duration round trips, account-scoped timer cleanup and idempotent save retry,
-then were deleted. Mocked Playwright covered Pro controls and persistent
-indicator behavior at 390/1440px in light/dark. No real device, notification,
-lock-screen surface or production service was tested.
+SP-PB10/SP-PB11 addendum (28 September): the complete backend suite passed with
+236 tests and one pre-existing Starlette `TestClient`/httpx deprecation warning.
+Five focused checks against a disposable local PostgreSQL database proved one
+timer under concurrent
+Start, one play under concurrent/repeated save, cross-account isolation, strict
+finished-timer game matching and timer retention after tier loss; the database
+was then removed. A second disposable PostgreSQL database migrated from empty
+to `b04c8f13a2d7`, and `alembic check` reported no new upgrade operations.
+Forty-nine frontend tests and the existing
+mocked Playwright coverage of Pro controls and the persistent indicator at
+390/1440px in light/dark also passed. A real-phone background/reopen check
+remains on the pre-beta checklist. Outside-app timer/notification work remains
+separate. No real device, notification, lock-screen surface or production
+service was tested; SP-PB02 remains blocked and beta remains on hold.
 
 - Code inspection: frontend route/component checks, backend dependency scoping,
   central entitlement mapping, routers, services and repositories.
