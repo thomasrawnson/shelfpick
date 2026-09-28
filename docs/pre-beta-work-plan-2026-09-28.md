@@ -93,9 +93,29 @@ Persist cooperative / competitive / no preference and initialise Picker from tha
 
 ### SP-PB05 — Restructure Settings navigation
 
-**Status:** NOT STARTED. **Workstream:** UI. **Access:** Existing access.
+**Status:** COMPLETE (28 September 2026). **Workstream:** UI. **Access:** Existing access.
 
 Use labelled headings and concise rows opening dedicated subpages for substantial forms; use dialogs only for short choices. Cover Profile, Preferences, Appearance, Collection & Data, Plays, Pro, Help and About using working actions only. Preserve deep links, Back, focus return and unsaved-input behaviour. Import must not display unrelated Profile settings. Retain official BGG attribution at relevant sync surfaces.
+
+Settings now opens as a grouped overview and routes each of those eight entries
+to focused content. Profile and Preferences reuse the existing profile API while
+showing only their relevant fields; Appearance retains the persistent theme
+control; Collection & Data reuses BGG sync and BG Stats import without the
+unrelated account/profile panel and adds explicit BGG attribution. Plays links
+to the working Insights history, Pro retains the comparison route, and Help and
+About contain only current information. Existing `/setup`, Profile and Pro deep
+links remain valid. Explicit Back and browser Back restore the originating row's
+keyboard focus.
+
+Validation: 39 frontend tests passed, including focused overview, route,
+section-isolation and import/profile-separation coverage. Build, lint,
+colour-token guard, PWA checks and `git diff --check` passed. Mocked Playwright
+verified overview → section → Back, browser Back focus, direct section routes,
+theme and saved-profile-preference persistence, keyboard focus, bottom-nav
+clearance and overflow at 390 and 1440px in light/dark. Before/after captures
+are in `docs/screenshots/sp-pb05/`. No live account or database data was used.
+SP-PB09 Add game/filter work and SP-PB20 cross-screen heading-copy cleanup
+remain pending; SP-PB02 remains blocked and beta remains on hold.
 
 ### SP-PB06 — Refresh typography
 

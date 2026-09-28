@@ -32,11 +32,10 @@ function render(view, props) {
   return renderToStaticMarkup(React.createElement(MemoryRouter, null, React.createElement(view, props)))
 }
 
-test("both Settings Pro entries open the comparison route", () => {
+test("Settings Pro entry opens the comparison route", () => {
   globalThis.window = { shelfPickTheme: { getPreference: () => "system" } }
   const markup = render(SettingsView, { user, onLogout: () => {} })
-  assert.match(markup, /href="\/settings\/pro"[^>]*>.*?Unlock Pro/s)
-  assert.match(markup, /href="\/settings\/pro"[^>]*>.*?Compare Free vs Pro/s)
+  assert.match(markup, /href="\/settings\/pro"[^>]*>.*?ShelfPick Pro/s)
   delete globalThis.window
 })
 

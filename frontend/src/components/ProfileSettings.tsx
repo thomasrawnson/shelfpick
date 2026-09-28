@@ -3,11 +3,11 @@ import { saveProfile } from "../api/client"
 import type { AuthUser } from "../auth"
 import PlayerAvatar from "./ui/PlayerAvatar"
 
-type Props = { user: AuthUser; onChange: (user: AuthUser) => void }
+type Props = { user: AuthUser; onChange: (user: AuthUser) => void; mode?: "all" | "profile" | "preferences" }
 const avatars = ["forest", "gold", "clay"] as const
 const times = [30, 60, 90, 120, 0]
 
-function ProfileSettings({ user, onChange }: Props) {
+function ProfileSettings({ user, onChange, mode = "all" }: Props) {
   const [name, setName] = useState(user.player_name)
   const [avatar, setAvatar] = useState(user.avatar_key)
   const [players, setPlayers] = useState(user.preferred_player_count)
@@ -33,9 +33,12 @@ function ProfileSettings({ user, onChange }: Props) {
     }
   }
 
-  return <section className="setup-card profile-settings" aria-labelledby="profile-heading">
-    <h2 id="profile-heading">Profile</h2>
-    <p>Your name, avatar and usual choices. Pick and Game Night can still be changed each time.</p>
+  const showProfile = mode !== "preferences"
+  const showPreferences = mode !== "profile"
+
+  return <section className="setup-card profile-settings" aria-label={mode === "preferences" ? "Recommendation preferences" : "Profile details"}>
+    {mode === "all" && <><h2>Profile</h2><p>Your name, avatar and usual choices. Pick and Game Night can still be changed each time.</p></>}
+    {showProfile && <>
     <label className="setup-label" htmlFor="profile-name">Player name</label>
     <input id="profile-name" className="setup-input" value={name} maxLength={100}
       onChange={(event) => setName(event.target.value)} />
@@ -50,6 +53,8 @@ function ProfileSettings({ user, onChange }: Props) {
         </button>)}
       </div>
     </fieldset>
+    </>}
+    {showPreferences && <>
     <fieldset className="onboarding-fieldset">
       <legend>Usual player count</legend>
       <div className="onboarding-choices">
@@ -74,9 +79,11 @@ function ProfileSettings({ user, onChange }: Props) {
           aria-pressed={time === null} onClick={() => setTime(null)}>No default</button>
       </div>
     </fieldset>
+    {mode === "preferences" && <p className="settings-field-note">Picker and Game Night can still be changed each time.</p>}
+    </>}
     <button type="button" className="primary-button" disabled={saving || !name.trim()}
-      onClick={() => void save()}>{saving ? "Saving..." : "Save profile"}</button>
-    {saved && <p className="setup-success" role="status">Profile saved.</p>}
+      onClick={() => void save()}>{saving ? "Saving..." : mode === "preferences" ? "Save preferences" : "Save profile"}</button>
+    {saved && <p className="setup-success" role="status">{mode === "preferences" ? "Preferences saved." : "Profile saved."}</p>}
     {error && <p className="error-message" role="alert">{error}</p>}
   </section>
 }

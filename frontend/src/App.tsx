@@ -8,7 +8,6 @@ import {
 } from "react";
 
 import {
-  Link,
   Navigate,
   Route,
   Routes,
@@ -41,8 +40,8 @@ import GameNightView from "./components/GameNightView";
 import OnboardingView from "./components/OnboardingView";
 
 import SetupView from "./components/SetupView";
-import ProfileSettings from "./components/ProfileSettings";
 import SettingsView from "./components/SettingsView";
+import SettingsSectionView from "./components/SettingsSectionView";
 import ProComparisonView from "./components/ProComparisonView";
 import PlayerAvatar from "./components/ui/PlayerAvatar";
 
@@ -561,11 +560,15 @@ function App() {
 
             <Route
               path={APP_PATHS.settingsProfile}
-              element={<>
-                <Link className="settings-back-link" to={APP_PATHS.settings}>Back to Settings</Link>
-                <ProfileSettings user={user} onChange={setUser} />
-              </>}
+              element={<SettingsSectionView section="profile" user={user} onUserChange={setUser} />}
             />
+
+            <Route path={APP_PATHS.settingsPreferences} element={<SettingsSectionView section="preferences" user={user} onUserChange={setUser} />} />
+            <Route path={APP_PATHS.settingsAppearance} element={<SettingsSectionView section="appearance" user={user} onUserChange={setUser} />} />
+            <Route path={APP_PATHS.settingsCollectionData} element={<SettingsSectionView section="collection-data" user={user} onUserChange={setUser} />} />
+            <Route path={APP_PATHS.settingsPlays} element={<SettingsSectionView section="plays" user={user} onUserChange={setUser} />} />
+            <Route path={APP_PATHS.settingsHelp} element={<SettingsSectionView section="help" user={user} onUserChange={setUser} />} />
+            <Route path={APP_PATHS.settingsAbout} element={<SettingsSectionView section="about" user={user} onUserChange={setUser} />} />
 
             <Route
               path={APP_PATHS.settingsPro}

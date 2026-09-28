@@ -17,12 +17,14 @@ type Props = {
   onUsernameChange?: (
     username: string,
   ) => void
+  compact?: boolean
 }
 
 
 function SetupView({
   initialUsername,
   onUsernameChange,
+  compact = false,
 }: Props) {
   const [username, setUsername] =
     useState(
@@ -129,8 +131,8 @@ function SetupView({
 
 
   return (
-    <section className="screen setup-screen">
-      <header>
+    <section className={compact ? "setup-screen setup-screen-compact" : "screen setup-screen"}>
+      {!compact && <header>
         <p className="eyebrow">
           Your games
         </p>
@@ -141,7 +143,7 @@ function SetupView({
           Bring in your collection first,
           then add your play history.
         </p>
-      </header>
+      </header>}
 
 
       <div className="setup-card">

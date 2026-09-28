@@ -2,6 +2,7 @@ import { Link } from "react-router-dom"
 
 import type { AuthUser } from "../auth"
 import { APP_PATHS } from "../routes"
+import { rememberSettingsEntry } from "../settings-focus"
 
 type ComparisonFeature = { name: string; detail: string; free: boolean; pro: boolean }
 
@@ -43,7 +44,8 @@ function ProComparisonView({ user }: { user: AuthUser }) {
   const isPro = user.tier === "PRO"
 
   return <section className="screen pro-comparison-screen" aria-labelledby="pro-comparison-heading">
-    <Link className="settings-back-link" to={APP_PATHS.settings}>Back to Settings</Link>
+    <Link className="settings-back-link" to={APP_PATHS.settings} state={{ focusEntry: "pro" }}
+      onClick={() => rememberSettingsEntry("pro")}>Back to Settings</Link>
     <header className="pro-comparison-heading">
       <h1 id="pro-comparison-heading">Free gives you the full shelf. Pro makes discovery personal.</h1>
       <p>ShelfPick is free to use. Pro will be a one-off payment when purchases become available.</p>

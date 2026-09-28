@@ -1,116 +1,69 @@
-import { Fragment, useState } from "react"
-import { Link } from "react-router-dom"
+import { useEffect, useRef } from "react"
+import { Link, useLocation } from "react-router-dom"
 
 import type { AuthUser } from "../auth"
 import { APP_PATHS } from "../routes"
-import { getThemePreference, setThemePreference, type ThemePreference } from "../theme"
-import { trackEvent } from "../telemetry"
+import { rememberSettingsEntry, takeRememberedSettingsEntry } from "../settings-focus"
 import PlayerAvatar from "./ui/PlayerAvatar"
 
-type Setting = {
-  label: string
-  to?: string
-  detail?: string
-}
+type SettingsEntry = { id: string; label: string; detail: string; to: string }
 
-const sections: { title: string; items: Setting[] }[] = [
-  { title: "ShelfPick Pro", items: [
-    { label: "Unlock Pro", to: APP_PATHS.settingsPro },
-    { label: "Compare Free vs Pro", to: APP_PATHS.settingsPro },
+const groups: { title: string; entries: SettingsEntry[] }[] = [
+  { title: "Your account", entries: [
+    { id: "profile", label: "Profile", detail: "Name and avatar", to: APP_PATHS.settingsProfile },
+    { id: "preferences", label: "Preferences", detail: "Usual players and play time", to: APP_PATHS.settingsPreferences },
   ] },
-  { title: "Collection & Data", items: [
-    { label: "Sync with BGG", to: APP_PATHS.setup },
-    { label: "Cloud Sync" },
-    { label: "Import Data", to: APP_PATHS.setup, detail: "BG Stats plays" },
-    { label: "Export Data" },
+  { title: "Your ShelfPick", entries: [
+    { id: "appearance", label: "Appearance", detail: "Theme", to: APP_PATHS.settingsAppearance },
+    { id: "collection-data", label: "Collection & Data", detail: "BGG sync and play import", to: APP_PATHS.settingsCollectionData },
+    { id: "plays", label: "Plays", detail: "View play history", to: APP_PATHS.settingsPlays },
+    { id: "pro", label: "ShelfPick Pro", detail: "Compare plans", to: APP_PATHS.settingsPro },
   ] },
-  { title: "Appearance", items: [] },
-  { title: "Plays", items: [
-    { label: "Play Challenges" },
-  ] },
-  { title: "Help", items: [
-    { label: "What's New" },
-    { label: "Feedback" },
-    { label: "Report a Bug" },
-    { label: "Roadmap" },
-    { label: "Privacy Policy" },
-  ] },
-  { title: "About", items: [
-    { label: "App version" },
-    { label: "Pluto Night Labs", detail: "Made by Pluto Night Labs" },
-    { label: "Pluto Night Labs website" },
-  ] },
-  { title: "Support ShelfPick", items: [
-    { label: "Tip Jar" },
+  { title: "Support", entries: [
+    { id: "help", label: "Help", detail: "Using ShelfPick", to: APP_PATHS.settingsHelp },
+    { id: "about", label: "About", detail: "App information", to: APP_PATHS.settingsAbout },
   ] },
 ]
 
-function SettingRow({ label, to, detail }: Setting) {
-  const content = <>
-    <span className="settings-row-label">{label}</span>
-    <span className="settings-row-detail">{detail ?? (to ? "Open" : "Coming soon")}</span>
-  </>
-
-  return to
-    ? <Link className="settings-row settings-row-link" to={to}>{content}</Link>
-    : <div className="settings-row settings-row-pending">{content}</div>
-}
-
 function SettingsView({ user, onLogout }: { user: AuthUser; onLogout: () => void }) {
-  const [theme, setTheme] = useState<ThemePreference>(getThemePreference)
-  const [feedbackOpen, setFeedbackOpen] = useState(false)
+  const location = useLocation()
+  const entryRefs = useRef<Record<string, HTMLAnchorElement | null>>({})
 
-  function chooseTheme(value: ThemePreference) {
-    setThemePreference(value)
-    setTheme(value)
-  }
+  useEffect(() => {
+    const state = location.state as { focusEntry?: string } | null
+    const rememberedEntry = takeRememberedSettingsEntry()
+    const focusEntry = rememberedEntry ?? state?.focusEntry
+    if (focusEntry) {
+      entryRefs.current[focusEntry]?.focus()
+    }
+  }, [location.state])
 
   return <section className="screen settings-screen" aria-labelledby="settings-heading">
     <header className="settings-heading">
       <h1 id="settings-heading">Settings</h1>
-      <p>Your profile, collection and ShelfPick options.</p>
+      <p>Manage your account, shelf and app.</p>
     </header>
 
-    <section className="settings-section" aria-labelledby="settings-profile">
-      <h2 id="settings-profile">Profile</h2>
-      <div className="settings-list">
-        <Link className="settings-row settings-row-link settings-profile-row" to={APP_PATHS.settingsProfile}>
-          <PlayerAvatar name={user.player_name} variant={user.avatar_key} />
-          <span className="settings-profile-copy">
-            <span className="settings-row-label">Player details</span>
-            <span className="settings-row-detail">{user.player_name}</span>
-          </span>
-        </Link>
-        <SettingRow label="Avatar" to={APP_PATHS.settingsProfile} />
-      </div>
-    </section>
-
-    {sections.map(({ title, items }) => {
-      const id = `settings-${title.toLowerCase().replace(/[^a-z]+/g, "-")}`
-      return <section key={title} className="settings-section" aria-labelledby={id}>
-        <h2 id={id}>{title}</h2>
-        {title === "Appearance" ? (
-          <fieldset className="settings-theme-list">
-            <legend>Theme / Appearance</legend>
-            {(["system", "light", "dark"] as const).map((value) => <label key={value} className="settings-theme-option">
-              <span>{value === "system" ? "System" : value === "light" ? "Light" : "Dark"}</span>
-              <input type="radio" name="appearance" value={value} checked={theme === value}
-                onChange={() => chooseTheme(value)} />
-            </label>)}
-          </fieldset>
-        ) : <div className="settings-list">
-          {items.map((item) => item.label === "Feedback" ? <Fragment key={item.label}>
-            <button type="button" className="settings-row settings-row-link settings-feedback-button"
-              aria-expanded={feedbackOpen} onClick={() => {
-                if (!feedbackOpen) trackEvent("feedback_opened", { source: "settings" })
-                setFeedbackOpen(!feedbackOpen)
-              }}>
-              <span className="settings-row-label">Feedback</span>
-              <span className="settings-row-detail">{feedbackOpen ? "Close" : "Open"}</span>
-            </button>
-            {feedbackOpen && <p className="settings-feedback-note">Feedback form coming soon.</p>}
-          </Fragment> : <SettingRow key={item.label} {...item} />)}
-        </div>}
+    {groups.map(({ title, entries }) => {
+      const headingId = `settings-${title.toLowerCase().replace(/[^a-z]+/g, "-")}`
+      return <section key={title} className="settings-section" aria-labelledby={headingId}>
+        <h2 id={headingId}>{title}</h2>
+        <div className="settings-list">
+          {entries.map((entry) => <Link
+            key={entry.id}
+            ref={(node) => { entryRefs.current[entry.id] = node }}
+            className="settings-row settings-row-link"
+            to={entry.to}
+            onClick={() => rememberSettingsEntry(entry.id, true)}
+          >
+            {entry.id === "profile" && <PlayerAvatar name={user.player_name} variant={user.avatar_key} />}
+            <span className="settings-row-copy">
+              <span className="settings-row-label">{entry.label}</span>
+              <span className="settings-row-detail">{entry.id === "profile" ? user.player_name : entry.detail}</span>
+            </span>
+            <span className="settings-row-chevron" aria-hidden="true" />
+          </Link>)}
+        </div>
       </section>
     })}
 

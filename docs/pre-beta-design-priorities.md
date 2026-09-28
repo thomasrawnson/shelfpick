@@ -127,6 +127,18 @@ the upstream restriction would make the product label misleading. Mocked
 responsive captures of the verified result and retry states are stored in
 `docs/screenshots/sp-pb02/`.
 
+SP-PB05 Settings navigation completed on 28 September 2026. The former long,
+mixed settings page is now a concise grouped overview, with substantial content
+on dedicated Profile, Preferences, Appearance, Collection & Data, Plays, Pro,
+Help and About routes. Rows use the existing surface, line, type and focus
+tokens, remain full-width at mobile sizes and return keyboard focus after Back.
+Collection & Data contains only the existing BGG sync and BG Stats import flows
+plus BGG attribution; account/profile controls remain elsewhere. Mocked
+Playwright covered the overview and import route at 390 and 1440px in both
+themes, including direct navigation, Back, persistence, focus, navigation
+clearance and overflow. SP-PB09 Add game prominence and SP-PB20 wider copy
+cleanup remain separate pending tasks.
+
 ### UI-2 — core visual polish
 
 After UI-1 is stable, refine hierarchy, typography, spacing, component

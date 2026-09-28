@@ -3,6 +3,10 @@
   padding-bottom: var(--space-5);
 }
 
+.settings-detail-screen {
+  gap: var(--space-4);
+}
+
 .settings-heading {
   text-align: left;
 }
@@ -88,6 +92,29 @@
   text-decoration: none;
 }
 
+.settings-row.settings-row-link {
+  display: flex;
+  width: 100%;
+}
+
+.settings-row-copy {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.settings-row-chevron {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 auto;
+  border-top: 2px solid var(--text-secondary);
+  border-right: 2px solid var(--text-secondary);
+  transform: rotate(45deg);
+}
+
 .settings-row + .settings-row {
   border-top: 1px solid var(--line);
 }
@@ -104,6 +131,10 @@
   text-align: right;
 }
 
+.settings-row-copy .settings-row-detail {
+  text-align: left;
+}
+
 .settings-row-pending .settings-row-detail {
   white-space: nowrap;
 }
@@ -112,36 +143,10 @@
   background: var(--color-surface-raised);
 }
 
-.settings-feedback-button {
-  width: 100%;
-  border: 0;
-  border-top: 1px solid var(--line);
-  background: transparent;
-  font: inherit;
-  cursor: pointer;
-}
-
-.settings-feedback-note {
-  margin: 0;
-  padding: var(--space-2) var(--space-4) var(--space-3);
-  color: var(--text-secondary);
-  font-size: var(--text-support);
-}
-
 .settings-row-link:focus-visible,
 .settings-logout:focus-visible {
   outline: 2px solid var(--color-brand-primary);
   outline-offset: -3px;
-}
-
-.settings-profile-row {
-  justify-content: flex-start;
-}
-
-.settings-profile-copy {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
 }
 
 .settings-logout {
@@ -164,4 +169,44 @@
   margin-bottom: var(--space-3);
   color: var(--color-brand-primary);
   font-weight: 700;
+}
+
+.settings-info-panel {
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.settings-info-panel h2,
+.settings-info-panel p {
+  margin-top: 0;
+}
+
+.settings-info-panel p:last-child {
+  margin-bottom: 0;
+}
+
+.settings-section-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--target-min);
+  text-decoration: none;
+}
+
+.settings-attribution,
+.settings-field-note {
+  color: var(--text-secondary);
+  font-size: var(--text-support);
+}
+
+.setup-screen-compact {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.setup-screen-compact .setup-divider {
+  margin: 0;
 }

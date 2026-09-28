@@ -129,6 +129,17 @@ Beta testing remains on hold. `docs/pre-beta-work-plan-2026-09-28.md` defines
 the remaining requested work; existing tokens below remain the implemented
 baseline until a later scoped task changes them.
 
+## Settings navigation update — 28 September 2026
+
+Settings uses a grouped overview as its stable entry point. Profile,
+Preferences, Appearance, Collection & Data, Plays, Pro, Help and About are
+full-width rows that open focused routes; Back returns to the overview and
+restores focus to the originating row. Subpages use the standard narrow shelf,
+existing form/card primitives and one clear heading. Collection & Data keeps
+BGG sync and BG Stats import together without unrelated account controls and
+retains BoardGameGeek attribution. This structure does not add a primary-nav
+destination or change Free/Pro access.
+
 ## Overview
 
 **Creative North Star: "The Considered Game Shelf"**
