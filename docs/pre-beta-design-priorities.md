@@ -1,5 +1,27 @@
 # Pre-beta design priorities
 
+## Updated priority — 28 September 2026
+
+**External beta testing is ON HOLD.** `docs/pre-beta-work-plan-2026-09-28.md`
+supersedes older delivery timing. SP-PB01–02 repair Picker logging and reported
+Top 100 failure. SP-PB03–09 address Picker defaults, Settings, typography,
+Rankings placement, Insights spacing and Collection. SP-PB10–19 cover
+location, Pro live duration, branded sharing, statistics, Pro ranking
+recommendations, scanning, avatars, Game Night voting and Pro challenges.
+These are planned; completed slices below remain historical evidence.
+Resume beta only after requested work, validation, operational gates and
+Tom's decision. A completed Top 100 rank filter does not establish live
+ranked-source availability.
+
+Confirmed on 28 September: use personal game rankings for the Pro recommendation
+enhancement; scan retail EAN/UPC box barcodes; attendees scan the host's QR and
+vote on their own phones; make Add game prominent. Rankings placement remains
+open because the navigation bar is crowded. SP-PB20 adds cleanup of repeated
+text beneath headings, retaining useful guidance and moving longer optional
+explanations into contextual help.
+
+## Prior priorities and completed work
+
 The agreed pre-beta priorities are:
 
 1. UI/layout redesign;

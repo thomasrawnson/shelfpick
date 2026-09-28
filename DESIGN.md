@@ -115,6 +115,34 @@ components:
     rounded: "{rounded.lg}"
 ---
 
+## Planned pre-beta design update — 28 September 2026
+
+Beta testing is on hold. `docs/pre-beta-work-plan-2026-09-28.md` defines the requested
+work. Existing tokens below describe the implemented baseline until changed.
+
+- Propose Inter for app typography, including headings, through shared tokens;
+  Proxima Nova is an alternative if licensed assets are supplied. Preserve
+  the approved logo and palette.
+- Give Picker Log a play a dedicated screen with game/players prefilled and
+  predictable Back/Cancel/Save. Derive count from named players; retain manual
+  count for count-only sessions. Use saved cooperative/competitive defaults.
+- Group Settings into headings and rows opening subpages for substantial forms
+  or dialogs for short choices; preserve deep links and focus restoration.
+- Review Rankings placement; reduce Friends' favourites padding; expand useful
+  Collection filters and strengthen Add game.
+- Use approved ShelfPick logo, game art and accurate stats in previewable play
+  and monthly exports. Exclude location and participant details by default.
+- Design live timer, location, avatars/photo upload, scan preview, voting and
+  challenge states. Keep Game Night distinct, with votes affecting selection.
+
+Confirmed on 28 September: use personal game rankings for the Pro recommendation
+enhancement; scan retail EAN/UPC box barcodes; attendees scan the host's QR and
+vote on their own phones; make Add game prominent. Rankings placement remains
+open because the navigation bar is crowded. SP-PB20 adds cleanup of repeated
+text beneath headings, retaining useful guidance and moving longer optional
+explanations into contextual help. Preserve responsive layouts, light/dark, keyboard
+access, truthful missing data, routes, Back and collection saved/scroll state.
+
 ## Overview
 
 **Creative North Star: "The Considered Game Shelf"**

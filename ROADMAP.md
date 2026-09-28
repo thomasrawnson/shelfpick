@@ -21,7 +21,31 @@ product work below is the current engineering priority.
 - Update the status in this roadmap when a slice is completed.
 - Do not mark a slice complete until its tests and required validation pass.
 
-## Current priority
+## Current priority — beta on hold (28 September 2026)
+
+**External beta testing is ON HOLD at Tom's request.** The requested pre-beta
+backlog and acceptance criteria are in `docs/pre-beta-work-plan-2026-09-28.md`.
+Complete SP-PB01–20 in the documented sequence, resolve the marked decisions,
+and validate the work before asking Tom to resume beta. Internal testing
+continues. This instruction supersedes older immediate-beta and post-launch
+timing below; existing completed slices remain historical implementation facts.
+
+Start with SP-PB01 (dedicated Picker play-entry flow) and SP-PB02 (reported
+Top 100 availability failure). Then address Picker defaults/navigation, UI and
+Settings, plays/statistics/sharing, ranking intelligence, scanning, avatars,
+Game Night voting and Pro challenges. New Pro scope is live duration,
+ranking-based recommendation enhancements and challenges. Picker scoring use
+is optional pending Discover evaluation; other new access boundaries are not
+silently changed. Keep purchase claims limited to working features.
+
+Confirmed on 28 September: use personal game rankings for the Pro recommendation
+enhancement; scan retail EAN/UPC box barcodes; attendees scan the host's QR and
+vote on their own phones; make Add game prominent. Rankings placement remains
+open because the navigation bar is crowded. SP-PB20 adds cleanup of repeated
+text beneath headings, retaining useful guidance and moving longer optional
+explanations into contextual help.
+
+## Completed pre-beta work and prior sequence
 
 **Pre-beta priority 1 — UI/layout redesign (UI-1, UI-2A and UI-2B complete)**
 
@@ -140,15 +164,18 @@ fallbacks, and do not change the logo or Free/Pro proposition as part of UI-1.
 
 ## Delivery order
 
-1. Game Night MVP + entitlement scaffolding
-2. Discover v3
-3. Onboarding + Player Profiles
-4. Settings + Pro foundations
-5. Private Beta readiness
-6. Public launch
-7. Live Plays
-8. Challenges
-9. Advanced Pro intelligence
+1. SP-PB01–02: fix Picker play logging and Top 100 availability.
+2. SP-PB03–04: selected-player count and saved play-style defaults.
+3. SP-PB05–09 and SP-PB20: Settings, typography, Rankings, spacing, Collection and heading copy.
+4. SP-PB10–11 and SP-PB14: location, Pro live duration and statistics.
+5. SP-PB12–13: branded play and monthly recap sharing.
+6. SP-PB15–17: Pro ranking recommendations, scanning and avatars.
+7. SP-PB18–19: Game Night voting and Pro challenges.
+8. Reconcile Free/Pro claims, complete validation and existing release gates.
+9. Resume private beta only after Tom's explicit decision, then public launch.
+
+See `docs/pre-beta-work-plan-2026-09-28.md` for dependencies, acceptance criteria
+and unresolved choices. Historical slice numbers below are retained.
 
 ## Foundation — Core Picker improvements
 
@@ -479,7 +506,11 @@ Private Beta without overbuilding it.
 - Club or cafe functionality.
 - Advanced Game Night statistics.
 
-### Coming after MVP / beta validation
+### Historical post-MVP candidates (voting moved before beta)
+
+SP-PB18 now requires QR joining and voting on participants' own phones before
+beta. Session membership, guest votes and cross-device state belong to this
+new task; the original completed MVP remains a historical baseline.
 
 - Guest invite links.
 - Saved regular groups.
@@ -522,7 +553,7 @@ In addition:
 
 ## Slice 5 — Private Beta readiness
 
-**Status:** IN PROGRESS — client instrumentation foundation complete; beta operations remain open
+**Status:** ON HOLD — external beta paused 28 September 2026; client instrumentation foundation complete, internal validation continues
 
 T01 production configuration and Apple Silicon setup is complete in the
 repository: local, CI and Render runtimes align on Python 3.12 and Node 22,
@@ -530,7 +561,8 @@ production requires a server-side BoardGameGeek token, and native arm64 setup
 is documented. Live Render configuration and verification remain operational
 steps rather than repository work.
 
-Run Private Beta immediately after the Game Night MVP. Before inviting users,
+Do not invite beta testers yet. Complete the requested SP-PB backlog, resolve
+its open decisions and obtain Tom's decision to resume. Before inviting users,
 complete the production deployment, migration, email and backup/recovery checks
 in `docs/production-runbook.md`.
 
@@ -565,23 +597,23 @@ operational requirements before widening access.
 
 **Status:** NOT STARTED
 
-Explore and deliver a focused live-session experience after public-launch
-requirements are stable. Define the scope from observed play-logging behavior;
-do not assume real-time group infrastructure is required.
+The focused Pro live-duration scope is now required before beta as SP-PB11,
+after the play-entry repair. Broader live-session infrastructure remains later
+work; do not assume multiplayer infrastructure is needed for a timer.
 
 ## Slice 9 — Challenges
 
 **Status:** NOT STARTED
 
-Add Play Challenges after the core play loop and Live Plays have sufficient
-usage evidence. Keep challenge progress understandable and avoid incentives
-that distort useful play records.
+The focused Pro play-challenge scope is now required before beta as SP-PB19.
+Use reliable play-counting semantics and the acceptance criteria in the new
+plan. Broader challenge systems remain later work.
 
 ## Slice 10 — Advanced Pro intelligence
 
 **Status:** NOT STARTED
 
-Develop advanced personalisation, recommendation intelligence and richer
-statistics only after the free experience, entitlement boundaries and user
-signals are validated. Prefer explainable improvements grounded in ShelfPick's
-existing data over an unrelated recommendation platform.
+SP-PB15 brings a focused Pro ranking-signal improvement to Discover before
+beta, with possible Picker use in a separate evaluated sub-slice. Confirm the
+mapping of the confirmed personal ranking data first. SP-PB14 adds requested statistics with access
+to be decided. Broader intelligence remains later work.
