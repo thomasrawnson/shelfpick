@@ -1769,3 +1769,87 @@
 .collection-section-tabs {
   grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
 }
+.play-location-field {
+  display: grid;
+  gap: 8px;
+}
+
+.play-location-field > span {
+  font-weight: 700;
+}
+
+.play-location-field small {
+  color: var(--color-text-support);
+  font-weight: 500;
+}
+
+.play-timer-panel {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+}
+
+.play-timer-panel p {
+  margin: 0;
+}
+
+.play-timer-value,
+.live-timer-clock,
+.live-timer-indicator-time {
+  font-variant-numeric: tabular-nums;
+}
+
+.play-timer-value {
+  font-size: 1.7rem;
+  letter-spacing: 0.03em;
+}
+
+.play-timer-actions,
+.live-timer-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.recent-play-location {
+  margin: 8px 0 0;
+  color: var(--color-text-support);
+  font-size: var(--text-support);
+}
+
+.live-timer-screen {
+  display: grid;
+  gap: 20px;
+}
+
+.live-timer-screen header p,
+.live-timer-discard-confirm p {
+  margin: 6px 0 0;
+  color: var(--color-text-support);
+}
+
+.live-timer-clock {
+  margin: 8px 0;
+  font-size: clamp(2.5rem, 12vw, 4.5rem);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.live-timer-discard {
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+}
+
+.live-timer-discard-confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.live-timer-discard-confirm p {
+  flex-basis: 100%;
+}

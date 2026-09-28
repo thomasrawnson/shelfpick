@@ -15,6 +15,10 @@ import {
 import {
   createBGStatsPlayUrl,
 } from "../../utils/bgstats"
+import {
+  useLiveTimer,
+} from "../../live-timer"
+import { elapsedSeconds, formatElapsed } from "../../live-timer-utils"
 
 
 type PlayerForm = {
@@ -32,6 +36,9 @@ type Props = {
   pickerSessionId?: string | null
   presentation?: "inline" | "dedicated"
   onCancel?: () => void
+  initialDurationMinutes?: number | null
+  initialLocation?: string
+  timerSessionId?: string | null
 }
 
 export type SavedPlayResult = {
@@ -87,7 +94,11 @@ function PlayLogForm({
   pickerSessionId = null,
   presentation = "inline",
   onCancel,
+  initialDurationMinutes = null,
+  initialLocation = "",
+  timerSessionId = null,
 }: Props) {
+  const liveTimer = useLiveTimer()
   const isDedicated = presentation === "dedicated"
   const [open, setOpen] =
     useState(isDedicated)
@@ -102,7 +113,10 @@ function PlayLogForm({
   const [
     duration,
     setDuration,
-  ] = useState("")
+  ] = useState(initialDurationMinutes === null ? "" : String(initialDurationMinutes))
+
+  const [location, setLocation] = useState(initialLocation)
+  const [, redrawTimer] = useState(0)
 
   const [
     players,
@@ -142,6 +156,23 @@ function PlayLogForm({
   )
 
   const savePending = useRef(false)
+  const matchingTimer = liveTimer.timer?.game.bgg_id === game.bgg_id
+    ? liveTimer.timer
+    : null
+
+  useEffect(() => {
+    if (matchingTimer?.status !== "finished") return
+    const id = window.setTimeout(() => {
+      setDuration(String(Math.max(0, Math.round(elapsedSeconds(matchingTimer) / 60))))
+    }, 0)
+    return () => window.clearTimeout(id)
+  }, [matchingTimer])
+
+  useEffect(() => {
+    if (matchingTimer?.status !== "running") return
+    const id = window.setInterval(() => redrawTimer(value => value + 1), 1000)
+    return () => window.clearInterval(id)
+  }, [matchingTimer?.public_id, matchingTimer?.status])
 
 
   useEffect(() => {
@@ -168,6 +199,7 @@ function PlayLogForm({
     )
 
     setDuration("")
+    setLocation("")
 
     setPlayers([
       {
@@ -371,6 +403,8 @@ function PlayLogForm({
           durationMinutes,
           participants,
           pickerSessionId,
+          location,
+          timerSessionId ?? (matchingTimer?.status === "finished" ? matchingTimer.public_id : null),
         )
 
       url =
@@ -413,6 +447,7 @@ function PlayLogForm({
     }
 
     void refreshPlayers()
+    void liveTimer.refresh()
   }
 
 
@@ -533,6 +568,50 @@ function PlayLogForm({
               </div>
             </label>
           </div>
+
+          <label className="play-location-field">
+            <span>Location <small>Optional</small></span>
+            <input
+              type="text"
+              maxLength={200}
+              autoComplete="off"
+              placeholder="e.g. The Dice Cup"
+              value={location}
+              onChange={(event) => setLocation(event.target.value)}
+            />
+          </label>
+
+          {liveTimer.enabled && (
+            <section className="play-timer-panel" aria-labelledby="play-timer-heading">
+              <div>
+                <p className="preference-label" id="play-timer-heading">Live duration · Pro</p>
+                <p>Keep an accurate duration while you use ShelfPick.</p>
+              </div>
+              {matchingTimer ? (
+                <>
+                  <strong className="play-timer-value">{formatElapsed(elapsedSeconds(matchingTimer))}</strong>
+                  <div className="play-timer-actions">
+                    {matchingTimer.status === "running" && <button type="button" className="secondary-button" disabled={liveTimer.pending} onClick={() => void liveTimer.pause()}>Pause</button>}
+                    {matchingTimer.status === "paused" && <button type="button" className="secondary-button" disabled={liveTimer.pending} onClick={() => void liveTimer.resume()}>Resume</button>}
+                    {matchingTimer.status !== "finished" && <button type="button" className="primary-button" disabled={liveTimer.pending} onClick={() => void liveTimer.finish()}>Finish</button>}
+                    {matchingTimer.status === "finished" && <span role="status">Duration ready to review</span>}
+                  </div>
+                </>
+              ) : liveTimer.timer ? (
+                <p className="supporting-copy">A timer is already active for {liveTimer.timer.game.name}.</p>
+              ) : (
+                <button
+                  type="button"
+                  className="secondary-button"
+                  disabled={liveTimer.pending}
+                  onClick={() => void liveTimer.start(game.bgg_id, players.map(player => player.name.trim()).filter(Boolean), location.trim())}
+                >
+                  Start timer
+                </button>
+              )}
+              {liveTimer.error && <p className="error-message" role="alert">{liveTimer.error}</p>}
+            </section>
+          )}
 
           <div className="player-form-heading">
             <p className="preference-label">
@@ -675,7 +754,7 @@ function PlayLogForm({
           </button>
 
           {error && (
-            <p className="error-message">
+            <p className="error-message" role="alert">
               {error}
             </p>
           )}

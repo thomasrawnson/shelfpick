@@ -44,6 +44,9 @@ import SettingsView from "./components/SettingsView";
 import SettingsSectionView from "./components/SettingsSectionView";
 import ProComparisonView from "./components/ProComparisonView";
 import PlayerAvatar from "./components/ui/PlayerAvatar";
+import LiveTimerIndicator from "./components/LiveTimerIndicator";
+import LiveTimerView from "./components/LiveTimerView";
+import { LiveTimerProvider } from "./live-timer";
 
 import AppNavigation, { type AppView } from "./components/AppNavigation";
 
@@ -475,6 +478,7 @@ function App() {
 
   return (
     <main className="app-shell">
+      <LiveTimerProvider enabled={user.entitlements.includes("live_play_enhancements")}>
       <section className={`phone app-phone${["collection", "discover", "rankings", "insights"].includes(view) || location.pathname === APP_PATHS.settingsPro ? " app-phone-wide" : ""}`} ref={appScrollRef}>
         <AppHeader
           user={user}
@@ -517,6 +521,11 @@ function App() {
                   onUnlockPro={() => navigate(APP_PATHS.settingsPro)}
                 />
               }
+            />
+
+            <Route
+              path={APP_PATHS.liveTimer}
+              element={<LiveTimerView onBack={() => navigate(-1)} />}
             />
 
             <Route
@@ -623,8 +632,13 @@ function App() {
           </Routes>
         </div>
 
+        {location.pathname !== APP_PATHS.liveTimer && (
+          <LiveTimerIndicator onOpen={() => navigate(APP_PATHS.liveTimer)} />
+        )}
+
         <AppNavigation view={view} onChangeView={navigateToView} />
       </section>
+      </LiveTimerProvider>
     </main>
   );
 }

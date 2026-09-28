@@ -14,6 +14,7 @@ from api.main import (
 from api.current_user import (
     get_current_user,
 )
+from api.dependencies import get_live_timer_service
 from database.models import User
 from models.game import Game
 from models.game import PlayerCountPoll
@@ -21,6 +22,18 @@ from models.play import Play
 
 
 client = TestClient(app)
+
+
+class FakeLiveTimerService:
+    def __init__(self):
+        self.started = []
+
+    def get_active(self):
+        return None
+
+    def start(self, bgg_id, participant_names, location):
+        self.started.append((bgg_id, participant_names, location))
+        return {"public_id": "timer-1", "status": "running"}
 
 
 class FakePickerAnalyticsRepository:
@@ -557,6 +570,8 @@ def test_record_play_returns_404_for_unknown_game():
                 int | None,
             participants:
                 list[dict],
+            location=None,
+            timer_session_id=None,
         ):
             return None
 
@@ -610,6 +625,8 @@ def test_record_play_links_picker_conversion():
             played_at,
             duration_minutes: int | None,
             participants: list[dict],
+            location=None,
+            timer_session_id=None,
         ):
             return Play(
                 id=7,
@@ -655,6 +672,26 @@ def test_record_play_links_picker_conversion():
         "event_type"
     ] == "log_play"
     assert analytics.events[0]["bgg_id"] == 42
+
+
+def test_live_timer_requires_pro_and_passes_draft_context():
+    service = FakeLiveTimerService()
+    app.dependency_overrides[get_live_timer_service] = lambda: service
+    try:
+        app.dependency_overrides[get_current_user] = lambda: User(id=1, email="free@example.com", tier="FREE")
+        denied = client.post("/play-timer/start", json={"bgg_id": 13})
+        assert denied.status_code == 403
+
+        app.dependency_overrides[get_current_user] = lambda: User(id=2, email="pro@example.com", tier="PRO")
+        allowed = client.post(
+            "/play-timer/start",
+            json={"bgg_id": 13, "participant_names": ["Alex"], "location": "Club"},
+        )
+    finally:
+        app.dependency_overrides.clear()
+
+    assert allowed.status_code == 201
+    assert service.started == [(13, ["Alex"], "Club")]
 
 
 def test_picker_uses_preferred_mechanic():

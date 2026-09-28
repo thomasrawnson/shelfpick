@@ -150,6 +150,7 @@ export interface GamePlay {
   played_at: string
   player_count: number
   duration_minutes: number | null
+  location: string | null
   source: string
   participants: GamePlayParticipant[]
 }
@@ -876,6 +877,8 @@ export async function recordPlay(
   participants:
     PlayParticipant[],
   pickerSessionId?: string | null,
+  location?: string | null,
+  timerSessionId?: string | null,
 ): Promise<Play> {
   const response =
     await apiFetch(
@@ -893,6 +896,8 @@ export async function recordPlay(
           duration_minutes:
             durationMinutes,
           participants,
+          location,
+          timer_session_id: timerSessionId,
           picker_session_id:
             pickerSessionId,
         }),
@@ -906,6 +911,49 @@ export async function recordPlay(
   }
 
   return response.json()
+}
+
+
+export type LiveTimerStatus = "running" | "paused" | "finished"
+
+export interface LiveTimer {
+  public_id: string
+  status: LiveTimerStatus
+  accumulated_seconds: number
+  running_since: string | null
+  finished_at: string | null
+  elapsed_seconds: number
+  draft: { participant_names?: string[]; location?: string }
+  game: { bgg_id: number; name: string; image_url: string | null; thumbnail_url: string | null }
+}
+
+async function liveTimerMutation(path: string, body?: unknown): Promise<LiveTimer> {
+  const response = await apiFetch(path, {
+    method: "POST",
+    headers: body === undefined ? undefined : { "Content-Type": "application/json" },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  })
+  if (!response.ok) throw new Error(await readError(response, "Couldn't update the live timer."))
+  return response.json()
+}
+
+export async function getLiveTimer(): Promise<LiveTimer | null> {
+  const response = await apiFetch("/play-timer")
+  if (!response.ok) throw new Error(await readError(response, "Couldn't restore the live timer."))
+  return response.json()
+}
+
+export function startLiveTimer(bggId: number, participantNames: string[], location: string): Promise<LiveTimer> {
+  return liveTimerMutation("/play-timer/start", { bgg_id: bggId, participant_names: participantNames, location })
+}
+
+export function pauseLiveTimer(): Promise<LiveTimer> { return liveTimerMutation("/play-timer/pause") }
+export function resumeLiveTimer(): Promise<LiveTimer> { return liveTimerMutation("/play-timer/resume") }
+export function finishLiveTimer(): Promise<LiveTimer> { return liveTimerMutation("/play-timer/finish") }
+
+export async function discardLiveTimer(): Promise<void> {
+  const response = await apiFetch("/play-timer", { method: "DELETE" })
+  if (!response.ok) throw new Error(await readError(response, "Couldn't discard the live timer."))
 }
 
 

@@ -144,6 +144,58 @@
   scroll-padding-bottom: calc(128px + env(safe-area-inset-bottom));
 }
 
+.app-phone:has(.live-timer-indicator) {
+  padding-bottom: calc(202px + env(safe-area-inset-bottom));
+  scroll-padding-bottom: calc(202px + env(safe-area-inset-bottom));
+}
+
+.live-timer-indicator {
+  position: fixed;
+  z-index: 105;
+  left: 50%;
+  bottom: calc(92px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: min(calc(100% - 24px), 390px);
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-primary);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-card);
+}
+
+.live-timer-indicator-copy {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+  text-align: left;
+}
+
+.live-timer-indicator-copy strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.live-timer-indicator-copy small {
+  color: var(--color-text-support);
+}
+
+.live-timer-indicator-time {
+  flex: 0 0 auto;
+  font-weight: 800;
+}
+
+/* The full controls are already authoritative here; avoid covering form actions. */
+.app-phone:has(.play-timer-value) .live-timer-indicator {
+  display: none;
+}
+
 @media (max-width: 480px) {
   .app-nav {
     bottom: 8px;

@@ -254,15 +254,32 @@ fallbacks, and do not change the logo or Free/Pro proposition as part of UI-1.
 3. SP-PB03–04: selected-player count and saved play-style defaults.
 4. SP-PB05 Settings navigation, SP-PB09 Add game discoverability and SP-PB20
    heading/copy cleanup — COMPLETE; SP-PB06–08 remain pending.
-5. SP-PB10–11 and SP-PB14: location, Pro live duration and statistics.
+5. SP-PB10–11 location and Pro live duration — COMPLETE; SP-PB14 statistics
+   remains pending.
 6. SP-PB12–13: branded play and monthly recap sharing.
 7. SP-PB15–17: Pro ranking recommendations, scanning and avatars.
 8. SP-PB18–19: Game Night voting and Pro challenges.
 9. Reconcile Free/Pro claims, complete validation and existing release gates.
 10. Resume private beta only after Tom's explicit decision, then public launch.
 
+Outside-app timer visibility is a separate, unsequenced future Pro task rather
+than part of SP-PB11. It must begin with a platform and packaging assessment for
+the current PWA and any native wrapper. Lock-screen/Live Activity and Android
+ongoing-notification approaches are considered only where the supported
+platform exposes a reliable lifecycle. A continuously visible timer is not the
+same as a one-off notification. Do not promise background execution or request
+notification permission until that assessment selects a supported design.
+
 See `docs/pre-beta-work-plan-2026-09-28.md` for dependencies, acceptance criteria
 and unresolved choices. Historical slice numbers below are retained.
+
+SP-PB10 and SP-PB11 completed on 28 September 2026. Optional play location is
+Free and shared by existing play-entry routes. The Pro timer is account-scoped,
+timestamp-derived and recoverable across navigation/refresh, with one persistent
+in-app indicator and explicit review before save. Local migration/schema checks,
+isolated PostgreSQL persistence, focused frontend/backend tests and mocked
+responsive browser validation passed. No real-device outside-app timer claim is
+made. SP-PB02 remains BLOCKED and beta remains on hold.
 
 ## Foundation — Core Picker improvements
 

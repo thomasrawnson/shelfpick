@@ -217,15 +217,81 @@ SP-PB02 remains blocked and beta remains on hold.
 
 ### SP-PB10 — Add optional play location
 
-**Status:** NOT STARTED. **Workstream:** Play data. **Access:** Proposed Free; not a confirmed new gate.
+**Status:** COMPLETE (28 September 2026). **Workstream:** Play data. **Access:** Free; no new gate.
 
 Add editable location text to create/edit/detail play flows; blank remains valid for existing/imported plays. Proposed scope is a venue label such as Home or a club, without GPS/maps. Preserve user isolation and import compatibility. Exclude location from shared graphics by default and allow deliberate opt-in.
 
+Implemented as an optional, trimmed 200-character text field in the shared play
+form, so Picker, Collection and Game Night entry paths retain their existing
+participant and validation behaviour. Location is returned in recent play
+history and shown on Collection game detail. The product does not currently
+support editing an existing play; this slice deliberately did not invent a new
+edit route. Nullable storage keeps older/imported plays valid.
+
 ### SP-PB11 — Record live play duration
 
-**Status:** NOT STARTED. **Workstream:** New feature. **Access:** Pro — explicitly requested.
+**Status:** COMPLETE (28 September 2026). **Workstream:** New feature. **Access:** Pro — enforced in frontend and backend.
 
-Add Start, Pause, Resume and Finish with visible elapsed duration and a route back to the active session. Derive elapsed time from persisted timestamps/pause intervals so backgrounding, reload and suspended tabs do not lose or invent time. Finishing prefills the play form; saving is explicit and creates one record. Allow correction, prevent negative durations and recover interrupted sessions. Enforce Pro on backend and frontend while preserving basic manual play logging. Depends on SP-PB01; define concurrent-session behaviour before implementation.
+Add Start, Pause, Resume and Finish with visible elapsed duration and a route
+back to the active session. While a timer exists, keep a persistent in-app
+indicator available throughout authenticated ShelfPick navigation. It shows the
+game name, elapsed time and running/paused state and provides an accessible,
+clearly named action that reopens the authoritative timer controls. The
+indicator must consume the same timer state rather than maintaining a second
+clock, and must remain clear of bottom navigation and primary screen actions at
+all supported widths.
+
+Derive elapsed time from persisted timestamps/pause intervals so backgrounding,
+reload and suspended tabs do not lose or invent time. Finishing prefills the
+play form; saving is explicit and creates one record. Allow correction, prevent
+negative durations and recover interrupted sessions. Enforce Pro on backend and
+frontend while preserving basic manual play logging. Depends on SP-PB01; define
+concurrent-session behaviour before implementation. Validation must include the
+in-app indicator across navigation, responsive layouts, keyboard and screen
+reader access, bottom-navigation/action clearance, background/reopen accuracy
+and interrupted-session recovery.
+
+Implemented lifecycle: Start creates the one account-scoped persisted timer;
+Pause snapshots elapsed seconds; Resume starts a new timestamp interval; Finish
+freezes elapsed duration and opens the shared play form for review. Finish does
+not create a play. The app-wide indicator and timer screen derive display time
+from the same server timer timestamps. A unique timer per account prevents
+parallel double counting. Refresh restores the timer for that account, and a
+finished timer is removed atomically only after a successful play save or an
+explicit confirmed discard. The timer public ID makes a lost-response retry
+idempotent, so it returns the already-created play instead of duplicating it.
+Manual duration entry remains Free and unchanged.
+
+Validation evidence: 18 focused backend service/API tests passed, including a
+controlled clock for pause/resume, background gaps, repeated actions, account
+isolation and cleanup. The configured development PostgreSQL migration upgraded
+to `b04c8f13a2d7`; `alembic check` reported no drift. An isolated real database
+round trip verified location/duration read-write, timer cleanup and one-play
+idempotent retry, then deleted its test records. Frontend tests (49), build,
+lint, colour-token guard and PWA checks passed. Mocked Playwright covered
+Start/Pause/Resume/Finish, navigation indicator, failure retention/retry,
+keyboard focus, bottom-navigation clearance and overflow at 390 and 1440px in
+light/dark. Before/after captures are in `docs/screenshots/sp-pb10-11/`.
+No real mobile device/background-process test was run; timestamp recovery is
+proved by controlled-clock and browser refresh/navigation coverage. SP-PB02
+remains BLOCKED and beta remains on hold.
+
+### Future Pro timer task — outside-app visibility
+
+**Status:** FUTURE / UNSEQUENCED. **Access:** Pro proposal. **Task ID:** Assign
+after platform feasibility is established; this is not part of SP-PB11.
+
+Assess ShelfPick's current PWA packaging, any native wrapper and the actually
+supported iOS/Android/browser platforms before selecting an implementation.
+Evaluate lock-screen/Live Activity support where a native platform genuinely
+provides it and an ongoing-notification approach where supported. Distinguish a
+continuously visible timer surface from a one-off notification: a completion or
+reminder notification does not satisfy this task. Document lifecycle,
+background-execution, permission, update-frequency, battery and store-policy
+constraints before implementation. Do not promise unsupported background
+execution, simulate continuous visibility with repeated notifications, or
+request notification permission as part of SP-PB11. This future task is not a
+pre-beta commitment unless it is explicitly reprioritised.
 
 ### SP-PB12 — Share a recorded play with ShelfPick branding
 

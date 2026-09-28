@@ -265,6 +265,32 @@ rerenders and dedicated play entry preserve explicit session choices. Start over
 begins a new session and reapplies the latest defaults. Saving Settings affects
 the next fresh session and never silently rewrites an active Picker session.
 
+### Live play details and active-timer indicator
+
+The shared play form accepts an optional Free-form location label and keeps
+manual duration entry available to every account. Recent play history shows a
+saved location when present; older and imported plays without one remain valid.
+
+SP-PB11 keeps an active Pro timer visible while the user navigates within
+ShelfPick. The compact in-app indicator shows the game name, elapsed time and an
+explicit running or paused label, with a keyboard- and screen-reader-accessible
+action to reopen the full timer controls. It reads from the authoritative timer
+session and never runs an independent display clock. Place it in the
+authenticated app shell where it remains clear of bottom navigation, safe-area
+insets and each screen's primary actions on mobile and desktop.
+
+Elapsed display is derived from persisted timestamps and pause intervals after
+backgrounding, suspension or reload. Responsive and recovery review must cover
+long game names, running/paused states, keyboard focus, accessible names,
+navigation clearance and horizontal overflow. Outside-app lock-screen, Live
+Activity or ongoing-notification support is a separate future platform task,
+not part of this component.
+
+Only one timer may exist per account. Finish freezes its duration and opens the
+existing play form for review; it never records a play automatically. Failed
+saves retain the draft and finished timer, while success removes timer state in
+the same transaction as the one play record. Discard is explicit and confirmed.
+
 ## Do's and Don'ts
 
 ### Do:

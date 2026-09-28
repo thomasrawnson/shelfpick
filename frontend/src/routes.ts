@@ -22,6 +22,7 @@ export const APP_PATHS = {
   collectionRanking:
     "/collection/ranking",
   gameNight: "/game-night",
+  liveTimer: "/live-timer",
   rankings: "/rankings",
   discover: "/discover",
   insights: "/insights",
@@ -121,6 +122,7 @@ export function isProtectedAppPath(
     )
     || pathname === APP_PATHS.discover
     || pathname === APP_PATHS.gameNight
+    || pathname === APP_PATHS.liveTimer
     || pathname === APP_PATHS.rankings
     || pathname === APP_PATHS.insights
     || pathname === APP_PATHS.setup

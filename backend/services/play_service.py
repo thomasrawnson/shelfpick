@@ -28,6 +28,8 @@ class PlayService:
         played_at,
         duration_minutes: int | None,
         participants: list[dict],
+        location: str | None = None,
+        timer_session_id: str | None = None,
     ) -> Play | None:
         normalized_names = [
             self._normalize_player_name(
@@ -53,6 +55,8 @@ class PlayService:
                 "be added twice."
             )
 
+        cleaned_location = " ".join(location.split()) if location else None
+
         return self.repository.create(
             bgg_id=bgg_id,
             played_at=played_at,
@@ -60,6 +64,8 @@ class PlayService:
                 duration_minutes
             ),
             participants=participants,
+            location=cleaned_location or None,
+            timer_session_id=timer_session_id,
         )
 
     def delete_play(

@@ -183,6 +183,33 @@ captures are in `docs/screenshots/sp-pb04/`. Isolated PostgreSQL save/reload and
 migration checks passed and all temporary data was removed. SP-PB02 remains
 blocked and beta remains on hold.
 
+SP-PB10 and SP-PB11 completed on 28 September. The shared play form now places
+the optional location beneath the date/duration group and uses a bounded Pro
+timer panel with clear Start, Pause, Resume and Finish actions. Finished time is
+returned to the ordinary editable duration field for review before saving.
+
+SP-PB11's Pro live-duration scope includes one persistent in-app timer
+indicator across authenticated navigation. It must show game, elapsed time and
+running/paused state, reopen the same authoritative timer controls, and remain
+clear of bottom navigation and primary actions. Background/reopen calculations
+come from persisted timestamps and pause intervals rather than a second clock.
+Responsive, accessibility, navigation and interrupted-session recovery checks
+must include this indicator.
+
+Outside-app timer visibility remains a separate unsequenced future Pro task. It
+starts with an assessment of the current PWA/native packaging and supported
+platforms before considering lock-screen/Live Activity or ongoing-notification
+integration. Continuous visibility is distinct from a one-off notification;
+unsupported background execution and notification permission are not promised
+or introduced by SP-PB11.
+
+Mocked responsive checks at 390 and 1440px in light/dark verified the indicator,
+full controls, focus, navigation clearance and overflow; captures are in
+`docs/screenshots/sp-pb10-11/`. Controlled-clock and real local PostgreSQL
+checks cover lifecycle/recovery and persistence respectively. No real-device
+background or lock-screen behavior is claimed. SP-PB02 remains blocked and beta
+remains on hold.
+
 ### UI-2 — core visual polish
 
 After UI-1 is stable, refine hierarchy, typography, spacing, component

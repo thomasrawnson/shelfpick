@@ -136,6 +136,10 @@ function GameHistory({ game, history, loading, onPlayDeleted }: Props) {
                     </span>
                   </div>
 
+                  {play.location && (
+                    <p className="recent-play-location">At {play.location}</p>
+                  )}
+
                   {play.participants.length > 0 && (
                     <div className="play-participants">
                       {play.participants.map((participant) => (

@@ -19,6 +19,8 @@ class FakePlayRepository:
         played_at,
         duration_minutes: int | None,
         participants: list[dict],
+        location: str | None = None,
+        timer_session_id: str | None = None,
     ) -> Play:
         self.created = {
             "bgg_id": bgg_id,
@@ -27,6 +29,8 @@ class FakePlayRepository:
                 duration_minutes
             ),
             "participants": participants,
+            "location": location,
+            "timer_session_id": timer_session_id,
         }
 
         return Play(
@@ -68,6 +72,7 @@ def test_record_play_uses_repository():
         played_at=played_at,
         duration_minutes=75,
         participants=participants,
+        location="  The   Dice Cup  ",
     )
 
     assert repository.created == {
@@ -75,6 +80,8 @@ def test_record_play_uses_repository():
         "played_at": played_at,
         "duration_minutes": 75,
         "participants": participants,
+        "location": "The Dice Cup",
+        "timer_session_id": None,
     }
 
     assert play.bgg_id == 167791

@@ -549,6 +549,14 @@ class Play(Base):
         Integer,
     )
 
+    location: Mapped[str | None] = mapped_column(
+        String(200), nullable=True,
+    )
+
+    timer_session_id: Mapped[str | None] = mapped_column(
+        String(36), nullable=True, unique=True,
+    )
+
     source: Mapped[str] = mapped_column(
         String(20),
         nullable=False,
@@ -565,6 +573,28 @@ class Play(Base):
         cascade="all, delete-orphan",
         lazy="selectin",
     )
+
+
+class LivePlayTimer(Base):
+    __tablename__ = "live_play_timers"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    public_id: Mapped[str] = mapped_column(String(36), nullable=False, unique=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False, unique=True, index=True,
+    )
+    game_id: Mapped[int] = mapped_column(
+        ForeignKey("games.id", ondelete="CASCADE"), nullable=False, index=True,
+    )
+    status: Mapped[str] = mapped_column(String(12), nullable=False)
+    accumulated_seconds: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+    running_since: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    draft_data: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
+
+    game = relationship("Game")
 
 class PlayParticipant(Base):
     __tablename__ = "play_participants"

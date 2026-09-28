@@ -19,7 +19,13 @@ from repositories.play_repository import (
     PlayRepository,
 )
 from api.schemas.play import PlayCreate
+from api.schemas.play import LiveTimerStart
 from services.play_service import PlayService
+from api.current_user import get_current_user
+from database.models import User
+from services.entitlements import Feature, can_use
+from services.live_timer_service import LiveTimerService
+from api.dependencies import get_live_timer_service
 
 
 router = APIRouter()
@@ -53,6 +59,8 @@ def record_play(
                 for participant
                 in play_data.participants
             ],
+            location=play_data.location,
+            timer_session_id=play_data.timer_session_id,
         )
     except ValueError as exc:
         raise HTTPException(
@@ -81,6 +89,66 @@ def record_play(
             )
 
     return play
+
+
+def require_live_timer(current_user: User) -> None:
+    if not can_use(current_user, Feature.LIVE_PLAY_ENHANCEMENTS):
+        raise HTTPException(status_code=403, detail="Live play timer requires Pro.")
+
+
+@router.get("/play-timer")
+def get_live_timer(
+    current_user: User = Depends(get_current_user),
+    service: LiveTimerService = Depends(get_live_timer_service),
+):
+    require_live_timer(current_user)
+    return service.get_active()
+
+
+@router.post("/play-timer/start", status_code=201)
+def start_live_timer(
+    data: LiveTimerStart,
+    current_user: User = Depends(get_current_user),
+    service: LiveTimerService = Depends(get_live_timer_service),
+):
+    require_live_timer(current_user)
+    try:
+        return service.start(data.bgg_id, data.participant_names, data.location)
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+
+
+@router.post("/play-timer/pause")
+def pause_live_timer(current_user: User = Depends(get_current_user), service: LiveTimerService = Depends(get_live_timer_service)):
+    require_live_timer(current_user)
+    try:
+        return service.pause()
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@router.post("/play-timer/resume")
+def resume_live_timer(current_user: User = Depends(get_current_user), service: LiveTimerService = Depends(get_live_timer_service)):
+    require_live_timer(current_user)
+    try:
+        return service.resume()
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@router.post("/play-timer/finish")
+def finish_live_timer(current_user: User = Depends(get_current_user), service: LiveTimerService = Depends(get_live_timer_service)):
+    require_live_timer(current_user)
+    try:
+        return service.finish()
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+@router.delete("/play-timer", status_code=204)
+def discard_live_timer(current_user: User = Depends(get_current_user), service: LiveTimerService = Depends(get_live_timer_service)):
+    require_live_timer(current_user)
+    service.discard()
 
 @router.get(
     "/players",

@@ -289,6 +289,7 @@ class PlayReadRepository:
                     "duration_minutes": (
                         play.duration_minutes
                     ),
+                    "location": play.location,
                     "source": play.source,
                     "participants": [
                         {

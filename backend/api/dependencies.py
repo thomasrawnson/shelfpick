@@ -20,6 +20,8 @@ from services.collection_service import CollectionService
 from services.game_service import GameService
 from services.insights_service import InsightsService
 from services.play_service import PlayService
+from services.live_timer_service import LiveTimerService
+from repositories.live_timer_repository import LiveTimerRepository
 from services.ranking_service import RankingService
 from services.discover_service import (
     DiscoverService,
@@ -76,6 +78,13 @@ def get_play_service(
     ),
 ) -> PlayService:
     return PlayService(repository)
+
+
+def get_live_timer_service(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> LiveTimerService:
+    return LiveTimerService(LiveTimerRepository(db, current_user.id))
 
 
 def get_picker_analytics_repository(

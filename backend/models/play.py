@@ -8,3 +8,5 @@ class Play:
     bgg_id: int
     player_count: int
     played_at: datetime
+    duration_minutes: int | None = None
+    location: str | None = None

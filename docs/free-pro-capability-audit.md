@@ -1,6 +1,6 @@
 # Free and Pro capability audit
 
-Verified 26 September 2026 from frontend and backend code, isolated fixtures,
+Verified through 28 September 2026 from frontend and backend code, isolated fixtures,
 and focused automated tests. No live account, purchase, database mutation or
 live BoardGameGeek request was used.
 
@@ -25,7 +25,8 @@ entitlement, purchase claim or billing behavior changed. Beta remains on hold.
 | Discover For You | Scores unowned Hot and ranked candidates using shelf categories/mechanics, per-owned-game play counts, preferred or observed player count, preferred or median play time, rating and BGG player-count evidence. Explanations are derived from the matching signals. | Pro only | Frontend checks `personalized_discover` before requesting results and shows a locked state otherwise. Backend independently returns 403 for Free before calling the service. | Empty/no-signal accounts fall back to popular source candidates rather than personalised evidence. Only the first 30 merged candidates receive metadata/scoring. Source caches are in-process and metadata remains a live dependency. |
 | Owned collection | Sync, search/add, browse, detail and ownership-aware Picker input. | Free and Pro | No frontend tier gate. Backend dependencies authenticate and scope ownership by current user. | BGG sync/search/add still depend on upstream availability; no Pro behaviour exists. |
 | Want to Play | Separate user-scoped list, add/remove/detail, and atomic move to Owned. | Free and Pro | No frontend tier gate. Backend service is authenticated and user-scoped. | Discovery metadata/add operations can depend on BGG; no Pro behaviour exists. |
-| Play logging | Records and deletes user-scoped plays with participants; feeds history, Picker and Game Night signals. | Free and Pro | No frontend tier gate. Backend play service and repositories are authenticated/user-scoped. | No implemented `live_play_enhancements` boundary. |
+| Play logging | Records and deletes user-scoped plays with participants, manual duration and optional location; feeds history, Picker and Game Night signals. | Free and Pro | No tier gate for ordinary play logging or location. Backend play service and repositories are authenticated/user-scoped. | Existing plays cannot currently be edited; location is editable during creation/retry and displayed in recent history. |
+| Live play duration | One recoverable timer per account with Start, Pause, Resume, Finish, an app-wide indicator and explicit play review before save. | Pro only | Frontend exposes controls only with `live_play_enhancements`; every timer endpoint independently enforces the same capability. Persisted user ownership and a unique account timer isolate sessions. | In-app PWA only. No lock-screen/Live Activity, ongoing notification, notification permission request or guaranteed background execution. |
 | Insights | Collection, play, monthly, game and group facts, including valid facts from one recorded play. | Free and Pro | Frontend route is always available. Backend service is authenticated/user-scoped; no Pro capability check. | `advanced_stats` is an entitlement name only; there is no separately implemented advanced Insights surface. |
 | Game Night | Builds a 3–5 game shortlist from the host’s owned collection using attendees, time, exact-player suitability, general play history and exact-group history. | Basic Game Night is Free and Pro | Frontend checks `game_night_basic`. Backend independently checks the same capability and validates player IDs against the current user. | `game_night_enhanced` is an entitlement name only; no enhanced mode is implemented. |
 
@@ -65,10 +66,11 @@ entitlement, purchase claim or billing behavior changed. Beta remains on hold.
 1. **Checkout blocker:** configure the agreed £3.99 one-off price, implement
    checkout, grant/reconcile Pro idempotently, and add purchase recovery. The
    current disabled action is truthful.
-2. **Entitlement contract overstates implementation:** Pro currently receives
-   `advanced_recommendations`, `advanced_stats`, `game_night_enhanced` and
-   `live_play_enhancements`, although no corresponding behaviour is enforced or
-   exposed. Before sale, expose only implemented capabilities or explicitly
+2. **Entitlement contract still overstates some implementation:** Pro currently
+   receives `advanced_recommendations`, `advanced_stats` and
+   `game_night_enhanced`, although no corresponding behaviour is enforced or
+   exposed. `live_play_enhancements` is now implemented and independently
+   enforced. Before sale, expose only implemented capabilities or explicitly
    separate planned capability identifiers from granted entitlements.
 3. **For You resilience is process-local:** persist a last-known-good candidate
    snapshot, define freshness, and verify restart behaviour. Candidate metadata
@@ -102,6 +104,14 @@ Acceptance criteria:
   £3.99 one-off checkout remains the subsequent commercial implementation.
 
 ## Validation record
+
+SP-PB10/SP-PB11 addendum (28 September): 18 focused backend tests and 49
+frontend tests passed. The development PostgreSQL migration reached
+`b04c8f13a2d7` with no Alembic drift; temporary records proved location and
+duration round trips, account-scoped timer cleanup and idempotent save retry,
+then were deleted. Mocked Playwright covered Pro controls and persistent
+indicator behavior at 390/1440px in light/dark. No real device, notification,
+lock-screen surface or production service was tested.
 
 - Code inspection: frontend route/component checks, backend dependency scoping,
   central entitlement mapping, routers, services and repositories.
