@@ -985,6 +985,12 @@ export async function getLiveTimer(): Promise<LiveTimer | null> {
   return response.json()
 }
 
+export async function getLiveTimerRecovery(): Promise<LiveTimer | null> {
+  const response = await apiFetch("/play-timer/recovery")
+  if (!response.ok) throw new Error(await readError(response, "Couldn't check for a retained live timer."))
+  return response.json()
+}
+
 export function startLiveTimer(bggId: number, participantNames: string[], location: string): Promise<LiveTimer> {
   return liveTimerMutation("/play-timer/start", { bgg_id: bggId, participant_names: participantNames, location })
 }

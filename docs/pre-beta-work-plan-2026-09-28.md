@@ -294,13 +294,16 @@ explicit confirmed discard. The timer public ID makes a lost-response retry
 idempotent, so it returns the already-created play instead of duplicating it.
 Manual duration entry remains Free and unchanged.
 
-If Pro access is lost while a timer is active or awaiting save, all timer read
-and control endpoints return 403 and the in-app Pro controls are unavailable.
-The persisted timer is not deleted or reassigned: restoring Pro restores access
-to the same timer. A finished timer may still be submitted through ordinary
-manual play logging with its account-scoped session ID; successful save remains
-the only implicit cleanup. This preserves captured data without weakening the
-Pro gate or silently creating a play.
+If Pro access is lost while a timer is active or awaiting save, the normal timer
+read and all Start/Pause/Resume/Finish/Discard endpoints return 403. A separate
+authenticated recovery read returns only the signed-in account's retained
+timer data. The frontend uses it once per entitlement state instead of making
+repeated forbidden requests. Running and paused states replace paid controls
+with a clear access-change explanation and a prefilled ordinary manual play
+form; saving manually does not finish, discard or clear the timer. Finished
+state retains its account-scoped session ID in the same form, so successful
+save remains the only implicit cleanup and a lost-response retry stays
+idempotent. Restoring Pro restores the same authoritative timer and controls.
 
 Validation evidence: the complete backend suite passed with 236 tests and one
 pre-existing Starlette `TestClient`/httpx deprecation warning. Five focused
@@ -321,6 +324,24 @@ pre-beta checklist item. Timestamp recovery is proved by controlled-clock and
 browser refresh/navigation coverage, but those checks are not a device
 substitute. Outside-app timer/notification work remains the separate future
 task below. SP-PB02 remains BLOCKED and beta remains on hold.
+
+SP-PB11 recovery follow-up evidence (28 September): four focused backend API
+checks covered running, paused and finished recovery plus the unchanged Pro
+gate on the normal read and paid controls. Five focused frontend tests covered
+the three recovery presentations and absence of paid controls. Changed-file
+ESLint and the production build passed. One mocked 390×844 Chrome flow covered
+Free running recovery, ordinary manual save without timer cleanup, restored Pro
+controls, Free paused recovery, retained finished details, failed-save retry
+with the same timer session ID and final success. It made no paid timer read in
+either Free state. Existing atomic repository code, constraints and account
+scoping were not changed, so the earlier isolated PostgreSQL proof was not
+repeated. No live account, database or production service was used.
+
+**Separate outstanding validation:** SP-PB18 phone voting still needs a manual
+end-to-end check with an actual Pro host. The existing mocked host/guest flow
+does not complete that check. The real-phone timer background/reopen check also
+remains outstanding. SP-PB02 remains BLOCKED, photo upload remains post-beta
+and beta remains on hold.
 
 ### Future Pro timer task — outside-app visibility
 
@@ -545,8 +566,10 @@ close → results with no horizontal overflow. macOS Vision decoded the rendered
 QR payload to the exact displayed configured-origin join link. The
 representative capture is `docs/screenshots/sp-pb18/game-night-phone-voting.png`.
 Physical-phone scanning, two real devices/networks and a deployed origin remain
-pre-beta checks. SP-PB02 remains blocked, photo upload remains post-beta and
-beta remains on hold.
+pre-beta checks. A manual end-to-end phone-voting run with an actual Pro host
+also remains outstanding and is not marked complete by the mocked flow.
+SP-PB02 remains blocked, photo upload remains post-beta and beta remains on
+hold.
 
 ### SP-PB19 — Add play challenges
 

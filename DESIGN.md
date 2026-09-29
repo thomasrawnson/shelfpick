@@ -330,6 +330,17 @@ existing play form for review; it never records a play automatically. Failed
 saves retain the draft and finished timer, while success removes timer state in
 the same transaction as the one play record. Discard is explicit and confirmed.
 
+If Pro access changes while a timer is retained, ShelfPick replaces the normal
+indicator and timer controls with an account-scoped recovery state. A running or
+paused timer is neither finished nor discarded: the screen explains that its
+data is safe, offers the ordinary Free play form with the available draft and
+duration, and states that a manual save does not alter the retained timer. A
+finished timer opens that same form with its timer session ID so the existing
+atomic, idempotent save removes the timer only after one play is safely stored.
+Restoring Pro restores the authoritative timer controls. The recovery read is
+authenticated and user-scoped; Start, Pause, Resume, Finish, Discard and the
+normal timer read remain Pro-enforced.
+
 ### Branded saved-play sharing
 
 SP-PB12 adds Share play only to persisted Collection history. The preview is a

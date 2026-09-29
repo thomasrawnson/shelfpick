@@ -3,6 +3,7 @@ import {
   discardLiveTimer,
   finishLiveTimer,
   getLiveTimer,
+  getLiveTimerRecovery,
   pauseLiveTimer,
   resumeLiveTimer,
   startLiveTimer,
@@ -33,14 +34,16 @@ const DISABLED_TIMER: TimerContextValue = {
 
 export function LiveTimerProvider({ enabled, children }: { enabled: boolean; children: ReactNode }) {
   const [timer, setTimer] = useState<LiveTimer | null>(null)
-  const [loading, setLoading] = useState(enabled)
+  const [loading, setLoading] = useState(true)
   const [pending, setPending] = useState(false)
   const [error, setError] = useState("")
   const actionPending = useRef(false)
 
   const refresh = useCallback(async () => {
-    if (!enabled) { setTimer(null); setLoading(false); return }
-    try { setTimer(await getLiveTimer()); setError("") }
+    try {
+      setTimer(await (enabled ? getLiveTimer() : getLiveTimerRecovery()))
+      setError("")
+    }
     catch (err) { setError(err instanceof Error ? err.message : "Couldn't restore the live timer.") }
     finally { setLoading(false) }
   }, [enabled])
@@ -51,6 +54,7 @@ export function LiveTimerProvider({ enabled, children }: { enabled: boolean; chi
   }, [refresh])
 
   async function act(action: () => Promise<LiveTimer | null>) {
+    if (!enabled) return
     if (actionPending.current) return
     actionPending.current = true
     setPending(true)

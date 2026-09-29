@@ -1854,6 +1854,37 @@
   flex-basis: 100%;
 }
 
+.live-timer-recovery-note {
+  padding: var(--space-4);
+  background: var(--color-warning-soft);
+  border: 1px solid var(--color-warning);
+  border-radius: var(--radius-md);
+}
+
+.live-timer-recovery-note h2,
+.live-timer-recovery-form-heading h2 {
+  margin: 0 0 var(--space-2);
+  font-size: 1.25rem;
+}
+
+.live-timer-recovery-note p,
+.live-timer-recovery-form-heading p {
+  margin: 0;
+  color: var(--color-text-support);
+  line-height: 1.5;
+}
+
+.live-timer-recovery-note p + p { margin-top: var(--space-2); }
+
+.live-timer-recovery-saved {
+  margin: 0;
+  padding: var(--space-3);
+  color: var(--color-success);
+  background: var(--color-success-soft);
+  border-radius: var(--radius-md);
+  font-weight: 800;
+}
+
 .recent-play-actions {
   display: flex;
   flex-wrap: wrap;

@@ -41,11 +41,12 @@ def neutral_picker_rankings():
 
 
 class FakeLiveTimerService:
-    def __init__(self):
+    def __init__(self, active=None):
         self.started = []
+        self.active = active
 
     def get_active(self):
-        return None
+        return self.active
 
     def start(self, bgg_id, participant_names, location):
         self.started.append((bgg_id, participant_names, location))
@@ -779,6 +780,38 @@ def test_live_timer_requires_pro_and_passes_draft_context():
 
     assert allowed.status_code == 201
     assert service.started == [(13, ["Alex"], "Club")]
+
+
+@pytest.mark.parametrize("status", ["running", "paused", "finished"])
+def test_live_timer_recovery_is_read_only_after_pro_loss(status):
+    retained_timer = {
+        "public_id": "timer-recovery-1",
+        "status": status,
+        "accumulated_seconds": 900,
+        "running_since": "2026-09-28T20:00:00Z" if status == "running" else None,
+        "finished_at": "2026-09-28T20:15:00Z" if status == "finished" else None,
+        "elapsed_seconds": 900,
+        "draft": {"participant_names": ["Alex"], "location": "Club"},
+        "game": {"bgg_id": 13, "name": "Recovery Game", "image_url": None, "thumbnail_url": None},
+    }
+    service = FakeLiveTimerService(active=retained_timer)
+    app.dependency_overrides[get_live_timer_service] = lambda: service
+    app.dependency_overrides[get_current_user] = lambda: User(id=1, email="free@example.com", tier="FREE")
+    try:
+        recovery = client.get("/play-timer/recovery")
+        paid_read = client.get("/play-timer")
+        pause = client.post("/play-timer/pause")
+        finish = client.post("/play-timer/finish")
+        discard = client.delete("/play-timer")
+    finally:
+        app.dependency_overrides.clear()
+
+    assert recovery.status_code == 200
+    assert recovery.json() == retained_timer
+    assert paid_read.status_code == 403
+    assert pause.status_code == 403
+    assert finish.status_code == 403
+    assert discard.status_code == 403
 
 
 def test_picker_uses_preferred_mechanic():

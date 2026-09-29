@@ -105,6 +105,19 @@ def get_live_timer(
     return service.get_active()
 
 
+@router.get("/play-timer/recovery")
+def get_live_timer_recovery(
+    current_user: User = Depends(get_current_user),
+    service: LiveTimerService = Depends(get_live_timer_service),
+):
+    """Return only the signed-in account's retained timer for recovery UI.
+
+    This read does not grant timer controls. Start, pause, resume, finish and
+    discard remain independently protected by the Pro capability check.
+    """
+    return service.get_active()
+
+
 @router.post("/play-timer/start", status_code=201)
 def start_live_timer(
     data: LiveTimerStart,

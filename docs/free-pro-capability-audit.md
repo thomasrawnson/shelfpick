@@ -28,7 +28,7 @@ entitlement, purchase claim or billing behavior changed. Beta remains on hold.
 | Want to Play | Separate user-scoped list, add/remove/detail, and atomic move to Owned. | Free and Pro | No frontend tier gate. Backend service is authenticated and user-scoped. | Discovery metadata/add operations can depend on BGG; no Pro behaviour exists. |
 | Play logging | Records and deletes user-scoped plays with participants, manual duration and optional location; feeds history, Picker and Game Night signals. | Free and Pro | No tier gate for ordinary play logging or location. Backend play service and repositories are authenticated/user-scoped. | Existing plays cannot currently be edited; location is editable during creation/retry and displayed in recent history. |
 | Branded play sharing | Previews and exports a persisted play as a ShelfPick-branded PNG, with native file sharing where supported and download fallback. Names, scores and location are explicit privacy choices. | Free and Pro | The saved-play action has no frontend tier check and needs no new backend endpoint; it consumes the already authenticated, user-scoped play history response. | Collection-history plays only. No public upload, public play URL, automatic posting, recipient selection or social integration. Native OS sharing and physical-device rendering remain pre-beta checks. |
-| Live play duration | One recoverable timer per account with Start, Pause, Resume, Finish, an app-wide indicator and explicit play review before save. | Pro only | Frontend exposes controls only with `live_play_enhancements`; every timer endpoint independently enforces the same capability. Persisted user ownership and a unique account timer isolate sessions. | In-app PWA only. No lock-screen/Live Activity, ongoing notification, notification permission request or guaranteed background execution. |
+| Live play duration | One recoverable timer per account with Start, Pause, Resume, Finish, an app-wide indicator and explicit play review before save. If Pro is lost, an account-scoped recovery view retains running/paused data and lets a finished timer use ordinary play logging. | Pro controls; ordinary manual logging remains Free | Frontend exposes controls only with `live_play_enhancements`; the normal timer read and every mutation independently enforce that capability. A separate authenticated recovery read is scoped by the current-user repository and cannot operate the timer. Persisted user ownership and a unique account timer isolate sessions. | In-app PWA only. A running/paused manual save does not clear the retained timer; Pro restoration returns its controls. No lock-screen/Live Activity, ongoing notification, notification permission request or guaranteed background execution. |
 | Insights | Collection, play, monthly, game and group facts, including valid facts from one recorded play. | Free and Pro | Frontend route is always available. Backend service is authenticated/user-scoped; no Pro capability check. | `advanced_stats` is an entitlement name only; there is no separately implemented advanced Insights surface. |
 | Game Night | Builds a 3–5 game shortlist from the host’s owned collection using attendees, time, exact-player suitability, general play history and exact-group history. A Pro host can open session-scoped phone voting for that shortlist; guests join without registration, keep one editable browser ballot and see shared closed results. | Basic Game Night is Free and Pro; phone voting is Pro | Frontend checks `game_night_basic` for the core flow and `game_night_enhanced` for the host voting action. Backend independently enforces both boundaries, restricts voting controls to the owner and exposes only token-scoped shortlist/vote state to guests. | Guest-browser identity cannot guarantee one real person across browsers/devices. Physical QR scanning and real cross-network/deployed-origin use remain pre-beta validation. No invitations, chat, push, vetoes or attendee-identity verification. |
 
@@ -119,6 +119,25 @@ Acceptance criteria:
   £3.99 one-off checkout remains the subsequent commercial implementation.
 
 ## Validation record
+
+SP-PB11 Pro-loss recovery follow-up (28 September): four focused backend API
+checks covered running, paused and finished recovery data while confirming the
+normal timer read, controls and discard remain Pro-only. Five focused frontend
+tests covered recovery copy, prefilled details and the absence of misleading
+controls. Changed-file ESLint, the production build and `git diff --check`
+passed. A mocked 390×844 Chrome flow covered Free running recovery and manual
+logging, restored Pro controls, Free paused recovery, and a finished save that
+retained the same account timer ID through failure and retry before success.
+The provider made no paid timer read while Free, avoiding repeated 403s. The
+repository save/cleanup, idempotency constraints and account scoping were not
+changed; their earlier isolated PostgreSQL proof was not repeated. This was not
+a live account, database, device or production test. The real-phone timer
+background/reopen check remains outstanding.
+
+Separately, SP-PB18 phone voting still requires a manual end-to-end run with an
+actual Pro host; existing mocked host/guest evidence does not complete that
+check. SP-PB02 remains BLOCKED, photo upload remains post-beta and beta remains
+on hold.
 
 Roadmap Slice 4 Free/Pro presentation reconciliation (28 September): the
 comparison was checked against the backend entitlement paths for For You,

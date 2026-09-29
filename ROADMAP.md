@@ -291,6 +291,18 @@ background/reopen check remains on the pre-beta checklist. Outside-app timer
 and notification work remains separate. SP-PB02 remains BLOCKED and beta
 remains on hold.
 
+The SP-PB11 Pro-loss recovery follow-up completed on 28 September 2026. An
+authenticated, account-scoped recovery read now keeps a retained running,
+paused or finished timer visible without exposing paid controls or repeatedly
+calling a 403 endpoint. Running and paused states explain the access change and
+offer ordinary manual logging without finishing or clearing the timer. Finished
+state reuses the prefilled play form and existing session ID, so successful
+save remains atomic and retries remain idempotent. Returning Pro access restores
+the retained timer controls. No persistence or entitlement rule changed. The
+real-phone background/reopen timer check and a separate manual phone-voting
+flow with an actual Pro host remain outstanding. SP-PB02 remains BLOCKED,
+photo upload remains post-beta and beta remains on hold.
+
 SP-PB12 completed on 28 September 2026 with existing Free access. Persisted
 plays now expose a labelled Share play action and an accessible preview that
 preserves Collection detail state and returns focus on Close or Escape. One
