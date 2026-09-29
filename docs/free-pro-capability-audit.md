@@ -120,6 +120,22 @@ Acceptance criteria:
 
 ## Validation record
 
+Local Free/Pro manual-test setup (29 September): a guarded development command
+creates marker-owned Free and Pro accounts in loopback PostgreSQL, using the
+normal password login and backend tier-to-entitlement mapping. It rejects every
+environment except `development`, non-PostgreSQL targets, remote hosts,
+unapproved database names and existing unmarked accounts. It seeds only three
+synthetic owned games and the players needed for Game Night, is repeatable, and
+has a matching removal/status flow. Eleven focused safety tests passed. A
+real-authentication 390×844 Chrome pass verified Free basic Game Night plus
+backend denial of Free phone-voting hosting and timer start, Pro voting with a
+QR/configured join link, an unauthenticated guest ballot in a separate context,
+and Pro timer start/cleanup. The setup was run twice, then removed; status
+reported both accounts missing and 0/3 synthetic games. No production service
+or remote database was accessed. Physical-phone QR/LAN testing remains pending.
+SP-PB02 remains blocked, photo upload remains post-beta and beta remains on
+hold.
+
 SP-PB11 Pro-loss recovery follow-up (28 September): four focused backend API
 checks covered running, paused and finished recovery data while confirming the
 normal timer read, controls and discard remain Pro-only. Five focused frontend
@@ -134,10 +150,10 @@ changed; their earlier isolated PostgreSQL proof was not repeated. This was not
 a live account, database, device or production test. The real-phone timer
 background/reopen check remains outstanding.
 
-Separately, SP-PB18 phone voting still requires a manual end-to-end run with an
-actual Pro host; existing mocked host/guest evidence does not complete that
-check. SP-PB02 remains BLOCKED, photo upload remains post-beta and beta remains
-on hold.
+Separately, SP-PB18 now has a real local Pro-host/accountless-guest browser run;
+physical-phone scanning and a phone-reachable LAN voting origin still require
+manual validation. SP-PB02 remains BLOCKED, photo upload remains post-beta and
+beta remains on hold.
 
 Roadmap Slice 4 Free/Pro presentation reconciliation (28 September): the
 comparison was checked against the backend entitlement paths for For You,

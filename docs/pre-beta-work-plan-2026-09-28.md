@@ -49,6 +49,31 @@ unmarketed `advanced_stats` entitlement still has no separate shipped surface;
 checkout remains pending. SP-PB02 remains BLOCKED, photo upload remains
 post-beta and beta remains on hold.
 
+## Local Free/Pro validation setup — 29 September 2026
+
+**Status:** COMPLETE as development tooling; it does not change product access.
+
+`backend/scripts/local_test_accounts.py` now creates dedicated Free and Pro
+accounts through a guarded local-only workflow. It accepts only
+`APP_ENV=development`, loopback PostgreSQL and an allowlisted development
+database name, refuses to replace an unmarked account, and seeds only three
+synthetic owned games plus the minimum players needed for Game Night. Repeated
+setup refreshes the dedicated credentials without clearing their test history;
+`remove` deletes the marked accounts and unreferenced synthetic games. Setup,
+LAN access, voting-origin configuration and cleanup are documented in
+`docs/local-free-pro-testing.md`.
+
+Eleven focused safety tests passed. Setup was run twice against local PostgreSQL,
+then a real-authentication Chrome pass at 390×844 verified a three-game Free
+Game Night shortlist, backend 403 responses for Free phone-voting host creation
+and timer start, Pro voting creation with a displayed QR and configured join
+link, accountless join/ballot persistence in a separate guest context, and Pro
+timer start plus cleanup. Cleanup returned both accounts to missing and the
+synthetic catalogue to 0/3. This used only local services and data. A physical
+phone has not scanned or opened the LAN-address QR/link, so that cross-device
+check remains pending. SP-PB02 remains BLOCKED, photo upload remains post-beta
+and beta remains on hold.
+
 ## Decisions and provisional interpretations
 
 - Confirmed: recommendation input is the user's personal game ranking, not global BGG rank/rating. Rankings placement is still open; Tom feels it deserves navigation visibility but the bar is crowded. Review a prominent My Rankings destination within Collection plus contextual game-detail access against a revised primary-navigation layout. Do not add another crowded bottom-bar item without evaluating the whole navigation.
@@ -337,11 +362,11 @@ either Free state. Existing atomic repository code, constraints and account
 scoping were not changed, so the earlier isolated PostgreSQL proof was not
 repeated. No live account, database or production service was used.
 
-**Separate outstanding validation:** SP-PB18 phone voting still needs a manual
-end-to-end check with an actual Pro host. The existing mocked host/guest flow
-does not complete that check. The real-phone timer background/reopen check also
-remains outstanding. SP-PB02 remains BLOCKED, photo upload remains post-beta
-and beta remains on hold.
+**Separate outstanding validation:** SP-PB18 now has a local real-authentication
+Pro-host and separate accountless guest browser proof. Physical-phone scanning
+and cross-network use of the configured LAN voting origin remain pending. The
+real-phone timer background/reopen check also remains outstanding. SP-PB02
+remains BLOCKED, photo upload remains post-beta and beta remains on hold.
 
 ### Future Pro timer task — outside-app visibility
 

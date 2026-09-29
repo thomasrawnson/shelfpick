@@ -402,6 +402,12 @@ alembic upgrade head
 
 The backend uses a `DATABASE_URL` environment variable. Local secrets and personal collection exports are intentionally excluded from source control.
 
+For repeatable real-authentication checks of Free and Pro entitlements, Game
+Night voting and live timers, use the guarded dedicated-account workflow in
+[`docs/local-free-pro-testing.md`](docs/local-free-pro-testing.md). It seeds
+only a local development PostgreSQL target and documents cleanup and LAN/phone
+configuration.
+
 ### Backend
 
 From `backend` with the virtual environment activated:
