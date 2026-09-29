@@ -288,7 +288,6 @@ function PickerView({
     onViewGame(match.game.bgg_id);
   }
 
-  const progressStep = step === "time" ? 1 : 0;
   const isPlayEntry = location.pathname === APP_PATHS.pickerPlay;
 
   if (isPlayEntry) {
@@ -331,20 +330,6 @@ function PickerView({
       {optionsError && <RetryNotice message={optionsError} busy={optionsLoading} onRetry={() => { setOptionsLoading(true); setOptionsAttempt(current => current + 1); }} />}
       {error && <RetryNotice message={error} busy={loading} onRetry={revealGame} />}
       <fieldset className="picker-request-fields" disabled={loading} aria-busy={loading}>
-      {step !== "reveal" && step !== "no_match" && (
-        <div
-          className="progress-dots"
-          aria-label={`Picker step ${progressStep + 1} of 2`}
-        >
-          {[0, 1].map((index) => (
-            <span
-              key={index}
-              className={progressStep === index ? "dot active" : "dot"}
-            />
-          ))}
-        </div>
-      )}
-
       {step === "players" && (
         <PlayerStep
           players={players}

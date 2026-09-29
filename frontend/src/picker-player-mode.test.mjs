@@ -60,7 +60,11 @@ test("named players replace the editable count control with one authoritative su
 test("count-only mode retains the player-count choices and selected count", () => {
   const markup = renderPlayerStep({ players: 4 })
 
+  assert.match(markup, />What should we play\?</)
+  assert.doesNotMatch(markup, /Set the table and any limits/)
   assert.match(markup, />Choose specific players</)
+  assert.match(markup, />Complexity</)
+  assert.match(markup, />Fine-tune</)
   assert.match(markup, /class="player-grid"/)
   assert.match(markup, /aria-label="4 players" aria-pressed="true"/)
   assert.doesNotMatch(markup, /named players/)

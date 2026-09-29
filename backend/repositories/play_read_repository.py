@@ -1,7 +1,7 @@
 from collections import Counter
 from statistics import median
 
-from sqlalchemy import func
+from sqlalchemy import and_, func
 
 from database.models import (
     Game as DatabaseGame,
@@ -486,14 +486,34 @@ class PlayReadRepository:
         if self.user_id is None:
             return []
 
+        last_played_at = func.max(
+            DatabasePlay.played_at
+        )
         rows = (
             self.db.query(Player)
+            .outerjoin(
+                PlayParticipant,
+                PlayParticipant.player_id
+                == Player.id,
+            )
+            .outerjoin(
+                DatabasePlay,
+                and_(
+                    DatabasePlay.id
+                    == PlayParticipant.play_id,
+                    DatabasePlay.user_id
+                    == self.user_id,
+                ),
+            )
             .filter(
                 Player.user_id
                 == self.user_id
             )
+            .group_by(Player.id)
             .order_by(
-                Player.name
+                last_played_at.desc().nulls_last(),
+                func.lower(Player.name),
+                Player.id,
             )
             .all()
         )

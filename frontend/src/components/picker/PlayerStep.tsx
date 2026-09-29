@@ -133,9 +133,6 @@ function PlayerStep({
     <section className="screen picker-step-screen player-step-screen">
       <header>
         <h1>What should we play?</h1>
-        <p className="subtitle">
-          Set the table and any limits. We’ll choose from your collection.
-        </p>
       </header>
 
       <div className="picker-step-centered">

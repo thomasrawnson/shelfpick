@@ -37,7 +37,7 @@ const statsSections: Array<{
   },
   {
     id: "group",
-    label: "Friends",
+    label: "Players",
   },
   {
     id: "recaps",
@@ -808,7 +808,7 @@ function InsightsView({
             <div className="players-card-header">
               <div>
                 <h2>
-                  Friends
+                  Players
                 </h2>
               </div>
 
@@ -901,7 +901,7 @@ function InsightsView({
             <div className="players-card-header">
               <div>
                 <h2>
-                  Friends favourites
+                  Players’ favourites
                 </h2>
               </div>
             </div>

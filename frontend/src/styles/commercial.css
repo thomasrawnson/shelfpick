@@ -904,7 +904,7 @@ h3,
   font-family: var(--font-display);
 }
 
-/* Friends/Insight text should use the same warm palette, never rust/red. */
+/* Player/Insight text should use the same warm palette, never rust/red. */
 .players-card .favourite-player-link,
 .players-card .favourite-game-link,
 .players-card .player-name-link,

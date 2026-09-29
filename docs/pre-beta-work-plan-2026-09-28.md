@@ -18,6 +18,76 @@ This is an implementation backlog, not a claim that features are shipped. All ta
    Validate all new work and existing operational release gates. Ask Tom to
    resume beta; do not resume automatically.
 
+## Bounded follow-up sequence — 29 September 2026
+
+Planning this sequence is not implementation of slices 2–5.
+
+1. **SP-PB03 follow-up, with bounded SP-PB08/SP-PB20 copy polish — COMPLETE.**
+   Order the shared player picker from the signed-in account's most recent
+   recorded play date, with unplayed players following alphabetically; retain
+   selection and named-player rules. Remove the redundant Picker progress/copy,
+   improve setup-section spacing and use player terminology in visible copy.
+   SP-PB08's separate favourites-card padding acceptance criteria remain open.
+2. **SP-PB05 Appearance follow-up — COMPLETE.** Settings offers **Black
+   (experimental)** to Free and Pro through an isolated semantic-token layer,
+   while System, Light and Dark retain their behaviour and saved values. The
+   pre-React theme bootstrap persists and restores Black before paint, and
+   unknown or retired values fall safely back to System. Existing dark-specific
+   logo and inactive-control treatment now includes Black. Gaming Table, Anime
+   Arcade and Quiet Garden are documented as possible Pro cosmetic themes only;
+   none is implemented or marketed.
+3. **SP-PB09 audit plus SP-PB16A — PLANNED.** Clarify current BGG title search,
+   bound true custom/manual-game work if absent, and establish UPC/EAN lookup
+   permission, coverage, commercial terms and cost before SP-PB16B. Plan
+   confirmation, duplicates and camera/browser recovery with title-search
+   fallback; QR voting is unrelated.
+4. **SP-PB12/SP-PB13 — PLANNED.** Audit approved branding and the renderer,
+   redesign persisted-play cards around available cover art, and add a truthful
+   monthly totals/collage export with a branded fallback. Preserve privacy,
+   redaction, native share/download and Free saved-play sharing.
+5. **SP-PB14 plus capability-audit follow-up — PLANNED.** Inventory actual
+   Insights/backend statistics and propose a concrete Free/Pro matrix before
+   gates. Keep basic history/headline totals Free and do not market the current
+   unimplemented `advanced_stats` capability.
+
+Slice 1 implementation uses one account-scoped aggregate query over players,
+participants and plays, ordered by `plays.played_at` rather than insertion or
+import timing. Unplayed players use a case-insensitive name then ID fallback.
+Picker selections and named-player precedence are unchanged. The non-interactive
+two-dot progress indicator and redundant supporting sentence above the setup
+controls were removed; explicit Back actions, browser history and primary
+navigation remain. Mobile Group size → Complexity and Complexity → Fine-tune
+gaps are now 24px in the focused browser fixture.
+
+Validation: seven focused backend profile/API tests and nine focused frontend
+tests passed; changed-file ESLint, the production build and `git diff --check`
+passed. A mocked 390×844 Chrome pass covered ordered players, alphabetical
+unplayed fallback, retained multi-selection, named-player precedence, Back,
+keyboard focus, navigation clearance and no horizontal overflow. Evidence is
+`docs/screenshots/sp-pb03-follow-up/picker-player-polish-mobile.png`. No live
+account, real device or production data was used. SP-PB02 remains BLOCKED,
+photo upload remains post-beta and beta remains on hold. Physical-phone
+Pro-host voting and the real-device timer background/reopen checks remain
+outstanding.
+
+SP-PB05 Appearance follow-up validation: eleven focused theme/Settings tests
+passed for System behaviour, explicit theme persistence, Black selection and
+reload, unknown-value fallback, absence of a Pro gate and the protected Pluto
+Night Labs link. Changed-file ESLint,
+the production build and `git diff --check` passed. A mocked 390×844 Chrome pass
+covered Settings, About, Picker, Collection and the saved-play share dialog in
+Black; the About link destination and keyboard access were verified, and the
+public HTTPS destination resolved successfully. The pass verified the
+true-black/near-black surface hierarchy, 17.64:1 primary token
+contrast, distinct borders and selections, keyboard focus, a disabled control,
+navigation, no horizontal overflow, and switching back to Light, Dark and
+System. Evidence is
+`docs/screenshots/sp-pb05-black/black-theme-settings-mobile.png`. No live
+account, physical device or production service was used. SP-PB02 remains
+BLOCKED, photo upload remains post-beta and beta remains on hold. Physical-phone
+Pro-host voting and the real-device timer background/reopen checks remain
+outstanding.
+
 Task IDs are new backlog IDs and do not replace historical roadmap slice IDs. Implement one bounded sub-slice per reviewable change; split larger data/UI work further when needed.
 
 ## Roadmap Slice 4 — Free versus Pro presentation reconciliation
@@ -214,7 +284,9 @@ unrelated account/profile panel and adds explicit BGG attribution. Plays links
 to the working Insights history, Pro retains the comparison route, and Help and
 About contain only current information. Existing `/setup`, Profile and Pro deep
 links remain valid. Explicit Back and browser Back restore the originating row's
-keyboard focus.
+keyboard focus. About now links to `https://plutonightlabs.com/` using its
+existing secondary-action styling, opens the destination in a protected new tab
+and exposes that behaviour to assistive technology.
 
 Validation: 39 frontend tests passed, including focused overview, route,
 section-isolation and import/profile-separation coverage. Build, lint,
@@ -238,11 +310,11 @@ Prepare and implement a consistent Inter-led direction across app headings, body
 
 The feature is the user's personal game ranking. Tom feels it merits primary-navigation visibility but the current bar is crowded; placement remains a design decision. Compare (A) a prominent My Rankings destination within Collection with a Rank this game action on game details, and (B) a revised primary-navigation structure with Rankings, accounting for all displaced destinations. Keep Game Night distinct and readily accessible. Recommend one using mobile/desktop mockups and findability evidence before structural implementation. Preserve existing rankings, ranking input, deep links, Back and collection state. Navigation changes must not make the new Pro recommendation signal gate existing ranking entry.
 
-### SP-PB08 — Reduce Friends' favourites padding
+### SP-PB08 — Reduce Players’ favourites padding
 
 **Status:** NOT STARTED. **Workstream:** UI. **Access:** Existing access.
 
-Reduce excess card/section padding and empty space while preserving artwork, readable labels, 44px touch targets and truthful sparse states. Check zero, one and multiple friends/participants and long names on mobile and desktop.
+Reduce excess card/section padding and empty space while preserving artwork, readable labels, 44px touch targets and truthful sparse states. Check zero, one and multiple players/participants and long names on mobile and desktop.
 
 ### SP-PB09 — Expand Collection filters and strengthen Add game
 

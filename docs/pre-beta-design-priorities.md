@@ -21,6 +21,15 @@ The agreed pre-beta priorities are:
 These are separate workstreams. UI work does not change the approved logo or
 the Free/Pro proposition.
 
+The SP-PB05 Appearance follow-up completed on 29 September. Settings now keeps
+System, Light and Dark and adds **Black (experimental)** for Free and Pro. Black
+uses the same semantic colour contract on a true-black canvas with near-black
+surfaces, readable text, distinct borders and visible focus; the pre-React
+bootstrap restores it before paint. Gaming Table (walnut/cream/brass), Anime
+Arcade (midnight violet/coral/cyan) and Quiet Garden (sage/mist blue/soft
+neutrals) are documented potential future Pro cosmetics only and are not
+implemented or marketed.
+
 The focused logo/brand correction completed on 26 September 2026. The supplied
 `Cozy Board Game Shelf Icon.png` is retained as the canonical source and now
 drives the Apple touch, standard PWA, dedicated safe-area maskable and square
@@ -31,7 +40,7 @@ BoardGameGeek attribution remains separate and unchanged.
 The initial bounded Free versus Pro pass completed on 26 September 2026 and was
 reconciled with subsequent shipped work on 28 September. Roadmap Slice 4's
 comparison now leads with three benefit cards: more personal recommendations,
-live in-app timing and Game Night voting from friends' phones. The account's
+live in-app timing and Game Night voting from players' phones. The account's
 current plan is explicit. The detailed matrix is grouped around building a
 shelf, choosing a game, recording/sharing a play and planning together rather
 than presenting an undifferentiated feature list.
@@ -137,6 +146,10 @@ mixed settings page is now a concise grouped overview, with substantial content
 on dedicated Profile, Preferences, Appearance, Collection & Data, Plays, Pro,
 Help and About routes. Rows use the existing surface, line, type and focus
 tokens, remain full-width at mobile sizes and return keyboard focus after Back.
+The About panel's Pluto Night Labs action uses the same link treatment, points
+to `https://plutonightlabs.com/` and announces its protected new-tab behaviour.
+The focused mobile Settings pass verified its keyboard access and exact
+destination, which also resolved successfully over HTTPS.
 Collection & Data contains only the existing BGG sync and BG Stats import flows
 plus BGG attribution; account/profile controls remain elsewhere. Mocked
 Playwright covered the overview and import route at 390 and 1440px in both

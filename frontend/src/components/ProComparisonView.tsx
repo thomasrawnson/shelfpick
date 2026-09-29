@@ -36,8 +36,8 @@ const proBenefits = [
     detail: "An in-app indicator brings you back to the timer while you move around the app. Lock-screen timers and notifications are not included.",
   },
   {
-    title: "Game Night voting from friends’ phones",
-    summary: "Open voting for your shortlist and let friends join by QR code or link.",
+    title: "Game Night voting from players’ phones",
+    summary: "Open voting for your shortlist and let players join by QR code or link.",
     detail: "Creating the voting session needs Pro. Guests join in their browser without an account or Pro.",
   },
 ]
@@ -79,7 +79,7 @@ const featureGroups: FeatureGroup[] = [
       { name: "Basic Game Night", detail: "Group shortlist and host selection", free: included, pro: included },
       { name: "Open phone voting", detail: "Host QR code and join link", free: proOnly, pro: included },
       {
-        name: "Join a friend’s vote",
+        name: "Join a hosted vote",
         detail: "Guest browser access",
         free: { label: "No plan needed", tone: "guest" },
         pro: { label: "No plan needed", tone: "guest" },

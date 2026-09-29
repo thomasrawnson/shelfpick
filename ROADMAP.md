@@ -30,6 +30,68 @@ and validate the work before asking Tom to resume beta. Internal testing
 continues. This instruction supersedes older immediate-beta and post-launch
 timing below; existing completed slices remain historical implementation facts.
 
+### Bounded follow-up sequence — 29 September 2026
+
+The next requested work is split across existing task areas; recording the
+sequence does not mark later slices as implemented.
+
+1. **SP-PB03 Picker/player-selection follow-up — COMPLETE (29 September).**
+   Player choices are returned in one account-scoped query, ordered by their
+   latest recorded `played_at` value, newest first, then unplayed players by a
+   stable case-insensitive name/ID fallback. Picker named-player precedence and
+   selections are unchanged. The redundant two-dot progress indicator and
+   supporting sentence under **What should we play?** were removed; explicit
+   Back actions and primary navigation remain. Group size, Complexity and
+   Fine-tune have clearer separation. Legacy relationship terminology was
+   replaced with player language as a bounded SP-PB08/SP-PB20 copy follow-up;
+   SP-PB08's original favourites-card spacing task remains pending.
+2. **SP-PB05 Appearance follow-up — COMPLETE (29 September).** Settings now
+   offers **Black (experimental)** to Free and Pro alongside System, Light and
+   Dark. An isolated semantic-token layer provides a true-black canvas,
+   near-black surfaces, readable text, distinct borders/selections and visible
+   focus while preserving ShelfPick green and gold. The pre-React bootstrap
+   accepts and applies Black before paint, persists it across reloads, and
+   safely falls back to System for unknown or later-retired values. Existing
+   dark-specific logo and inactive-control handling includes Black; no gate or
+   dependency was added. Gaming Table, Anime Arcade and Quiet Garden remain
+   documented potential Pro cosmetics only.
+3. **SP-PB09/SP-PB16A entry and barcode audit — PLANNED.** Clarify the existing
+   BoardGameGeek title-search/add flow, decide and bound true custom games, and
+   establish a permitted commercial UPC/EAN lookup source before SP-PB16B scan
+   integration. Decoding digits alone is not delivery.
+4. **SP-PB12/SP-PB13 sharing follow-up — PLANNED.** Audit logo use and existing
+   exports, refine saved-play cards around cover artwork, then add the truthful
+   **This month** recap/collage using the existing renderer. Saved-play sharing
+   remains Free unless a later product decision changes it.
+5. **SP-PB14 statistics and Pro proposal — PLANNED.** Audit actual Insights and
+   backend capabilities, then agree a Free/Pro matrix before any new gate or
+   `advanced_stats` marketing. Basic history and headline totals remain Free.
+
+Focused evidence for slice 1: seven backend profile/API tests and nine focused
+frontend tests passed, as did changed-file ESLint, the production build and
+`git diff --check`. A mocked 390×844 Chrome pass verified returned player order,
+unplayed fallback order, preserved multi-selection and named-player precedence,
+explicit Back navigation, 24px section separation, keyboard focus, primary-
+navigation clearance and no horizontal overflow. The capture is
+`docs/screenshots/sp-pb03-follow-up/picker-player-polish-mobile.png`. No live
+account, physical device or production data was used. SP-PB02 remains blocked,
+photo upload remains post-beta and beta remains on hold. Physical-phone Pro-host
+voting and the real-device timer background/reopen check remain outstanding.
+
+Focused SP-PB05 follow-up evidence: eleven theme/Settings tests passed, covering
+System behaviour, explicit-theme persistence, Black reload, unknown-value
+fallback, the ungated Settings choice and the protected Pluto Night Labs link.
+Changed-file ESLint, the production
+build and `git diff --check` passed. A mocked 390×844 Chrome pass covered Black
+Settings, About, Picker, Collection and the saved-play share dialog; confirmed
+the About destination and keyboard access, a
+17.64:1 primary text/surface token contrast, visible keyboard focus, selected
+and disabled controls, navigation, no horizontal overflow, and switching back
+to Light, Dark and System. The screenshot is
+`docs/screenshots/sp-pb05-black/black-theme-settings-mobile.png`. No physical
+device, live account or production data was used. SP-PB02 remains blocked,
+photo upload remains post-beta and beta remains on hold.
+
 SP-PB01 is complete. Picker Log a play now opens a dedicated `/picker/log-play`
 screen while the parent Picker route remains mounted, preserving its selected
 game, named players or count-only rows, criteria, recommendation set and result
@@ -519,7 +581,7 @@ group features.
 
 - Rich social profiles.
 - Messaging.
-- Friends or followers.
+- Social connections or followers.
 - Advanced player statistics.
 
 ### Acceptance criteria
@@ -600,7 +662,8 @@ communicate Free versus Pro.
 - **About**
   - app version;
   - Pluto Night Labs;
-  - Pluto Night Labs landing-page link.
+  - Pluto Night Labs landing-page link — delivered as a clearly labelled,
+    keyboard-accessible external link with an accessible new-tab indication.
 - **Support ShelfPick**
   - Tip Jar.
 

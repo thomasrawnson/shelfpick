@@ -61,7 +61,7 @@
 }
 
 /* Enabled choices must remain clearly legible against dark raised surfaces. */
-:root[data-theme="dark"]
+:is(:root[data-theme="dark"], :root[data-theme="black"])
   :is(
     .segmented-control button:not(.active),
     .filter-tabs button:not(.active),
@@ -505,7 +505,9 @@
 }
 
 .picker-first-step-advanced {
-  margin-top: var(--space-3);
+  width: 100%;
+  max-width: 330px;
+  margin: 28px auto 0 !important;
   border-top: 1px solid var(--color-border);
   border-bottom: 1px solid var(--color-border);
 }
@@ -617,7 +619,7 @@
   }
 
   .player-complexity-section {
-    margin-top: 12px !important;
+    margin-top: 24px !important;
   }
 
   .player-complexity-section .preference-label {
@@ -625,7 +627,7 @@
   }
 
   .picker-first-step-advanced {
-    margin-top: 10px !important;
+    margin-top: 24px !important;
     margin-bottom: 0;
     padding-bottom: 0;
   }
