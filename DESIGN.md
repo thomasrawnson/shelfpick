@@ -29,6 +29,12 @@ colors:
   dark-ink: "#F4F1E8"
   dark-ink-secondary: "#AAB4AD"
   dark-line: "#39413B"
+  black-canvas: "#000000"
+  black-surface: "#0B0E0C"
+  black-surface-raised: "#151A17"
+  black-ink: "#F7F4EB"
+  black-ink-secondary: "#BAC5BD"
+  black-line: "#465149"
 typography:
   display:
     fontFamily: "Lora, Georgia, 'Times New Roman', serif"
@@ -138,7 +144,9 @@ restores focus to the originating row. Subpages use the standard narrow shelf,
 existing form/card primitives and one clear heading. Collection & Data keeps
 BGG sync and BG Stats import together without unrelated account controls and
 retains BoardGameGeek attribution. This structure does not add a primary-nav
-destination or change Free/Pro access.
+destination or change Free/Pro access. About retains the same focused-panel and
+secondary-action treatment for its labelled Pluto Night Labs website link; the
+external action announces that it opens a new tab to assistive technology.
 
 ## Preset avatar update — 28 September 2026
 
@@ -181,7 +189,7 @@ error states retain the same stable page heading as their completed screen.
 
 ShelfPick should feel like opening a well-kept personal game shelf: warm, calm, tactile and easy to scan. The interface helps hobbyists make a confident choice, so game artwork and recommendation reasoning lead while the brand supplies structure and recognition.
 
-Forest Green carries action, selection and trust. Warm Gold marks moments of emphasis, collection character and small editorial details. Cream canvas, paper-like surfaces and restrained depth keep the product inviting in light mode; the dark theme translates the same relationships into charcoal-green layers rather than becoming a separate visual identity.
+Forest Green carries action, selection and trust. Warm Gold marks moments of emphasis, collection character and small editorial details. Cream canvas, paper-like surfaces and restrained depth keep the product inviting in light mode; the dark theme translates the same relationships into charcoal-green layers rather than becoming a separate visual identity. The optional **Black (experimental)** theme keeps that Forest & Gold identity on a true-black canvas with near-black semantic surfaces, brighter text and explicit borders. It is available to Free and Pro while tested.
 
 **Key Characteristics:**
 
@@ -231,7 +239,17 @@ closed links show final results.
 
 **The Semantic Color Rule.** Success, warning, danger and info retain their functional hues and labels. Never substitute Forest or Gold where the user needs to understand status or risk.
 
-Use `canvas` for the page environment, `surface` for the main app plane and `surface-raised` for controls, nested cards and quiet groupings. In dark mode use the corresponding `dark-*` tokens and preserve the same ordering from background to surface to raised surface. Supporting text uses the production `--color-text-support` mix so it stays readable on raised surfaces in both themes.
+Use `canvas` for the page environment, `surface` for the main app plane and `surface-raised` for controls, nested cards and quiet groupings. In dark mode use the corresponding `dark-*` tokens and preserve the same ordering from background to surface to raised surface. Black uses the isolated `black-*` equivalents with `#000000` canvas, `#0B0E0C` surface and `#151A17` raised surface; do not replace these with component-level hardcoded colours. Supporting text uses the production `--color-text-support` mix so it stays readable on raised surfaces in every implemented theme.
+
+Potential future cosmetic Pro themes are product proposals, not implemented or
+marketed capabilities:
+
+- **Gaming Table:** walnut, cream and brass.
+- **Anime Arcade:** midnight violet, coral and cyan.
+- **Quiet Garden:** sage, mist blue and soft neutrals.
+
+Any later decision to build or gate these requires its own contrast, persistence
+and entitlement review. It does not change Black's current Free-and-Pro access.
 
 ## Typography
 

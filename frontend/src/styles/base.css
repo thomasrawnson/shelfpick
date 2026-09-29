@@ -135,6 +135,18 @@ header {
   display: block !important;
 }
 
+:root[data-theme="black"] .app-shell {
+  background: var(--color-bg);
+}
+
+:root[data-theme="black"] .brand-logo-light {
+  display: none;
+}
+
+:root[data-theme="black"] .brand-logo-dark {
+  display: block !important;
+}
+
 h1,
 h2 {
   font-family: var(--font-display);

@@ -27,11 +27,17 @@ function AppearanceSettings() {
     setThemePreference(value)
     setTheme(value)
   }
+  const options: Array<{ value: ThemePreference; label: string }> = [
+    { value: "system", label: "Use device setting" },
+    { value: "light", label: "Light" },
+    { value: "dark", label: "Dark" },
+    { value: "black", label: "Black (experimental)" },
+  ]
   return <fieldset className="settings-theme-list">
     <legend>Choose how ShelfPick looks on this device</legend>
-    {(["system", "light", "dark"] as const).map((value) => <label key={value} className="settings-theme-option">
-      <span>{value === "system" ? "Use device setting" : value === "light" ? "Light" : "Dark"}</span>
-      <input type="radio" name="appearance" value={value} checked={theme === value} onChange={() => chooseTheme(value)} />
+    {options.map((option) => <label key={option.value} className="settings-theme-option">
+      <span>{option.label}</span>
+      <input type="radio" name="appearance" value={option.value} checked={theme === option.value} onChange={() => chooseTheme(option.value)} />
     </label>)}
   </fieldset>
 }
@@ -59,6 +65,10 @@ function SettingsSectionView({ section, user, onUserChange }: Props) {
       <h2>ShelfPick</h2>
       <p>A calm way to choose from your collection and keep track of what reaches the table.</p>
       <p className="settings-row-detail">Made by Pluto Night Labs</p>
+      <a className="secondary-button settings-section-action" href="https://plutonightlabs.com/"
+        target="_blank" rel="noopener noreferrer">
+        Pluto Night Labs<span className="sr-only"> (opens in a new tab)</span>
+      </a>
     </div>}
   </section>
 }

@@ -4,7 +4,7 @@
   if (root.hasAttribute("data-theme")) return
   const key = "shelfpick-theme"
   const preference = window.matchMedia("(prefers-color-scheme: dark)")
-  const valid = value => value === "system" || value === "light" || value === "dark"
+  const valid = value => value === "system" || value === "light" || value === "dark" || value === "black"
   let choice = "system"
   try {
     const stored = window.localStorage.getItem(key)
@@ -14,8 +14,9 @@
   const applyTheme = () => {
     const theme = choice === "system" ? (preference.matches ? "dark" : "light") : choice
     root.dataset.theme = theme
+    const browserColor = theme === "black" ? "#000000" : theme === "dark" ? "#151816" : "#315C48"
     document.querySelectorAll('meta[name="theme-color"]').forEach(meta => {
-      meta.setAttribute("content", theme === "dark" ? "#151816" : "#315C48")
+      meta.setAttribute("content", browserColor)
     })
   }
 

@@ -77,3 +77,34 @@ test("focused settings sections provide a route back to the overview", () => {
   assert.match(markup, /href="\/settings"[^>]*>Back to Settings/)
   assert.doesNotMatch(markup, /Sync BoardGameGeek|Usual player count/)
 })
+
+test("About links to Pluto Night Labs with an accessible new-tab indication", () => {
+  const markup = render(SettingsSectionView, { section: "about", user, onUserChange: () => {} }, "/settings/about")
+
+  assert.match(markup, /href="https:\/\/plutonightlabs\.com\/"/)
+  assert.match(markup, /target="_blank"/)
+  assert.match(markup, /rel="noopener noreferrer"/)
+  assert.match(markup, /Pluto Night Labs<span class="sr-only"> \(opens in a new tab\)<\/span>/)
+})
+
+test("Appearance offers the experimental Black theme without a plan gate", () => {
+  globalThis.window = {
+    shelfPickTheme: {
+      getPreference: () => "black",
+      setPreference: () => {},
+    },
+  }
+  const markup = render(
+    SettingsSectionView,
+    { section: "appearance", user, onUserChange: () => {} },
+    "/settings/appearance",
+  )
+
+  assert.match(markup, /Black \(experimental\)/)
+  assert.match(markup, /checked="" value="black"/)
+  assert.match(markup, /Use device setting/)
+  assert.match(markup, />Light</)
+  assert.match(markup, />Dark</)
+  assert.doesNotMatch(markup, /Pro|upgrade|unlock/i)
+  delete globalThis.window
+})

@@ -127,6 +127,32 @@
   --color-shadow: rgb(0 0 0 / 24%);
 }
 
+/* Experimental and intentionally isolated so the theme can be retired cleanly. */
+:root[data-theme="black"] {
+  color-scheme: dark;
+  --color-brand-primary: #8FC4A5;
+  --color-brand-primary-hover: #A7D2B8;
+  --color-brand-primary-soft: #17241D;
+  --color-brand-accent: #E7B55F;
+  --color-brand-accent-hover: #F0C576;
+  --color-brand-accent-soft: #2A2113;
+  --color-bg: #000000;
+  --color-surface: #0B0E0C;
+  --color-surface-raised: #151A17;
+  --color-text-primary: #F7F4EB;
+  --color-text-secondary: #BAC5BD;
+  --color-text-inverse: #050605;
+  --color-border: #465149;
+  --color-success: #78B58D;
+  --color-warning: #E1B45F;
+  --color-danger: #EB8177;
+  --color-info: #82B3C0;
+  --color-accent-text: #E7B55F;
+  --color-on-accent: #050605;
+  --color-on-danger: #050605;
+  --color-shadow: rgb(0 0 0 / 60%);
+}
+
 body,
 button,
 input,

@@ -46,8 +46,8 @@ test("system theme follows OS preference and updates browser theme colour", () =
   }
 })
 
-test("light and dark stay selected regardless of OS and persist across refresh", () => {
-  for (const theme of ["light", "dark"]) {
+test("explicit themes stay selected regardless of OS and persist across refresh", () => {
+  for (const theme of ["light", "dark", "black"]) {
     const current = initialize(theme === "dark")
     current.window.shelfPickTheme.setPreference(theme)
     assert.equal(current.root.dataset.theme, theme)
@@ -57,6 +57,7 @@ test("light and dark stay selected regardless of OS and persist across refresh",
     assert.equal(current.values.get("shelfpick-theme"), theme)
     const refreshed = initialize(theme !== "dark", current.values.get("shelfpick-theme"))
     assert.equal(refreshed.root.dataset.theme, theme)
+    assert.equal(refreshed.meta[0].content, theme === "black" ? "#000000" : theme === "dark" ? "#151816" : "#315C48")
     refreshed.window.shelfPickTheme.setPreference("system")
     assert.equal(refreshed.root.dataset.theme, refreshed.preference.matches ? "dark" : "light")
   }
@@ -69,7 +70,7 @@ test("invalid stored preference falls back to system", () => {
 })
 
 test("explicit host theme is preserved", () => {
-  for (const theme of ["light", "dark"]) {
+  for (const theme of ["light", "dark", "black"]) {
     const { root, listener } = initialize(theme === "light", null, theme)
     assert.equal(root.dataset.theme, theme)
     assert.equal(listener, undefined)

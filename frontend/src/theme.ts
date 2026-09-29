@@ -1,4 +1,4 @@
-export type ThemePreference = "system" | "light" | "dark"
+export type ThemePreference = "system" | "light" | "dark" | "black"
 
 declare global {
   interface Window {
