@@ -42,12 +42,42 @@ class WishlistService:
             bgg_id
         )
 
-        if game is None:
+        if (
+            game is None
+            or not game.expansion_checked
+        ):
             xml = self.bgg_client.get_game(
                 bgg_id
             )
             game = parse_game_metadata(xml)
-            self.repository.create(game)
+
+            if game.bgg_id != bgg_id:
+                raise ValueError(
+                    "BoardGameGeek returned "
+                    "unexpected game metadata."
+                )
+
+            if game.is_expansion:
+                raise ValueError(
+                    "Expansions aren't added "
+                    "to Want to Play."
+                )
+
+            existing = (
+                self.repository
+                .get_by_bgg_id(bgg_id)
+            )
+
+            if existing is None:
+                self.repository.create(game)
+            else:
+                self.repository.update(game)
+
+        elif game.is_expansion:
+            raise ValueError(
+                "Expansions aren't added "
+                "to Want to Play."
+            )
 
         added = self.repository.add_to_wishlist(
             self.user_id,

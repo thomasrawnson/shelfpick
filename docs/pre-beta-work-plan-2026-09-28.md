@@ -36,11 +36,25 @@ Planning this sequence is not implementation of slices 2–5.
    logo and inactive-control treatment now includes Black. Gaming Table, Anime
    Arcade and Quiet Garden are documented as possible Pro cosmetic themes only;
    none is implemented or marketed.
-3. **SP-PB09 audit plus SP-PB16A — PLANNED.** Clarify current BGG title search,
-   bound true custom/manual-game work if absent, and establish UPC/EAN lookup
-   permission, coverage, commercial terms and cost before SP-PB16B. Plan
-   confirmation, duplicates and camera/browser recovery with title-search
-   fallback; QR voting is unrelated.
+3. **SP-PB09 audit plus SP-PB16A — AUDIT RECORDED (11 October).** Existing BGG
+   title search/Add to Owned is suitable for beta and should be retained. Want
+   to Play exists through Discover/API but is missing from the same Add game
+   search; address it with the bounded SP-PB09B parity/expansion guard before
+   launch. Custom games are post-launch. Browser decoding is feasible, but
+   barcode identification is blocked on a permitted commercial source,
+   representative box coverage, BGG candidate mapping, terms and cost approval.
+   SP-PB16 remains not started and out of the launch critical path. See
+   `docs/sp-pb09-sp-pb16a-add-game-barcode-audit-2026-10-11.md`.
+
+   **SP-PB09B COMPLETE (11 October).** The existing inline search now supports
+   Add to Owned and Add to Want to Play without moving a game between lists.
+   Search results include account-scoped `owned` and `wishlisted` state, render
+   both accurately, preserve the query/results after mutation, announce
+   success/errors and synchronously prevent repeated or competing adds.
+   Wishlist validation now matches the Owned base-game invariant: confirmed
+   expansions are rejected with HTTP 400 detail before membership persistence,
+   while cached rows with incomplete expansion classification are refreshed
+   from BGG and fail closed if metadata cannot be safely resolved.
 4. **SP-PB12/SP-PB13 — PLANNED.** Audit approved branding and the renderer,
    redesign persisted-play cards around available cover art, and add a truthful
    monthly totals/collage export with a branded fallback. Preserve privacy,
@@ -344,6 +358,25 @@ and overflow. Before/after captures are in `docs/screenshots/sp-pb09/`. No live
 account, backend or database data was used. SP-PB20 is recorded complete below;
 SP-PB02 remains blocked and beta remains on hold.
 
+SP-PB09B follow-up validation is complete. The existing PostgreSQL 16
+development container was started on `localhost:5433` against its existing
+named volume, without reset, recreation or migration. The 42-test targeted
+collection/wishlist service, API and repository set passed, including account
+isolation, existing membership, expansion rejection, valid base games,
+incomplete metadata and persistence. The full backend suite passed 278 tests
+with 5 intentional skips. The frontend suite passed all 71 tests; lint,
+production build, PWA checks and `git diff --check` passed. The colour review
+command completed successfully with its 14 pre-existing raw-colour notices.
+
+Playwright drove installed Google Chrome at 390x844 and 1440x900 in light and
+dark themes. The four-run matrix passed both add destinations, Owned/wishlist/
+both membership labels, synchronous duplicate-click protection, retained
+search state, visible keyboard focus, horizontal-overflow and bottom-navigation
+clearance. A forced wishlist API failure passed error feedback, retry and focus
+restoration. This closes SP-PB09B's automated acceptance gap; physical-device
+and assistive-technology testing remain general launch validation rather than a
+slice-specific blocker.
+
 ### SP-PB10 — Add optional play location
 
 **Status:** COMPLETE (28 September 2026). **Workstream:** Play data. **Access:** Free; no new gate.
@@ -586,6 +619,17 @@ remains blocked, photo upload remains post-beta and beta remains on hold.
 **Status:** NOT STARTED. **Workstream:** Barcode lookup and collection entry. **Access:** Tier not specified.
 
 Confirmed scope: scan retail EAN/UPC barcodes on game boxes. Split into SP-PB16A catalogue feasibility and SP-PB16B scan/add integration. First establish a permitted barcode-to-game/edition data source, actual coverage on representative boxes, commercial terms, costs and canonical BGG ID mapping; do not assume existing BGG endpoints supply this mapping. Then implement camera scan or manual code entry → matched game/edition preview → user confirmation → add to Owned/Want to Play. Handle ambiguous editions, no match, duplicate ownership, unsupported camera, permission denial and lookup failure with manual-search fallback. A successful camera decode alone does not complete this task. Game-link QR scanning is not a substitute for retail barcode support.
+
+The 11 October SP-PB16A audit found decoding feasible but identification
+blocked. `getUserMedia` requires a secure context and explicit permission;
+native `BarcodeDetector` is not sufficiently portable, while a maintained
+library fallback can decode UPC/EAN. Neither route supplies product identity.
+ShelfPick has no barcode catalogue or official barcode-to-BGG field, and no
+provider has yet passed licensing, coverage, edition mapping, cost and approval
+gates. Do not start SP-PB16B or make scanning a launch requirement until the
+external decision task in
+`docs/sp-pb09-sp-pb16a-add-game-barcode-audit-2026-10-11.md` passes. SP-PB16 is
+not complete and its status remains unchanged.
 
 ### SP-PB17 — Expand preset avatars
 

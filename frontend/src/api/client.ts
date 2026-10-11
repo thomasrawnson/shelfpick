@@ -380,6 +380,7 @@ export interface BGGSearchResult {
   year_published:
     number | null
   owned: boolean
+  wishlisted: boolean
 }
 
 const configuredApiUrl =

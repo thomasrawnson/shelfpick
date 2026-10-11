@@ -66,7 +66,13 @@ def seed_user(email):
     }
 
 
-def seed_game(bgg_id, name):
+def seed_game(
+    bgg_id,
+    name,
+    *,
+    is_expansion=False,
+    expansion_checked=True,
+):
     db = TestingSessionLocal()
     db.add(
         Game(
@@ -77,6 +83,8 @@ def seed_game(bgg_id, name):
             max_play_time=60,
             complexity=2.5,
             owned=False,
+            is_expansion=is_expansion,
+            expansion_checked=expansion_checked,
         )
     )
     db.commit()
@@ -100,6 +108,31 @@ def test_add_and_duplicate_add_are_safe(client):
         .filter(UserWishlistGame.user_id == user_id)
         .count()
         == 1
+    )
+    db.close()
+
+
+def test_existing_expansion_is_rejected_before_wishlist_persistence(client):
+    user_id, headers = seed_user("expansion@example.com")
+    seed_game(
+        9,
+        "Expansion",
+        is_expansion=True,
+    )
+
+    response = client.post("/wishlist/9", headers=headers)
+
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "Expansions aren't added to Want to Play."
+    }
+
+    db = TestingSessionLocal()
+    assert (
+        db.query(UserWishlistGame)
+        .filter(UserWishlistGame.user_id == user_id)
+        .count()
+        == 0
     )
     db.close()
 

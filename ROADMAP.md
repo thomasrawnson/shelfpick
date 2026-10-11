@@ -55,10 +55,26 @@ sequence does not mark later slices as implemented.
    dark-specific logo and inactive-control handling includes Black; no gate or
    dependency was added. Gaming Table, Anime Arcade and Quiet Garden remain
    documented potential Pro cosmetics only.
-3. **SP-PB09/SP-PB16A entry and barcode audit — PLANNED.** Clarify the existing
-   BoardGameGeek title-search/add flow, decide and bound true custom games, and
-   establish a permitted commercial UPC/EAN lookup source before SP-PB16B scan
-   integration. Decoding digits alone is not delivery.
+3. **SP-PB09/SP-PB16A entry and barcode audit — AUDIT RECORDED (11 October).**
+   The existing BoardGameGeek title-search/Add to Owned flow remains the beta
+   path and should not be rebuilt. Want to Play works through Discover and its
+   account-scoped API. **SP-PB09B is COMPLETE (11 October):** the same search
+   now exposes independent Add to Owned and Add to Want to Play actions with
+   accurate existing/both membership states, retained query/results and a
+   single-mutation guard. Wishlist additions now refresh unclassified BGG
+   metadata and reject confirmed expansions before persistence. QA closeout
+   used the existing PostgreSQL 16 development container and installed Chrome:
+   42 targeted backend tests and the full 278-test backend suite passed (5
+   intentional skips), while Playwright passed the 390x844 and 1440x900
+   light/dark matrix, including duplicate clicks, API-error recovery, keyboard
+   focus, overflow and bottom-navigation clearance. The frontend suite remains
+   green at 71 tests, with lint, build and PWA checks passing.
+   True source-neutral custom games are a large post-launch change. Camera
+   decoding is feasible, but SP-PB16B remains blocked on a commercially
+   permitted UPC/EAN source, representative box coverage, canonical BGG
+   candidate mapping, terms and cost approval. Keep barcode out of the launch
+   critical path. See
+   `docs/sp-pb09-sp-pb16a-add-game-barcode-audit-2026-10-11.md`.
 4. **SP-PB12/SP-PB13 sharing follow-up — PLANNED.** Audit logo use and existing
    exports, refine saved-play cards around cover artwork, then add the truthful
    **This month** recap/collage using the existing renderer. Saved-play sharing

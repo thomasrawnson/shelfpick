@@ -830,7 +830,7 @@ def test_sync_collection_refreshes_legacy_credits():
     assert games[0].publishers == ["Cephalofair Games"]
     assert games[0].credits_checked is True
 
-def test_search_games_marks_owned_results():
+def test_search_games_marks_owned_and_wishlisted_results():
     search_xml = """
     <items>
         <item type="boardgame" id="1">
@@ -859,6 +859,10 @@ def test_search_games_marks_owned_results():
                 )
             ]
 
+        def get_wishlisted_bgg_ids(self, user_id):
+            assert user_id == 7
+            return {1, 2}
+
     service = CollectionService(
         FakeBGGClient(),
         FakeRepository(),
@@ -875,12 +879,14 @@ def test_search_games_marks_owned_results():
             "name": "Owned Game",
             "year_published": 2020,
             "owned": True,
+            "wishlisted": True,
         },
         {
             "bgg_id": 2,
             "name": "New Game",
             "year_published": 2021,
             "owned": False,
+            "wishlisted": True,
         },
     ]
 

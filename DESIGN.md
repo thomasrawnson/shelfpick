@@ -172,6 +172,15 @@ success, no-result and failure states remain visible without discarding the
 query. Collection filters, sorting and navigation state remain outside and
 unchanged by the add task.
 
+SP-PB09B keeps that panel and route structure. Each result presents explicit,
+independent **Add to Owned** and **Add to Want to Play** actions. Existing
+membership is stated as **Already Owned** and/or **Already Want to Play** rather
+than inferred from colour or iconography. While one mutation is pending, both
+destinations are disabled to prevent duplicate or competing submissions; the
+query and full result list remain visible for success, failure and retry. On
+phone widths the two 44px actions stack, while wider layouts keep a compact
+wrapping action group.
+
 ## Heading and supporting-copy update — 28 September 2026
 
 Primary Picker, Collection, Discover, Rankings, Insights, Game Night and
