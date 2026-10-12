@@ -232,9 +232,11 @@ export interface CollectionInsights {
   total_games: number
   total_plays: number
   played_games_count: number
+  historical_played_games_count: number
   collection_played_percentage:
     number
-  total_duration_minutes: number
+  total_duration_minutes: number | null
+  duration_plays: number
   average_duration_minutes:
     number | null
   most_played:
@@ -247,6 +249,24 @@ export interface CollectionInsights {
   neglected_games: NeglectedGame[]
   top_games_by_player: PlayerTopGame[]
   common_groups: PlayerGroupSummary[]
+}
+
+export interface MonthlyRecapGame {
+  bgg_id: number
+  name: string
+  play_count: number
+  image_url: string | null
+}
+
+export interface MonthlyRecap {
+  month: string
+  month_label: string
+  total_plays: number
+  unique_games: number
+  total_duration_minutes: number | null
+  duration_plays: number
+  most_played: MonthlyRecapGame | null
+  collage_games: MonthlyRecapGame[]
 }
 
 
@@ -288,6 +308,7 @@ export interface PlayerRecentGame {
   name: string
   played_at: string
   is_winner: boolean
+  outcome: "win" | "loss" | "draw" | "unknown"
   score: number | null
 }
 
@@ -302,7 +323,11 @@ export interface PlayerStats {
   total_plays: number
   unique_games: number
   wins: number
-  win_rate: number
+  losses: number
+  draws: number
+  unknown_results: number
+  decided_plays: number
+  win_rate: number | null
   most_played_games: PlayerStatsGame[]
   recent_games: PlayerRecentGame[]
   common_partners: PlayerPartner[]
@@ -480,7 +505,7 @@ export async function register(
   email: string,
   displayName: string,
   password: string,
-): Promise<AuthResult> {
+): Promise<AuthResult | { message: string }> {
   const response = await request(
     `${API_BASE_URL}/auth/register`,
     {
@@ -1019,6 +1044,18 @@ Promise<CollectionInsights> {
     )
   }
 
+  return response.json()
+}
+
+export async function getMonthlyRecap(
+  month: string,
+  timezone: string,
+): Promise<MonthlyRecap> {
+  const parameters = new URLSearchParams({ month, timezone })
+  const response = await apiFetch(`/insights/monthly-recap?${parameters}`)
+  if (!response.ok) {
+    throw new Error(`Monthly recap request failed: ${response.status}`)
+  }
   return response.json()
 }
 
@@ -1603,5 +1640,17 @@ export async function confirmEmailVerification(
 
   const data = await response.json()
 
+  return data.message
+}
+
+
+export async function resendBetaVerification(email: string): Promise<string> {
+  const response = await request(`${API_BASE_URL}/auth/verification/resend`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  })
+  if (!response.ok) throw await responseError(response, "Couldn't resend verification email")
+  const data = await response.json()
   return data.message
 }

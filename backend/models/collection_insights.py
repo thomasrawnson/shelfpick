@@ -61,13 +61,35 @@ class MonthlyActivity:
     new_games: int
     repeat_plays: int
     recent_plays: list[MonthlyPlay]
+
+
+@dataclass
+class MonthlyRecapGame:
+    bgg_id: int
+    name: str
+    play_count: int
+    image_url: str | None
+
+
+@dataclass
+class MonthlyRecap:
+    month: str
+    month_label: str
+    total_plays: int
+    unique_games: int
+    total_duration_minutes: int | None
+    duration_plays: int
+    most_played: MonthlyRecapGame | None
+    collage_games: list[MonthlyRecapGame]
 @dataclass
 class CollectionInsights:
     total_games: int
     total_plays: int
     played_games_count: int
+    historical_played_games_count: int
     collection_played_percentage: int
-    total_duration_minutes: int
+    total_duration_minutes: int | None
+    duration_plays: int
     average_duration_minutes: int | None
     most_played: GamePlaySummary | None
     last_played: LastPlayedGame | None

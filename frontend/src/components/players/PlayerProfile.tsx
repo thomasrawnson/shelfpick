@@ -10,6 +10,8 @@ import {
 
 import LoadingMessage
   from "../ui/LoadingMessage"
+import { winRateCopy }
+  from "../../insights-format"
 
 
 type Props = {
@@ -34,6 +36,14 @@ function formatDate(
     new Date(value),
   )
 }
+
+
+const outcomeLabels = {
+  win: "Win",
+  loss: "Loss",
+  draw: "Draw",
+  unknown: "Not recorded",
+} as const
 
 
 function PlayerProfile({
@@ -204,12 +214,52 @@ function PlayerProfile({
 
         <article className="stat-card">
           <strong>
-            {stats.win_rate}%
+            {stats.losses}
+          </strong>
+
+          <span>
+            Losses
+          </span>
+        </article>
+
+        <article className="stat-card">
+          <strong>
+            {stats.draws}
+          </strong>
+
+          <span>
+            Draws
+          </span>
+        </article>
+
+        <article className="stat-card">
+          <strong>
+            {stats.unknown_results}
+          </strong>
+
+          <span>
+            Outcome not recorded
+          </span>
+        </article>
+
+        <article className="stat-card">
+          <strong>
+            {winRateCopy(
+              stats.win_rate,
+            )}
           </strong>
 
           <span>
             Win rate
           </span>
+
+          <small>
+            {
+              stats.decided_plays > 0
+                ? `${stats.decided_plays} decided ${stats.decided_plays === 1 ? "play" : "plays"}`
+                : "No decided outcomes"
+            }
+          </small>
         </article>
       </div>
 
@@ -222,11 +272,11 @@ function PlayerProfile({
           <article className="player-profile-section">
             <div className="player-profile-section-header">
               <p className="insight-label">
-                Favourites
+                Play history
               </p>
 
               <h2>
-                Most played
+                Most played together
               </h2>
             </div>
 
@@ -343,20 +393,19 @@ function PlayerProfile({
                         </div>
 
                         <div className="player-recent-result">
-                          {
-                            game
-                              .is_winner
-                              ? (
-                                <span className="player-win-badge">
-                                  Win
-                                </span>
-                              )
-                              : (
-                                <span className="player-played-badge">
-                                  Played
-                                </span>
-                              )
-                          }
+                          <span
+                            className={
+                              game.outcome === "win"
+                                ? "player-win-badge"
+                                : "player-played-badge"
+                            }
+                          >
+                            {
+                              outcomeLabels[
+                                game.outcome
+                              ]
+                            }
+                          </span>
 
                           {
                             game.score

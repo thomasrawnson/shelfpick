@@ -13,8 +13,13 @@ import PlayerProfile
 
 import RankingCategorySummary
   from "./rankings/RankingCategorySummary"
+import MonthlyRecapPanel from "./insights/MonthlyRecapPanel"
 import { insightHistoryState }
   from "../ui-empty-state"
+import {
+  durationCoverageCopy,
+  formatRecordedHours,
+} from "../insights-format"
 
 
 type StatsSection =
@@ -63,23 +68,6 @@ function formatPlayedAt(
 }
 
 
-function formatHours(
-  minutes: number,
-): string {
-  const hours =
-    minutes / 60
-
-  if (hours < 10) {
-    return hours.toFixed(1)
-  }
-
-  return (
-    Math.round(hours)
-      .toString()
-  )
-}
-
-
 type Props = {
   onOpenGame:
     (bggId: number) => void
@@ -111,16 +99,16 @@ function InsightsView({
   ] = useState("")
 
   const [
+    retryKey,
+    setRetryKey,
+  ] = useState(0)
+
+  const [
     selectedPlayerId,
     setSelectedPlayerId,
   ] = useState<number | null>(
     null,
   )
-
-  const [
-    showMonthlyPlays,
-    setShowMonthlyPlays,
-  ] = useState(false)
 
   const [
     showAllNeglected,
@@ -147,6 +135,8 @@ function InsightsView({
 
   useEffect(() => {
     async function loadInsights() {
+      setError("")
+
       try {
         const result =
           await getCollectionInsights()
@@ -164,7 +154,15 @@ function InsightsView({
     }
 
     loadInsights()
-  }, [])
+  }, [retryKey])
+
+
+  function retryInsights() {
+    setLoading(true)
+    setRetryKey(
+      (current) => current + 1,
+    )
+  }
 
 
   if (
@@ -212,6 +210,14 @@ function InsightsView({
         <p className="error-message">
           {error}
         </p>
+
+        <button
+          type="button"
+          className="secondary-button"
+          onClick={retryInsights}
+        >
+          Retry
+        </button>
       </section>
     )
   }
@@ -313,7 +319,7 @@ function InsightsView({
           <div className="insights-mini-grid">
             <article className="insight-mini-card">
               <span>
-                Games played
+                Owned games played
               </span>
 
               <strong>
@@ -382,28 +388,51 @@ function InsightsView({
 
             <article className="stat-card">
               <strong>
-                {formatHours(
+                {formatRecordedHours(
                   insights
                     .total_duration_minutes,
                 )}
               </strong>
 
               <span>
-                Hours played
+                {
+                  insights
+                    .total_duration_minutes
+                  === null
+                    ? "Recorded time"
+                    : "Hours recorded"
+                }
               </span>
+
+              {
+                durationCoverageCopy(
+                  insights.total_plays,
+                  insights.duration_plays,
+                )
+                && (
+                  <small>
+                    {
+                      durationCoverageCopy(
+                        insights.total_plays,
+                        insights.duration_plays,
+                      )
+                    }
+                  </small>
+                )
+              }
             </article>
           </div>
 
           <div className="insights-mini-grid">
             <article className="insight-mini-card">
               <span>
-                Games played
+                Games in history
               </span>
 
               <strong>
                 {
                   insights
-                    .played_games_count
+                    .historical_played_games_count
                 }
               </strong>
             </article>
@@ -432,180 +461,7 @@ function InsightsView({
       )}
 
 
-      {activeSection === "recaps" && (
-        <div className="stats-section-heading">
-          <h2>
-            This month in games
-          </h2>
-        </div>
-      )}
-
-
-      {activeSection === "recaps" && (
-      <article className="monthly-activity-card">
-        <button
-          type="button"
-          className="monthly-activity-trigger"
-          onClick={() =>
-            setShowMonthlyPlays(
-              (current) => !current
-            )
-          }
-        >
-          <div>
-            <p className="insight-label">
-              This month
-            </p>
-
-            <h2>
-              Around the table
-            </h2>
-          </div>
-
-          <span className="monthly-activity-chevron">
-            {
-              showMonthlyPlays
-                ? "⌃"
-                : "⌄"
-            }
-          </span>
-        </button>
-
-        <div className="monthly-activity-grid">
-          <div className="monthly-activity-stat">
-            <strong>
-              {
-                insights
-                  .monthly_activity
-                  .plays
-              }
-            </strong>
-
-            <span>
-              Plays
-            </span>
-          </div>
-
-          <div className="monthly-activity-stat">
-            <strong>
-              {
-                insights
-                  .monthly_activity
-                  .unique_games
-              }
-            </strong>
-
-            <span>
-              Games
-            </span>
-          </div>
-
-          <div className="monthly-activity-stat">
-            <strong>
-              {
-                insights
-                  .monthly_activity
-                  .new_games
-              }
-            </strong>
-
-            <span>
-              New
-            </span>
-          </div>
-
-          <div className="monthly-activity-stat">
-            <strong>
-              {
-                insights
-                  .monthly_activity
-                  .repeat_plays
-              }
-            </strong>
-
-            <span>
-              Repeat
-            </span>
-          </div>
-        </div>
-
-        {
-          showMonthlyPlays
-          && (
-            <div className="monthly-play-list">
-              {
-                insights
-                  .monthly_activity
-                  .recent_plays
-                  .map(
-                    (play) => (
-                      <div
-                        key={
-                          play.play_id
-                        }
-                        className="monthly-play-row"
-                      >
-                        <button
-                          type="button"
-                          className="monthly-play-game"
-                          onClick={() =>
-                            onOpenGame(
-                              play.bgg_id
-                            )
-                          }
-                        >
-                          {
-                            play
-                              .game_name
-                          }
-                        </button>
-
-                        <div className="monthly-play-meta">
-                          <span>
-                            {
-                              formatPlayedAt(
-                                play
-                                  .played_at
-                              )
-                            }
-                          </span>
-
-                          <span>
-                            {
-                              play
-                                .player_count
-                            }{" "}
-                            players
-                          </span>
-                        </div>
-                      </div>
-                    ),
-                  )
-              }
-
-              {
-                insights
-                  .monthly_activity
-                  .recent_plays
-                  .length === 0
-                && (
-                  <div className="insight-empty">
-                    <p>No plays recorded this month.</p>
-                    <button
-                      type="button"
-                      className="ghost-button"
-                      onClick={onOpenPicker}
-                    >
-                      Pick a game
-                    </button>
-                  </div>
-                )
-              }
-            </div>
-          )
-        }
-      </article>
-      )}
+      {activeSection === "recaps" && <MonthlyRecapPanel />}
 
 
       {activeSection === "play" && historyState === "ready" && (
@@ -878,7 +734,7 @@ function InsightsView({
                           </strong>
 
                           <span>
-                            wins
+                            marked winner
                           </span>
                         </div>
                       </div>
@@ -901,7 +757,7 @@ function InsightsView({
             <div className="players-card-header">
               <div>
                 <h2>
-                  Players’ favourites
+                  Most played together
                 </h2>
               </div>
             </div>
