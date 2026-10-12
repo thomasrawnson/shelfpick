@@ -1009,6 +1009,10 @@ def test_get_player_stats():
                 "total_plays": 12,
                 "unique_games": 6,
                 "wins": 4,
+                "losses": 6,
+                "draws": 2,
+                "unknown_results": 0,
+                "decided_plays": 12,
                 "win_rate": 33.3,
                 "most_played_games": [
                     {
@@ -1043,6 +1047,7 @@ def test_get_player_stats():
                             )
                         ),
                         "is_winner": True,
+                        "outcome": "win",
                         "score": 85,
                     },
                 ],
@@ -1079,6 +1084,10 @@ def test_get_player_stats():
     assert data["total_plays"] == 12
     assert data["unique_games"] == 6
     assert data["wins"] == 4
+    assert data["losses"] == 6
+    assert data["draws"] == 2
+    assert data["unknown_results"] == 0
+    assert data["decided_plays"] == 12
     assert data["win_rate"] == 33.3
 
     assert (

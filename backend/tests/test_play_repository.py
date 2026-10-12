@@ -202,6 +202,11 @@ def test_get_player_stats():
             == 1
         )
 
+        assert stats["losses"] == 2
+        assert stats["draws"] == 0
+        assert stats["unknown_results"] == 0
+        assert stats["decided_plays"] == 3
+
         assert (
             stats["win_rate"]
             == 33.3

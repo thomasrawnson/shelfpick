@@ -1,15 +1,22 @@
 import {
+  useRef,
   useState,
 } from "react"
 import { Link } from "react-router-dom"
 
 import {
   addGameToCollection,
+  addToWishlist,
   searchBGGGames,
   type BGGSearchResult,
   type Game,
 } from "../../api/client"
 import { APP_PATHS } from "../../routes"
+import {
+  beginAddGameAction,
+  markSearchResultMembership,
+  type AddGameDestination,
+} from "../../add-game-state"
 
 
 type Props = {
@@ -17,6 +24,61 @@ type Props = {
     game: Game,
   ) => void
   onClose: () => void
+}
+
+type ResultProps = {
+  result: BGGSearchResult
+  pendingAction: string
+  onAdd: (
+    result: BGGSearchResult,
+    destination: "owned" | "wishlist",
+  ) => void
+}
+
+export function AddGameResult({
+  result,
+  pendingAction,
+  onAdd,
+}: ResultProps) {
+  return (
+    <div className="add-game-result">
+      <div>
+        <strong>{result.name}</strong>
+
+        {result.year_published && (
+          <span>{result.year_published}</span>
+        )}
+      </div>
+
+      <div className="add-game-result-actions" role="group" aria-label={`Add ${result.name}`}>
+        <button
+          type="button"
+          className="ghost-button"
+          disabled={result.owned || Boolean(pendingAction)}
+          onClick={() => onAdd(result, "owned")}
+        >
+          {result.owned
+            ? "Already Owned"
+            : pendingAction === `owned:${result.bgg_id}`
+              ? "Adding to Owned..."
+              : "Add to Owned"}
+        </button>
+
+        <button
+          type="button"
+          className="ghost-button"
+          disabled={result.wishlisted || Boolean(pendingAction)}
+          onClick={() => onAdd(result, "wishlist")}
+        >
+          {result.wishlisted
+            ? "Already Want to Play"
+            : pendingAction === `wishlist:${result.bgg_id}`
+              ? "Adding to Want to Play..."
+              : "Add to Want to Play"}
+        </button>
+      </div>
+    </div>
+  )
 }
 
 
@@ -41,12 +103,8 @@ function AddGameSearch({
     setSearching,
   ] = useState(false)
 
-  const [
-    addingId,
-    setAddingId,
-  ] = useState<number | null>(
-    null
-  )
+  const [pendingAction, setPendingAction] = useState("")
+  const pendingActions = useRef(new Set<string>())
 
   const [
     error,
@@ -93,49 +151,52 @@ function AddGameSearch({
 
   async function addGame(
     result: BGGSearchResult,
+    destination: AddGameDestination,
   ) {
-    setAddingId(
-      result.bgg_id
-    )
+    const actionKey = `${destination}:${result.bgg_id}`
+
+    if (!beginAddGameAction(pendingActions.current, actionKey)) {
+      return
+    }
+
+    setPendingAction(actionKey)
 
     setError("")
     setStatus("")
 
     try {
-      const game =
-        await addGameToCollection(
-          result.bgg_id
-        )
+      const game = destination === "owned"
+        ? await addGameToCollection(result.bgg_id)
+        : await addToWishlist(result.bgg_id)
 
-      onGameAdded(
-        game
+      if (destination === "owned") {
+        onGameAdded(game)
+      }
+
+      setStatus(
+        destination === "owned"
+          ? `${game.name} added to Owned.`
+          : `${game.name} added to Want to Play.`
       )
 
-      setStatus(`${game.name} added to your collection.`)
-
       setResults(
-        (current) =>
-          current.map(
-            (item) =>
-              item.bgg_id
-              === result.bgg_id
-                ? {
-                    ...item,
-                    owned: true,
-                  }
-                : item
-          )
+        (current) => markSearchResultMembership(
+          current,
+          result.bgg_id,
+          destination,
+        )
       )
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : "Couldn't add that game."
+          : destination === "owned"
+            ? "Couldn't add that game to Owned."
+            : "Couldn't add that game to Want to Play."
       )
     } finally {
-      setAddingId(
-        null
-      )
+      pendingActions.current.delete(actionKey)
+      setPendingAction("")
     }
   }
 
@@ -207,48 +268,12 @@ function AddGameSearch({
       <div className="add-game-results">
         {results.map(
           (result) => (
-            <div
-              key={
-                result.bgg_id
-              }
-              className="add-game-result"
-            >
-              <div>
-                <strong>
-                  {result.name}
-                </strong>
-
-                {result.year_published && (
-                  <span>
-                    {
-                      result.year_published
-                    }
-                  </span>
-                )}
-              </div>
-
-              <button
-                type="button"
-                className="ghost-button"
-                disabled={
-                  result.owned
-                  || addingId
-                    === result.bgg_id
-                }
-                onClick={() =>
-                  void addGame(
-                    result
-                  )
-                }
-              >
-                {result.owned
-                  ? "Owned"
-                  : addingId
-                    === result.bgg_id
-                    ? "Adding..."
-                    : "Add"}
-              </button>
-            </div>
+            <AddGameResult
+              key={result.bgg_id}
+              result={result}
+              pendingAction={pendingAction}
+              onAdd={(item, destination) => void addGame(item, destination)}
+            />
           ),
         )}
       </div>

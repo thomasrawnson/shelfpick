@@ -89,14 +89,14 @@ def test_unavailable_discover_source_is_not_an_empty_success():
     }
 
 
-def test_no_matching_top100_games_is_an_empty_success():
+def test_top100_is_unavailable_without_calling_discover_service():
     class EmptyDiscoverService:
         def get_recommendation_result(
             self,
             mode="hot",
             limit=10,
         ):
-            assert mode == "top100"
+            raise AssertionError("Top 100 must fail before source retrieval")
             return DiscoverRecommendationResult(
                 recommendations=[],
                 personalisation="not_applicable",
@@ -117,5 +117,7 @@ def test_no_matching_top100_games_is_an_empty_success():
     finally:
         app.dependency_overrides.clear()
 
-    assert response.status_code == 200
-    assert response.json() == []
+    assert response.status_code == 503
+    assert response.json() == {
+        "detail": "Top 100 is temporarily unavailable during private beta."
+    }

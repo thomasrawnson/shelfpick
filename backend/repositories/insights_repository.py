@@ -1,4 +1,7 @@
 from sqlalchemy import case, func
+from sqlalchemy.dialects.postgresql import (
+    aggregate_order_by,
+)
 from sqlalchemy.orm import Session
 
 from database.models import (
@@ -13,6 +16,7 @@ from models.collection_insights import (
     LastPlayedGame,
     MonthlyActivity,
     MonthlyPlay,
+    MonthlyRecapGame,
     NeglectedGame,
     PlayerGroupSummary,
     PlayerSummary,
@@ -104,13 +108,54 @@ class InsightsRepository:
             or 0
         )
 
-    def total_duration_minutes(self) -> int:
+    def historical_played_games_count(
+        self,
+    ) -> int:
         if self.user_id is None:
             return 0
 
         return (
             self.db.query(
+                func.count(
+                    func.distinct(
+                        Play.game_id
+                    )
+                )
+            )
+            .filter(
+                Play.user_id
+                == self.user_id
+            )
+            .scalar()
+            or 0
+        )
+
+    def total_duration_minutes(
+        self,
+    ) -> int | None:
+        if self.user_id is None:
+            return None
+
+        return (
+            self.db.query(
                 func.sum(
+                    Play.duration_minutes
+                )
+            )
+            .filter(
+                Play.user_id
+                == self.user_id
+            )
+            .scalar()
+        )
+
+    def duration_plays(self) -> int:
+        if self.user_id is None:
+            return 0
+
+        return (
+            self.db.query(
+                func.count(
                     Play.duration_minutes
                 )
             )
@@ -163,17 +208,10 @@ class InsightsRepository:
                 ).label("play_count"),
             )
             .join(
-                UserGame,
-                UserGame.game_id
-                == Game.id,
-            )
-            .join(
                 Play,
                 Play.game_id == Game.id,
             )
             .filter(
-                UserGame.user_id
-                == self.user_id,
                 Play.user_id
                 == self.user_id,
             )
@@ -186,7 +224,10 @@ class InsightsRepository:
                 func.count(
                     Play.id
                 ).desc(),
-                Game.name,
+                func.lower(
+                    Game.name
+                ).asc(),
+                Game.bgg_id.asc(),
             )
             .first()
         )
@@ -213,22 +254,16 @@ class InsightsRepository:
                 Play.played_at,
             )
             .join(
-                UserGame,
-                UserGame.game_id
-                == Game.id,
-            )
-            .join(
                 Play,
                 Play.game_id == Game.id,
             )
             .filter(
-                UserGame.user_id
-                == self.user_id,
                 Play.user_id
                 == self.user_id,
             )
             .order_by(
-                Play.played_at.desc()
+                Play.played_at.desc(),
+                Play.id.desc(),
             )
             .first()
         )
@@ -517,6 +552,77 @@ class InsightsRepository:
             recent_plays=recent_plays,
         )
 
+    def get_monthly_recap(
+        self,
+        start: datetime,
+        end: datetime,
+        limit: int = 4,
+    ) -> dict:
+        if self.user_id is None:
+            return {
+                "total_plays": 0,
+                "unique_games": 0,
+                "total_duration_minutes": None,
+                "duration_plays": 0,
+                "games": [],
+            }
+
+        scoped_plays = (
+            self.db.query(Play)
+            .filter(
+                Play.user_id == self.user_id,
+                Play.played_at >= start,
+                Play.played_at < end,
+            )
+        )
+        totals = scoped_plays.with_entities(
+            func.count(Play.id).label("total_plays"),
+            func.count(func.distinct(Play.game_id)).label("unique_games"),
+            func.sum(Play.duration_minutes).label("total_duration_minutes"),
+            func.count(Play.duration_minutes).label("duration_plays"),
+        ).one()
+
+        rows = (
+            self.db.query(
+                Game.bgg_id,
+                Game.name,
+                Game.image_url,
+                func.count(Play.id).label("play_count"),
+                func.max(Play.played_at).label("last_played_at"),
+            )
+            .join(Play, Play.game_id == Game.id)
+            .filter(
+                Play.user_id == self.user_id,
+                Play.played_at >= start,
+                Play.played_at < end,
+            )
+            .group_by(Game.id, Game.bgg_id, Game.name, Game.image_url)
+            .order_by(
+                func.count(Play.id).desc(),
+                func.max(Play.played_at).desc(),
+                func.lower(Game.name).asc(),
+                Game.bgg_id.asc(),
+            )
+            .limit(limit)
+            .all()
+        )
+
+        return {
+            "total_plays": totals.total_plays or 0,
+            "unique_games": totals.unique_games or 0,
+            "total_duration_minutes": totals.total_duration_minutes,
+            "duration_plays": totals.duration_plays or 0,
+            "games": [
+                MonthlyRecapGame(
+                    bgg_id=row.bgg_id,
+                    name=row.name,
+                    play_count=row.play_count,
+                    image_url=row.image_url,
+                )
+                for row in rows
+            ],
+        }
+
 
     def get_neglected_games(
         self,
@@ -725,107 +831,95 @@ class InsightsRepository:
         if self.user_id is None:
             return []
 
-        plays = (
+        distinct_members = (
             self.db.query(
-                Play
+                Play.id.label("play_id"),
+                Player.id.label("player_id"),
+                Player.name.label("player_name"),
+            )
+            .join(
+                PlayParticipant,
+                PlayParticipant.play_id
+                == Play.id,
+            )
+            .join(
+                Player,
+                Player.id
+                == PlayParticipant.player_id,
             )
             .filter(
                 Play.user_id
-                == self.user_id
+                == self.user_id,
+                Player.user_id
+                == self.user_id,
             )
-            .order_by(
-                Play.played_at.desc()
+            .distinct(
+                Play.id,
+                Player.id,
+                Player.name,
             )
-            .all()
+            .subquery()
         )
 
-        groups: dict[
-            tuple[int, ...],
-            dict,
-        ] = {}
-
-        for play in plays:
-            players = [
-                participant.player
-                for participant
-                in play.participants
-                if participant.player
-                is not None
-            ]
-
-            unique_players = {
-                player.id:
-                    player
-                for player
-                in players
-            }
-
-            if len(
-                unique_players
-            ) < 2:
-                continue
-
-            sorted_players = sorted(
-                unique_players.values(),
-                key=lambda player:
-                    player.id,
+        play_groups = (
+            self.db.query(
+                distinct_members.c.play_id,
+                func.array_agg(
+                    aggregate_order_by(
+                        distinct_members.c.player_id,
+                        distinct_members.c.player_id,
+                    )
+                ).label("player_ids"),
+                func.array_agg(
+                    aggregate_order_by(
+                        distinct_members.c.player_name,
+                        distinct_members.c.player_id,
+                    )
+                ).label("player_names"),
             )
-
-            key = tuple(
-                player.id
-                for player
-                in sorted_players
+            .group_by(
+                distinct_members.c.play_id,
             )
+            .having(
+                func.count() >= 2
+            )
+            .subquery()
+        )
 
-            if key not in groups:
-                groups[key] = {
-                    "player_ids": [
-                        player.id
-                        for player
-                        in sorted_players
-                    ],
-                    "player_names": [
-                        player.name
-                        for player
-                        in sorted_players
-                    ],
-                    "play_count": 0,
-                }
+        play_count = func.count().label(
+            "play_count"
+        )
 
-            groups[
-                key
-            ]["play_count"] += 1
-
-        ranked_groups = sorted(
-            groups.values(),
-            key=lambda group: (
-                -group[
-                    "play_count"
-                ],
-                group[
-                    "player_names"
-                ],
-            ),
-        )[:limit]
+        rows = (
+            self.db.query(
+                play_groups.c.player_ids,
+                play_groups.c.player_names,
+                play_count,
+            )
+            .group_by(
+                play_groups.c.player_ids,
+                play_groups.c.player_names,
+            )
+            .order_by(
+                play_count.desc(),
+                play_groups.c.player_names.asc(),
+                play_groups.c.player_ids.asc(),
+            )
+            .limit(limit)
+            .all()
+        )
 
         return [
             PlayerGroupSummary(
                 player_ids=(
-                    group[
-                        "player_ids"
-                    ]
+                    row.player_ids
                 ),
                 player_names=(
-                    group[
-                        "player_names"
-                    ]
+                    row.player_names
                 ),
                 play_count=(
-                    group[
-                        "play_count"
-                    ]
+                    row.play_count
                 ),
             )
-            for group
-            in ranked_groups
+            for row in rows
         ]

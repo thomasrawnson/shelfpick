@@ -223,12 +223,23 @@ class CollectionService:
             )
         }
 
+        wishlisted_ids = (
+            self.repository
+            .get_wishlisted_bgg_ids(
+                self.user_id
+            )
+        )
+
         return [
             {
                 **result,
                 "owned": (
                     result["bgg_id"]
                     in owned_ids
+                ),
+                "wishlisted": (
+                    result["bgg_id"]
+                    in wishlisted_ids
                 ),
             }
             for result

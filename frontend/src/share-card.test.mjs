@@ -6,6 +6,8 @@ let server
 let buildShareCardContent
 let renderPlayShareCard
 let isShareCancellation
+let containImageRect
+let redactEmailAddresses
 let defaults
 
 before(async () => {
@@ -14,6 +16,8 @@ before(async () => {
   buildShareCardContent = module.buildShareCardContent
   renderPlayShareCard = module.renderPlayShareCard
   isShareCancellation = module.isShareCancellation
+  containImageRect = module.containImageRect
+  redactEmailAddresses = module.redactEmailAddresses
   defaults = module.DEFAULT_SHARE_PRIVACY
 })
 
@@ -67,6 +71,58 @@ test("email-like participant names are excluded even when names are selected", (
   }, { ...defaults, includePlayerNames: true })
   assert.equal(content.participants[0].label, "Player 1")
   assert.equal(content.result, "Winner: Player 1")
+})
+
+test("location email addresses are redacted before preview or export content is built", () => {
+  const locations = [
+    ["alex@example.com", "[email hidden]"],
+    ["The hall — alex@example.com after six", "The hall — [email hidden] after six"],
+    ["alex@example.com and host@example.org", "[email hidden] and [email hidden]"],
+    ["Contact Alex.Example@Example.COM", "Contact [email hidden]"],
+  ]
+
+  for (const [location, expected] of locations) {
+    const content = buildShareCardContent(game, { ...play, location }, {
+      ...defaults,
+      includeLocation: true,
+    })
+    assert.equal(content.location, expected)
+    assert.equal(redactEmailAddresses(location), expected)
+  }
+})
+
+test("every privacy combination remains independent and disabled options reveal nothing", () => {
+  for (const includePlayerNames of [false, true]) {
+    for (const includeScores of [false, true]) {
+      for (const includeLocation of [false, true]) {
+        const content = buildShareCardContent(game, {
+          ...play,
+          location: "host@example.com",
+        }, { includePlayerNames, includeScores, includeLocation })
+        assert.equal(content.participants[0].label, includePlayerNames ? "Alex" : "Player 1")
+        assert.equal(content.participants[0].score, includeScores ? "42" : null)
+        assert.equal(content.location, includeLocation ? "[email hidden]" : null)
+      }
+    }
+  }
+})
+
+test("recorded duration is shown while missing and zero durations remain absent", () => {
+  assert.equal(buildShareCardContent(game, play, defaults).duration, "75 min")
+  assert.equal(buildShareCardContent(game, { ...play, duration_minutes: null }, defaults).duration, null)
+  assert.equal(buildShareCardContent(game, { ...play, duration_minutes: 0 }, defaults).duration, null)
+})
+
+test("portrait, landscape and square artwork fit completely inside the cover stage", () => {
+  const bounds = { x: 98, y: 92, width: 1004, height: 582 }
+  for (const [width, height] of [[600, 900], [1200, 600], [800, 800]]) {
+    const target = containImageRect(width, height, bounds)
+    assert.ok(target.x >= bounds.x)
+    assert.ok(target.y >= bounds.y)
+    assert.ok(target.x + target.width <= bounds.x + bounds.width + Number.EPSILON)
+    assert.ok(target.y + target.height <= bounds.y + bounds.height + Number.EPSILON)
+    assert.ok(Math.abs(target.width / target.height - width / height) < 0.000001)
+  }
 })
 
 test("cooperative and tied results are distinguished without guessing a loser", () => {
@@ -136,7 +192,58 @@ test("artwork loading failure renders the branded fallback PNG", async () => {
       defaults,
     )
     assert.equal(blob.type, "image/png")
-    assert.ok(drawnText.includes("Artwork unavailable"))
+    assert.ok(drawnText.includes("Cover not available"))
+  } finally {
+    globalThis.document = originalDocument
+    globalThis.Image = originalImage
+    globalThis.window = originalWindow
+  }
+})
+
+test("export rendering uses redacted location content and bounds a very long title", async () => {
+  const originalDocument = globalThis.document
+  const originalImage = globalThis.Image
+  const originalWindow = globalThis.window
+  const drawnText = []
+  const context = {
+    beginPath() {},
+    drawImage() {},
+    fill() {},
+    fillRect() {},
+    fillText(value, _x, y) { drawnText.push({ value, y }) },
+    measureText(value) { return { width: value.length * 22 } },
+    roundRect() {},
+    set fillStyle(_value) {},
+    set font(_value) {},
+    set textAlign(_value) {},
+  }
+  const canvas = {
+    getContext() { return context },
+    toBlob(callback) { callback(new Blob(["png"], { type: "image/png" })) },
+  }
+  class MockImage {
+    width = 300
+    height = 100
+    set src(_value) { queueMicrotask(() => this.onload?.()) }
+  }
+  globalThis.document = { createElement: () => canvas }
+  globalThis.Image = MockImage
+  globalThis.window = { setTimeout, clearTimeout }
+  try {
+    await renderPlayShareCard(
+      {
+        ...game,
+        name: "The Extraordinary Expedition Through the Unreasonably Long Kingdom Beyond Every Known Horizon and Then Some",
+        image_url: null,
+      },
+      { ...play, location: "Hall host@example.com" },
+      { ...defaults, includeLocation: true, includePlayerNames: true, includeScores: true },
+    )
+    const values = drawnText.map(item => item.value)
+    assert.ok(values.includes("At Hall [email hidden]"))
+    assert.equal(values.some(value => value.includes("@")), false)
+    assert.ok(values.some(value => value.endsWith("…")))
+    assert.ok(drawnText.every(item => item.y === undefined || item.y < 1500))
   } finally {
     globalThis.document = originalDocument
     globalThis.Image = originalImage

@@ -35,6 +35,8 @@ services:
         sync: false
       - key: BGG_API_TOKEN
         sync: false
+      - key: BETA_INVITE_EMAILS
+        sync: false
 
   - type: web
     name: board-game-picker-web

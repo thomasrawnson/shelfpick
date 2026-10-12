@@ -22,9 +22,26 @@ export type ShareCardContent = {
 }
 
 const EMAIL_ADDRESS = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i
+const EMAIL_ADDRESSES = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi
+
+export const SHARE_CARD = {
+  background: "#F6F3EB",
+  surface: "#FFFFFF",
+  forest: "#315C48",
+  forestSoft: "#E3EBE6",
+  goldSoft: "#F4EAD7",
+  goldText: "#81591F",
+  ink: "#1E2A24",
+  inkSecondary: "#667068",
+  line: "#D9D5CB",
+} as const
 
 function shareParticipantLabel(name: string, index: number): string {
   return EMAIL_ADDRESS.test(name) ? `Player ${index + 1}` : name
+}
+
+export function redactEmailAddresses(value: string): string {
+  return value.replace(EMAIL_ADDRESSES, "[email hidden]")
 }
 
 export function buildShareCardContent(
@@ -78,7 +95,9 @@ export function buildShareCardContent(
     duration: play.duration_minutes && play.duration_minutes > 0
       ? `${play.duration_minutes} min`
       : null,
-    location: privacy.includeLocation ? play.location : null,
+    location: privacy.includeLocation && play.location
+      ? redactEmailAddresses(play.location)
+      : null,
     result,
     participants: play.participants.map((participant, index) => ({
       label: privacy.includePlayerNames
@@ -91,7 +110,7 @@ export function buildShareCardContent(
   }
 }
 
-function loadImage(src: string): Promise<HTMLImageElement> {
+export function loadShareImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const image = new Image()
     const timeout = window.setTimeout(() => reject(new Error("Image timed out")), 8_000)
@@ -102,7 +121,7 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   })
 }
 
-function wrapText(
+export function wrapShareText(
   context: CanvasRenderingContext2D,
   text: string,
   x: number,
@@ -148,7 +167,7 @@ function wrapText(
   return y + visible.length * lineHeight
 }
 
-function fitText(
+export function fitShareText(
   context: CanvasRenderingContext2D,
   text: string,
   maxWidth: number,
@@ -161,10 +180,66 @@ function fitText(
   return `${visible}…`
 }
 
-function roundedRect(context: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number) {
+export function fillRoundedRect(context: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number) {
   context.beginPath()
   context.roundRect(x, y, width, height, radius)
   context.fill()
+}
+
+export type ImageRect = {
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
+export function containImageRect(
+  imageWidth: number,
+  imageHeight: number,
+  bounds: ImageRect,
+): ImageRect {
+  if (imageWidth <= 0 || imageHeight <= 0) return { ...bounds }
+  const scale = Math.min(bounds.width / imageWidth, bounds.height / imageHeight)
+  const width = imageWidth * scale
+  const height = imageHeight * scale
+  return {
+    x: bounds.x + (bounds.width - width) / 2,
+    y: bounds.y + (bounds.height - height) / 2,
+    width,
+    height,
+  }
+}
+
+export function drawShareArtworkFallback(
+  context: CanvasRenderingContext2D,
+  gameName: string,
+  bounds: ImageRect,
+) {
+  context.fillStyle = SHARE_CARD.forestSoft
+  fillRoundedRect(context, bounds.x, bounds.y, bounds.width, bounds.height, 28)
+
+  const tileWidth = Math.min(360, bounds.width - 96)
+  const tileHeight = Math.min(390, bounds.height - 96)
+  const tileX = bounds.x + (bounds.width - tileWidth) / 2
+  const tileY = bounds.y + (bounds.height - tileHeight) / 2
+  context.fillStyle = SHARE_CARD.background
+  fillRoundedRect(context, tileX, tileY, tileWidth, tileHeight, 24)
+
+  context.fillStyle = SHARE_CARD.forest
+  context.textAlign = "center"
+  const initialsSize = Math.min(142, tileWidth * 0.38, tileHeight * 0.38)
+  context.font = `600 ${initialsSize}px Lora, Georgia, serif`
+  const initials = gameName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(word => word[0]?.toUpperCase())
+    .join("") || "SP"
+  context.fillText(initials, bounds.x + bounds.width / 2, tileY + tileHeight * 0.55)
+  const fallbackLabelSize = Math.min(29, Math.max(16, tileWidth / 13))
+  context.font = `700 ${fallbackLabelSize}px 'Nunito Sans', system-ui, sans-serif`
+  context.fillText("Cover not available", bounds.x + bounds.width / 2, tileY + tileHeight * 0.82)
+  context.textAlign = "left"
 }
 
 export async function renderPlayShareCard(
@@ -179,102 +254,111 @@ export async function renderPlayShareCard(
   if (!context) throw new Error("Image generation is unavailable in this browser.")
   const content = buildShareCardContent(game, play, privacy)
 
-  context.fillStyle = "#F6F3EB"
-  context.fillRect(0, 0, canvas.width, canvas.height)
-  context.fillStyle = "#315C48"
-  context.fillRect(0, 0, canvas.width, 26)
+  try {
+    await document.fonts?.ready
+  } catch {
+    // Canvas font stacks retain safe local fallbacks.
+  }
 
-  const artworkX = 72
-  const artworkY = 72
-  const artworkWidth = 1056
-  const artworkHeight = 530
+  context.fillStyle = SHARE_CARD.background
+  context.fillRect(0, 0, canvas.width, canvas.height)
+  context.fillStyle = SHARE_CARD.forest
+  context.fillRect(0, 0, canvas.width, 22)
+
+  const hasOptionalDetails = Boolean(
+    content.location
+    || privacy.includePlayerNames
+    || privacy.includeScores,
+  )
+  const artworkStageHeight = hasOptionalDetails ? 560 : 650
+  const artworkStage = { x: 64, y: 58, width: 1072, height: artworkStageHeight }
+  const artworkBounds = { x: 98, y: 92, width: 1004, height: artworkStageHeight - 68 }
+  context.fillStyle = SHARE_CARD.forestSoft
+  fillRoundedRect(
+    context,
+    artworkStage.x,
+    artworkStage.y,
+    artworkStage.width,
+    artworkStage.height,
+    32,
+  )
   let artworkLoaded = false
   if (game.image_url) {
     try {
-      const artwork = await loadImage(game.image_url)
-      const scale = Math.max(artworkWidth / artwork.width, artworkHeight / artwork.height)
-      const width = artwork.width * scale
-      const height = artwork.height * scale
-      context.save()
-      context.beginPath()
-      context.roundRect(artworkX, artworkY, artworkWidth, artworkHeight, 32)
-      context.clip()
-      context.drawImage(artwork, artworkX + (artworkWidth - width) / 2, artworkY + (artworkHeight - height) / 2, width, height)
-      context.restore()
+      const artwork = await loadShareImage(game.image_url)
+      const target = containImageRect(artwork.width, artwork.height, artworkBounds)
+      context.fillStyle = SHARE_CARD.surface
+      fillRoundedRect(context, target.x - 10, target.y - 10, target.width + 20, target.height + 20, 24)
+      context.drawImage(artwork, target.x, target.y, target.width, target.height)
       artworkLoaded = true
     } catch {
       artworkLoaded = false
     }
   }
   if (!artworkLoaded) {
-    context.fillStyle = "#E3EBE6"
-    roundedRect(context, artworkX, artworkY, artworkWidth, artworkHeight, 32)
-    context.fillStyle = "#315C48"
-    context.textAlign = "center"
-    context.font = "700 170px Lora, Georgia, serif"
-    const initials = game.name.split(/\s+/).slice(0, 2).map(word => word[0]?.toUpperCase()).join("") || "SP"
-    context.fillText(initials, canvas.width / 2, artworkY + 315)
-    context.font = "700 32px 'Nunito Sans', system-ui, sans-serif"
-    context.fillText("Artwork unavailable", canvas.width / 2, artworkY + 390)
-    context.textAlign = "left"
+    drawShareArtworkFallback(context, game.name, artworkBounds)
   }
 
-  let y = 680
-  context.fillStyle = "#1E2A24"
-  context.font = "600 76px Lora, Georgia, serif"
-  y = wrapText(context, content.title, 72, y, 1056, 82, 2) + 20
-  context.fillStyle = "#667068"
-  context.font = "700 30px 'Nunito Sans', system-ui, sans-serif"
-  context.fillText(content.date, 72, y)
-  y += 58
+  let y = artworkStage.y + artworkStage.height + 84
+  context.fillStyle = SHARE_CARD.ink
+  context.font = "600 68px Lora, Georgia, serif"
+  y = wrapShareText(context, content.title, 72, y, 1056, 72, 2) + 16
+  context.fillStyle = SHARE_CARD.inkSecondary
+  context.font = "700 29px 'Nunito Sans', system-ui, sans-serif"
+  const dateAndDuration = [content.date, content.duration].filter(Boolean).join("  ·  ")
+  context.fillText(fitShareText(context, dateAndDuration, 1056), 72, y)
+  y += 48
 
-  const facts = [content.duration, content.location ? `At ${content.location}` : null].filter(Boolean) as string[]
-  if (facts.length) {
-    context.fillStyle = "#315C48"
-    context.font = "700 30px 'Nunito Sans', system-ui, sans-serif"
-    context.fillText(fitText(context, facts.join("  ·  "), 1056), 72, y)
-    y += 56
+  if (content.location) {
+    context.fillStyle = SHARE_CARD.forest
+    context.font = "700 28px 'Nunito Sans', system-ui, sans-serif"
+    context.fillText(fitShareText(context, `At ${content.location}`, 1056), 72, y)
+    y += 46
   }
   if (content.result) {
-    context.fillStyle = "#F4EAD7"
-    roundedRect(context, 72, y, 1056, 76, 18)
-    context.fillStyle = "#81591F"
-    context.font = "700 31px 'Nunito Sans', system-ui, sans-serif"
-    wrapText(context, content.result, 98, y + 49, 1004, 38, 1)
-    y += 106
+    context.fillStyle = SHARE_CARD.goldSoft
+    fillRoundedRect(context, 72, y, 1056, 70, 16)
+    context.fillStyle = SHARE_CARD.goldText
+    context.font = "700 29px 'Nunito Sans', system-ui, sans-serif"
+    context.fillText(fitShareText(context, content.result, 1004), 98, y + 45)
+    y += 92
   }
 
-  const visibleParticipants = content.participants.slice(0, 5)
+  const visibleParticipants = content.participants.slice(0, 4)
   if (privacy.includePlayerNames || privacy.includeScores) {
-    context.font = "700 28px 'Nunito Sans', system-ui, sans-serif"
+    context.font = "700 26px 'Nunito Sans', system-ui, sans-serif"
     for (const participant of visibleParticipants) {
-      context.fillStyle = "#1E2A24"
-      context.fillText(fitText(context, participant.label, 820), 78, y)
+      context.fillStyle = SHARE_CARD.ink
+      context.fillText(fitShareText(context, participant.label, 820), 78, y)
       if (participant.score !== null) {
         context.textAlign = "right"
-        context.fillText(fitText(context, participant.score, 160), 1122, y)
+        context.fillText(fitShareText(context, participant.score, 160), 1122, y)
         context.textAlign = "left"
       }
-      y += 43
+      y += 35
     }
     if (content.participants.length > visibleParticipants.length) {
-      context.fillStyle = "#667068"
-      context.fillText(`+${content.participants.length - visibleParticipants.length} more`, 78, y)
+      context.fillStyle = SHARE_CARD.inkSecondary
+      context.fillText(`+${content.participants.length - visibleParticipants.length} more players`, 78, y)
     }
   }
 
+  context.fillStyle = SHARE_CARD.line
+  context.fillRect(72, 1332, 1056, 2)
   try {
-    const logo = await loadImage("/branding/shelfpick-logo-light.svg")
-    context.drawImage(logo, 72, 1350, 300, 86)
+    const logo = await loadShareImage("/branding/shelfpick-logo-light.svg")
+    context.drawImage(logo, 72, 1362, 258, 74)
   } catch {
-    context.fillStyle = "#315C48"
-    context.font = "700 48px 'Nunito Sans', system-ui, sans-serif"
-    context.fillText("ShelfPick", 72, 1412)
+    context.fillStyle = SHARE_CARD.forest
+    context.font = "700 43px 'Nunito Sans', system-ui, sans-serif"
+    context.fillText("ShelfPick", 72, 1415)
   }
-  context.fillStyle = "#667068"
+  context.fillStyle = SHARE_CARD.inkSecondary
   context.textAlign = "right"
-  context.font = "700 25px 'Nunito Sans', system-ui, sans-serif"
-  context.fillText("A play from my shelf", 1128, 1405)
+  context.font = "700 24px 'Nunito Sans', system-ui, sans-serif"
+  context.fillText("A play from my shelf", 1128, 1395)
+  context.font = "600 20px 'Nunito Sans', system-ui, sans-serif"
+  context.fillText("Game data from BoardGameGeek", 1128, 1428)
 
   return new Promise((resolve, reject) => {
     canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error("Couldn't create the PNG.")), "image/png")

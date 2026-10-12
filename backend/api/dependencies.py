@@ -30,7 +30,6 @@ from services.discover_service import (
 from services.discover_sources import (
     DiscoverCandidateProvider,
     HotDiscoverSource,
-    RankedDiscoverSource,
 )
 from services.wishlist_service import WishlistService
 from services.entitlements import Feature, can_use
@@ -192,7 +191,6 @@ def get_discover_service(
             DiscoverCandidateProvider(
                 sources=[
                     HotDiscoverSource(bgg_client),
-                    RankedDiscoverSource(bgg_client),
                 ]
             )
         ),

@@ -94,6 +94,18 @@
   gap: 3px;
 }
 
+.add-game-result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.add-game-result-actions .ghost-button {
+  width: auto;
+  min-height: 44px;
+}
+
 
 .add-game-result span {
   color: var(--text-muted);
@@ -108,5 +120,19 @@
   .add-game-search-row {
     grid-template-columns:
       1fr;
+  }
+
+  .add-game-result {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .add-game-result-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .add-game-result-actions .ghost-button {
+    width: 100%;
   }
 }

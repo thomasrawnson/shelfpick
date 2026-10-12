@@ -1,5 +1,5 @@
 import { useRef, useState, type FormEvent } from "react"
-import { login, register } from "../api/client"
+import { login, register, resendBetaVerification } from "../api/client"
 import { FieldValidationError } from "../api/request"
 import { saveToken, type AuthUser } from "../auth"
 import { registrationErrors } from "../auth-validation"
@@ -15,6 +15,8 @@ export default function AuthView({ onAuthenticated, sessionExpired }: Props) {
   const [error, setError] = useState("")
   const [fields, setFields] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
+  const [registrationMessage, setRegistrationMessage] = useState("")
+  const [resending, setResending] = useState(false)
   const pending = useRef(false)
   const form = useRef<HTMLFormElement>(null)
 
@@ -37,8 +39,13 @@ export default function AuthView({ onAuthenticated, sessionExpired }: Props) {
     setSubmitting(true)
     try {
       const result = mode === "login" ? await login(email.trim(), password) : await register(email.trim(), displayName, password)
-      saveToken(result.access_token)
-      onAuthenticated(result.user)
+      if ("access_token" in result) {
+        saveToken(result.access_token)
+        onAuthenticated(result.user)
+      } else {
+        setRegistrationMessage(result.message)
+        setPassword("")
+      }
     } catch (err) {
       if (err instanceof FieldValidationError) showFields(err.fields)
       else if (mode === "register" && err instanceof Error && /email.*already/i.test(err.message)) showFields({ email: err.message })
@@ -50,13 +57,13 @@ export default function AuthView({ onAuthenticated, sessionExpired }: Props) {
   }
   function switchMode(next: "login" | "register") {
     if (pending.current) return
-    setMode(next); setError(""); setFields({})
+    setMode(next); setError(""); setFields({}); setRegistrationMessage("")
   }
   return <section className="auth-screen"><div className="auth-card">
     <header className="auth-header">
       <BrandLogo />
       <h1>{mode === "login" ? "Welcome back" : "Create your account"}</h1>
-      <p className="subtitle">Your collection, plays and recommendations in one place.</p>
+      <p className="subtitle">{mode === "register" ? "Private beta registration is invite-only." : "Your collection, plays and recommendations in one place."}</p>
     </header>
     {sessionExpired && <p role="status" className="field-hint">Your session has expired. Log in again to continue.</p>}
     <div className="auth-tabs">
@@ -64,6 +71,14 @@ export default function AuthView({ onAuthenticated, sessionExpired }: Props) {
       <button type="button" disabled={submitting} aria-pressed={mode === "register"} className={mode === "register" ? "active" : ""} onClick={() => switchMode("register")}>Register</button>
     </div>
     <form ref={form} className="auth-form" onSubmit={handleSubmit} noValidate aria-busy={submitting}>
+      {registrationMessage && <p className="field-hint" role="status">{registrationMessage}</p>}
+      {registrationMessage && <button type="button" className="auth-link-button" disabled={resending} onClick={() => {
+        setResending(true); setError("")
+        void resendBetaVerification(email.trim())
+          .then(setRegistrationMessage)
+          .catch(err => setError(err instanceof Error ? err.message : "Couldn't resend verification email."))
+          .finally(() => setResending(false))
+      }}>{resending ? "Sending…" : "Resend verification email"}</button>}
       {mode === "register" && <div>
         <label htmlFor="display-name">Name</label>
         <input id="display-name" name="display_name" value={displayName} onChange={e => setDisplayName(e.target.value)} autoComplete="name" required disabled={submitting} aria-invalid={!!fields.display_name} aria-describedby={fields.display_name ? "name-error" : undefined} />

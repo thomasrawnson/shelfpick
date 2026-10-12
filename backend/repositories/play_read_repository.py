@@ -18,6 +18,55 @@ from database.models import (
 from models.game_play_stats import GamePlayStats
 
 
+def _participant_outcome(
+    participant: PlayParticipant,
+    play: DatabasePlay,
+    game: DatabaseGame,
+) -> str:
+    winners = [
+        candidate
+        for candidate in play.participants
+        if candidate.is_winner
+    ]
+
+    if not winners:
+        return "unknown"
+
+    if not participant.is_winner:
+        return "loss"
+
+    is_cooperative = any(
+        mechanic.name.strip().casefold()
+        == "cooperative game"
+        for mechanic in game.mechanics
+    )
+
+    if (
+        is_cooperative
+        and len(winners)
+        == len(play.participants)
+    ):
+        return "win"
+
+    is_scored_tie = (
+        len(winners) > 1
+        and all(
+            winner.score is not None
+            for winner in winners
+        )
+        and all(
+            winner.score
+            == winners[0].score
+            for winner in winners
+        )
+    )
+
+    if is_scored_tie:
+        return "draw"
+
+    return "win"
+
+
 class PlayReadRepository:
     def get_discover_profile(self) -> dict[str, int | str | None]:
         if self.user_id is None:
@@ -569,7 +618,8 @@ class PlayReadRepository:
                 == player_id,
             )
             .order_by(
-                DatabasePlay.played_at.desc()
+                DatabasePlay.played_at.desc(),
+                DatabasePlay.id.desc(),
             )
             .all()
         )
@@ -586,24 +636,37 @@ class PlayReadRepository:
             in participant_rows
         }
 
-        wins = sum(
-            1
-            for participant,
-            _play,
-            _game
+        outcomes = [
+            _participant_outcome(
+                participant,
+                play,
+                game,
+            )
+            for participant, play, game
             in participant_rows
-            if participant.is_winner
+        ]
+
+        wins = outcomes.count("win")
+        losses = outcomes.count("loss")
+        draws = outcomes.count("draw")
+        unknown_results = outcomes.count(
+            "unknown"
+        )
+        decided_plays = (
+            wins
+            + losses
+            + draws
         )
 
         win_rate = (
             round(
                 wins
-                / total_plays
+                / decided_plays
                 * 100,
                 1,
             )
-            if total_plays
-            else 0.0
+            if decided_plays
+            else None
         )
 
         game_counts: dict[
@@ -660,9 +723,8 @@ class PlayReadRepository:
                 -item[
                     "play_count"
                 ],
-                item[
-                    "name"
-                ],
+                item["name"].casefold(),
+                item["bgg_id"],
             ),
         )[:5]
 
@@ -678,6 +740,12 @@ class PlayReadRepository:
                     play.played_at,
                 "is_winner":
                     participant.is_winner,
+                "outcome":
+                    _participant_outcome(
+                        participant,
+                        play,
+                        game,
+                    ),
                 "score":
                     participant.score,
             }
@@ -771,6 +839,14 @@ class PlayReadRepository:
                 ),
             "wins":
                 wins,
+            "losses":
+                losses,
+            "draws":
+                draws,
+            "unknown_results":
+                unknown_results,
+            "decided_plays":
+                decided_plays,
             "win_rate":
                 win_rate,
             "most_played_games":

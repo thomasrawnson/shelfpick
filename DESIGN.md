@@ -172,6 +172,15 @@ success, no-result and failure states remain visible without discarding the
 query. Collection filters, sorting and navigation state remain outside and
 unchanged by the add task.
 
+SP-PB09B keeps that panel and route structure. Each result presents explicit,
+independent **Add to Owned** and **Add to Want to Play** actions. Existing
+membership is stated as **Already Owned** and/or **Already Want to Play** rather
+than inferred from colour or iconography. While one mutation is pending, both
+destinations are disabled to prevent duplicate or competing submissions; the
+query and full result list remain visible for success, failure and retry. On
+phone widths the two 44px actions stack, while wider layouts keep a compact
+wrapping action group.
+
 ## Heading and supporting-copy update — 28 September 2026
 
 Primary Picker, Collection, Discover, Rankings, Insights, Game Night and
@@ -377,6 +386,36 @@ preview controls; names, scores and location begin hidden, and email-like
 participant labels are always redacted. The preview and output use the same
 renderer. Native file sharing and PNG download require explicit actions, and
 the interface never claims that ShelfPick posted or uploaded the result.
+
+SP-PB12B refines that same renderer as a cover-led editorial poster. The full
+cover is contained inside a quiet Forest-soft stage without cropping; portrait,
+landscape and square sources retain their aspect ratio. Detail-rich variants
+use a slightly shorter stage so title, facts, outcome, participants and the
+restrained footer always retain separate safe zones. Missing or blocked artwork
+uses the same stage with an intentional initials tile. Email-like text is
+redacted from opted-in location as well as participant labels before preview or
+PNG generation. The footer retains the approved ShelfPick wordmark, quiet
+sign-off and BoardGameGeek data attribution without competing with the cover.
+
+SP-PB13 extends the same sharing language inside Insights → Recaps. Current and
+previous local calendar months use compact labelled navigation; loading, retry,
+empty and populated states retain the selected month. Empty months explain that
+only saved plays count and cannot be shared. Populated months lead with factual
+play/game totals, recorded-duration coverage and a single explicit Share this
+month action. The 1200x1500 recap is an editorial collage rather than a generic
+dashboard: one to four complete, uncropped covers or branded initials tiles lead,
+followed by actual totals, nullable recorded time, deterministic most-played
+copy and the established ShelfPick/BGG footer. Player names, scores and location
+never enter the monthly response, preview or image.
+
+SP-PB14A keeps collection usage and lifetime play history visibly distinct.
+**Owned games played** belongs to current-shelf coverage; **Games in history**,
+most played and last played cover every saved account play even when a title is
+no longer Owned. Recorded time shows an unavailable state when absent, retains
+a genuine recorded zero, and states partial timed-play coverage. Player
+frequency is **Most played together**, never “favourite.” Player profiles show
+win, loss, draw and unrecorded outcome counts; win rate names its decided-play
+denominator and uses an unavailable state when no outcome is determinable.
 
 ## Do's and Don'ts
 

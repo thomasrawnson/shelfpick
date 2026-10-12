@@ -26,6 +26,7 @@ from database.connection import (
     get_db,
 )
 from database.models import (
+    AuthToken,
     Game,
     User,
     UserGame,
@@ -146,6 +147,112 @@ def token_from_email(
         .split("token=", 1)[1]
         .split('"', 1)[0]
     )
+
+
+def enable_private_beta(monkeypatch: pytest.MonkeyPatch, invited: set[str]):
+    monkeypatch.setattr("api.routers.auth.private_beta_enabled", lambda: True)
+    monkeypatch.setattr(
+        "api.routers.auth.is_beta_invited",
+        lambda email: email.strip().casefold() in invited,
+    )
+
+
+def test_private_beta_registration_is_invite_only_and_generic(
+    client: TestClient,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    sent_emails = capture_sent_emails(monkeypatch)
+    enable_private_beta(monkeypatch, {"invited@example.com"})
+
+    uninvited = register_user(client, email="outsider@example.com")
+    invited = register_user(client, email="Invited@Example.com")
+    duplicate = register_user(client, email="invited@example.com")
+
+    assert uninvited.status_code == invited.status_code == duplicate.status_code == 201
+    assert uninvited.json() == invited.json() == duplicate.json()
+    assert len(sent_emails) == 1
+
+    db = TestingSessionLocal()
+    try:
+        users = db.query(User).all()
+        assert [user.email for user in users] == ["invited@example.com"]
+        assert users[0].tier == "FREE"
+    finally:
+        db.close()
+
+
+def test_beta_account_requires_valid_single_use_verification(
+    client: TestClient,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    sent_emails = capture_sent_emails(monkeypatch)
+    enable_private_beta(monkeypatch, {"invited@example.com"})
+    register_user(client, email="invited@example.com")
+
+    blocked = client.post("/auth/login", json={
+        "email": "invited@example.com", "password": "password123",
+    })
+    assert blocked.status_code == 403
+
+    token = token_from_email(sent_emails[-1])
+    confirmed = client.post("/auth/verification/confirm", json={"token": token})
+    reused = client.post("/auth/verification/confirm", json={"token": token})
+    login = client.post("/auth/login", json={
+        "email": "invited@example.com", "password": "password123",
+    })
+
+    assert confirmed.status_code == 200
+    assert reused.status_code == 400
+    assert login.status_code == 200
+    assert login.json()["user"]["tier"] == "FREE"
+
+
+def test_expired_beta_verification_token_is_rejected(
+    client: TestClient,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    sent_emails = capture_sent_emails(monkeypatch)
+    enable_private_beta(monkeypatch, {"invited@example.com"})
+    register_user(client, email="invited@example.com")
+    token = token_from_email(sent_emails[-1])
+
+    db = TestingSessionLocal()
+    try:
+        auth_token = db.query(AuthToken).one()
+        auth_token.expires_at = datetime.now(timezone.utc) - timedelta(seconds=1)
+        db.commit()
+    finally:
+        db.close()
+
+    response = client.post("/auth/verification/confirm", json={"token": token})
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Invalid or expired verification token"
+
+
+def test_beta_verification_resend_is_generic_and_rate_limited(
+    client: TestClient,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    capture_sent_emails(monkeypatch)
+    enable_private_beta(monkeypatch, {"invited@example.com"})
+    register_user(client, email="invited@example.com")
+
+    responses = []
+    for _ in range(5):
+        responses.append(client.post(
+            "/auth/verification/resend", json={"email": "invited@example.com"},
+        ))
+    missing = client.post(
+        "/auth/verification/resend", json={"email": "missing@example.com"},
+    )
+    blocked = client.post(
+        "/auth/verification/resend", json={"email": "invited@example.com"},
+    )
+
+    assert all(response.status_code == 200 for response in responses)
+    assert missing.status_code == 200
+    assert missing.json() == responses[0].json()
+    assert blocked.status_code == 429
 
 
 def test_register_returns_token_and_user(

@@ -40,6 +40,12 @@ def get_discover_recommendations(
     ),
     current_user: User = Depends(get_current_user),
 ):
+    if mode == "top100":
+        raise HTTPException(
+            status_code=503,
+            detail="Top 100 is temporarily unavailable during private beta.",
+        )
+
     if mode == "for_you" and not can_use(
         current_user,
         Feature.PERSONALIZED_DISCOVER,
