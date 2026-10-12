@@ -89,6 +89,36 @@ policy, hosted email and health checks, paid PostgreSQL backup/recovery proof,
 physical iPhone/Android journeys and explicit owner approval remain beta entry
 gates. No production, real-email, invitation or physical-device claim is made.
 
+## SP-BETA-04 remote CI and PR review — 12 October 2026
+
+The release branch was confirmed on GitHub at the locally validated candidate
+SHA `28da80da363ecd2b3cb77bc0f9294fccd8317ed1`, then opened as
+https://github.com/thomasrawnson/shelfpick/pull/3 targeting `main`. The PR is
+open, non-draft and reported mergeable. Its remote commit list exactly matched
+the five integration commits documented above before this documentation-only
+closeout was appended.
+
+GitHub Actions completed successfully for both the push-triggered and
+pull-request-triggered runs:
+
+- backend tests and migrations: passed in 55 seconds and 1 minute 4 seconds;
+- frontend tests, lint and build: passed in 41 seconds and 28 seconds;
+- Vercel preview deployment: passed;
+- Vercel preview comments: passed.
+
+The remote PR inventory contains 89 task files before this closeout. Review of
+the names and patch confirmed no `frontend/src/components/picker/PickerView.tsx`
+change, no `.env`, dependency directory, virtual environment or build-output
+file, and no private-key, GitHub-token, cloud-key or live-secret signature.
+Synthetic credentials remain limited to tests and documented examples. The
+PNG additions under `docs/screenshots/` are intentional responsive and export
+QA evidence rather than unexpected generated application artefacts.
+
+This documentation-only commit records the remote result and does not modify
+application behaviour. The PR must not be merged until owner review; private
+beta still requires the remaining operational, rights, recovery and real-device
+gates recorded above. No deployment or tester invitation was performed.
+
 ## 1. Release and integration state
 
 At audit time the checkout is `main`, one commit ahead of its local

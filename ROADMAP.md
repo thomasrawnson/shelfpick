@@ -92,6 +92,23 @@ CI evidence, and has not received physical-device or production validation.
 Private beta remains on hold for the external and operational gates listed in
 the readiness audit.
 
+### SP-BETA-04 remote CI and PR review — COMPLETE (12 October 2026)
+
+The candidate was pushed at the locally validated SHA
+`28da80da363ecd2b3cb77bc0f9294fccd8317ed1` and opened as GitHub PR #3 against
+`main`: https://github.com/thomasrawnson/shelfpick/pull/3. Both GitHub Actions
+jobs passed on the push and pull-request runs: backend tests/migrations and
+frontend tests/lint/build. The Vercel preview and preview-comment checks also
+passed. GitHub reports the PR mergeable.
+
+Remote file and patch review found the intended five integrated commits, no
+`PickerView.tsx` change, no credential or private-key signature, and no
+dependency, build-output or local-environment file. The committed PNG files
+are the expected QA evidence for SP-PB12B, SP-PB13, SP-PB14A and SP-BETA-02,
+not application build artefacts. This documentation-only closeout commit is a
+sixth administrative PR commit and does not change the validated application.
+Merge, deployment and tester invitations remain explicitly unauthorised.
+
 ### Bounded follow-up sequence — 29 September 2026
 
 The next requested work is split across existing task areas; recording the
