@@ -47,6 +47,48 @@ overflow and navigation clearance passed. See
 sp-beta-02-qa-closeout-2026-10-12.md. SP-BETA-02 is complete; no application
 change was required by QA.
 
+## SP-BETA-03 release-candidate integration — 12 October 2026
+
+An isolated release candidate was created without modifying the original dirty
+checkout:
+
+- branch: `release/shelfpick-private-beta-rc1`;
+- base: `de97c31904ef194288319644232b4b3537c51bfd` (`origin/main` after fetch);
+- integrated commits: `5644cc9` (SP-PB09B), `b89ed00` (SP-PB12B, SP-PB13,
+  SP-PB14A and SP-PB14B), `b06c053` (SP-BETA-02), and `3842dea` (integration
+  lint closeout and refreshed browser evidence).
+
+Task-specific uncommitted files were transferred individually; the working tree
+was not copied wholesale. The unrelated `PickerView.tsx` rewrite, local `.env`,
+dependency/build directories and other environment-specific state were
+excluded. No real credentials were found in the candidate diff. The only
+credential-shaped values found by the review were synthetic test values and
+documented examples.
+
+The integrated candidate passed the PostgreSQL backend suite (**296 passed,
+5 skipped**), Alembic schema check, frontend suite (**87 passed**), ESLint,
+TypeScript production build, PWA validation and whitespace checks. ESLint
+initially found a synchronous `setLoading(false)` inside the Top 100 effect.
+Removing that redundant assignment preserved behaviour because tab selection
+already sets the unavailable tab's loading state; frontend tests and browser
+validation passed afterward.
+
+Google Chrome production-preview smoke matrices passed at 390x844 and 1440x900
+in light and dark. They covered generic invited/uninvited registration,
+verification states, resend, existing-account login and Picker routing; explicit
+Top 100 unavailability without a ranked request; Hot and Pro For You;
+Collection add/recovery; historical Insights and outcome display; and monthly
+recap PNG sharing. Keyboard focus, horizontal overflow and bottom-navigation
+clearance were checked by the relevant harnesses. The Insights harness logged
+expected service-worker errors because service workers were deliberately
+blocked, plus an intentional 503 used to prove retry behaviour.
+
+This candidate is locally ready for remote CI, but has not been pushed. Remote
+CI, branch review/protection, artwork-rights resolution or fallback-only export
+policy, hosted email and health checks, paid PostgreSQL backup/recovery proof,
+physical iPhone/Android journeys and explicit owner approval remain beta entry
+gates. No production, real-email, invitation or physical-device claim is made.
+
 ## 1. Release and integration state
 
 At audit time the checkout is `main`, one commit ahead of its local

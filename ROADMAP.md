@@ -72,6 +72,26 @@ artwork-rights resolution or fallback-only exports, provisioned backup/recovery
 evidence, deployed email/health checks, physical iPhone/Android validation and
 explicit owner approval.
 
+### SP-BETA-03 private-beta release candidate — COMPLETE LOCALLY (12 October 2026)
+
+The isolated candidate is `release/shelfpick-private-beta-rc1`, based on
+`origin/main` at `de97c31904ef194288319644232b4b3537c51bfd`. It integrates
+SP-PB09B, SP-PB12B, SP-PB13, SP-PB14A, SP-PB14B and SP-BETA-02 through commits
+`5644cc9`, `b89ed00`, `b06c053` and the integration closeout `3842dea`.
+The original dirty `main` checkout, its local test configuration and its
+unrelated `frontend/src/components/picker/PickerView.tsx` modification were
+not transferred or modified.
+
+Local release validation passed: backend **296 passed / 5 skipped**, Alembic
+reported no new upgrade operations, frontend **87 passed**, ESLint, TypeScript
+production build, PWA validation and diff checks passed. Google Chrome smoke
+matrices passed at 390x844 and 1440x900 in light and dark for authentication,
+Discover, Collection, Insights and recap sharing; existing-account login also
+validated Picker navigation. The candidate has not been pushed, has no remote
+CI evidence, and has not received physical-device or production validation.
+Private beta remains on hold for the external and operational gates listed in
+the readiness audit.
+
 ### Bounded follow-up sequence — 29 September 2026
 
 The next requested work is split across existing task areas; recording the
