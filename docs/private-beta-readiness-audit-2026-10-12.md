@@ -1,6 +1,6 @@
 # SP-BETA-01 — private beta readiness audit
 
-**Date:** 12 October 2026  
+**Date:** 12 October 2026
 **Scope:** audit and planning only; no application, schema, dependency,
 production or deployment change was authorised.
 

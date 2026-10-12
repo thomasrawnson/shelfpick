@@ -75,7 +75,6 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
 
   useEffect(() => {
     if (mode === "top100") {
-      setLoading(false)
       return
     }
 

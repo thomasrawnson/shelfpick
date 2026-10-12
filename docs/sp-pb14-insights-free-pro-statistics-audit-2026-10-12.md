@@ -1,7 +1,7 @@
 # SP-PB14 — Insights and Free/Pro statistics audit
 
-**Date:** 12 October 2026  
-**Status:** Audit and SP-PB14A implementation complete  
+**Date:** 12 October 2026
+**Status:** Audit and SP-PB14A implementation complete
 **Scope:** Product/architecture audit followed by the bounded SP-PB14A accuracy
 implementation. No new statistic, entitlement, migration or dependency was
 introduced.
@@ -146,8 +146,8 @@ rather than withholding users' own basic history.
 
 ### SP-PB14A — Insights truthfulness and history scope
 
-**Status:** Complete (12 October 2026)  
-**Complexity:** Medium  
+**Status:** Complete (12 October 2026)
+**Complexity:** Medium
 **Dependencies:** Existing play and Insights repositories only; no migration or
 new dependency.
 
@@ -188,8 +188,8 @@ Likely files: `backend/models/collection_insights.py`,
 
 ### SP-PB14B — Insights query and contract hardening
 
-**Status:** Complete (12 October 2026)  
-**Complexity:** Medium  
+**Status:** Complete (12 October 2026)
+**Complexity:** Medium
 **Dependencies:** SP-PB14A semantics agreed; API compatibility review.
 
 Scope and acceptance criteria:
@@ -203,8 +203,8 @@ Scope and acceptance criteria:
 
 ### SP-PB14C — Trend-value discovery
 
-**Priority:** Post-launch  
-**Complexity:** Small discovery; Large if implemented  
+**Priority:** Post-launch
+**Complexity:** Small discovery; Large if implemented
 **Dependencies:** Real usage/feedback and an explicit entitlement decision.
 
 Interview or test whether month/year comparisons and custom ranges materially

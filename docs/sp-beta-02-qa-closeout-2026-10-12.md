@@ -1,6 +1,6 @@
 # SP-BETA-02-QA — browser validation closeout
 
-**Date:** 12 October 2026  
+**Date:** 12 October 2026
 **Scope:** local synthetic browser and focused regression validation only.
 
 ## Previous failure root cause
