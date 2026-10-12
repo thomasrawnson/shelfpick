@@ -48,6 +48,7 @@ class Settings:
     resend_api_key: str
     email_from: str
     bgg_api_token: str
+    beta_invite_emails: frozenset[str]
 
 
 def get_settings() -> Settings:
@@ -109,6 +110,12 @@ def get_settings() -> Settings:
         "BGG_API_TOKEN",
         "",
     ).strip()
+
+    beta_invite_emails = frozenset(
+        email.strip().casefold()
+        for email in os.getenv("BETA_INVITE_EMAILS", "").split(",")
+        if email.strip()
+    )
 
     if not database_url:
         raise RuntimeError(
@@ -175,6 +182,11 @@ def get_settings() -> Settings:
                 "BGG_API_TOKEN must be configured"
             )
 
+        if not beta_invite_emails:
+            raise RuntimeError(
+                "BETA_INVITE_EMAILS must contain at least one invited email"
+            )
+
     return Settings(
         environment=environment,
         database_url=database_url,
@@ -190,6 +202,7 @@ def get_settings() -> Settings:
         resend_api_key=resend_api_key,
         email_from=email_from,
         bgg_api_token=bgg_api_token,
+        beta_invite_emails=beta_invite_emails,
     )
 
 

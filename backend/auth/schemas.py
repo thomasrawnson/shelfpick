@@ -59,6 +59,10 @@ class AuthResponse(BaseModel):
     token_type: str = "bearer"
     user: UserResponse
 
+
+class RegistrationResponse(BaseModel):
+    message: str
+
 class EmailRequest(BaseModel):
     email: EmailStr
 

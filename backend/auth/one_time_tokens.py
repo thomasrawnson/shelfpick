@@ -14,6 +14,7 @@ from database.models import (
 
 
 EMAIL_VERIFY = "email_verify"
+BETA_EMAIL_VERIFY = "beta_email_verify"
 PASSWORD_RESET = "password_reset"
 
 EMAIL_VERIFY_HOURS = 24
@@ -33,7 +34,7 @@ def create_one_time_token(
     user_id: int,
     purpose: str,
 ) -> str:
-    if purpose == EMAIL_VERIFY:
+    if purpose in {EMAIL_VERIFY, BETA_EMAIL_VERIFY}:
         lifetime = timedelta(
             hours=EMAIL_VERIFY_HOURS
         )

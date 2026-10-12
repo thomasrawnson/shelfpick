@@ -17,6 +17,7 @@ from auth.schemas import (
     AuthResponse,
     LoginRequest,
     RegisterRequest,
+    RegistrationResponse,
     UserResponse,
     ProfileUpdateRequest,
     EmailRequest,
@@ -30,7 +31,7 @@ from auth.security import (
     verify_password,
 )
 from database.connection import get_db
-from database.models import User
+from database.models import AuthToken, User
 from services.profile_service import update_profile
 from services.entitlements import entitlements_for, resolve_tier
 from auth.login_rate_limiter import (
@@ -45,6 +46,7 @@ from datetime import (
     timezone,
 )
 from auth.one_time_tokens import (
+    BETA_EMAIL_VERIFY,
     EMAIL_VERIFY,
     PASSWORD_RESET,
     consume_one_time_token,
@@ -59,6 +61,22 @@ router = APIRouter(
 logger = logging.getLogger(
     "boardgamepicker.auth"
 )
+
+BETA_REGISTRATION_MESSAGE = (
+    "If this address is invited, check your email to activate your account."
+)
+
+
+def normalize_email(value: str) -> str:
+    return value.strip().casefold()
+
+
+def private_beta_enabled() -> bool:
+    return bool(settings.beta_invite_emails)
+
+
+def is_beta_invited(email: str) -> bool:
+    return normalize_email(email) in settings.beta_invite_emails
 
 
 def verification_email_html(
@@ -171,18 +189,17 @@ def user_response(
 
 @router.post(
     "/register",
-    response_model=AuthResponse,
+    response_model=AuthResponse | RegistrationResponse,
     status_code=201,
 )
 def register(
     request: RegisterRequest,
     db: Session = Depends(get_db),
 ):
-    email = (
-        request.email
-        .strip()
-        .lower()
-    )
+    email = normalize_email(str(request.email))
+
+    if private_beta_enabled() and not is_beta_invited(email):
+        return RegistrationResponse(message=BETA_REGISTRATION_MESSAGE)
 
     existing = (
         db.query(User)
@@ -193,6 +210,8 @@ def register(
     )
 
     if existing is not None:
+        if private_beta_enabled():
+            return RegistrationResponse(message=BETA_REGISTRATION_MESSAGE)
         raise HTTPException(
             status_code=409,
             detail=(
@@ -209,6 +228,7 @@ def register(
         password_hash=hash_password(
             request.password
         ),
+        tier="FREE",
     )
 
     db.add(user)
@@ -219,7 +239,7 @@ def register(
         create_one_time_token(
             db,
             user.id,
-            EMAIL_VERIFY,
+            BETA_EMAIL_VERIFY if private_beta_enabled() else EMAIL_VERIFY,
         )
     )
 
@@ -242,9 +262,10 @@ def register(
             "user_id=%s",
             user.id,
         )
-    token = create_access_token(
-        user.id
-    )
+    if private_beta_enabled():
+        return RegistrationResponse(message=BETA_REGISTRATION_MESSAGE)
+
+    token = create_access_token(user.id)
 
     return AuthResponse(
         access_token=token,
@@ -324,6 +345,20 @@ def login(
             detail=(
                 "Invalid email or password"
             ),
+        )
+
+    pending_beta_activation = (
+        db.query(AuthToken.id).filter(
+            AuthToken.user_id == user.id,
+            AuthToken.purpose == BETA_EMAIL_VERIFY,
+        ).first()
+        if user.email_verified_at is None
+        else None
+    )
+    if pending_beta_activation is not None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Verify your email before signing in.",
         )
 
     login_rate_limiter.reset(
@@ -464,6 +499,52 @@ def request_verification(
 
 
 @router.post(
+    "/verification/resend",
+    response_model=MessageResponse,
+)
+def resend_beta_verification(
+    request: EmailRequest,
+    http_request: Request,
+    db: Session = Depends(get_db),
+):
+    email = normalize_email(str(request.email))
+    rate_limit_key = login_rate_limit_key(http_request, email)
+
+    if verification_request_rate_limiter.is_limited(rate_limit_key):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Too many verification requests. Please try again later.",
+            headers={"Retry-After": str(AUTH_REQUEST_WINDOW_SECONDS)},
+        )
+
+    verification_request_rate_limiter.record_request(rate_limit_key)
+    generic = MessageResponse(message=BETA_REGISTRATION_MESSAGE)
+    user = db.query(User).filter(User.email == email).first()
+
+    if user is None or user.email_verified_at is not None or not is_beta_invited(email):
+        return generic
+
+    beta_account = db.query(AuthToken.id).filter(
+        AuthToken.user_id == user.id,
+        AuthToken.purpose == BETA_EMAIL_VERIFY,
+    ).first()
+    if beta_account is None:
+        return generic
+
+    token = create_one_time_token(db, user.id, BETA_EMAIL_VERIFY)
+    try:
+        send_email(
+            to_email=user.email,
+            subject="Verify your ShelfPick email",
+            html=verification_email_html(token),
+        )
+    except Exception:
+        logger.exception("verification_email_failed user_id=%s", user.id)
+
+    return generic
+
+
+@router.post(
     "/verification/confirm",
     response_model=MessageResponse,
 )
@@ -471,11 +552,11 @@ def confirm_verification(
     request: TokenRequest,
     db: Session = Depends(get_db),
 ):
-    token = consume_one_time_token(
-        db,
-        request.token,
-        EMAIL_VERIFY,
-    )
+    token = consume_one_time_token(db, request.token, BETA_EMAIL_VERIFY)
+    beta_token = token is not None
+
+    if token is None:
+        token = consume_one_time_token(db, request.token, EMAIL_VERIFY)
 
     if token is None:
         raise HTTPException(
@@ -495,6 +576,12 @@ def confirm_verification(
         raise HTTPException(
             status_code=400,
             detail="Invalid token",
+        )
+
+    if beta_token and not is_beta_invited(user.email):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid or expired verification token",
         )
 
     user.email_verified_at = (

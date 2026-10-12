@@ -45,7 +45,9 @@ function VerifyEmailView() {
         setMessage("")
         setError(
           err instanceof Error
-            ? err.message
+            ? (/invalid|expired/i.test(err.message)
+              ? "This verification link is invalid, expired or already used. Ask for a new invitation email if you still need access."
+              : err.message)
             : "Verification failed",
         )
       })
@@ -70,7 +72,7 @@ function VerifyEmailView() {
         )}
 
         {error && (
-          <p className="error-message">
+          <p className="error-message" role="alert">
             {error}
           </p>
         )}

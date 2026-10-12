@@ -55,14 +55,18 @@ Planning this sequence is not implementation of slices 2–5.
    expansions are rejected with HTTP 400 detail before membership persistence,
    while cached rows with incomplete expansion classification are refreshed
    from BGG and fail closed if metadata cannot be safely resolved.
-4. **SP-PB12/SP-PB13 — PLANNED.** Audit approved branding and the renderer,
-   redesign persisted-play cards around available cover art, and add a truthful
-   monthly totals/collage export with a branded fallback. Preserve privacy,
-   redaction, native share/download and Free saved-play sharing.
-5. **SP-PB14 plus capability-audit follow-up — PLANNED.** Inventory actual
-   Insights/backend statistics and propose a concrete Free/Pro matrix before
-   gates. Keep basic history/headline totals Free and do not market the current
-   unimplemented `advanced_stats` capability.
+4. **SP-PB12/SP-PB13 — COMPLETE (12 October).** Persisted-play cards now use
+   the approved cover-led renderer and opted-in location redaction. Insights →
+   Recaps adds the bounded local-month endpoint and truthful monthly
+   totals/collage export with branded fallbacks. Privacy, native share/download
+   and Free access remain intact; artwork rights and physical-device sharing
+   remain release checks.
+5. **SP-PB14 statistics audit and SP-PB14A accuracy follow-up — COMPLETE (12
+   October).** The inventory confirms a substantial Free Insights
+   surface and no separate advanced-statistics product. Correct existing
+   truthfulness and history scope before adding statistics. Keep all current
+   history, collection use, player summaries and monthly recaps Free; do not
+   market or enforce the unused `advanced_stats` capability.
 
 Slice 1 implementation uses one account-scoped aggregate query over players,
 participants and plays, ordered by `plays.played_at` rather than insertion or
@@ -526,17 +530,132 @@ artwork hosts and physical-device rendering remain pre-beta checks. The existing
 timer-after-Pro-loss and real-phone background/reopen checks remain on that
 checklist. SP-PB02 remains BLOCKED and beta remains on hold.
 
+**SP-PB12B COMPLETE (12 October).** The existing renderer now uses the approved
+cover-led editorial poster direction without changing the 1200x1500 format,
+dialog, privacy choices, native share or download paths. Portrait, landscape
+and square artwork is contained at its original aspect ratio rather than
+cropped; a branded initials tile handles missing/CORS-failed artwork. A shorter
+artwork stage is used only when opted-in details need the space, keeping the
+title, date/duration, location, truthful outcome, up to four participant rows,
+overflow count and restrained ShelfPick/BGG footer inside fixed safe zones.
+
+Email-like text in an opted-in location is now replaced before share content is
+built, so the same sanitised value reaches preview alt text, the canvas, native
+share and download. Participant-name redaction and private defaults are
+unchanged. Twelve focused tests cover email-only, embedded, multiple and
+mixed-case location addresses, every privacy combination, missing/recorded
+duration, outcome types, contain geometry, fallback, long titles and failures.
+The configured frontend suite passed all 76 tests; lint, production build, PWA
+and diff checks passed. The advisory colour review completed with ten notices:
+nine fixed canvas colours centralised in the export palette and one pre-existing
+Game Night CSS colour. Playwright passed the 390x844/1440x900 light/dark matrix
+for modal responsiveness, visible keyboard focus, Escape focus return,
+navigation/action clearance and overflow. It also proved the downloaded PNG was
+byte-identical to the preview blob. Inspected portrait, landscape, square,
+fallback and modal evidence is in `docs/screenshots/sp-pb12b/`.
+
+Native OS sharing on physical iOS/Android hardware and representative live BGG
+artwork hosts remain launch validation. Production cover-bearing exports still
+require confirmation that ShelfPick's BGG agreement covers commercial image
+redistribution and attribution; the branded fallback remains available and no
+new artwork source was added.
+
 ### SP-PB13 — Share This month in games
 
-**Status:** NOT STARTED. **Workstream:** Sharing. **Access:** Proposed Free marketing feature.
+**Status:** COMPLETE (12 October). **Workstream:** Sharing. **Access:** Free.
 
 Add an accessible share icon to the monthly recap. Export game images, ShelfPick logo and statistics from the same month/filter/timezone as the visible recap. Preview before sharing; handle no plays, one play, missing images and long names. Reuse SP-PB12 rendering and privacy choices; verify readable exported images, not only on-screen layout.
 
-### SP-PB14 — Add total plays and board-game H-index
+The implemented authenticated endpoint accepts validated `YYYY-MM` and IANA
+timezone parameters, converts the selected local calendar month to inclusive
+UTC start/exclusive UTC end boundaries, and performs bounded account-scoped
+aggregation without the existing Insights 20-row detail cap. It returns actual
+play/game totals, nullable duration plus recorded-play coverage, deterministic
+most-played and up to four collage games. Equal counts sort by latest play,
+case-insensitive name and BGG ID. Invalid artwork references become fallbacks.
 
-**Status:** NOT STARTED. **Workstream:** Statistics. **Access:** Tier not specified; preserve existing Free statistics.
+Insights → Recaps starts at the current local month, supports previous-month
+navigation and prevents future selection. Loading, failure/retry, empty and
+sparse states preserve the selection; empty months cannot be shared. The
+1200x1500 cover-led collage includes no participant, score or location data and
+uses the existing preview, native-file-share, download, cancellation, retry and
+focus behavior. One/four-game, partial/missing-duration, long-title and failed
+artwork fixtures were visually inspected.
 
-Show clearly labelled total plays and H-index: the largest h for which at least h distinct games have each been played at least h times. Define all-time versus selected-period scope visibly and use the existing play quantity/import conventions. Test zero plays, ties, repeated plays, deleted records and duplicate-import handling. Explain that these are recorded ShelfPick/imported plays, not an assertion about all lifetime play.
+Validation: focused backend service/API/PostgreSQL tests passed 10/10. The full backend suite passed 287 with five conditional
+skips; the frontend suite passed 80/80. ESLint, production build, PWA,
+colour-review and `git diff --check` passed. Playwright passed 390x844 and
+1440x900 in light/dark, including error/retry, empty/sparse months, keyboard
+focus restoration, action/navigation clearance, no horizontal overflow and a
+byte-identical preview/download PNG. Evidence is under
+`docs/screenshots/sp-pb13/`. Physical iOS/Android share sheets and representative
+live BGG artwork hosts remain launch validation. No migration, new dependency,
+entitlement, primary navigation or production change was introduced.
+
+Official BGG terms require attribution and separate commercial permission, and
+BGG's image guidance says uploaders retain outside-use rights. Before launch,
+confirm that ShelfPick's approved application agreement covers embedding cover
+images in redistributed share PNGs. If it does not, use the same branded
+initial/title fallbacks until an authorised artwork source exists. Full findings,
+contracts, tie-breaking and acceptance tests are in
+`docs/sp-pb12-sp-pb13-sharing-audit-2026-10-11.md`.
+
+### SP-PB14 — Insights and Free/Pro statistics audit
+
+**Status:** AUDIT AND SP-PB14A COMPLETE (12 October). **Workstream:** Statistics. **Access:** Free; unchanged.
+
+The audit found that total plays already ships alongside current-shelf coverage,
+total/average recorded duration, most/last played, waiting games, player/group
+summaries, personal-ranking metadata and the SP-PB13 monthly recap. All are
+currently Free. The backend also computes a legacy current-month activity
+payload that the current UI does not use; it must not be mistaken for a missing
+feature or turned into a second recap flow.
+
+Three corrections precede new statistics: all-time duration must distinguish no
+recorded duration from zero and disclose partial coverage; Play-tab unique,
+most-played and last-played values must cover saved account history rather than
+silently requiring current Owned membership; and winner/favourite wording must
+not overclaim incomplete winner flags or inferred preference. The old H-index
+proposal is not recommended for beta or launch because it is niche, needs
+explanation and offers little commercial value.
+
+**SP-PB14A — Insights truthfulness and history scope — COMPLETE (12 October).**
+Current collection coverage remains based on current Owned, non-expansion
+membership. The Play tab separately reports distinct games across the account's
+saved history, and most/last played no longer require current ownership.
+All-time recorded duration is nullable, genuine recorded zero remains `0.0`,
+and partial history states the number of timed plays. The main error state can
+be retried without introducing a new route or entitlement.
+
+Player frequency is now labelled **Most played together**, not preference.
+Outcome classification uses only saved participant facts: no winner flags means
+unknown; a non-winner in a play with at least one recorded winner is a loss; a
+single winner or non-tied shared winner is a win; equal non-null scores across
+multiple recorded winners are a draw; and an all-winner Cooperative Game is a
+cooperative win. Win rate is `wins / (wins + losses + draws)` and is unavailable
+when that denominator is zero. Saved plays are unchanged.
+
+Validation: 30 focused backend tests and the full PostgreSQL-backed backend
+suite passed (289 passed, five conditional timer-isolation skips). The frontend
+suite passed 84/84. Alembic reported no new upgrade operations; ESLint,
+production build, PWA checks and `git diff --check` passed. Mock-backed
+Playwright passed 390x844 and 1440x900 in light/dark for truthful partial,
+missing and recorded-zero duration, historical games, player outcomes, empty
+and retry states, SP-PB13 missing-duration behaviour, visible keyboard focus,
+navigation clearance and horizontal overflow. Captures are under
+`docs/screenshots/sp-pb14a/`. No migration, dependency, Pro gate or recap
+calculation changed.
+
+**SP-PB14B — query and contract hardening (Medium; worth before launch):**
+replace the unbounded in-memory regular-group scan with bounded database work
+and retire unused `monthly_activity` only after compatibility review.
+
+**SP-PB14C — trend-value discovery (post-launch):** validate demand before
+considering custom ranges or month/year comparisons as a coherent Pro bundle.
+Do not gate basic totals, history or recaps. `advanced_stats` remains an
+unmarketed capability name with no shipped surface. Full inventory, Free/Pro
+matrix, acceptance criteria and blocker separation are in
+`docs/sp-pb14-insights-free-pro-statistics-audit-2026-10-12.md`.
 
 ### SP-PB15 — Use ranking scores in recommendations
 

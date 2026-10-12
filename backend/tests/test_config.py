@@ -27,6 +27,7 @@ def production_environment(
         "BGG_API_TOKEN": (
             "test-bgg-token-not-a-real-secret"
         ),
+        "BETA_INVITE_EMAILS": " Invited@Example.com ",
     }
 
     for name, value in values.items():
@@ -49,6 +50,7 @@ def test_production_settings_are_normalised(
     assert settings.bgg_api_token == (
         "test-bgg-token-not-a-real-secret"
     )
+    assert settings.beta_invite_emails == frozenset({"invited@example.com"})
 
 
 @pytest.mark.parametrize(
@@ -93,6 +95,11 @@ def test_production_settings_are_normalised(
             "BGG_API_TOKEN",
             "   ",
             "BGG_API_TOKEN",
+        ),
+        (
+            "BETA_INVITE_EMAILS",
+            "",
+            "BETA_INVITE_EMAILS",
         ),
     ],
 )

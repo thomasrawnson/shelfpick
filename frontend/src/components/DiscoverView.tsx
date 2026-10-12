@@ -74,6 +74,11 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
   }, [mode])
 
   useEffect(() => {
+    if (mode === "top100") {
+      setLoading(false)
+      return
+    }
+
     if (mode === "for_you" && !personalized) return
 
     let cancelled = false
@@ -283,6 +288,12 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
           <button type="button" className="primary-button" onClick={onUnlockPro}>
             Compare Free and Pro
           </button>
+        </div>
+      ) : mode === "top100" ? (
+        <div className="discover-empty" role="status">
+          <h2>Top 100 is temporarily unavailable</h2>
+          <p>We’ll restore it when an authorised official rankings source is available and validated.</p>
+          <button type="button" className="secondary-button" onClick={() => selectMode("hot")}>Browse Hot games</button>
         </div>
       ) : (
         <>

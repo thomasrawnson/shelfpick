@@ -30,6 +30,48 @@ and validate the work before asking Tom to resume beta. Internal testing
 continues. This instruction supersedes older immediate-beta and post-launch
 timing below; existing completed slices remain historical implementation facts.
 
+### SP-BETA-01 private-beta readiness — AUDIT COMPLETE (12 October 2026)
+
+ShelfPick is not ready for tester invitations yet, but a small controlled beta
+does not need to wait for an authorised Top 100 data source. SP-PB02 may remain
+incomplete if ranked retrieval is disabled and the UI truthfully marks Top 100
+unavailable; Hot, For You and Free access must remain unchanged. The minimum
+path is a clean release candidate excluding unrelated `PickerView.tsx` work,
+server-enforced invited and verified accounts, resolved or disabled
+cover-bearing exports, a paid private PostgreSQL database with tested recovery,
+and signed-off iPhone/Android journeys. The recommended baseline Render
+configuration is approximately $13/month before overages, domains, email and
+temporary recovery resources. Existing test Pro entitlements may support
+selected testers through an audited server-side grant; checkout remains a
+public-launch task and the approved launch price remains £3.99 one-off.
+
+The current checkout is not a release candidate: local `main` is one commit
+ahead of its tracked remote, completed SP-PB12B–14B work is still uncommitted,
+and remote CI predates it. Assemble the work in a clean branch, preserve the
+dirty checkout, exclude unrelated Picker changes, require green candidate CI,
+then complete deployment/recovery and real-device gates before an explicit
+owner invitation decision. See
+`docs/private-beta-readiness-audit-2026-10-12.md`. The next bounded
+implementation task is **SP-BETA-02 — Controlled beta access and truthful
+unavailable services**; this roadmap entry records the audit only and does not
+change any completed feature status or resume beta.
+
+**SP-BETA-02 is COMPLETE (12 October 2026).** Production
+registration is server allow-listed, normalised, generic and email-verification
+gated without changing existing accounts or entitlements. Top 100 fails closed
+without ranked retrieval; Hot and For You remain available and SP-PB02 remains
+blocked. The production-preview Playwright matrix passed at 390x844 and
+1440x900 in light/dark with synthetic CORS-valid authentication fixtures,
+covering generic invite responses, verification required/success/failure,
+resend, existing-account compatibility, Hot, Hot-backed Pro For You, explicit
+Top 100 unavailability, absence of ranked requests, focus, overflow and
+navigation clearance. See
+docs/sp-beta-02-qa-closeout-2026-10-12.md. Beta is still on hold pending
+clean release-candidate integration,
+artwork-rights resolution or fallback-only exports, provisioned backup/recovery
+evidence, deployed email/health checks, physical iPhone/Android validation and
+explicit owner approval.
+
 ### Bounded follow-up sequence — 29 September 2026
 
 The next requested work is split across existing task areas; recording the
@@ -75,13 +117,53 @@ sequence does not mark later slices as implemented.
    candidate mapping, terms and cost approval. Keep barcode out of the launch
    critical path. See
    `docs/sp-pb09-sp-pb16a-add-game-barcode-audit-2026-10-11.md`.
-4. **SP-PB12/SP-PB13 sharing follow-up — PLANNED.** Audit logo use and existing
-   exports, refine saved-play cards around cover artwork, then add the truthful
-   **This month** recap/collage using the existing renderer. Saved-play sharing
-   remains Free unless a later product decision changes it.
-5. **SP-PB14 statistics and Pro proposal — PLANNED.** Audit actual Insights and
-   backend capabilities, then agree a Free/Pro matrix before any new gate or
-   `advanced_stats` marketing. Basic history and headline totals remain Free.
+4. **SP-PB12/SP-PB13 sharing follow-up — COMPLETE (12 October).** SP-PB12
+   already has one privacy-safe 1200x1500 renderer, responsive preview, approved
+   logo, artwork fallback, native file share and download. SP-PB12B retained
+   that architecture and delivered the cover-led editorial poster: complete
+   portrait/landscape/square artwork, bounded long-content regions, a polished
+   fallback, restrained ShelfPick/BGG footer and email redaction for opted-in
+   location text before preview/export. Twelve focused sharing tests and the
+   76-test frontend suite passed with lint, build and PWA checks. Playwright
+   passed 390x844 and 1440x900 in light/dark, including focus restoration,
+   overflow, modal/action clearance and byte-identical preview/download PNGs.
+   SP-PB13 now adds the Free monthly recap in Insights through authenticated
+   `GET /insights/monthly-recap?month=YYYY-MM&timezone=IANA_ZONE`. Local month
+   bounds are converted to a half-open UTC interval; totals, nullable duration
+   and coverage, deterministic most-played and up to four collage games remain
+   account scoped. Empty months cannot be shared. The 1200x1500 preview/export
+   excludes player names, scores and locations and reuses SP-PB12B contain-style
+   artwork, fallbacks, branding, native share and download behavior. Full backend
+   (287 passed, 5 conditional skips) and frontend (80 passed) suites, PostgreSQL
+   integration, lint, build and PWA checks passed; Playwright passed 390x844 and
+   1440x900 in light/dark. No migration or dependency was added. Cover-bearing exports require
+   confirmation that ShelfPick's BGG agreement covers commercial image
+   redistribution and attribution. See
+   `docs/sp-pb12-sp-pb13-sharing-audit-2026-10-11.md`.
+5. **SP-PB14 statistics and Pro proposal — AUDIT COMPLETE (12 October).**
+   Insights already provides Free collection coverage, play totals, recorded
+   time, most/last played, player/group summaries, ranking metadata and the
+   SP-PB13 monthly recap. Do not build another dashboard or market
+   `advanced_stats`. **SP-PB14A is COMPLETE (12 October):** missing all-time
+   duration remains unavailable rather than becoming zero, partial coverage is
+   explicit, and lifetime unique/most/last-played values now include every
+   account play even when its game is no longer Owned. Current-shelf coverage
+   remains current-Owned and excludes expansions. Player history now says
+   **Most played together** and classifies saved outcomes as wins, losses,
+   scored draws or unknown; win rate uses only decided plays. All existing
+   Insights and recaps remain Free. Backend 289 passed with five conditional
+   skips, frontend 84 passed, Alembic/lint/build/PWA checks passed, and the
+   390x844/1440x900 light/dark Playwright matrix passed. Date-range comparisons
+   and longitudinal trends are only a post-launch Pro research candidate;
+   H-index is not recommended. See
+   `docs/sp-pb14-insights-free-pro-statistics-audit-2026-10-12.md`.
+   **SP-PB14B is COMPLETE (12 October):** exact regular-group aggregation now
+   runs as one account-scoped PostgreSQL query instead of loading every play,
+   participant and linked player into Python. A disposable 10,000-play fixture
+   reduced the median from 1,280.71 ms, 51 queries and 64.64 MiB peak traced
+   Python memory to 21.78 ms, one query and 0.07 MiB, with identical top-five
+   output. Existing indexes were sufficient; no migration, API, statistic,
+   entitlement, frontend or monthly-recap change was needed.
 
 Focused evidence for slice 1: seven backend profile/API tests and nine focused
 frontend tests passed, as did changed-file ESLint, the production build and
@@ -334,10 +416,12 @@ fallbacks, and do not change the logo or Free/Pro proposition as part of UI-1.
 3. SP-PB03–04: selected-player count and saved play-style defaults.
 4. SP-PB05 Settings navigation, SP-PB09 Add game discoverability and SP-PB20
    heading/copy cleanup — COMPLETE; SP-PB06–08 remain pending.
-5. SP-PB10–11 location and Pro live duration — COMPLETE; SP-PB14 statistics
-   remains pending.
-6. SP-PB12 branded saved-play sharing — COMPLETE; SP-PB13 monthly recap
-   sharing remains pending.
+5. SP-PB10–11 location and Pro live duration — COMPLETE; the SP-PB14 audit,
+   SP-PB14A accuracy implementation and SP-PB14B regular-group query hardening
+   are COMPLETE.
+6. SP-PB12 branded saved-play sharing and SP-PB13 monthly recap sharing —
+   COMPLETE; external artwork rights and physical-device sharing remain release
+   checks.
 7. SP-PB15 Pro ranking recommendations are COMPLETE; SP-PB16 scanning remains pending;
    SP-PB17 preset avatars are complete. Photo upload is a post-beta follow-up,
    not a beta blocker.
@@ -388,11 +472,13 @@ preserves Collection detail state and returns focus on Close or Escape. One
 download; it uses the approved ShelfPick logo, defaults names/location/scores
 to private choices, redacts email-like labels, preserves missing scores and
 recorded cooperative, tie and shared-win results, and substitutes a branded fallback when
-artwork is missing or CORS-blocked. Focused tests, build, changed-file lint and
-a mocked 390×844 browser pass passed; actual normal and long-title/fallback PNGs
-were inspected. Native OS sharing, real artwork hosts and physical-device
-rendering remain pre-beta validation. SP-PB13 remains separate, SP-PB02 remains
-BLOCKED and beta remains on hold.
+artwork is missing or CORS-blocked. SP-PB12B subsequently delivered the
+cover-led poster and location redaction; SP-PB13 delivered the account-scoped
+local-month recap endpoint, Recaps UI and deterministic collage renderer.
+Automated, PostgreSQL and responsive browser validation is recorded in the
+sharing audit. Native OS sharing, real artwork hosts and physical-device
+rendering remain pre-beta validation. SP-PB02 remains BLOCKED and beta remains
+on hold.
 
 The bounded SP-PB17 preset-avatar subtask completed on 28 September 2026 with
 the existing authenticated-user access and no new entitlement. The three
