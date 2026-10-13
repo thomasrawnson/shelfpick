@@ -146,6 +146,16 @@ remain disabled until external permission is documented. Physical iOS/Android
 native-share validation, controlled hosting, email/health checks and database
 recovery evidence remain beta gates.
 
+SP-BETA-08A integrated the slice for review on 13 October. Commit `f25a183`
+was pushed on `feature/sp-beta-08-safe-artwork-exports` and opened as PR #4
+against exact base `c4811cf`. Both push and PR backend/frontend CI runs passed;
+Vercel and Preview Comments passed, and GitHub classified deployment
+`7037330333` as Preview with `production_environment: false`. Live Vercel review
+confirmed production-domain auto-assignment off and authentication required for
+all deployments. GitHub's active `Protect Main` ruleset requires a PR and
+strict backend/frontend checks and blocks deletion/non-fast-forward updates.
+No merge, production promotion, provider mutation or invitation occurred.
+
 ## 1. Release and integration state
 
 At audit time the checkout is `main`, one commit ahead of its local

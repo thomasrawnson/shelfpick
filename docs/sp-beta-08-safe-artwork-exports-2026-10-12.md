@@ -2,10 +2,32 @@
 
 **Date:** 12 October 2026
 
-**Status:** Complete locally; uncommitted and not deployed
+**Status:** Complete; committed for owner review and not deployed to production
 
 **Branch:** `feature/sp-beta-08-safe-artwork-exports`
 **Base:** `c4811cf69a7bff63b94fdea608b73783ddf5efd4`
+
+## SP-BETA-08A integration closeout — 13 October 2026
+
+The reviewed implementation commit `f25a183754ebd9eb848e6df2109bf1cdc0faa5b1`
+was pushed to `feature/sp-beta-08-safe-artwork-exports` and opened as GitHub
+PR #4 against `main`. The PR base is exactly `c4811cf69a7bff63b94fdea608b73783ddf5efd4`.
+The remote file inventory matches the scoped local commit and excludes
+`PickerView.tsx`, local environments, dependency/build directories and secrets.
+
+Before push, Vercel's live Production environment was re-read and showed
+**Auto-Assign Custom Production Domains** disabled. Deployment Protection
+showed **Require Log In** enabled for **All Deployments**, and an unauthenticated
+request to the public alias redirected to Vercel SSO. GitHub's active
+`Protect Main` ruleset requires a pull request, strict backend/frontend status
+checks and blocks deletion/non-fast-forward updates while retaining limited
+owner recovery through pull-request bypass.
+
+Both GitHub Actions jobs passed on the push and PR runs. Vercel and Preview
+Comments passed; GitHub recorded deployment `7037330333` for the implementation
+SHA as environment `Preview` with `production_environment: false`. PR #4 was
+open, non-draft, mergeable and clean at that head. No merge, production
+promotion, provider-setting change, secret change or invitation was performed.
 
 ## Export restriction
 

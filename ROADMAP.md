@@ -109,7 +109,7 @@ not application build artefacts. This documentation-only closeout commit is a
 sixth administrative PR commit and does not change the validated application.
 Merge, deployment and tester invitations remain explicitly unauthorised.
 
-### SP-BETA-08 safe artwork exports — COMPLETE LOCALLY (12 October 2026)
+### SP-BETA-08 safe artwork exports — COMPLETE; PR #4 OPEN (13 October 2026)
 
 Saved-play cards and monthly recaps now default to branded initials artwork for
 preview, PNG download and native file sharing. The API owns the explicit
@@ -131,6 +131,15 @@ cover request. The inspected fallback outputs are in
 `docs/screenshots/sp-beta-08/`. This closes the application-side artwork export
 gate without claiming permission to enable cover-bearing exports; physical
 iOS/Android share sheets and the remaining operational beta gates stay open.
+
+SP-BETA-08A committed the scoped slice as `f25a183`, pushed the feature branch
+and opened https://github.com/thomasrawnson/shelfpick/pull/4 against the exact
+merged base `c4811cf`. Push and pull-request CI passed for both backend and
+frontend; Vercel's deployment was explicitly recorded as Preview, not
+Production. Live provider review confirmed production-domain auto-assignment
+disabled, authentication required for all Vercel deployments and an active
+GitHub `Protect Main` ruleset requiring PR plus strict backend/frontend checks.
+Owner merge approval remains required; nothing was merged or promoted.
 
 ### Bounded follow-up sequence — 29 September 2026
 
