@@ -51,6 +51,45 @@ def test_production_settings_are_normalised(
         "test-bgg-token-not-a-real-secret"
     )
     assert settings.beta_invite_emails == frozenset({"invited@example.com"})
+    assert settings.export_cover_artwork_enabled is False
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        (None, False),
+        ("false", False),
+        ("0", False),
+        ("true", True),
+        ("1", True),
+    ],
+)
+def test_export_cover_artwork_setting_is_explicit_and_defaults_closed(
+    monkeypatch: pytest.MonkeyPatch,
+    value: str | None,
+    expected: bool,
+):
+    monkeypatch.setenv("APP_ENV", "test")
+    monkeypatch.setenv("DATABASE_URL", "postgresql://user:password@db/app")
+    monkeypatch.setenv("JWT_SECRET", "local-test-secret")
+    if value is None:
+        monkeypatch.delenv("EXPORT_COVER_ARTWORK_ENABLED", raising=False)
+    else:
+        monkeypatch.setenv("EXPORT_COVER_ARTWORK_ENABLED", value)
+
+    assert get_settings().export_cover_artwork_enabled is expected
+
+
+def test_invalid_export_cover_artwork_setting_fails_fast(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("APP_ENV", "test")
+    monkeypatch.setenv("DATABASE_URL", "postgresql://user:password@db/app")
+    monkeypatch.setenv("JWT_SECRET", "local-test-secret")
+    monkeypatch.setenv("EXPORT_COVER_ARTWORK_ENABLED", "maybe")
+
+    with pytest.raises(RuntimeError, match="EXPORT_COVER_ARTWORK_ENABLED must be a boolean"):
+        get_settings()
 
 
 @pytest.mark.parametrize(

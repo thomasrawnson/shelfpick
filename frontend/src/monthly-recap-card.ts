@@ -58,6 +58,7 @@ async function drawGameTile(
   context: CanvasRenderingContext2D,
   game: MonthlyRecapGame,
   bounds: ImageRect,
+  allowCoverArtwork: boolean,
 ) {
   context.fillStyle = SHARE_CARD.forestSoft
   fillRoundedRect(context, bounds.x, bounds.y, bounds.width, bounds.height, 24)
@@ -68,7 +69,7 @@ async function drawGameTile(
     height: bounds.height - 88,
   }
   let loaded = false
-  if (game.image_url) {
+  if (allowCoverArtwork && game.image_url) {
     try {
       const artwork = await loadShareImage(game.image_url)
       const target = containImageRect(artwork.width, artwork.height, artworkBounds)
@@ -86,7 +87,10 @@ async function drawGameTile(
   context.fillText(fitShareText(context, game.name, bounds.width - 40), bounds.x + 20, bounds.y + bounds.height - 27)
 }
 
-export async function renderMonthlyRecapCard(recap: MonthlyRecap): Promise<Blob> {
+export async function renderMonthlyRecapCard(
+  recap: MonthlyRecap,
+  allowCoverArtwork = false,
+): Promise<Blob> {
   const canvas = document.createElement("canvas")
   canvas.width = 1200
   canvas.height = 1500
@@ -106,7 +110,12 @@ export async function renderMonthlyRecapCard(recap: MonthlyRecap): Promise<Blob>
   context.fillText("My month in games", 72, 190)
 
   const games = recap.collage_games.slice(0, 4)
-  await Promise.all(games.map((game, index) => drawGameTile(context, game, collageRects(games.length)[index])))
+  await Promise.all(games.map((game, index) => drawGameTile(
+    context,
+    game,
+    collageRects(games.length)[index],
+    allowCoverArtwork,
+  )))
 
   const metricY = 1010
   const recordedTime = recap.total_duration_minutes === null

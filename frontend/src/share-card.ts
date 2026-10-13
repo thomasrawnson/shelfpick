@@ -246,6 +246,7 @@ export async function renderPlayShareCard(
   game: Game,
   play: GamePlay,
   privacy: SharePrivacyOptions,
+  allowCoverArtwork = false,
 ): Promise<Blob> {
   const canvas = document.createElement("canvas")
   canvas.width = 1200
@@ -283,7 +284,7 @@ export async function renderPlayShareCard(
     32,
   )
   let artworkLoaded = false
-  if (game.image_url) {
+  if (allowCoverArtwork && game.image_url) {
     try {
       const artwork = await loadShareImage(game.image_url)
       const target = containImageRect(artwork.width, artwork.height, artworkBounds)

@@ -408,6 +408,14 @@ followed by actual totals, nullable recorded time, deterministic most-played
 copy and the established ShelfPick/BGG footer. Player names, scores and location
 never enter the monthly response, preview or image.
 
+SP-BETA-08 keeps these cover-led compositions while making exported artwork a
+server-owned release policy. Unless the API explicitly permits cover artwork,
+every preview and its matching PNG/native-share file uses the established
+branded initials tile; configuration errors also fall back safely. This export
+rule does not alter ordinary in-app covers. Users are not offered an artwork
+override, and the ShelfPick wordmark plus BoardGameGeek data attribution remain
+in both modes.
+
 SP-PB14A keeps collection usage and lifetime play history visibly distinct.
 **Owned games played** belongs to current-shelf coverage; **Games in history**,
 most played and last played cover every saved account play even when a title is

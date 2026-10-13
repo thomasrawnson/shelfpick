@@ -36,6 +36,24 @@ def _get_bool(
     )
 
 
+def _get_strict_bool(
+    name: str,
+    default: bool = False,
+) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+
+    normalised = value.strip().lower()
+    if normalised in {"1", "true", "yes", "on"}:
+        return True
+    if normalised in {"0", "false", "no", "off"}:
+        return False
+    raise RuntimeError(
+        f"{name} must be a boolean value"
+    )
+
+
 @dataclass(frozen=True)
 class Settings:
     environment: str
@@ -49,6 +67,7 @@ class Settings:
     email_from: str
     bgg_api_token: str
     beta_invite_emails: frozenset[str]
+    export_cover_artwork_enabled: bool
 
 
 def get_settings() -> Settings:
@@ -115,6 +134,13 @@ def get_settings() -> Settings:
         email.strip().casefold()
         for email in os.getenv("BETA_INVITE_EMAILS", "").split(",")
         if email.strip()
+    )
+
+    export_cover_artwork_enabled = (
+        _get_strict_bool(
+            "EXPORT_COVER_ARTWORK_ENABLED",
+            False,
+        )
     )
 
     if not database_url:
@@ -203,6 +229,9 @@ def get_settings() -> Settings:
         email_from=email_from,
         bgg_api_token=bgg_api_token,
         beta_invite_emails=beta_invite_emails,
+        export_cover_artwork_enabled=(
+            export_cover_artwork_enabled
+        ),
     )
 
 

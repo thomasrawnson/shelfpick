@@ -4,6 +4,28 @@
 **Scope:** The initial audit was planning-only. The bounded SP-PB12B
 and SP-PB13 implementation records are included below.
 
+## SP-BETA-08 export-policy closeout — 12 October 2026
+
+**Status: COMPLETE LOCALLY.** The SP-PB12B and SP-PB13 renderers retain their
+1200x1500 cover-led layouts, but cover inclusion is now controlled by the
+server's `EXPORT_COVER_ARTWORK_ENABLED` setting and defaults off. The public
+configuration response contains only the non-sensitive boolean policy. Both
+dialogs resolve it before rendering; only strict `true` enables the existing
+cover path, while API/configuration failure uses branded initials. Users have
+no UI control for this policy. The same generated blob still supplies preview,
+PNG download and native sharing, and normal in-app covers are unaffected.
+
+Tests cover server defaults, explicit true/false values, invalid startup
+values, endpoint output, malformed/unavailable client configuration and both
+renderer modes. The full backend suite passed 303 tests with five existing
+conditional skips; the full frontend suite passed 92. Alembic, ESLint, build,
+PWA and diff checks passed. Chrome passed both sharing flows at 390x844 and
+1440x900 in light/dark and demonstrated that fallback export made no additional
+cover request. The inspected play and four-game recap PNGs preserve privacy,
+layout and attribution. Permission remains an external prerequisite for ever
+setting the flag to true; fallback-only exports do not establish rights to the
+underlying in-app artwork.
+
 ## SP-PB12B implementation record — 12 October 2026
 
 **Status: COMPLETE. Complexity: Medium.** The existing 1200x1500 canvas,

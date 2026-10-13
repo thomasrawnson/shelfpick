@@ -28,6 +28,15 @@ from models.play import Play
 client = TestClient(app)
 
 
+def test_export_configuration_defaults_to_branded_fallback():
+    response = client.get("/export-config")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "cover_artwork_enabled": False,
+    }
+
+
 @pytest.fixture(autouse=True)
 def neutral_picker_rankings():
     app.dependency_overrides[
