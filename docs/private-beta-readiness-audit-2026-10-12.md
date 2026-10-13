@@ -119,6 +119,33 @@ application behaviour. The PR must not be merged until owner review; private
 beta still requires the remaining operational, rights, recovery and real-device
 gates recorded above. No deployment or tester invitation was performed.
 
+## SP-BETA-08 safe artwork exports — 12 October 2026
+
+The application-side cover-redistribution blocker is resolved locally without
+assuming new rights. A server-only `EXPORT_COVER_ARTWORK_ENABLED` flag defaults
+to `false` in code, the example environment and the Render Blueprint. Both
+saved-play and monthly-recap dialogs request the same API policy before creating
+their preview blob. Only an exact boolean `true` permits cover retrieval;
+network, HTTP, malformed-contract and invalid startup configuration paths fail
+closed. There is no browser setting or query parameter to override the policy.
+Preview, PNG download and native file share continue to consume the same blob.
+
+Normal Collection/Insights cover display is unchanged. Fallback exports retain
+the cover-led stage and collage geometry, branded initials, truthful data,
+privacy redaction, ShelfPick branding and BoardGameGeek data attribution. Full
+local validation passed: backend **303 passed / 5 skipped**, Alembic clean;
+frontend **92 passed**, ESLint, configured production build, PWA and diff checks
+green. Chrome passed play-card and recap matrices at 390x844 and 1440x900 in
+light/dark, and observed no additional cover request during fallback export.
+Two 1200x1500 PNGs were visually inspected and preview/download hashes matched.
+The first sandboxed backend run failed 23 database-dependent tests because the
+sandbox denied localhost:5433; the identical authorised PostgreSQL run passed.
+
+SP-BETA-08 can close as an application slice. Cover-bearing export mode must
+remain disabled until external permission is documented. Physical iOS/Android
+native-share validation, controlled hosting, email/health checks and database
+recovery evidence remain beta gates.
+
 ## 1. Release and integration state
 
 At audit time the checkout is `main`, one commit ahead of its local

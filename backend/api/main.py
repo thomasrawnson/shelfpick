@@ -15,6 +15,7 @@ from api.routers import (
     auth,
     collection,
     discover,
+    export_config,
     games,
     game_night,
     health,
@@ -79,6 +80,10 @@ app.add_middleware(
 
 app.include_router(
     health.router
+)
+
+app.include_router(
+    export_config.router
 )
 
 app.include_router(

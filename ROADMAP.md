@@ -109,6 +109,29 @@ not application build artefacts. This documentation-only closeout commit is a
 sixth administrative PR commit and does not change the validated application.
 Merge, deployment and tester invitations remain explicitly unauthorised.
 
+### SP-BETA-08 safe artwork exports — COMPLETE LOCALLY (12 October 2026)
+
+Saved-play cards and monthly recaps now default to branded initials artwork for
+preview, PNG download and native file sharing. The API owns the explicit
+`EXPORT_COVER_ARTWORK_ENABLED` policy; its code, example-environment and Render
+Blueprint defaults are `false`. The browser has no user-facing override, and
+an unavailable, invalid or non-boolean policy response fails closed. Normal
+in-app cover display, the existing 1200x1500 layouts, privacy safeguards, Free
+access and BoardGameGeek data attribution are unchanged.
+
+Focused policy/API/renderer tests passed in both permitted and fallback-only
+modes, including invalid server configuration and client policy failures. The
+full PostgreSQL backend suite passed **303 tests with 5 conditional skips**;
+Alembic found no schema operations; the frontend passed **92 tests**, ESLint,
+the production build, PWA validation and diff checks. Google Chrome passed the
+390x844 and 1440x900 light/dark matrices for both play and recap dialogs,
+including keyboard focus, layout bounds, navigation clearance, byte-identical
+preview/download files and proof that export generation made no additional
+cover request. The inspected fallback outputs are in
+`docs/screenshots/sp-beta-08/`. This closes the application-side artwork export
+gate without claiming permission to enable cover-bearing exports; physical
+iOS/Android share sheets and the remaining operational beta gates stay open.
+
 ### Bounded follow-up sequence — 29 September 2026
 
 The next requested work is split across existing task areas; recording the

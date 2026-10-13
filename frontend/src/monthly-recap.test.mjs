@@ -101,6 +101,43 @@ test("one-game, missing-artwork and long-title recaps render a 1200x1500 PNG", a
   }
 })
 
+test("recap covers are loaded only in explicitly permitted export mode", async () => {
+  const originalDocument = globalThis.document
+  const originalImage = globalThis.Image
+  const originalWindow = globalThis.window
+  const requested = []
+  const context = {
+    beginPath() {}, drawImage() {}, fill() {}, fillRect() {}, fillText() {}, roundRect() {},
+    measureText(value) { return { width: value.length * 18 } },
+    set fillStyle(_value) {}, set font(_value) {}, set textAlign(_value) {},
+  }
+  const canvas = {
+    width: 0, height: 0,
+    getContext() { return context },
+    toBlob(callback) { callback(new Blob([`${this.width}x${this.height}`], { type: "image/png" })) },
+  }
+  class MockImage {
+    width = 400
+    height = 700
+    set src(value) { requested.push(value); queueMicrotask(() => this.onload?.()) }
+  }
+  globalThis.document = { createElement: () => canvas }
+  globalThis.Image = MockImage
+  globalThis.window = { setTimeout, clearTimeout }
+  try {
+    const fallbackBlob = await renderMonthlyRecapCard(recap)
+    assert.equal(await fallbackBlob.text(), "1200x1500")
+    assert.equal(requested.some(value => value.includes("portrait.svg")), false)
+
+    await renderMonthlyRecapCard(recap, true)
+    assert.equal(requested.some(value => value.includes("portrait.svg")), true)
+  } finally {
+    globalThis.document = originalDocument
+    globalThis.Image = originalImage
+    globalThis.window = originalWindow
+  }
+})
+
 test("Recaps UI preserves retry, empty state, sharing and native-share fallback behavior", async () => {
   const panel = await readFile(new URL("./components/insights/MonthlyRecapPanel.tsx", import.meta.url), "utf8")
   const dialog = await readFile(new URL("./components/insights/MonthlyRecapShareDialog.tsx", import.meta.url), "utf8")
@@ -112,4 +149,5 @@ test("Recaps UI preserves retry, empty state, sharing and native-share fallback 
   assert.match(dialog, /Download image/)
   assert.match(dialog, /Sharing cancelled/)
   assert.match(dialog, /Player names, scores and locations are never included/)
+  assert.match(dialog, /resolveExportCoverArtworkPermission/)
 })

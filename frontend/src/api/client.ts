@@ -269,6 +269,10 @@ export interface MonthlyRecap {
   collage_games: MonthlyRecapGame[]
 }
 
+export interface ExportConfiguration {
+  cover_artwork_enabled: boolean
+}
+
 
 export interface CollectionSyncResult {
   username: string
@@ -1055,6 +1059,14 @@ export async function getMonthlyRecap(
   const response = await apiFetch(`/insights/monthly-recap?${parameters}`)
   if (!response.ok) {
     throw new Error(`Monthly recap request failed: ${response.status}`)
+  }
+  return response.json()
+}
+
+export async function getExportConfiguration(): Promise<ExportConfiguration> {
+  const response = await apiFetch("/export-config")
+  if (!response.ok) {
+    throw new Error(`Export configuration request failed: ${response.status}`)
   }
   return response.json()
 }

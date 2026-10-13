@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import type { Game, GamePlay } from "../../api/client"
+import { resolveExportCoverArtworkPermission } from "../../export-artwork-policy"
 import {
   buildShareCardContent,
   DEFAULT_SHARE_PRIVACY,
@@ -28,7 +29,13 @@ function PlayShareDialog({ game, play, onClose }: Props) {
   useEffect(() => {
     const current = ++generation.current
     let active = true
-    void renderPlayShareCard(game, play, privacy).then(nextBlob => {
+    void resolveExportCoverArtworkPermission()
+      .then(allowCoverArtwork => renderPlayShareCard(
+        game,
+        play,
+        privacy,
+        allowCoverArtwork,
+      )).then(nextBlob => {
       if (!active || generation.current !== current) return
       const nextUrl = URL.createObjectURL(nextBlob)
       setBlob(nextBlob)

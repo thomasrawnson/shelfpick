@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import type { MonthlyRecap } from "../../api/client"
+import { resolveExportCoverArtworkPermission } from "../../export-artwork-policy"
 import {
   monthlyRecapAltText,
   monthlyRecapFileName,
@@ -21,7 +22,11 @@ function MonthlyRecapShareDialog({ recap, onClose }: Props) {
   useEffect(() => { dialogRef.current?.showModal() }, [])
   useEffect(() => {
     let active = true
-    void renderMonthlyRecapCard(recap).then(nextBlob => {
+    void resolveExportCoverArtworkPermission()
+      .then(allowCoverArtwork => renderMonthlyRecapCard(
+        recap,
+        allowCoverArtwork,
+      )).then(nextBlob => {
       if (!active) return
       const nextUrl = URL.createObjectURL(nextBlob)
       setBlob(nextBlob)

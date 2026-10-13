@@ -25,6 +25,8 @@ services:
         value: "1440"
       - key: AI_PICKER_ENABLED
         value: "false"
+      - key: EXPORT_COVER_ARTWORK_ENABLED
+        value: "false"
       - key: CORS_ORIGINS
         sync: false
       - key: FRONTEND_URL

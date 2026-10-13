@@ -190,9 +190,47 @@ test("artwork loading failure renders the branded fallback PNG", async () => {
       { ...game, image_url: "https://example.invalid/blocked.jpg" },
       play,
       defaults,
+      true,
     )
     assert.equal(blob.type, "image/png")
     assert.ok(drawnText.includes("Cover not available"))
+  } finally {
+    globalThis.document = originalDocument
+    globalThis.Image = originalImage
+    globalThis.window = originalWindow
+  }
+})
+
+test("cover artwork is loaded only when the server-controlled mode permits it", async () => {
+  const originalDocument = globalThis.document
+  const originalImage = globalThis.Image
+  const originalWindow = globalThis.window
+  const requested = []
+  const context = {
+    beginPath() {}, drawImage() {}, fill() {}, fillRect() {}, fillText() {},
+    measureText(value) { return { width: value.length * 18 } }, roundRect() {},
+    set fillStyle(_value) {}, set font(_value) {}, set textAlign(_value) {},
+  }
+  const canvas = {
+    getContext() { return context },
+    toBlob(callback) { callback(new Blob([`${this.width}x${this.height}`], { type: "image/png" })) },
+  }
+  class MockImage {
+    width = 400
+    height = 700
+    set src(value) { requested.push(value); queueMicrotask(() => this.onload?.()) }
+  }
+  globalThis.document = { createElement: () => canvas }
+  globalThis.Image = MockImage
+  globalThis.window = { setTimeout, clearTimeout }
+  try {
+    const artwork = "https://example.com/cover.jpg"
+    const fallbackBlob = await renderPlayShareCard({ ...game, image_url: artwork }, play, defaults)
+    assert.equal(await fallbackBlob.text(), "1200x1500")
+    assert.equal(requested.includes(artwork), false)
+
+    await renderPlayShareCard({ ...game, image_url: artwork }, play, defaults, true)
+    assert.equal(requested.includes(artwork), true)
   } finally {
     globalThis.document = originalDocument
     globalThis.Image = originalImage
