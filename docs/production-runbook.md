@@ -42,6 +42,18 @@ The Foundation B table below remains a dated 20 September dashboard snapshot.
 SP-BETA-01 did not access or change production, so refresh every dashboard
 claim before provisioning rather than treating that snapshot as current.
 
+## Manual Render deployment safeguard — 21 October 2026
+
+Both Git-backed services in `render.yaml` set `autoDeployTrigger: "off"`.
+GitHub Actions in `.github/workflows/ci.yml` still runs on pushes and pull
+requests; a passing CI run no longer authorises or starts a Render deploy.
+Before applying a Blueprint, verify the reviewed commit and owner approval for
+the initial deployment and paid resources. Applying a new Blueprint may itself
+start the first build and deploy, even with later automatic deploys disabled.
+After creation, verify **Auto-Deploy: Off** for both services in Render, then
+deploy only the separately approved exact commit through a manual action.
+Record that commit, CI run, approver and deployment ID in the release log.
+
 ### Private-beta invitation operator procedure
 
 `BETA_INVITE_EMAILS` is a server-only, comma-separated allow-list on the API.
@@ -103,15 +115,14 @@ until the reviewed Blueprint is applied in a later, explicitly authorized step.
 2. For `board-game-picker-web`, confirm type **Static Site**, branch `main`,
    root directory `frontend`, build command
    `npm ci && npm run build && npm run check:pwa`, publish directory `./dist`,
-   runtime environment `NODE_VERSION=22`, and auto-deploy **After CI Checks
-   Pass**. Confirm its latest deploy is
-   `aa686635580ecf3bdab3704388528fa67a79289c` and `Live`.
+   runtime environment `NODE_VERSION=22`, and **Auto-Deploy: Off**. Confirm
+   its latest deploy is the separately approved commit and `Live`.
 3. For `board-game-picker-api`, confirm region **Frankfurt**, plan
    `0.5c-512mb`, branch `main`, root directory `backend`, build command
    `pip install -r requirements.txt`, pre-deploy command
    `alembic upgrade head`, start command `bash start.sh`, health path
-   `/health`, runtime environment `PYTHON_VERSION=3.12.14`, and auto-deploy
-   **After CI Checks Pass**. Confirm the latest
+   `/health`, runtime environment `PYTHON_VERSION=3.12.14`, and
+   **Auto-Deploy: Off**. Confirm the latest
    deploy is the same commit and `Live`.
 4. For `board-game-picker-db`, confirm region **Frankfurt**, PostgreSQL 16,
    plan `0.1c-256mb`, 1 GB storage, database `boardgamepicker`, user
@@ -163,9 +174,10 @@ prompted values shown in section 2, use
 The public-repository preparation reached Render's review page but was not
 applied. Render warned that the Git provider is not configured and that the
 paid API and database require payment information. Connecting the GitHub
-provider before creation preserves the intended GitHub integration and
-`checksPass` deployment gate. Adding a card, connecting repository access and
-applying the Blueprint are production/account changes outside this inspection.
+provider before creation preserves the intended GitHub integration while
+Render automatic deploys remain off. Adding a card, connecting repository
+access and applying the Blueprint are production/account changes outside this
+inspection.
 
 At Render's 2026-09-20 list prices, this section originally estimated
 **$13.30/month** by adding $0.30 for 1 GB database storage. Render's official
@@ -234,9 +246,10 @@ the DNS records Render supplies.
 6. Redeploy the web service if its first build ran before
 `VITE_API_BASE_URL` was entered. Vite embeds this value at build time.
 
-Automatic deployment waits for the GitHub Actions checks to pass. Render then
-runs `alembic upgrade head` as the API's pre-deploy command. A failed migration
-prevents the new API version from starting.
+GitHub Actions checks continue independently of Render. Once the approved
+commit passes CI and the owner authorises deployment, manually deploy that
+exact commit. Render then runs `alembic upgrade head` as the API's pre-deploy
+command. A failed migration prevents the new API version from starting.
 
 ## 3. Release verification
 
@@ -273,7 +286,7 @@ Before adding alpha testers:
    current public IP on the recovered instance and remove that rule when the
    check is complete.
 5. Verify the migration revision and row counts for `users`, `games`,
-   `user_games`, `plays` and `user_wishlist`.
+   `user_games`, `plays` and `user_wishlist_games`.
 6. Keep the original database as primary; delete the temporary recovery
    instance after verification to stop further charges.
 
