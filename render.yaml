@@ -9,7 +9,7 @@ services:
     preDeployCommand: alembic upgrade head
     startCommand: bash start.sh
     healthCheckPath: /health
-    autoDeployTrigger: checksPass
+    autoDeployTrigger: "off"
     envVars:
       - key: PYTHON_VERSION
         value: "3.12.14"
@@ -46,7 +46,7 @@ services:
     rootDir: frontend
     buildCommand: npm ci && npm run build && npm run check:pwa
     staticPublishPath: ./dist
-    autoDeployTrigger: checksPass
+    autoDeployTrigger: "off"
     envVars:
       - key: NODE_VERSION
         value: "22"
