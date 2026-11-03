@@ -27,6 +27,8 @@ services:
         value: "false"
       - key: EXPORT_COVER_ARTWORK_ENABLED
         value: "false"
+      - key: RETENTION_CLEANUP_ENABLED
+        value: "false"
       - key: CORS_ORIGINS
         sync: false
       - key: FRONTEND_URL
@@ -59,6 +61,8 @@ services:
         value: "22"
       - key: VITE_API_BASE_URL
         sync: false
+      - key: VITE_LEGAL_DRAFTS_ENABLED
+        value: "false"
     routes:
       - type: rewrite
         source: /*

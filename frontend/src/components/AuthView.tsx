@@ -1,10 +1,13 @@
 import { useRef, useState, type FormEvent } from "react"
+import { Link } from "react-router-dom"
 import { login, register, resendVerification } from "../api/client"
 import { FieldValidationError } from "../api/request"
 import { saveToken, type AuthUser } from "../auth"
 import { registrationErrors } from "../auth-validation"
 import PasswordField from "./ui/PasswordField"
 import BrandLogo from "./ui/BrandLogo"
+import { APP_PATHS } from "../routes"
+import { LEGAL_DRAFTS_ENABLED } from "../legal-drafts"
 
 type Props = { onAuthenticated: (user: AuthUser) => void; sessionExpired?: boolean }
 export default function AuthView({ onAuthenticated, sessionExpired }: Props) {
@@ -97,5 +100,9 @@ export default function AuthView({ onAuthenticated, sessionExpired }: Props) {
         {submitting ? "Please wait…" : mode === "login" ? "Log in" : "Create account"}
       </button>
     </form>
+    {LEGAL_DRAFTS_ENABLED && <nav className="auth-legal-links" aria-label="Draft legal documents">
+      <Link to={APP_PATHS.privacyDraft}>Privacy Policy draft</Link>
+      <Link to={APP_PATHS.termsDraft}>Terms of Use draft</Link>
+    </nav>}
   </div></section>
 }

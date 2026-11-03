@@ -64,8 +64,7 @@ def send_email(
     )
 
     logger.info(
-        "email_sent to=%s message_id=%s",
-        to_email,
+        "email_sent message_id=%s",
         message_id,
     )
 
