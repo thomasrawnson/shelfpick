@@ -30,6 +30,9 @@ jobs:
     env:
       APP_ENV: test
       DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/boardgamepicker_test
+      LAUNCH_HARDENING_DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/boardgamepicker_launch_hardening_test
+      TIMER_INTEGRITY_DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/boardgamepicker_timer_integrity_test
+      RETENTION_TEST_DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/boardgamepicker_retention_test
       JWT_SECRET: ci-only-secret-not-used-outside-tests
 
     defaults:
@@ -62,20 +65,26 @@ jobs:
       - name: Check models and migrations are aligned
         run: alembic check
 
-      - name: Run backend tests
-        run: python -m pytest
-
-      - name: Create isolated launch-hardening database
+      - name: Create isolated PostgreSQL test databases
         run: >-
           python -c "import psycopg;
           connection = psycopg.connect('postgresql://postgres:postgres@localhost:5432/boardgamepicker_test', autocommit=True);
           connection.execute('CREATE DATABASE boardgamepicker_launch_hardening_test');
+          connection.execute('CREATE DATABASE boardgamepicker_timer_integrity_test');
+          connection.execute('CREATE DATABASE boardgamepicker_retention_test');
           connection.close()"
 
+      - name: Run backend tests without PostgreSQL skips
+        run: python -m pytest
+
       - name: Run PostgreSQL launch-hardening tests without skips
-        env:
-          LAUNCH_HARDENING_DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/boardgamepicker_launch_hardening_test
         run: python -m pytest -q tests/test_launch_hardening_postgres.py
+
+      - name: Run PostgreSQL timer-integrity tests without skips
+        run: python -m pytest -q tests/test_timer_integrity_postgres.py
+
+      - name: Run PostgreSQL retention tests without skips
+        run: python -m pytest -q tests/test_retention_cleanup_postgres.py
 
   frontend:
     name: Frontend tests, lint and build
@@ -109,6 +118,9 @@ jobs:
         run: npm run lint
 
       - name: Build production frontend
+        env:
+          VITE_API_BASE_URL: http://127.0.0.1:8000
+          VITE_LEGAL_DRAFTS_ENABLED: "false"
         run: npm run build
 
       - name: Validate generated PWA assets
