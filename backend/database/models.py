@@ -176,6 +176,10 @@ class AuthToken(Base):
             "token_hash",
             "purpose",
         ),
+        Index(
+            "ix_auth_tokens_expires_at",
+            "expires_at",
+        ),
     )
 
     id: Mapped[int] = mapped_column(
@@ -842,6 +846,13 @@ class PickerEvent(Base):
 
 class GameNightVotingSession(Base):
     __tablename__ = "game_night_voting_sessions"
+
+    __table_args__ = (
+        Index(
+            "ix_game_night_voting_sessions_expires_at",
+            "expires_at",
+        ),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     public_id: Mapped[str] = mapped_column(

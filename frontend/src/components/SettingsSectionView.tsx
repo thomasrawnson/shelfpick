@@ -9,6 +9,7 @@ import ProfileSettings from "./ProfileSettings"
 import SetupView from "./SetupView"
 import { deleteAccount } from "../api/client"
 import { clearToken } from "../auth"
+import { LEGAL_DRAFTS_ENABLED } from "../legal-drafts"
 
 type Section = "profile" | "preferences" | "appearance" | "collection-data" | "plays" | "help" | "about"
 type Props = {
@@ -121,6 +122,10 @@ function SettingsSectionView({ section, user, onUserChange, onAccountDeleted }: 
       <p>A calm way to choose from your collection and keep track of what reaches the table.</p>
       <p className="settings-row-detail">Made by Pluto Night Labs</p>
       <BggAttribution />
+      {LEGAL_DRAFTS_ENABLED && <nav className="settings-legal-links" aria-label="Draft legal documents">
+        <Link to={APP_PATHS.privacyDraft}>Privacy Policy draft</Link>
+        <Link to={APP_PATHS.termsDraft}>Terms of Use draft</Link>
+      </nav>}
       <a className="secondary-button settings-section-action" href="https://plutonightlabs.com/"
         target="_blank" rel="noopener noreferrer">
         Pluto Night Labs<span className="sr-only"> (opens in a new tab)</span>

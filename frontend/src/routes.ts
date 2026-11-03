@@ -12,6 +12,8 @@ export const APP_PATHS = {
   forgotPassword: "/forgot-password",
   resetPassword: "/reset-password",
   verifyEmail: "/verify-email",
+  privacyDraft: "/legal/privacy-draft",
+  termsDraft: "/legal/terms-draft",
   onboarding: "/onboarding",
   picker: "/picker",
   pickerPlay: "/picker/log-play",

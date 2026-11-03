@@ -10,10 +10,14 @@
 
 ## Legal and upstream
 
-- [ ] Controller/legal identity, privacy/support contact and retention periods supplied.
+- [ ] Complete O1–O9 in `docs/sp-launch-03-owner-decision-sheet.md`; this is the authoritative owner decision register.
+- [x] Operator direction, public contact and all seven provisional retention periods supplied for legal review.
+- [ ] Registered company number/postal address and monitored privacy-request process evidenced.
 - [ ] Privacy notice and terms receive qualified review and owner approval before publication.
 - [ ] Manual data-request channel and secure delivery method approved and drilled.
-- [ ] BGG application/licence classification, token and cover-image permission recorded; attribution visually checked.
+- [x] BGG commercial XML API application approval recorded without storing its token; linked attribution preserved.
+- [ ] Underlying cover-image display/export rights recorded; exported cover artwork remains disabled.
+- [ ] Draft Privacy/Terms routes receive legal and owner approval before their fail-closed production gate can change.
 
 ## Operations — not performed by SP-LAUNCH-02
 

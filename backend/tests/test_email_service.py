@@ -1,4 +1,5 @@
 from types import SimpleNamespace
+import logging
 
 import email_service
 
@@ -13,6 +14,7 @@ class FakeResponse:
 
 def test_production_email_uses_resend(
     monkeypatch,
+    caplog,
 ):
     request = {}
 
@@ -49,11 +51,15 @@ def test_production_email_uses_resend(
         fake_post,
     )
 
-    message_id = email_service.send_email(
-        "tester@example.com",
-        "Verify your email",
-        "<p>Verify</p>",
-    )
+    with caplog.at_level(
+        logging.INFO,
+        logger="boardgamepicker.email",
+    ):
+        message_id = email_service.send_email(
+            "tester@example.com",
+            "Verify your email",
+            "<p>Verify</p>",
+        )
 
     assert message_id == "email-123"
     assert request["url"] == (
@@ -72,6 +78,8 @@ def test_production_email_uses_resend(
         "subject": "Verify your email",
         "html": "<p>Verify</p>",
     }
+    assert "email_sent message_id=email-123" in caplog.text
+    assert "tester@example.com" not in caplog.text
 
 
 def test_non_production_email_is_not_sent(

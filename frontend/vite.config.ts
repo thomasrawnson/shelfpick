@@ -11,6 +11,14 @@ import {
 
 
 export default defineConfig({
+  define: {
+    __SHELFPICK_LEGAL_DRAFTS__:
+      JSON.stringify(
+        process.env.VITE_LEGAL_DRAFTS_ENABLED
+        === "true",
+      ),
+  },
+
   plugins: [
     react(),
 

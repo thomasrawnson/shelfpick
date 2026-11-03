@@ -48,6 +48,14 @@ test("Game Night guest links remain public session-scoped routes", () => {
 })
 
 
+test("legal review routes are explicit draft paths and never protected return targets", () => {
+  assert.equal(APP_PATHS.privacyDraft, "/legal/privacy-draft")
+  assert.equal(APP_PATHS.termsDraft, "/legal/terms-draft")
+  assert.equal(safeReturnPath(APP_PATHS.privacyDraft), null)
+  assert.equal(safeReturnPath(APP_PATHS.termsDraft), null)
+})
+
+
 test("collection detail routes keep Collection navigation active", () => {
   assert.equal(
     appViewForPath(

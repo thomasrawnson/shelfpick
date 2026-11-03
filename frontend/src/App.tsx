@@ -59,6 +59,11 @@ import ForgotPasswordView from "./components/ForgotPasswordView";
 import ResetPasswordView from "./components/ResetPasswordView";
 
 import VerifyEmailView from "./components/VerifyEmailView";
+import LegalDraftView from "./components/LegalDraftView";
+import {
+  LEGAL_DRAFTS_ENABLED,
+  type LegalDraftKind,
+} from "./legal-drafts";
 
 import {
   APP_PATHS,
@@ -404,6 +409,22 @@ function App() {
   }
 
   const guestVotingToken = gameNightJoinToken(location.pathname);
+
+  const legalDraftKind: LegalDraftKind | null =
+    location.pathname === APP_PATHS.privacyDraft
+      ? "privacy"
+      : location.pathname === APP_PATHS.termsDraft
+        ? "terms"
+        : null;
+
+  if (legalDraftKind && LEGAL_DRAFTS_ENABLED) {
+    return pageShell(
+      <LegalDraftView
+        kind={legalDraftKind}
+        backTo={user ? APP_PATHS.settingsAbout : APP_PATHS.login}
+      />,
+    );
+  }
 
   if (guestVotingToken) {
     return pageShell(<GameNightGuestVotingView joinToken={guestVotingToken} />);

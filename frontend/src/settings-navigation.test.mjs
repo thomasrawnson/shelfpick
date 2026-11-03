@@ -101,6 +101,9 @@ test("About links to Pluto Night Labs with an accessible new-tab indication", ()
   assert.match(markup, /target="_blank"/)
   assert.match(markup, /rel="noopener noreferrer"/)
   assert.match(markup, /Pluto Night Labs<span class="sr-only"> \(opens in a new tab\)<\/span>/)
+  assert.match(markup, /src="\/branding\/powered-by-bgg-rgb\.svg"/)
+  assert.match(markup, /href="https:\/\/boardgamegeek\.com\/"/)
+  assert.match(markup, /alt="Powered by BoardGameGeek"/)
 })
 
 test("Appearance offers the experimental Black theme without a plan gate", () => {
