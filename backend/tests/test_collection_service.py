@@ -1,6 +1,11 @@
 from models.game import Game
+import pytest
 from models.game import PlayerCountPoll
-from services.collection_service import CollectionService
+from services.collection_service import (
+    CollectionService,
+    MAX_COLLECTION_GAMES,
+    MAX_METADATA_REFRESH_GAMES,
+)
 
 
 
@@ -43,6 +48,66 @@ GAME_XML = """
     </item>
 </items>
 """
+
+
+def collection_xml(count: int) -> str:
+    return "<items>" + "".join(
+        f'<item objectid="{index + 1}"/>'
+        for index in range(count)
+    ) + "</items>"
+
+
+def test_sync_rejects_collection_above_safe_limit_before_database_work():
+    class FakeBGGClient:
+        def get_collection(self, _username):
+            return collection_xml(MAX_COLLECTION_GAMES + 1)
+
+    class UnexpectedRepository:
+        def __getattr__(self, _name):
+            raise AssertionError("oversized collection reached repository")
+
+    service = CollectionService(FakeBGGClient(), UnexpectedRepository())
+
+    try:
+        service.sync_collection("large-user")
+    except ValueError as exc:
+        assert "too large to sync safely" in str(exc)
+    else:
+        raise AssertionError("Expected oversized collection rejection")
+
+
+def test_sync_rejects_excessive_metadata_work_before_upstream_batches():
+    class FakeBGGClient:
+        def get_collection(self, _username):
+            return collection_xml(MAX_METADATA_REFRESH_GAMES + 1)
+
+        def get_games(self, _ids):
+            raise AssertionError("metadata request must not start")
+
+    class FakeRepository:
+        def get_existing_bgg_ids(self, _ids):
+            return set()
+
+        def get_bgg_ids_needing_player_count_poll_refresh(self, _ids):
+            return set()
+
+        def get_bgg_ids_needing_expansion_check(self, _ids):
+            return set()
+
+        def get_bgg_ids_needing_min_age_check(self, _ids):
+            return set()
+
+        def get_bgg_ids_needing_credits_refresh(self, _ids):
+            return set()
+
+    service = CollectionService(FakeBGGClient(), FakeRepository())
+
+    try:
+        service.sync_collection("uncached-user")
+    except ValueError as exc:
+        assert "too many game updates" in str(exc)
+    else:
+        raise AssertionError("Expected metadata work rejection")
 
 
 def test_sync_game_creates_new_game():
@@ -1003,3 +1068,8 @@ def test_add_game_rejects_expansion():
         raise AssertionError(
             "Expected expansion rejection"
         )
+
+
+def test_collection_sync_deadline_is_enforced():
+    with pytest.raises(RuntimeError, match="safe time limit"):
+        CollectionService._check_deadline(-1)

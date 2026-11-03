@@ -35,6 +35,7 @@ def verify_password(
 
 def create_access_token(
     user_id: int,
+    token_version: int = 0,
 ) -> str:
     now = datetime.now(
         timezone.utc
@@ -47,6 +48,7 @@ def create_access_token(
             minutes=settings.access_token_minutes
         ),
         "iss": JWT_ISSUER,
+        "ver": token_version,
     }
 
     return jwt.encode(
@@ -58,7 +60,7 @@ def create_access_token(
 
 def decode_access_token(
     token: str,
-) -> int:
+) -> tuple[int, int]:
     payload = jwt.decode(
         token,
         settings.jwt_secret,
@@ -77,4 +79,8 @@ def decode_access_token(
             "Token has no subject"
         )
 
-    return int(subject)
+    token_version = payload.get("ver", 0)
+    if not isinstance(token_version, int):
+        raise ValueError("Token version is invalid")
+
+    return int(subject), token_version

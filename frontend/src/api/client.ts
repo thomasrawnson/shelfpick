@@ -1656,13 +1656,33 @@ export async function confirmEmailVerification(
 }
 
 
-export async function resendBetaVerification(email: string): Promise<string> {
+export async function resendVerification(email: string): Promise<string> {
   const response = await request(`${API_BASE_URL}/auth/verification/resend`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),
   })
   if (!response.ok) throw await responseError(response, "Couldn't resend verification email")
+  const data = await response.json()
+  return data.message
+}
+
+
+export async function logoutAllSessions(): Promise<string> {
+  const response = await apiFetch("/auth/logout-all", { method: "POST" })
+  if (!response.ok) throw new Error(await readError(response, "Couldn't log out all sessions"))
+  const data = await response.json()
+  return data.message
+}
+
+
+export async function deleteAccount(password: string): Promise<string> {
+  const response = await apiFetch("/auth/account", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password }),
+  })
+  if (!response.ok) throw new Error(await readError(response, "Couldn't delete account"))
   const data = await response.json()
   return data.message
 }

@@ -20,6 +20,8 @@
   --color-warning: #A66D16;
   --color-danger: #B7463C;
   --color-info: #356A7A;
+  /* Fixed light field for third-party brand marks designed for white artwork. */
+  --color-brand-artwork-surface: #FFFFFF;
   --color-accent-text: #81591F;
   --color-on-accent: #151816;
   --color-on-danger: #FFFFFF;

@@ -1,6 +1,11 @@
 import json
 
+import pytest
+
 from bgstats.play_parser import (
+    BGStatsImportLimitError,
+    MAX_BGSTATS_GAMES,
+    MAX_PARTICIPANTS_PER_PLAY,
     parse_bgstats_plays,
 )
 
@@ -126,3 +131,39 @@ def test_blank_score_becomes_none():
         play.participants[0].score
         is None
     )
+
+
+def test_rejects_too_many_game_records():
+    export = {
+        "games": [
+            {"id": index, "bggId": index}
+            for index in range(MAX_BGSTATS_GAMES + 1)
+        ],
+        "players": [],
+        "plays": [],
+    }
+
+    with pytest.raises(BGStatsImportLimitError, match="too many games"):
+        parse_bgstats_plays(json.dumps(export))
+
+
+def test_rejects_too_many_participants_in_one_play():
+    export = {
+        "games": [{"id": 1, "bggId": 36218}],
+        "players": [
+            {"id": index, "name": f"Player {index}"}
+            for index in range(MAX_PARTICIPANTS_PER_PLAY + 1)
+        ],
+        "plays": [{
+            "uuid": "too-many-players",
+            "playDate": "2026-11-03T12:00:00Z",
+            "gameRefId": 1,
+            "playerScores": [
+                {"playerRefId": index}
+                for index in range(MAX_PARTICIPANTS_PER_PLAY + 1)
+            ],
+        }],
+    }
+
+    with pytest.raises(BGStatsImportLimitError, match="too many participants"):
+        parse_bgstats_plays(json.dumps(export))

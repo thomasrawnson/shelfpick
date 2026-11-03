@@ -6,8 +6,9 @@ const authSource = await readFile(new URL("./components/AuthView.tsx", import.me
 const discoverSource = await readFile(new URL("./components/DiscoverView.tsx", import.meta.url), "utf8")
 const verifySource = await readFile(new URL("./components/VerifyEmailView.tsx", import.meta.url), "utf8")
 
-test("registration explains invite-only activation without exposing eligibility", () => {
-  assert.match(authSource, /Private beta registration is invite-only/)
+test("public registration requires verification without exposing account existence", () => {
+  assert.match(authSource, /Create a free account, then verify your email to continue/)
+  assert.match(authSource, /resendVerification/)
   assert.match(authSource, /registrationMessage/)
   assert.match(authSource, /role="status"/)
 })

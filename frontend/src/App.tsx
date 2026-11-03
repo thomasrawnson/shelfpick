@@ -43,6 +43,7 @@ import OnboardingView from "./components/OnboardingView";
 import SetupView from "./components/SetupView";
 import SettingsView from "./components/SettingsView";
 import SettingsSectionView from "./components/SettingsSectionView";
+import { logoutAllSessions } from "./api/client";
 import ProComparisonView from "./components/ProComparisonView";
 import PlayerAvatar from "./components/ui/PlayerAvatar";
 import LiveTimerIndicator from "./components/LiveTimerIndicator";
@@ -380,6 +381,11 @@ function App() {
     navigate(APP_PATHS.login, { replace: true });
   }
 
+  async function handleLogoutAll() {
+    await logoutAllSessions();
+    handleLogout();
+  }
+
   function navigateToView(nextView: AppView) {
     if (nextView === "collection") {
       navigate(APP_PATHS.collection);
@@ -574,12 +580,12 @@ function App() {
 
             <Route
               path={APP_PATHS.settings}
-              element={<SettingsView user={user} onLogout={handleLogout} />}
+              element={<SettingsView user={user} onLogout={handleLogout} onLogoutAll={handleLogoutAll} />}
             />
 
             <Route
               path={APP_PATHS.settingsProfile}
-              element={<SettingsSectionView section="profile" user={user} onUserChange={setUser} />}
+              element={<SettingsSectionView section="profile" user={user} onUserChange={setUser} onAccountDeleted={handleLogout} />}
             />
 
             <Route path={APP_PATHS.settingsPreferences} element={<SettingsSectionView section="preferences" user={user} onUserChange={setUser} />} />

@@ -69,7 +69,23 @@ test("Collection and Data keeps import controls separate from profile and accoun
   assert.match(markup, /Sync BoardGameGeek/)
   assert.match(markup, /Import BG Stats history/)
   assert.match(markup, /BoardGameGeek is not affiliated with ShelfPick/)
+  assert.match(markup, /src="\/branding\/powered-by-bgg-rgb\.svg"/)
+  assert.match(markup, /href="https:\/\/boardgamegeek\.com\/"/)
   assert.doesNotMatch(markup, /Player name|Avatar|Signed in as|Log out/)
+})
+
+test("Profile requires password and explicit acknowledgement before account deletion", () => {
+  const markup = render(SettingsSectionView, {
+    section: "profile",
+    user,
+    onUserChange: () => {},
+    onAccountDeleted: () => {},
+  }, "/settings/profile")
+
+  assert.match(markup, /Delete account/)
+  assert.match(markup, /type="password"/)
+  assert.match(markup, /I understand this cannot be undone/)
+  assert.match(markup, /type="submit"[^>]*disabled="">Delete my account/)
 })
 
 test("focused settings sections provide a route back to the overview", () => {

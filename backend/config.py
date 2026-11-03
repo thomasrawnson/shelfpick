@@ -67,6 +67,7 @@ class Settings:
     email_from: str
     bgg_api_token: str
     beta_invite_emails: frozenset[str]
+    public_registration_enabled: bool
     export_cover_artwork_enabled: bool
 
 
@@ -134,6 +135,13 @@ def get_settings() -> Settings:
         email.strip().casefold()
         for email in os.getenv("BETA_INVITE_EMAILS", "").split(",")
         if email.strip()
+    )
+
+    public_registration_enabled = (
+        _get_strict_bool(
+            "PUBLIC_REGISTRATION_ENABLED",
+            environment != "production",
+        )
     )
 
     export_cover_artwork_enabled = (
@@ -208,9 +216,13 @@ def get_settings() -> Settings:
                 "BGG_API_TOKEN must be configured"
             )
 
-        if not beta_invite_emails:
+        if (
+            not public_registration_enabled
+            and not beta_invite_emails
+        ):
             raise RuntimeError(
-                "BETA_INVITE_EMAILS must contain at least one invited email"
+                "Production PUBLIC_REGISTRATION_ENABLED must be true or "
+                "BETA_INVITE_EMAILS must contain at least one address"
             )
 
     return Settings(
@@ -229,6 +241,9 @@ def get_settings() -> Settings:
         email_from=email_from,
         bgg_api_token=bgg_api_token,
         beta_invite_emails=beta_invite_emails,
+        public_registration_enabled=(
+            public_registration_enabled
+        ),
         export_cover_artwork_enabled=(
             export_cover_artwork_enabled
         ),

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useRef, useState, type FormEvent } from "react"
 import { Link } from "react-router-dom"
 
 import type { AuthUser } from "../auth"
@@ -7,9 +7,16 @@ import { rememberSettingsEntry } from "../settings-focus"
 import { getThemePreference, setThemePreference, type ThemePreference } from "../theme"
 import ProfileSettings from "./ProfileSettings"
 import SetupView from "./SetupView"
+import { deleteAccount } from "../api/client"
+import { clearToken } from "../auth"
 
 type Section = "profile" | "preferences" | "appearance" | "collection-data" | "plays" | "help" | "about"
-type Props = { section: Section; user: AuthUser; onUserChange: (user: AuthUser) => void }
+type Props = {
+  section: Section
+  user: AuthUser
+  onUserChange: (user: AuthUser) => void
+  onAccountDeleted?: () => void
+}
 
 const titles: Record<Section, string> = {
   profile: "Profile", preferences: "Preferences", appearance: "Appearance",
@@ -42,16 +49,64 @@ function AppearanceSettings() {
   </fieldset>
 }
 
-function SettingsSectionView({ section, user, onUserChange }: Props) {
+function AccountDeletion({ onDeleted }: { onDeleted?: () => void }) {
+  const [password, setPassword] = useState("")
+  const [confirmed, setConfirmed] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState("")
+  const pending = useRef(false)
+
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (pending.current || !password || !confirmed) return
+    pending.current = true
+    setSubmitting(true)
+    setError("")
+    void deleteAccount(password).then(() => {
+      clearToken()
+      onDeleted?.()
+    }).catch((failure) => {
+      pending.current = false
+      setError(failure instanceof Error ? failure.message : "Couldn't delete account.")
+      setSubmitting(false)
+    })
+  }
+
+  return <form className="settings-info-panel account-deletion-panel" onSubmit={submit} aria-busy={submitting}>
+    <h2>Delete account</h2>
+    <p>This permanently removes your ShelfPick account, collection, wishlist, plays, players, preferences, rankings, timers, Picker history and hosted Game Night voting data. Shared game catalogue records remain.</p>
+    <label htmlFor="delete-account-password">Confirm your password</label>
+    <input id="delete-account-password" type="password" autoComplete="current-password" value={password} maxLength={128} required
+      onChange={(event) => { setPassword(event.target.value); setError("") }} disabled={submitting} />
+    <label className="settings-confirmation">
+      <input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} disabled={submitting} />
+      <span>I understand this cannot be undone.</span>
+    </label>
+    <button type="submit" className="settings-danger-button" disabled={!password || !confirmed || submitting}>
+      {submitting ? "Deleting…" : "Delete my account"}
+    </button>
+    {error && <p className="error-message" role="alert">{error}</p>}
+  </form>
+}
+
+function BggAttribution() {
+  return <a className="bgg-attribution" href="https://boardgamegeek.com/" target="_blank" rel="noopener noreferrer">
+    <img src="/branding/powered-by-bgg-rgb.svg" alt="Powered by BoardGameGeek" />
+    <span className="sr-only"> (opens in a new tab)</span>
+  </a>
+}
+
+function SettingsSectionView({ section, user, onUserChange, onAccountDeleted }: Props) {
   return <section className="screen settings-screen settings-detail-screen" aria-labelledby="settings-section-heading">
     <SettingsBackLink section={section} />
     <header className="settings-heading"><h1 id="settings-section-heading">{titles[section]}</h1></header>
-    {section === "profile" && <ProfileSettings user={user} onChange={onUserChange} mode="profile" />}
+    {section === "profile" && <><ProfileSettings user={user} onChange={onUserChange} mode="profile" /><AccountDeletion onDeleted={onAccountDeleted} /></>}
     {section === "preferences" && <ProfileSettings user={user} onChange={onUserChange} mode="preferences" />}
     {section === "appearance" && <AppearanceSettings />}
     {section === "collection-data" && <>
       <SetupView initialUsername={user.bgg_username} onUsernameChange={(username) => onUserChange({ ...user, bgg_username: username })} compact />
       <p className="settings-attribution">Collection information is imported from BoardGameGeek. BoardGameGeek is not affiliated with ShelfPick.</p>
+      <BggAttribution />
     </>}
     {section === "plays" && <div className="settings-info-panel">
       <p>Review recorded plays, participants and game history in Insights.</p>
@@ -65,6 +120,7 @@ function SettingsSectionView({ section, user, onUserChange }: Props) {
       <h2>ShelfPick</h2>
       <p>A calm way to choose from your collection and keep track of what reaches the table.</p>
       <p className="settings-row-detail">Made by Pluto Night Labs</p>
+      <BggAttribution />
       <a className="secondary-button settings-section-action" href="https://plutonightlabs.com/"
         target="_blank" rel="noopener noreferrer">
         Pluto Night Labs<span className="sr-only"> (opens in a new tab)</span>

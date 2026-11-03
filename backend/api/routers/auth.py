@@ -1,4 +1,5 @@
 import logging
+import secrets
 from config import settings
 from email_service import send_email
 from fastapi import (
@@ -13,6 +14,7 @@ from sqlalchemy.orm import Session
 from api.current_user import (
     get_current_user,
 )
+from api.client_address import trusted_client_address
 from auth.schemas import (
     AuthResponse,
     LoginRequest,
@@ -24,6 +26,7 @@ from auth.schemas import (
     MessageResponse,
     ResetPasswordRequest,
     TokenRequest,
+    DeleteAccountRequest,
 )
 from auth.security import (
     create_access_token,
@@ -37,9 +40,7 @@ from services.entitlements import entitlements_for, resolve_tier
 from auth.login_rate_limiter import (
     AUTH_REQUEST_WINDOW_SECONDS,
     LOGIN_WINDOW_SECONDS,
-    login_rate_limiter,
-    password_reset_request_rate_limiter,
-    verification_request_rate_limiter,
+    DatabaseAuthRateLimiter,
 )
 from datetime import (
     datetime,
@@ -51,6 +52,10 @@ from auth.one_time_tokens import (
     PASSWORD_RESET,
     consume_one_time_token,
     create_one_time_token,
+)
+from services.account_service import (
+    AccountService,
+    InvalidAccountPasswordError,
 )
 
 router = APIRouter(
@@ -65,6 +70,9 @@ logger = logging.getLogger(
 BETA_REGISTRATION_MESSAGE = (
     "If this address is invited, check your email to activate your account."
 )
+PUBLIC_REGISTRATION_MESSAGE = (
+    "If registration can continue for this address, check your email to verify your account."
+)
 
 
 def normalize_email(value: str) -> str:
@@ -72,7 +80,7 @@ def normalize_email(value: str) -> str:
 
 
 def private_beta_enabled() -> bool:
-    return bool(settings.beta_invite_emails)
+    return not settings.public_registration_enabled
 
 
 def is_beta_invited(email: str) -> bool:
@@ -131,33 +139,40 @@ def password_reset_email_html(
     </p>
     """
 
-def login_rate_limit_key(
+def enforce_auth_limit(
+    db: Session,
     request: Request,
+    scope: str,
     email: str,
-) -> str:
-    forwarded_for = (
-        request.headers.get(
-            "x-forwarded-for"
+    email_limit: int,
+    ip_limit: int,
+    window_seconds: int = AUTH_REQUEST_WINDOW_SECONDS,
+    detail: str = "Too many requests. Please try again later.",
+) -> None:
+    limiter = DatabaseAuthRateLimiter(db)
+    address = trusted_client_address(request)
+    if limiter.check_and_record(
+        f"{scope}:ip",
+        address,
+        ip_limit,
+        window_seconds,
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=detail,
+            headers={"Retry-After": str(window_seconds)},
         )
-    )
-
-    if forwarded_for:
-        client_ip = (
-            forwarded_for
-            .split(",")[0]
-            .strip()
+    if limiter.check_and_record(
+        f"{scope}:email",
+        email,
+        email_limit,
+        window_seconds,
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=detail,
+            headers={"Retry-After": str(window_seconds)},
         )
-    elif request.client:
-        client_ip = (
-            request.client.host
-        )
-    else:
-        client_ip = "unknown"
-
-    return (
-        f"{client_ip}:"
-        f"{email}"
-    )
 
 def user_response(
     user: User,
@@ -194,12 +209,18 @@ def user_response(
 )
 def register(
     request: RegisterRequest,
+    http_request: Request,
     db: Session = Depends(get_db),
 ):
     email = normalize_email(str(request.email))
 
-    if private_beta_enabled() and not is_beta_invited(email):
-        return RegistrationResponse(message=BETA_REGISTRATION_MESSAGE)
+    enforce_auth_limit(
+        db, http_request, "register", email,
+        email_limit=3, ip_limit=10,
+    )
+
+    private_beta = private_beta_enabled()
+    invited = not private_beta or is_beta_invited(email)
 
     existing = (
         db.query(User)
@@ -210,15 +231,49 @@ def register(
     )
 
     if existing is not None:
-        if private_beta_enabled():
-            return RegistrationResponse(message=BETA_REGISTRATION_MESSAGE)
-        raise HTTPException(
-            status_code=409,
-            detail=(
-                "An account with this "
-                "email already exists"
-            ),
+        # Keep the public path materially similar for existing and new
+        # addresses. Account owners receive the same verification-shaped
+        # message; verified accounts get a deliberately invalid link.
+        hash_password(request.password)
+        verification_token = (
+            create_one_time_token(
+                db,
+                existing.id,
+                BETA_EMAIL_VERIFY if private_beta else EMAIL_VERIFY,
+            )
+            if invited and existing.email_verified_at is None
+            else secrets.token_urlsafe(32)
         )
+        try:
+            send_email(
+                to_email=email,
+                subject="Verify your ShelfPick email",
+                html=verification_email_html(verification_token),
+            )
+        except Exception:
+            logger.exception(
+                "verification_email_failed user_id=%s",
+                existing.id,
+            )
+        return RegistrationResponse(
+            message=(
+                BETA_REGISTRATION_MESSAGE
+                if private_beta_enabled()
+                else PUBLIC_REGISTRATION_MESSAGE
+            )
+        )
+
+    if not invited:
+        hash_password(request.password)
+        try:
+            send_email(
+                to_email=email,
+                subject="Verify your ShelfPick email",
+                html=verification_email_html(secrets.token_urlsafe(32)),
+            )
+        except Exception:
+            logger.exception("verification_email_failed user_id=unknown")
+        return RegistrationResponse(message=BETA_REGISTRATION_MESSAGE)
 
     user = User(
         email=email,
@@ -239,7 +294,7 @@ def register(
         create_one_time_token(
             db,
             user.id,
-            BETA_EMAIL_VERIFY if private_beta_enabled() else EMAIL_VERIFY,
+            BETA_EMAIL_VERIFY if private_beta else EMAIL_VERIFY,
         )
     )
 
@@ -262,14 +317,12 @@ def register(
             "user_id=%s",
             user.id,
         )
-    if private_beta_enabled():
-        return RegistrationResponse(message=BETA_REGISTRATION_MESSAGE)
-
-    token = create_access_token(user.id)
-
-    return AuthResponse(
-        access_token=token,
-        user=user_response(user),
+    return RegistrationResponse(
+        message=(
+            BETA_REGISTRATION_MESSAGE
+                if private_beta
+            else PUBLIC_REGISTRATION_MESSAGE
+        )
     )
 
 
@@ -288,34 +341,15 @@ def login(
         .lower()
     )
 
-    rate_limit_key = (
-        login_rate_limit_key(
-            request,
-            email,
-        )
+    enforce_auth_limit(
+        db, request, "login", email,
+        email_limit=5, ip_limit=50,
+        window_seconds=LOGIN_WINDOW_SECONDS,
+        detail=(
+            "Too many failed login attempts. "
+            "Please try again later."
+        ),
     )
-
-    if (
-        login_rate_limiter
-        .is_limited(
-            rate_limit_key
-        )
-    ):
-        raise HTTPException(
-            status_code=(
-                status.HTTP_429_TOO_MANY_REQUESTS
-            ),
-            detail=(
-                "Too many failed login "
-                "attempts. Please try "
-                "again later."
-            ),
-            headers={
-                "Retry-After": str(
-                    LOGIN_WINDOW_SECONDS
-                ),
-            },
-        )
 
     user = (
         db.query(User)
@@ -334,10 +368,6 @@ def login(
             user.password_hash,
         )
     ):
-        login_rate_limiter.record_failure(
-            rate_limit_key
-        )
-
         raise HTTPException(
             status_code=(
                 status.HTTP_401_UNAUTHORIZED
@@ -347,26 +377,19 @@ def login(
             ),
         )
 
-    pending_beta_activation = (
-        db.query(AuthToken.id).filter(
-            AuthToken.user_id == user.id,
-            AuthToken.purpose == BETA_EMAIL_VERIFY,
-        ).first()
-        if user.email_verified_at is None
-        else None
-    )
-    if pending_beta_activation is not None:
+    if user.email_verified_at is None:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Verify your email before signing in.",
         )
 
-    login_rate_limiter.reset(
-        rate_limit_key
+    DatabaseAuthRateLimiter(db).reset(
+        "login:email", email
     )
 
     token = create_access_token(
-        user.id
+        user.id,
+        user.token_version,
     )
 
     return AuthResponse(
@@ -415,35 +438,9 @@ def request_verification(
     ),
     db: Session = Depends(get_db),
 ):
-    rate_limit_key = (
-        login_rate_limit_key(
-            request,
-            str(current_user.id),
-        )
-    )
-
-    if (
-        verification_request_rate_limiter
-        .is_limited(rate_limit_key)
-    ):
-        raise HTTPException(
-            status_code=(
-                status.HTTP_429_TOO_MANY_REQUESTS
-            ),
-            detail=(
-                "Too many verification "
-                "requests. Please try "
-                "again later."
-            ),
-            headers={
-                "Retry-After": str(
-                    AUTH_REQUEST_WINDOW_SECONDS
-                ),
-            },
-        )
-
-    verification_request_rate_limiter.record_request(
-        rate_limit_key
+    enforce_auth_limit(
+        db, request, "verification", current_user.email,
+        email_limit=5, ip_limit=10,
     )
 
     if (
@@ -508,38 +505,50 @@ def resend_beta_verification(
     db: Session = Depends(get_db),
 ):
     email = normalize_email(str(request.email))
-    rate_limit_key = login_rate_limit_key(http_request, email)
-
-    if verification_request_rate_limiter.is_limited(rate_limit_key):
-        raise HTTPException(
-            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail="Too many verification requests. Please try again later.",
-            headers={"Retry-After": str(AUTH_REQUEST_WINDOW_SECONDS)},
+    enforce_auth_limit(
+        db, http_request, "verification", email,
+        email_limit=5, ip_limit=10,
+    )
+    generic = MessageResponse(
+        message=(
+            BETA_REGISTRATION_MESSAGE
+            if private_beta_enabled()
+            else PUBLIC_REGISTRATION_MESSAGE
         )
-
-    verification_request_rate_limiter.record_request(rate_limit_key)
-    generic = MessageResponse(message=BETA_REGISTRATION_MESSAGE)
+    )
+    private_beta = private_beta_enabled()
     user = db.query(User).filter(User.email == email).first()
-
-    if user is None or user.email_verified_at is not None or not is_beta_invited(email):
-        return generic
-
-    beta_account = db.query(AuthToken.id).filter(
-        AuthToken.user_id == user.id,
-        AuthToken.purpose == BETA_EMAIL_VERIFY,
-    ).first()
-    if beta_account is None:
-        return generic
-
-    token = create_one_time_token(db, user.id, BETA_EMAIL_VERIFY)
+    purpose = BETA_EMAIL_VERIFY if private_beta else EMAIL_VERIFY
+    pending_account = (
+        db.query(AuthToken.id).filter(
+            AuthToken.user_id == user.id,
+            AuthToken.purpose == purpose,
+        ).first()
+        if user is not None
+        else None
+    )
+    can_issue = (
+        user is not None
+        and user.email_verified_at is None
+        and (not private_beta or is_beta_invited(email))
+        and pending_account is not None
+    )
+    token = (
+        create_one_time_token(db, user.id, purpose)
+        if can_issue
+        else secrets.token_urlsafe(32)
+    )
     try:
         send_email(
-            to_email=user.email,
+            to_email=email,
             subject="Verify your ShelfPick email",
             html=verification_email_html(token),
         )
     except Exception:
-        logger.exception("verification_email_failed user_id=%s", user.id)
+        logger.exception(
+            "verification_email_failed user_id=%s",
+            user.id if user is not None else "unknown",
+        )
 
     return generic
 
@@ -552,11 +561,15 @@ def confirm_verification(
     request: TokenRequest,
     db: Session = Depends(get_db),
 ):
-    token = consume_one_time_token(db, request.token, BETA_EMAIL_VERIFY)
+    token = consume_one_time_token(
+        db, request.token, BETA_EMAIL_VERIFY, commit=False
+    )
     beta_token = token is not None
 
     if token is None:
-        token = consume_one_time_token(db, request.token, EMAIL_VERIFY)
+        token = consume_one_time_token(
+            db, request.token, EMAIL_VERIFY, commit=False
+        )
 
     if token is None:
         raise HTTPException(
@@ -612,35 +625,9 @@ def request_password_reset(
         .lower()
     )
 
-    rate_limit_key = (
-        login_rate_limit_key(
-            http_request,
-            email,
-        )
-    )
-
-    if (
-        password_reset_request_rate_limiter
-        .is_limited(rate_limit_key)
-    ):
-        raise HTTPException(
-            status_code=(
-                status.HTTP_429_TOO_MANY_REQUESTS
-            ),
-            detail=(
-                "Too many password reset "
-                "requests. Please try "
-                "again later."
-            ),
-            headers={
-                "Retry-After": str(
-                    AUTH_REQUEST_WINDOW_SECONDS
-                ),
-            },
-        )
-
-    password_reset_request_rate_limiter.record_request(
-        rate_limit_key
+    enforce_auth_limit(
+        db, http_request, "password-reset", email,
+        email_limit=5, ip_limit=10,
     )
 
     user = (
@@ -651,6 +638,7 @@ def request_password_reset(
         .first()
     )
 
+    reset_token = secrets.token_urlsafe(32)
     if user is not None:
         reset_token = (
             create_one_time_token(
@@ -660,26 +648,17 @@ def request_password_reset(
             )
         )
 
-        try:
-            send_email(
-                to_email=user.email,
-                subject=(
-                    "Reset your "
-                    "ShelfPick "
-                    "password"
-                ),
-                html=(
-                    password_reset_email_html(
-                        reset_token
-                    )
-                ),
-            )
-        except Exception:
-            logger.exception(
-                "password_reset_email_failed "
-                "user_id=%s",
-                user.id,
-            )
+    try:
+        send_email(
+            to_email=email,
+            subject="Reset your ShelfPick password",
+            html=password_reset_email_html(reset_token),
+        )
+    except Exception:
+        logger.exception(
+            "password_reset_email_failed user_id=%s",
+            user.id if user is not None else "unknown",
+        )
 
     # Deliberately identical response
     # whether the account exists or not.
@@ -704,6 +683,7 @@ def confirm_password_reset(
         db,
         request.token,
         PASSWORD_RESET,
+        commit=False,
     )
 
     if token is None:
@@ -731,6 +711,7 @@ def confirm_password_reset(
             request.password
         )
     )
+    user.token_version += 1
 
     db.commit()
 
@@ -752,3 +733,31 @@ def me(
     return user_response(
         current_user
     )
+
+
+@router.post("/logout-all", response_model=MessageResponse)
+def logout_all(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    current_user.token_version += 1
+    db.commit()
+    return MessageResponse(message="All sessions logged out")
+
+
+@router.delete("/account", response_model=MessageResponse)
+def delete_account(
+    request: DeleteAccountRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        AccountService(db).delete_account(
+            current_user, request.password
+        )
+    except InvalidAccountPasswordError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=str(exc),
+        ) from exc
+    return MessageResponse(message="Account deleted")

@@ -92,6 +92,26 @@ def test_invalid_export_cover_artwork_setting_fails_fast(
         get_settings()
 
 
+def test_public_registration_is_explicit_and_allows_no_invite_list(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    production_environment(monkeypatch)
+    monkeypatch.setenv("PUBLIC_REGISTRATION_ENABLED", "true")
+    monkeypatch.setenv("BETA_INVITE_EMAILS", "")
+
+    assert get_settings().public_registration_enabled is True
+
+
+def test_invalid_public_registration_setting_fails_fast(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    production_environment(monkeypatch)
+    monkeypatch.setenv("PUBLIC_REGISTRATION_ENABLED", "sometimes")
+
+    with pytest.raises(RuntimeError, match="PUBLIC_REGISTRATION_ENABLED"):
+        get_settings()
+
+
 @pytest.mark.parametrize(
     ("name", "value", "message"),
     [

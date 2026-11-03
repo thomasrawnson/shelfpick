@@ -45,7 +45,7 @@ def get_current_user(
         )
 
     try:
-        user_id = decode_access_token(
+        user_id, token_version = decode_access_token(
             credentials.credentials
         )
 
@@ -91,6 +91,19 @@ def get_current_user(
             headers={
                 "WWW-Authenticate": "Bearer"
             },
+        )
+
+    if user.token_version != token_version:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Session has been revoked",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    if user.email_verified_at is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Verify your email before signing in.",
         )
 
     return user

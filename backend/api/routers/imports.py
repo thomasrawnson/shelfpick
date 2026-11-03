@@ -14,9 +14,11 @@ from api.dependencies import (
 from services.bgstats_play_import_service import (
     BGStatsPlayImportService,
 )
+from bgstats.play_parser import BGStatsImportLimitError
 
 
 router = APIRouter()
+MAX_BGSTATS_UPLOAD_BYTES = 10 * 1024 * 1024
 
 
 @router.post(
@@ -41,7 +43,12 @@ async def import_bgstats_plays(
             ),
         )
 
-    contents = await file.read()
+    contents = await file.read(MAX_BGSTATS_UPLOAD_BYTES + 1)
+    if len(contents) > MAX_BGSTATS_UPLOAD_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail="BG Stats export must be 10 MB or smaller",
+        )
 
     try:
         json_text = contents.decode(
@@ -59,6 +66,11 @@ async def import_bgstats_plays(
         result = service.import_plays(
             json_text
         )
+    except BGStatsImportLimitError as exc:
+        raise HTTPException(
+            status_code=413,
+            detail=str(exc),
+        ) from exc
     except (
         json.JSONDecodeError,
         KeyError,

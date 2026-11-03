@@ -21,7 +21,11 @@ def account():
     session_factory = sessionmaker(bind=engine)
     Base.metadata.create_all(engine)
     with session_factory() as db:
-        user = User(email="profile@example.com", display_name="Morgan")
+        user = User(
+            email="profile@example.com",
+            display_name="Morgan",
+            email_verified_at=datetime.now(timezone.utc),
+        )
         db.add(user)
         db.commit()
         db.refresh(user)

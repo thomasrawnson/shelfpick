@@ -12,6 +12,13 @@ from database.models import UserWishlistGame
 class GameRepository:
     def __init__(self, db: Session):
         self.db = db
+        self.autocommit = True
+
+    def _finish_write(self) -> None:
+        if self.autocommit:
+            self.db.commit()
+        else:
+            self.db.flush()
 
     def get_owned_by_user(
         self,
@@ -452,7 +459,7 @@ class GameRepository:
         )
 
         self.db.add(database_game)
-        self.db.commit()
+        self._finish_write()
         self.db.refresh(database_game)
 
         return self._to_domain(database_game)
@@ -546,7 +553,7 @@ class GameRepository:
             )
         )
 
-        self.db.commit()
+        self._finish_write()
         self.db.refresh(database_game)
 
         return self._to_domain(database_game)
@@ -567,7 +574,7 @@ class GameRepository:
             return False
 
         self.db.delete(database_game)
-        self.db.commit()
+        self._finish_write()
 
         return True
 
@@ -814,7 +821,7 @@ class GameRepository:
             )
         )
 
-        self.db.commit()
+        self._finish_write()
 
     def get_bgg_ids_needing_expansion_check(
         self,
@@ -980,4 +987,4 @@ class GameRepository:
                 membership
             )
 
-        self.db.commit()
+        self._finish_write()

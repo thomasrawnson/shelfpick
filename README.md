@@ -464,12 +464,13 @@ Secrets and environment-specific URLs are prompted for by Render and are not
 stored in source control. The database must use a paid plan so point-in-time
 recovery and logical exports are available for the closed alpha.
 Render is pinned to Python 3.12.14 and Node 22 by the Blueprint. Production
-startup fails with a variable-name-only error when required configuration,
-including `BGG_API_TOKEN` or the server-only `BETA_INVITE_EMAILS` allow-list,
-is blank. Private-beta registration gives no session until the invited address
-uses its single-use verification link; existing accounts retain their prior
-login behaviour. Invitation operations are documented in the runbook and no
-invite list is exposed to the browser or an API.
+startup fails with a variable-name-only error when required configuration is
+absent. `PUBLIC_REGISTRATION_ENABLED` is an explicit launch switch and remains
+`false` in `render.yaml`; while false, the server-only `BETA_INVITE_EMAILS`
+allow-list is required. Public or invited registration gives no session until
+the address uses its single-use verification link. Invitation and later public
+promotion procedures are documented in the runbook; neither account existence
+nor the invite list is exposed to the browser or API.
 
 Follow [the production deployment runbook](docs/production-runbook.md) for
 domain setup, Resend verification, environment values, smoke testing,

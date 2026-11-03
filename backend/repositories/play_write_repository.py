@@ -251,6 +251,7 @@ class PlayWriteRepository:
         source: str,
         source_play_id: str,
         participants: list[dict],
+        commit: bool = True,
     ) -> bool:
         if self.user_id is None:
             return False
@@ -299,7 +300,10 @@ class PlayWriteRepository:
             participants
         )
 
-        self.db.commit()
+        if commit:
+            self.db.commit()
+        else:
+            self.db.flush()
 
         return True
 
@@ -312,6 +316,7 @@ class PlayWriteRepository:
         source: str,
         source_play_id: str,
         participants: list[dict],
+        commit: bool = True,
     ) -> bool:
         if self.user_id is None:
             raise ValueError(
@@ -337,6 +342,7 @@ class PlayWriteRepository:
                 source=source,
                 source_play_id=source_play_id,
                 participants=participants,
+                commit=commit,
             )
 
             return False
@@ -370,11 +376,8 @@ class PlayWriteRepository:
             source_play_id=source_play_id,
         )
 
-        self.db.add(
-            database_play
-        )
-
         try:
+            self.db.add(database_play)
             self.db.flush()
         except IntegrityError:
             # Narrow race window: another
@@ -387,10 +390,14 @@ class PlayWriteRepository:
             # surfacing a raw 500.
             self.db.rollback()
 
+            if not commit:
+                raise
+
             self.enrich_imported_participants(
                 source=source,
                 source_play_id=source_play_id,
                 participants=participants,
+                commit=commit,
             )
 
             return False
@@ -416,7 +423,10 @@ class PlayWriteRepository:
                 )
             )
 
-        self.db.commit()
+        if commit:
+            self.db.commit()
+        else:
+            self.db.flush()
 
         return True
 

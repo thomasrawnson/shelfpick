@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Link, useLocation } from "react-router-dom"
 
 import type { AuthUser } from "../auth"
@@ -25,9 +25,15 @@ const groups: { title: string; entries: SettingsEntry[] }[] = [
   ] },
 ]
 
-function SettingsView({ user, onLogout }: { user: AuthUser; onLogout: () => void }) {
+function SettingsView({ user, onLogout, onLogoutAll }: {
+  user: AuthUser
+  onLogout: () => void
+  onLogoutAll?: () => Promise<void>
+}) {
   const location = useLocation()
   const entryRefs = useRef<Record<string, HTMLAnchorElement | null>>({})
+  const [sessionError, setSessionError] = useState("")
+  const [loggingOutAll, setLoggingOutAll] = useState(false)
 
   useEffect(() => {
     const state = location.state as { focusEntry?: string } | null
@@ -67,6 +73,14 @@ function SettingsView({ user, onLogout }: { user: AuthUser; onLogout: () => void
     })}
 
     <button type="button" className="settings-logout" onClick={onLogout}>Log out</button>
+    {onLogoutAll && <button type="button" className="settings-logout" disabled={loggingOutAll} onClick={() => {
+      setLoggingOutAll(true); setSessionError("")
+      void onLogoutAll().catch((error) => {
+        setSessionError(error instanceof Error ? error.message : "Couldn't log out all sessions.")
+        setLoggingOutAll(false)
+      })
+    }}>{loggingOutAll ? "Logging out…" : "Log out all devices"}</button>}
+    {sessionError && <p className="error-message" role="alert">{sessionError}</p>}
   </section>
 }
 

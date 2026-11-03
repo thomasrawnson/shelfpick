@@ -162,6 +162,31 @@
   cursor: pointer;
 }
 
+.settings-danger-button {
+  min-height: 44px;
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  color: var(--color-danger);
+  background: transparent;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.settings-danger-button:hover:not(:disabled) { background: var(--color-danger-soft); }
+.settings-danger-button:focus-visible {
+  outline: 2px solid var(--color-danger);
+  outline-offset: 2px;
+}
+.settings-danger-button:disabled { cursor: not-allowed; opacity: 0.55; }
+.account-deletion-panel { margin-top: var(--space-6); }
+.account-deletion-panel input[type="password"] { width: 100%; }
+.settings-confirmation { display: flex; gap: var(--space-2); align-items: flex-start; }
+.bgg-attribution { display: inline-flex; min-height: 44px; align-items: center; padding: var(--space-1) var(--space-2); border-radius: var(--radius-sm); background: var(--color-brand-artwork-surface); }
+.bgg-attribution:focus-visible { outline: 2px solid var(--color-brand-primary); outline-offset: 2px; }
+.bgg-attribution img { width: 171px; height: auto; display: block; }
+
 .settings-back-link {
   display: inline-flex;
   align-items: center;

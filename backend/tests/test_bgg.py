@@ -3,15 +3,15 @@ from types import SimpleNamespace
 import httpx
 import pytest
 
-from bgg.client import BGGClient
+from bgg.client import BGGClient, MAX_BGG_RESPONSE_BYTES
 from bgg.client import BGGSourceUnavailableError
 
 
 def test_bgg_client_can_be_created():
     client = BGGClient()
 
-    assert client.timeout == 30.0
-    assert client.max_retries == 5
+    assert client.timeout == 20.0
+    assert client.max_retries == 3
 
 
 def test_get_game_requests_correct_bgg_endpoint(
@@ -71,12 +71,42 @@ def test_get_game_requests_correct_bgg_endpoint(
         "stats": 1,
     }
 
-    assert requested["timeout"] == 30.0
+    assert requested["timeout"] == 20.0
 
     assert isinstance(
         requested["headers"],
         dict,
     )
+
+
+def test_rejects_oversized_bgg_response(monkeypatch):
+    def mock_get(url, params, headers, timeout):
+        return httpx.Response(
+            200,
+            request=httpx.Request("GET", url),
+            content=b"x" * (MAX_BGG_RESPONSE_BYTES + 1),
+        )
+
+    monkeypatch.setattr(httpx, "get", mock_get)
+
+    with pytest.raises(RuntimeError, match="safe size limit"):
+        BGGClient().get_game(174430)
+
+
+def test_rejects_bgg_response_past_absolute_request_deadline(monkeypatch):
+    def mock_get(url, params, headers, timeout):
+        return httpx.Response(
+            200,
+            request=httpx.Request("GET", url),
+            content=b"<items />",
+        )
+
+    ticks = iter((0.0, 21.0))
+    monkeypatch.setattr(httpx, "get", mock_get)
+    monkeypatch.setattr("bgg.client.time.monotonic", lambda: next(ticks))
+
+    with pytest.raises(httpx.ReadTimeout, match="request deadline"):
+        BGGClient(timeout=20).get_game(174430)
 
 
 def test_get_game_retries_when_bgg_returns_202(

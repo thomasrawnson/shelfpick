@@ -28,8 +28,21 @@ from database.connection import (
 from database.models import (
     AuthToken,
     Game,
+    GameComparison,
+    GameNightBallot,
+    GameNightGuest,
+    GameNightVotingSession,
+    GameRanking,
+    LivePlayTimer,
+    PickerEvent,
+    PickerSession,
+    Play,
+    PlayParticipant,
+    Player,
     User,
     UserGame,
+    UserOperationLease,
+    UserWishlistGame,
 )
 from api.dependencies import (
     get_collection_service,
@@ -40,6 +53,7 @@ from auth.login_rate_limiter import (
     password_reset_request_rate_limiter,
     verification_request_rate_limiter,
 )
+from services.account_service import AccountService
 
 engine = create_engine(
     "sqlite://",
@@ -113,6 +127,31 @@ def register_user(
     )
 
 
+def mark_user_verified(email: str) -> None:
+    db = TestingSessionLocal()
+    try:
+        user = db.query(User).filter(User.email == email.casefold()).one()
+        user.email_verified_at = datetime.now(timezone.utc)
+        db.commit()
+    finally:
+        db.close()
+
+
+def register_verified_user(
+    client: TestClient,
+    email: str = "tom@example.com",
+    display_name: str = "Tom",
+    password: str = "password123",
+):
+    registration = register_user(client, email, display_name, password)
+    assert registration.status_code == 201
+    mark_user_verified(email)
+    return client.post(
+        "/auth/login",
+        json={"email": email, "password": password},
+    )
+
+
 def capture_sent_emails(
     monkeypatch: pytest.MonkeyPatch,
 ):
@@ -170,7 +209,7 @@ def test_private_beta_registration_is_invite_only_and_generic(
 
     assert uninvited.status_code == invited.status_code == duplicate.status_code == 201
     assert uninvited.json() == invited.json() == duplicate.json()
-    assert len(sent_emails) == 1
+    assert len(sent_emails) == 3
 
     db = TestingSessionLocal()
     try:
@@ -255,37 +294,19 @@ def test_beta_verification_resend_is_generic_and_rate_limited(
     assert blocked.status_code == 429
 
 
-def test_register_returns_token_and_user(
+def test_public_registration_requires_verification_before_session(
     client: TestClient,
 ):
     response = register_user(client)
 
     assert response.status_code == 201
 
-    data = response.json()
-
-    assert data["access_token"]
-    assert data["token_type"] == "bearer"
-
-    assert (
-        data["user"]["email"]
-        == "tom@example.com"
+    assert "access_token" not in response.json()
+    blocked = client.post(
+        "/auth/login",
+        json={"email": "tom@example.com", "password": "password123"},
     )
-
-    assert (
-        data["user"]["display_name"]
-        == "Tom"
-    )
-
-    assert (
-        data["user"]["bgg_username"]
-        is None
-    )
-
-    assert (
-        data["user"]["email_verified"]
-        is False
-    )
+    assert blocked.status_code == 403
 
 
 def test_valid_verification_token_verifies_user_once(
@@ -297,9 +318,7 @@ def test_valid_verification_token_verifies_user_once(
     )
 
     registration = register_user(client)
-    access_token = registration.json()[
-        "access_token"
-    ]
+    assert "access_token" not in registration.json()
     verification_token = token_from_email(
         sent_emails[-1]
     )
@@ -315,6 +334,13 @@ def test_valid_verification_token_verifies_user_once(
     assert response.json() == {
         "message": "Email verified"
     }
+
+    login_response = client.post(
+        "/auth/login",
+        json={"email": "tom@example.com", "password": "password123"},
+    )
+    assert login_response.status_code == 200
+    access_token = login_response.json()["access_token"]
 
     me_response = client.get(
         "/auth/me",
@@ -361,6 +387,7 @@ def test_password_reset_request_is_generic(
 ):
     capture_sent_emails(monkeypatch)
     register_user(client)
+    mark_user_verified("tom@example.com")
 
     existing = client.post(
         "/auth/password-reset/request",
@@ -388,6 +415,7 @@ def test_valid_password_reset_token_changes_password_once(
         monkeypatch
     )
     register_user(client)
+    mark_user_verified("tom@example.com")
 
     request_response = client.post(
         "/auth/password-reset/request",
@@ -454,7 +482,7 @@ def test_invalid_password_reset_token_returns_400(
 
     assert response.status_code == 400
 
-def test_duplicate_registration_returns_409(
+def test_duplicate_registration_is_indistinguishable(
     client: TestClient,
 ):
     first = register_user(client)
@@ -463,13 +491,15 @@ def test_duplicate_registration_returns_409(
 
     second = register_user(client)
 
-    assert second.status_code == 409
+    assert second.status_code == 201
+    assert second.json() == first.json()
 
 
 def test_login_returns_token(
     client: TestClient,
 ):
     register_user(client)
+    mark_user_verified("tom@example.com")
 
     response = client.post(
         "/auth/login",
@@ -509,9 +539,7 @@ def test_login_rejects_wrong_password(
 def test_me_returns_authenticated_user(
     client: TestClient,
 ):
-    register_response = (
-        register_user(client)
-    )
+    register_response = register_verified_user(client)
 
     token = register_response.json()[
         "access_token"
@@ -600,13 +628,13 @@ def test_protected_endpoint_requires_auth(
 def test_users_only_see_their_own_collection(
     client: TestClient,
 ):
-    first = register_user(
+    first = register_verified_user(
         client,
         email="tom@example.com",
         display_name="Tom",
     )
 
-    second = register_user(
+    second = register_verified_user(
         client,
         email="other@example.com",
         display_name="Other",
@@ -724,9 +752,7 @@ def test_users_only_see_their_own_collection(
 def test_authenticated_user_can_sync_collection(
     client: TestClient,
 ):
-    register_response = (
-        register_user(client)
-    )
+    register_response = register_verified_user(client)
 
     token = register_response.json()[
         "access_token"
@@ -863,7 +889,7 @@ def test_verification_requests_are_rate_limited(
     monkeypatch: pytest.MonkeyPatch,
 ):
     capture_sent_emails(monkeypatch)
-    registration = register_user(client)
+    registration = register_verified_user(client)
     access_token = registration.json()[
         "access_token"
     ]
@@ -926,6 +952,7 @@ def test_successful_login_resets_rate_limit(
     register_user(
         client
     )
+    mark_user_verified("tom@example.com")
 
     for _ in range(4):
         response = client.post(
@@ -972,3 +999,232 @@ def test_successful_login_resets_rate_limit(
         after_success.status_code
         == 401
     )
+
+
+def test_logout_all_revokes_existing_token(client: TestClient):
+    login = register_verified_user(client)
+    token = login.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    response = client.post("/auth/logout-all", headers=headers)
+
+    assert response.status_code == 200
+    assert client.get("/auth/me", headers=headers).status_code == 401
+    assert client.post(
+        "/auth/login",
+        json={"email": "tom@example.com", "password": "password123"},
+    ).status_code == 200
+
+
+def test_password_reset_revokes_existing_token(
+    client: TestClient,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    sent_emails = capture_sent_emails(monkeypatch)
+    login = register_verified_user(client)
+    headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
+    client.post(
+        "/auth/password-reset/request",
+        json={"email": "tom@example.com"},
+    )
+
+    response = client.post(
+        "/auth/password-reset/confirm",
+        json={
+            "token": token_from_email(sent_emails[-1]),
+            "password": "new-password123",
+        },
+    )
+
+    assert response.status_code == 200
+    assert client.get("/auth/me", headers=headers).status_code == 401
+
+
+def test_account_deletion_removes_owned_graph_and_preserves_shared_games(
+    client: TestClient,
+):
+    owner_login = register_verified_user(client)
+    register_verified_user(
+        client,
+        email="other@example.com",
+        display_name="Other",
+    )
+    db = TestingSessionLocal()
+    try:
+        owner = db.query(User).filter(User.email == "tom@example.com").one()
+        other = db.query(User).filter(User.email == "other@example.com").one()
+        first_game = Game(bgg_id=900001, name="Shared one", owned=False)
+        second_game = Game(bgg_id=900002, name="Shared two", owned=False)
+        db.add_all([first_game, second_game])
+        db.flush()
+        player = Player(
+            user_id=owner.id,
+            name="Tom",
+            normalized_name="tom",
+        )
+        db.add(player)
+        db.flush()
+        owner.profile_player_id = player.id
+        play = Play(
+            user_id=owner.id,
+            game_id=first_game.id,
+            player_count=1,
+            source="app",
+        )
+        picker = PickerSession(
+            public_id="delete-picker",
+            user_id=owner.id,
+            criteria={},
+            recommendation_bgg_ids=[first_game.bgg_id],
+        )
+        voting = GameNightVotingSession(
+            public_id="delete-vote",
+            join_token_hash="delete-vote-hash",
+            host_user_id=owner.id,
+            status="open",
+            candidates=[],
+            expires_at=datetime.now(timezone.utc) + timedelta(hours=1),
+        )
+        db.add_all([play, picker, voting])
+        db.flush()
+        guest = GameNightGuest(
+            public_id="delete-guest",
+            session_id=voting.id,
+            credential_hash="delete-guest-hash",
+            display_name="Guest",
+        )
+        db.add(guest)
+        db.flush()
+        db.add_all([
+            UserGame(user_id=owner.id, game_id=first_game.id),
+            UserGame(user_id=other.id, game_id=first_game.id),
+            UserWishlistGame(user_id=owner.id, game_id=second_game.id),
+            PlayParticipant(
+                play_id=play.id,
+                player_id=player.id,
+                name="Tom",
+                is_winner=True,
+            ),
+            LivePlayTimer(
+                public_id="delete-timer",
+                user_id=owner.id,
+                game_id=first_game.id,
+                status="running",
+                accumulated_seconds=0,
+            ),
+            PickerEvent(
+                picker_session_id=picker.id,
+                event_type="shown",
+                bgg_id=first_game.bgg_id,
+            ),
+            GameNightBallot(
+                session_id=voting.id,
+                guest_id=guest.id,
+                candidate_bgg_id=first_game.bgg_id,
+            ),
+            GameRanking(
+                user_id=owner.id,
+                game_id=first_game.id,
+                rating=1500,
+            ),
+            GameComparison(
+                user_id=owner.id,
+                winner_game_id=first_game.id,
+                loser_game_id=second_game.id,
+            ),
+            UserOperationLease(
+                user_id=owner.id,
+                operation="test-operation",
+                started_at=datetime.now(timezone.utc),
+                lease_expires_at=datetime.now(timezone.utc) + timedelta(minutes=1),
+            ),
+        ])
+        db.commit()
+        owner_id = owner.id
+        other_id = other.id
+    finally:
+        db.close()
+
+    headers = {
+        "Authorization": f"Bearer {owner_login.json()['access_token']}"
+    }
+    response = client.request(
+        "DELETE",
+        "/auth/account",
+        headers=headers,
+        json={"password": "password123"},
+    )
+
+    assert response.status_code == 200
+    assert client.get("/auth/me", headers=headers).status_code == 401
+    db = TestingSessionLocal()
+    try:
+        assert db.get(User, owner_id) is None
+        assert db.query(Game).count() == 2
+        assert db.query(UserGame).count() == 1
+        assert db.query(UserGame).one().user_id == other_id
+        for model in (
+            UserWishlistGame,
+            Player,
+            Play,
+            PlayParticipant,
+            LivePlayTimer,
+            PickerSession,
+            PickerEvent,
+            GameNightVotingSession,
+            GameNightGuest,
+            GameNightBallot,
+            GameRanking,
+            GameComparison,
+            UserOperationLease,
+        ):
+            assert db.query(model).count() == 0
+    finally:
+        db.close()
+
+
+def test_account_deletion_requires_correct_password(client: TestClient):
+    login = register_verified_user(client)
+    headers = {"Authorization": f"Bearer {login.json()['access_token']}"}
+
+    response = client.request(
+        "DELETE",
+        "/auth/account",
+        headers=headers,
+        json={"password": "wrong-password"},
+    )
+
+    assert response.status_code == 403
+    assert client.get("/auth/me", headers=headers).status_code == 200
+
+
+def test_account_deletion_rolls_back_if_commit_fails(
+    client: TestClient,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    register_verified_user(client)
+    db = TestingSessionLocal()
+    try:
+        user = db.query(User).filter(User.email == "tom@example.com").one()
+        game = Game(bgg_id=900003, name="Rollback game", owned=False)
+        db.add(game)
+        db.flush()
+        db.add(UserGame(user_id=user.id, game_id=game.id))
+        db.commit()
+        user_id = user.id
+
+        def fail_commit():
+            raise RuntimeError("simulated commit failure")
+
+        monkeypatch.setattr(db, "commit", fail_commit)
+        with pytest.raises(RuntimeError, match="simulated commit failure"):
+            AccountService(db).delete_account(user, "password123")
+    finally:
+        db.close()
+
+    verify = TestingSessionLocal()
+    try:
+        assert verify.get(User, user_id) is not None
+        assert verify.query(UserGame).filter(UserGame.user_id == user_id).count() == 1
+    finally:
+        verify.close()

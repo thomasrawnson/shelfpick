@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -54,6 +56,7 @@ def seed_user(email):
         email=email,
         display_name=email,
         password_hash=hash_password("password123"),
+        email_verified_at=datetime.now(timezone.utc),
     )
     db.add(user)
     db.commit()

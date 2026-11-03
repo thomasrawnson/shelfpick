@@ -46,7 +46,7 @@ function VerifyEmailView() {
         setError(
           err instanceof Error
             ? (/invalid|expired/i.test(err.message)
-              ? "This verification link is invalid, expired or already used. Ask for a new invitation email if you still need access."
+              ? "This verification link is invalid, expired or already used. Return to sign in to request a new verification email."
               : err.message)
             : "Verification failed",
         )
