@@ -4,6 +4,8 @@ import httpx
 
 from config import settings
 
+MAX_BGG_RESPONSE_BYTES = 5 * 1024 * 1024
+
 
 class BGGSourceUnavailableError(
     RuntimeError
@@ -32,10 +34,10 @@ class BGGClient:
 
     def __init__(
         self,
-        timeout: float = 30.0,
+        timeout: float = 20.0,
         retry_delay: float = 5.0,
-        max_retries: int = 5,
-        max_retry_wait: float = 30.0,
+        max_retries: int = 3,
+        max_retry_wait: float = 10.0,
     ):
         self.timeout = timeout
         self.retry_delay = retry_delay
@@ -215,7 +217,9 @@ class BGGClient:
         for attempt in range(
             self.max_retries
         ):
-            response = httpx.get(
+            attempt_deadline = time.monotonic() + self.timeout
+            with httpx.stream(
+                "GET",
                 url,
                 params=params,
                 headers=(
@@ -224,55 +228,42 @@ class BGGClient:
                     else headers
                 ),
                 timeout=self.timeout,
-            )
+            ) as response:
+                if response.status_code == 202:
+                    if self._is_last_attempt(attempt):
+                        raise RuntimeError(
+                            f"{description} remained queued after maximum retries"
+                        )
+                    self._sleep(self.retry_delay)
+                    continue
 
-            if response.status_code == 202:
-                if self._is_last_attempt(
-                    attempt
-                ):
-                    raise RuntimeError(
-                        f"{description} remained "
-                        "queued after maximum "
-                        "retries"
+                if response.status_code == 429:
+                    if self._is_last_attempt(attempt):
+                        raise RuntimeError(
+                            "BGG rate limit exceeded after maximum retries"
+                        )
+                    wait_seconds = self._get_retry_wait(response, attempt)
+                    print(
+                        "BGG rate limit reached. "
+                        f"Waiting {wait_seconds:.0f}s..."
                     )
+                    self._sleep(wait_seconds)
+                    continue
 
-                self._sleep(
-                    self.retry_delay
-                )
-
-                continue
-
-            if response.status_code == 429:
-                if self._is_last_attempt(
-                    attempt
-                ):
-                    raise RuntimeError(
-                        "BGG rate limit exceeded "
-                        "after maximum retries"
-                    )
-
-                wait_seconds = (
-                    self._get_retry_wait(
-                        response,
-                        attempt,
-                    )
-                )
-
-                print(
-                    "BGG rate limit reached. "
-                    f"Waiting "
-                    f"{wait_seconds:.0f}s..."
-                )
-
-                self._sleep(
-                    wait_seconds
-                )
-
-                continue
-
-            response.raise_for_status()
-
-            return response.text
+                response.raise_for_status()
+                body = bytearray()
+                for chunk in response.iter_bytes():
+                    if time.monotonic() > attempt_deadline:
+                        raise httpx.ReadTimeout(
+                            "BGG response exceeded the request deadline",
+                            request=response.request,
+                        )
+                    body.extend(chunk)
+                    if len(body) > MAX_BGG_RESPONSE_BYTES:
+                        raise RuntimeError(
+                            "BGG response exceeded the safe size limit"
+                        )
+                return bytes(body).decode(response.encoding or "utf-8")
 
         raise RuntimeError(
             f"Unable to complete "

@@ -1,5 +1,5 @@
 import { useRef, useState, type FormEvent } from "react"
-import { login, register, resendBetaVerification } from "../api/client"
+import { login, register, resendVerification } from "../api/client"
 import { FieldValidationError } from "../api/request"
 import { saveToken, type AuthUser } from "../auth"
 import { registrationErrors } from "../auth-validation"
@@ -63,7 +63,7 @@ export default function AuthView({ onAuthenticated, sessionExpired }: Props) {
     <header className="auth-header">
       <BrandLogo />
       <h1>{mode === "login" ? "Welcome back" : "Create your account"}</h1>
-      <p className="subtitle">{mode === "register" ? "Private beta registration is invite-only." : "Your collection, plays and recommendations in one place."}</p>
+      <p className="subtitle">{mode === "register" ? "Create a free account, then verify your email to continue." : "Your collection, plays and recommendations in one place."}</p>
     </header>
     {sessionExpired && <p role="status" className="field-hint">Your session has expired. Log in again to continue.</p>}
     <div className="auth-tabs">
@@ -74,7 +74,7 @@ export default function AuthView({ onAuthenticated, sessionExpired }: Props) {
       {registrationMessage && <p className="field-hint" role="status">{registrationMessage}</p>}
       {registrationMessage && <button type="button" className="auth-link-button" disabled={resending} onClick={() => {
         setResending(true); setError("")
-        void resendBetaVerification(email.trim())
+        void resendVerification(email.trim())
           .then(setRegistrationMessage)
           .catch(err => setError(err instanceof Error ? err.message : "Couldn't resend verification email."))
           .finally(() => setResending(false))

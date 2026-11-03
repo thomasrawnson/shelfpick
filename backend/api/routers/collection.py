@@ -29,6 +29,16 @@ from api.schemas.collection import (
 )
 from database.connection import get_db
 from database.models import User
+from services.workload_limits import (
+    GlobalOperationGuard,
+    OperationCapacityError,
+    OperationCooldownError,
+    OperationInProgressError,
+    UserOperationGuard,
+)
+
+COLLECTION_SYNC_COOLDOWN_SECONDS = 5 * 60
+COLLECTION_SYNC_LEASE_SECONDS = 2 * 60 * 60
 
 router = APIRouter()
 
@@ -51,77 +61,110 @@ def sync_collection(
         .strip()
     )
 
-    try:
-        games = service.sync_collection(
-            username
-        )
-
-    except ValueError as exc:
-        raise HTTPException(
-            status_code=400,
-            detail=str(exc),
-        ) from exc
-
-    except httpx.TimeoutException as exc:
-        raise HTTPException(
-            status_code=504,
-            detail=(
-                "BoardGameGeek took too long "
-                "to respond. Please try again."
-            ),
-        ) from exc
-
-    except httpx.HTTPStatusError as exc:
-        status = (
-            exc.response.status_code
-        )
-
-        if status == 404:
-            detail = (
-                "That BoardGameGeek account "
-                "couldn't be found."
-            )
-        elif status == 401:
-            detail = (
-                "BoardGameGeek rejected the "
-                "request. Please try again later."
-            )
-        elif status == 429:
-            detail = (
-                "BoardGameGeek is temporarily "
-                "rate limiting requests. "
-                "Please try again shortly."
-            )
-        else:
-            detail = (
-                "BoardGameGeek couldn't be "
-                "reached. Please try again."
-            )
-
-        raise HTTPException(
-            status_code=502,
-            detail=detail,
-        ) from exc
-
-    except RuntimeError as exc:
-        raise HTTPException(
-            status_code=503,
-            detail=(
-                "BoardGameGeek is temporarily "
-                "busy. Please try again shortly."
-            ),
-        ) from exc
-
-    current_user.bgg_username = (
-        username
+    user_guard = UserOperationGuard(
+        db,
+        current_user.id,
+        "collection-sync",
+        COLLECTION_SYNC_COOLDOWN_SECONDS,
+        COLLECTION_SYNC_LEASE_SECONDS,
+    )
+    global_guard = GlobalOperationGuard(
+        db,
+        current_user.id,
+        "collection-sync",
+        COLLECTION_SYNC_LEASE_SECONDS,
     )
 
-    db.commit()
+    try:
+        global_guard.acquire()
+    except OperationCapacityError as exc:
+        raise HTTPException(
+            status_code=429,
+            detail=str(exc),
+            headers={"Retry-After": "30"},
+        ) from exc
 
-    return {
-        "username": username,
-        "games_synced": len(games),
-    }
+    try:
+        user_guard.acquire()
+    except (OperationCooldownError, OperationInProgressError) as exc:
+        global_guard.release()
+        raise HTTPException(
+            status_code=429,
+            detail=str(exc),
+            headers={
+                "Retry-After": str(COLLECTION_SYNC_COOLDOWN_SECONDS)
+            },
+        ) from exc
+
+    try:
+        try:
+            games = service.sync_collection(username)
+
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=400,
+                detail=str(exc),
+            ) from exc
+
+        except httpx.TimeoutException as exc:
+            raise HTTPException(
+                status_code=504,
+                detail=(
+                    "BoardGameGeek took too long "
+                    "to respond. Please try again."
+                ),
+            ) from exc
+
+        except httpx.HTTPStatusError as exc:
+            upstream_status = exc.response.status_code
+
+            if upstream_status == 404:
+                detail = (
+                    "That BoardGameGeek account "
+                    "couldn't be found."
+                )
+            elif upstream_status == 401:
+                detail = (
+                    "BoardGameGeek rejected the "
+                    "request. Please try again later."
+                )
+            elif upstream_status == 429:
+                detail = (
+                    "BoardGameGeek is temporarily "
+                    "rate limiting requests. "
+                    "Please try again shortly."
+                )
+            else:
+                detail = (
+                    "BoardGameGeek couldn't be "
+                    "reached. Please try again."
+                )
+
+            raise HTTPException(
+                status_code=502,
+                detail=detail,
+            ) from exc
+
+        except RuntimeError as exc:
+            raise HTTPException(
+                status_code=503,
+                detail=(
+                    "BoardGameGeek is temporarily "
+                    "busy. Please try again shortly."
+                ),
+            ) from exc
+
+        current_user.bgg_username = username
+        db.commit()
+
+        return {
+            "username": username,
+            "games_synced": len(games),
+        }
+    finally:
+        user_guard.release()
+        global_guard.release()
+
 
 @router.get(
     "/collection/search"

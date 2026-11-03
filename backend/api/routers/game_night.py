@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 
 from api.current_user import get_current_user
+from api.client_address import trusted_client_address
 from api.dependencies import (
     get_game_night_voting_repository,
     get_game_service,
@@ -180,7 +181,7 @@ def join_game_night_voting(
         get_game_night_voting_repository
     ),
 ):
-    client = request.client.host if request.client else "unknown"
+    client = trusted_client_address(request)
     limiter_key = (
         f"{client}:"
         f"{sha256(join_token.encode('utf-8')).hexdigest()[:16]}"

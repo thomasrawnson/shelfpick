@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 
 from database.models import (
     AuthToken,
+    User,
 )
 
 
@@ -53,6 +54,10 @@ def create_one_time_token(
         32
     )
 
+    # Serialize replacement per account so concurrent requests cannot leave
+    # multiple active links for the same purpose.
+    db.query(User).filter(User.id == user_id).with_for_update().one()
+
     db.query(AuthToken).filter(
         AuthToken.user_id == user_id,
         AuthToken.purpose == purpose,
@@ -86,6 +91,8 @@ def consume_one_time_token(
     db: Session,
     raw_token: str,
     purpose: str,
+    *,
+    commit: bool = True,
 ) -> AuthToken | None:
     now = datetime.now(
         timezone.utc
@@ -101,6 +108,7 @@ def consume_one_time_token(
             AuthToken.used_at.is_(None),
             AuthToken.expires_at > now,
         )
+        .with_for_update()
         .first()
     )
 
@@ -109,7 +117,10 @@ def consume_one_time_token(
 
     token.used_at = now
 
-    db.commit()
-    db.refresh(token)
+    if commit:
+        db.commit()
+        db.refresh(token)
+    else:
+        db.flush()
 
     return token

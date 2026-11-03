@@ -1,4 +1,5 @@
 from datetime import datetime
+import secrets
 
 from sqlalchemy import (
     Boolean,
@@ -131,6 +132,13 @@ class User(Base):
             DateTime(timezone=True),
             nullable=True,
         )
+
+    token_version: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=0,
+        server_default="0",
+    )
     
     user_games = relationship(
         "UserGame",
@@ -210,6 +218,85 @@ class AuthToken(Base):
         DateTime(timezone=True),
         nullable=False,
         server_default=func.now(),
+    )
+
+
+class AuthRateLimit(Base):
+    __tablename__ = "auth_rate_limits"
+
+    __table_args__ = (
+        UniqueConstraint(
+            "scope",
+            "key_hash",
+            name="uq_auth_rate_limits_scope_key",
+        ),
+        Index(
+            "ix_auth_rate_limits_updated_at",
+            "updated_at",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    scope: Mapped[str] = mapped_column(String(32), nullable=False)
+    key_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    window_started_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False,
+    )
+    request_count: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0",
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False,
+    )
+
+
+class UserOperationLease(Base):
+    __tablename__ = "user_operation_leases"
+
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id",
+            "operation",
+            name="uq_user_operation_leases_user_operation",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    operation: Mapped[str] = mapped_column(String(32), nullable=False)
+    started_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False,
+    )
+    lease_expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False,
+    )
+    lease_token: Mapped[str] = mapped_column(
+        String(64), nullable=False,
+        default=lambda: secrets.token_urlsafe(24),
+    )
+
+
+class OperationLeaseSlot(Base):
+    __tablename__ = "operation_lease_slots"
+
+    operation: Mapped[str] = mapped_column(
+        String(32), primary_key=True,
+    )
+    slot: Mapped[int] = mapped_column(Integer, primary_key=True)
+    owner_user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    lease_expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False,
+    )
+    lease_token: Mapped[str | None] = mapped_column(
+        String(64), nullable=True,
     )
 class UserGame(Base):
     __tablename__ = "user_games"

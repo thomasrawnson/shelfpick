@@ -39,6 +39,13 @@ services:
         sync: false
       - key: BETA_INVITE_EMAILS
         sync: false
+      - key: PUBLIC_REGISTRATION_ENABLED
+        value: "false"
+      # Render's edge is the only public route to this service. Uvicorn uses
+      # forwarded scheme metadata; security limits separately use Render's
+      # edge-overwritten CF-Connecting-IP header, never client X-Forwarded-For.
+      - key: FORWARDED_ALLOW_IPS
+        value: "*"
 
   - type: web
     name: board-game-picker-web
