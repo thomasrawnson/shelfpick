@@ -45,8 +45,13 @@ export function AddGameResult({
       <div>
         <strong>{result.name}</strong>
 
-        {result.year_published && (
-          <span>{result.year_published}</span>
+        {(result.year_published || result.item_type === "boardgameexpansion") && (
+          <span>
+            {[
+              result.year_published,
+              result.item_type === "boardgameexpansion" ? "Expansion" : null,
+            ].filter(Boolean).join(" · ")}
+          </span>
         )}
       </div>
 
@@ -262,6 +267,13 @@ function AddGameSearch({
 
       {hasSearched && !searching && results.length === 0 && !error && (
         <p className="add-game-no-results">No BoardGameGeek games matched that title. Try another search.</p>
+      )}
+
+      {hasSearched && !searching && results.length > 0 && !error && (
+        <p className="add-game-no-results" role="status">
+          Best title matches first. Showing {results.length} results.
+          {results.length === 20 && " Try a more specific title to narrow them down."}
+        </p>
       )}
 
 

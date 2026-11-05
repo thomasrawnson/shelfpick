@@ -84,6 +84,13 @@ test("search results expose independent Owned and Want to Play actions", () => {
   assert.match(markup, />Add to Want to Play<\/button>/)
 })
 
+test("search results label BGG expansions while retaining their add actions", () => {
+  const markup = renderResult({ name: "Ticket to Ride: Fan Expansion", item_type: "boardgameexpansion" })
+  assert.match(markup, /2022 · Expansion/)
+  assert.match(markup, />Add to Owned<\/button>/)
+  assert.match(markup, />Add to Want to Play<\/button>/)
+})
+
 test("search results accurately show either or both memberships", () => {
   const owned = renderResult({ owned: true })
   assert.match(owned, /disabled=""[^>]*>Already Owned<\/button>/)
