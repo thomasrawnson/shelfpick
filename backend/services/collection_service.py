@@ -15,6 +15,7 @@ from repositories.game_repository import (
 )
 from bgg.search_parser import (
     parse_search_results,
+    rank_search_results,
 )
 
 THING_BATCH_SIZE = 20
@@ -227,8 +228,9 @@ class CollectionService:
         )
 
         results = (
-            parse_search_results(
-                xml
+            rank_search_results(
+                parse_search_results(xml),
+                cleaned_query,
             )
         )
 

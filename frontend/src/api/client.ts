@@ -406,6 +406,7 @@ export interface DiscoverRecommendationResult {
 export interface BGGSearchResult {
   bgg_id: number
   name: string
+  item_type?: string
   year_published:
     number | null
   owned: boolean
