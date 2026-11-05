@@ -226,3 +226,9 @@
     max-height: 100dvh;
   }
 }
+
+@media (max-width: 360px) {
+  .app-nav { gap: 2px; }
+  .nav-button { padding-inline: 0; }
+  .nav-label { white-space: normal; }
+}

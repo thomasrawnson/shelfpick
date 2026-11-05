@@ -8,6 +8,7 @@ import {
 } from "../api/client"
 import BrandLogo from "./ui/BrandLogo"
 import RetryNotice from "./ui/RetryNotice"
+import { clearCredential, getCredential, isNativeIos, saveCredential } from "../native-secure-storage"
 
 
 type Props = {
@@ -59,7 +60,9 @@ function Results({ state }: { state: GameNightVotingPublicState }) {
 
 function GameNightGuestVotingView({ joinToken }: Props) {
   const storageKey = credentialKey(joinToken)
-  const [credential, setCredential] = useState(() => localStorage.getItem(storageKey))
+  const [savedCredential, setSavedCredential] = useState<{ key: string; value: string | null } | null>(null)
+  const credentialReady = savedCredential?.key === storageKey
+  const credential = credentialReady ? savedCredential.value : null
   const [state, setState] = useState<GameNightVotingPublicState | null>(null)
   const [displayName, setDisplayName] = useState("")
   const [selection, setSelection] = useState<Selection>(null)
@@ -70,6 +73,20 @@ function GameNightGuestVotingView({ joinToken }: Props) {
 
   useEffect(() => {
     let active = true
+    void getCredential(storageKey).then((saved) => {
+      if (!active) return
+      setSavedCredential({ key: storageKey, value: saved })
+    }).catch((failure) => {
+      if (!active) return
+      setError(failure instanceof Error ? failure.message : "Couldn't restore this guest session.")
+      setLoading(false)
+    })
+    return () => { active = false }
+  }, [storageKey, refreshKey])
+
+  useEffect(() => {
+    if (!credentialReady) return
+    let active = true
     const interval = setInterval(() => { void load() }, 4000)
 
     async function load() {
@@ -79,8 +96,8 @@ function GameNightGuestVotingView({ joinToken }: Props) {
         setState(next)
         setError("")
         if (credential && !next.guest) {
-          localStorage.removeItem(storageKey)
-          setCredential(null)
+          await clearCredential(storageKey)
+          setSavedCredential({ key: storageKey, value: null })
         }
         if (next.guest?.has_submitted) {
           setSelection(next.guest.current_vote ?? "abstain")
@@ -100,7 +117,7 @@ function GameNightGuestVotingView({ joinToken }: Props) {
       active = false
       clearInterval(interval)
     }
-  }, [credential, joinToken, refreshKey, storageKey])
+  }, [credential, credentialReady, joinToken, refreshKey, storageKey])
 
   async function join() {
     setSubmitting(true)
@@ -108,8 +125,8 @@ function GameNightGuestVotingView({ joinToken }: Props) {
     try {
       const next = await joinGameNightVoting(joinToken, displayName)
       if (!next.guest_credential) throw new Error("ShelfPick couldn't restore this guest session.")
-      localStorage.setItem(storageKey, next.guest_credential)
-      setCredential(next.guest_credential)
+      await saveCredential(storageKey, next.guest_credential)
+      setSavedCredential({ key: storageKey, value: next.guest_credential })
       setState(next)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Couldn't join this voting session.")
@@ -168,8 +185,8 @@ function GameNightGuestVotingView({ joinToken }: Props) {
             {submitting ? "Joining…" : "Join voting"}
           </button>
           <p className="form-help">
-            No ShelfPick account is needed. This browser identifies your ballot for this session.
-            A different browser or device could join again, so this cannot prove one vote per real person.
+            No ShelfPick account is needed. This {isNativeIos ? "app" : "browser"} identifies your ballot for this session.
+            A different {isNativeIos ? "app" : "browser"} or device could join again, so this cannot prove one vote per real person.
           </p>
         </form>
       )}

@@ -62,7 +62,7 @@ test("avatar catalogue keeps legacy IDs and offers labelled board-game choices",
   }))
   assert.match(markup, /role="radiogroup"|type="radio"/)
   assert.match(markup, /checked="" value="cards"/)
-  assert.match(markup, /Card blue/)
+  assert.match(markup, /Cards/)
   assert.match(markup, /Blue token with a card motif/)
 })
 

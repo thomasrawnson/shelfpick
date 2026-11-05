@@ -27,7 +27,7 @@ const groups: { title: string; entries: SettingsEntry[] }[] = [
 
 function SettingsView({ user, onLogout, onLogoutAll }: {
   user: AuthUser
-  onLogout: () => void
+  onLogout: () => Promise<void>
   onLogoutAll?: () => Promise<void>
 }) {
   const location = useLocation()
@@ -72,7 +72,10 @@ function SettingsView({ user, onLogout, onLogoutAll }: {
       </section>
     })}
 
-    <button type="button" className="settings-logout" onClick={onLogout}>Log out</button>
+    <button type="button" className="settings-logout" onClick={() => {
+      setSessionError("")
+      void onLogout().catch((error) => setSessionError(error instanceof Error ? error.message : "Couldn't log out."))
+    }}>Log out</button>
     {onLogoutAll && <button type="button" className="settings-logout" disabled={loggingOutAll} onClick={() => {
       setLoggingOutAll(true); setSessionError("")
       void onLogoutAll().catch((error) => {

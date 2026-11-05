@@ -1,0 +1,128 @@
+/* WebKit's system body style follows the iOS preferred content size. Keep
+   ShelfPick's font families and normal-size proportions through rem tokens. */
+@supports (font: -apple-system-body) {
+  :root[data-native-ios] {
+    font: -apple-system-body;
+    font-family: var(--font-ui);
+    --text-body: 0.941176rem;
+    --text-support: 0.823529rem;
+    --text-meta: 0.705882rem;
+    --text-overline: 0.647059rem;
+  }
+
+  :root[data-native-ios] h1 {
+    font-size: 1.823529rem;
+    overflow-wrap: anywhere;
+  }
+  :root[data-native-ios] .subtitle,
+  :root[data-native-ios] :is(.primary-button, .secondary-button, .ghost-button) {
+    font-size: var(--text-support);
+  }
+  :root[data-native-ios] .player-chip strong { font-size: 1.588235rem; }
+  :root[data-native-ios] .time-option strong { font-size: 1rem; }
+  :root[data-native-ios] :is(.wishlist-card-body strong, .collection-game-info strong) {
+    font-size: 1.058824rem;
+  }
+  :root[data-native-ios] .collection-game-info strong {
+    display: block;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+    overflow-wrap: anywhere;
+  }
+
+  :root[data-native-ios] .collection-heading-row { flex-wrap: wrap; }
+  :root[data-native-ios] .collection-heading-row header {
+    flex: 1 1 5em;
+    min-width: 0;
+  }
+  :root[data-native-ios] .collection-section-tabs {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 3em), 1fr)) !important;
+  }
+  :root[data-native-ios] :is(.collection-filter-tabs, .collection-tools .filter-tabs) {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 5em), 1fr));
+    gap: 6px;
+  }
+  :root[data-native-ios] :is(.collection-filter-tabs button, .collection-tools .filter-tabs button) {
+    min-width: 0;
+    overflow-wrap: normal;
+    word-break: keep-all;
+    white-space: normal;
+  }
+  :root[data-native-ios] .collection-search-sort-row {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 7.5rem), 1fr));
+  }
+
+  :root[data-native-ios] .player-complexity-section .complexity-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 3em), 1fr));
+  }
+  :root[data-native-ios] .player-complexity-section .complexity-option {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  :root[data-native-ios] .avatar-choice-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  :root[data-native-ios] .avatar-choice-label {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: normal;
+    word-break: keep-all;
+  }
+
+  :root[data-native-ios] .discover-header { flex-wrap: wrap; }
+  :root[data-native-ios] .discover-header > div { flex: 1 0 auto; }
+  :root[data-native-ios] .discover-header h1 {
+    overflow-wrap: normal;
+    word-break: keep-all;
+  }
+
+  :root[data-native-ios] .app-nav {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  :root[data-native-ios] .nav-button {
+    flex: 1 0 3.5rem;
+    min-width: 3.5rem;
+    font-size: 0.764706rem;
+  }
+  :root[data-native-ios] .nav-label {
+    max-width: 100%;
+    font-size: 0.764706rem;
+    white-space: normal;
+    overflow-wrap: normal;
+    word-break: keep-all;
+    text-align: center;
+  }
+  :root[data-native-ios] .app-phone {
+    padding-bottom: calc(max(128px, 6rem) + env(safe-area-inset-bottom));
+    scroll-padding-bottom: calc(max(128px, 6rem) + env(safe-area-inset-bottom));
+  }
+
+  :root[data-native-ios] :is(.auth-tabs, .collection-section-tabs, .collection-filter-tabs, .filter-tabs),
+  :root[data-native-ios] .player-grid {
+    min-width: 0;
+  }
+  :root[data-native-ios] :is(.auth-tabs button, .collection-section-tabs button, .collection-filter-tabs button, .filter-tabs button) {
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+  :root[data-native-ios] .player-chip {
+    min-height: max(70px, 4.5rem);
+    aspect-ratio: auto;
+    overflow-wrap: anywhere;
+  }
+  :root[data-native-ios] :is(.time-option, .settings-row, .wishlist-card-main, .collection-game) {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  :root[data-native-ios] .auth-screen {
+    flex: 0 0 auto;
+    min-width: 0;
+    justify-content: safe center;
+  }
+  :root[data-native-ios] .auth-card { min-width: 0; }
+}

@@ -1,4 +1,5 @@
 import type { AvatarId } from "./avatar-catalog"
+import { clearCredential, getCredential, isNativeIos, saveCredential } from "./native-secure-storage.ts"
 
 export interface AuthUser {
   id: number
@@ -27,27 +28,30 @@ export interface AuthResult {
 const TOKEN_KEY =
   "boardgamepicker_access_token"
 
+let nativeToken: string | null = null
+
+export async function restoreToken(): Promise<string | null> {
+  if (!isNativeIos) return getToken()
+  nativeToken = await getCredential(TOKEN_KEY)
+  return nativeToken
+}
+
 
 export function getToken():
 string | null {
-  return localStorage.getItem(
-    TOKEN_KEY,
-  )
+  return isNativeIos ? nativeToken : localStorage.getItem(TOKEN_KEY)
 }
 
 
-export function saveToken(
+export async function saveToken(
   token: string,
-): void {
-  localStorage.setItem(
-    TOKEN_KEY,
-    token,
-  )
+): Promise<void> {
+  await saveCredential(TOKEN_KEY, token)
+  if (isNativeIos) nativeToken = token
 }
 
 
-export function clearToken(): void {
-  localStorage.removeItem(
-    TOKEN_KEY,
-  )
+export async function clearToken(): Promise<void> {
+  nativeToken = null
+  await clearCredential(TOKEN_KEY)
 }
