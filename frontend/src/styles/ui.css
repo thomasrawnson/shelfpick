@@ -566,6 +566,17 @@
   padding-top: calc(10px + env(safe-area-inset-top));
 }
 
+:root[data-native-ios] .dice-menu-button {
+  width: var(--target-min);
+  height: var(--target-min);
+}
+
+:root[data-native-ios] input:not([type="checkbox"]):not([type="radio"]),
+:root[data-native-ios] select,
+:root[data-native-ios] textarea {
+  font-size: max(16px, 1em);
+}
+
 /* The Forest outline follows the state-derived selected class only. */
 .player-step-screen .player-chip.solo:not(.selected) {
   border-color: var(--sp-line);

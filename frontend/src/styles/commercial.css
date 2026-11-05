@@ -1189,11 +1189,7 @@ h3,
 /* Warmer selection surfaces across the app. */
 .collection-section-tabs button.active,
 .ranking-view-tabs button.active,
-.stats-section-tab.active,
-.collection-search,
-.collection-section-tabs,
-.ranking-view-tabs,
-.stats-section-tabs {
+.stats-section-tab.active {
   background-color: var(--color-brand-primary-soft);
 }
 

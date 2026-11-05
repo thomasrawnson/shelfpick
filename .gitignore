@@ -12,6 +12,7 @@ frontend/dist/
 .env
 .env.*
 !.env.example
+!frontend/.env.ios
 
 # IDE
 .vscode/

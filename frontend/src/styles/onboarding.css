@@ -225,6 +225,9 @@
 .player-avatar-motif { position: absolute; right: 1px; bottom: 1px; width: 15px; height: 15px; opacity: .58; }
 .player-avatar-motif svg { display: block; width: 100%; height: 100%; fill: currentColor; }
 .player-avatar-motif-dice rect, .player-avatar-motif-cards rect { fill: none; stroke: currentColor; stroke-width: 1.5; }
+.player-avatar-motif-forest path, .player-avatar-motif-clay rect, .player-avatar-motif-clay path { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.player-avatar-motif-gold path { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linejoin: round; }
+.player-avatar-forest .player-avatar-initials, .player-avatar-gold .player-avatar-initials, .player-avatar-clay .player-avatar-initials { transform: translate(-2px, -2px); }
 .player-avatar-dice .player-avatar-initials, .player-avatar-meeple .player-avatar-initials, .player-avatar-cards .player-avatar-initials { transform: translate(-2px, -2px); }
 .player-avatar-forest { color: var(--color-brand-primary); background: var(--color-brand-primary-soft); }
 .player-avatar-gold { color: var(--color-accent-text); background: var(--color-brand-accent-soft); }

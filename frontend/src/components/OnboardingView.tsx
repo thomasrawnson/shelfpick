@@ -104,7 +104,8 @@ function OnboardingView({ displayName, onComplete }: Props) {
       <button type="button" className="primary-button" onClick={() => setStep(1)}>Get started</button>
     </div>}
     {step === 1 && <div className="onboarding-card">
-      <h2>Import from BGG</h2>
+      <h2>Bring in your owned games</h2>
+      <p>BoardGameGeek imports your collection, not your past plays.</p>
       <label className="setup-label" htmlFor="onboarding-bgg">BoardGameGeek username</label>
       <input id="onboarding-bgg" className="setup-input" value={username}
         autoCapitalize="none" autoCorrect="off" placeholder="Your BGG username"
@@ -132,6 +133,7 @@ function OnboardingView({ displayName, onComplete }: Props) {
       </ul>}
       {searched && results.length === 0 && <p role="status">No games found. Try a different title.</p>}
       {added.length > 0 && <p role="status">{added.length} game{added.length === 1 ? "" : "s"} added.</p>}
+      <p className="onboarding-import-note">Have plays in BG Stats? After setup, import your BG Stats JSON in Settings → Collection &amp; Data. You can do both imports later.</p>
       <button type="button" className="secondary-button onboarding-next" onClick={() => { setError(""); setStep(2) }}>Continue</button>
       <button type="button" className="onboarding-skip" onClick={() => { setError(""); setStep(2) }}>Skip for now</button>
     </div>}

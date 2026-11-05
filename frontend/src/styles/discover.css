@@ -165,12 +165,11 @@
   position: relative;
   display: grid;
   grid-template-columns: 118px minmax(0, 1fr);
-  gap: 14px;
-  padding: 14px 14px 14px 14px;
+  gap: var(--space-3);
+  padding: var(--space-4);
   background: var(--color-surface);
-  box-shadow: var(--shadow-card);
-  border: 0;
-  border-radius: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
 }
 
 .discover-save-button {

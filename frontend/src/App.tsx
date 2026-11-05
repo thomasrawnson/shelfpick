@@ -21,7 +21,7 @@ import RetryNotice from "./components/ui/RetryNotice";
 import BrandLogo from "./components/ui/BrandLogo";
 import { getMe } from "./api/client";
 
-import { clearToken, getToken, type AuthUser } from "./auth";
+import { clearToken, restoreToken, type AuthUser } from "./auth";
 
 import AuthView from "./components/AuthView";
 
@@ -311,12 +311,8 @@ function App() {
   useEffect(() => {
     let active = true;
     async function restoreSession() {
-      if (!getToken()) {
-        setCheckingAuth(false);
-        return;
-      }
-
       try {
+        if (!(await restoreToken())) return;
         const currentUser = await getMe();
 
         if (active) setUser(currentUser);
@@ -378,17 +374,21 @@ function App() {
     navigate(intendedRoute ?? APP_PATHS.picker, { replace: true });
   }
 
-  function handleLogout() {
+  function finishLogout() {
     setSessionExpired(false);
-    clearToken();
     resetCollectionUiState();
     setUser(null);
     navigate(APP_PATHS.login, { replace: true });
   }
 
+  async function handleLogout() {
+    await clearToken();
+    finishLogout();
+  }
+
   async function handleLogoutAll() {
     await logoutAllSessions();
-    handleLogout();
+    await handleLogout();
   }
 
   function navigateToView(nextView: AppView) {
@@ -606,7 +606,7 @@ function App() {
 
             <Route
               path={APP_PATHS.settingsProfile}
-              element={<SettingsSectionView section="profile" user={user} onUserChange={setUser} onAccountDeleted={handleLogout} />}
+              element={<SettingsSectionView section="profile" user={user} onUserChange={setUser} onAccountDeleted={finishLogout} />}
             />
 
             <Route path={APP_PATHS.settingsPreferences} element={<SettingsSectionView section="preferences" user={user} onUserChange={setUser} />} />

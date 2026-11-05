@@ -43,7 +43,7 @@ export default function AuthView({ onAuthenticated, sessionExpired }: Props) {
     try {
       const result = mode === "login" ? await login(email.trim(), password) : await register(email.trim(), displayName, password)
       if ("access_token" in result) {
-        saveToken(result.access_token)
+        await saveToken(result.access_token)
         onAuthenticated(result.user)
       } else {
         setRegistrationMessage(result.message)

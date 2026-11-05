@@ -1,0 +1,5 @@
+// Local, unsigned company candidate. Keep the Personal Team project settings intact.
+CODE_SIGNING_ALLOWED = NO
+PRODUCT_BUNDLE_IDENTIFIER = com.plutonightlabs.shelfpick
+TARGETED_DEVICE_FAMILY = 1
+INFOPLIST_FILE = App/Info-Company.plist

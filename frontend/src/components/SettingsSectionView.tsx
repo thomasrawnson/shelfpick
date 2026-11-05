@@ -8,8 +8,8 @@ import { getThemePreference, setThemePreference, type ThemePreference } from "..
 import ProfileSettings from "./ProfileSettings"
 import SetupView from "./SetupView"
 import { deleteAccount } from "../api/client"
-import { clearToken } from "../auth"
 import { LEGAL_DRAFTS_ENABLED } from "../legal-drafts"
+import { deleteAccountAndClearSession } from "../account-deletion-session"
 
 type Section = "profile" | "preferences" | "appearance" | "collection-data" | "plays" | "help" | "about"
 type Props = {
@@ -63,10 +63,7 @@ function AccountDeletion({ onDeleted }: { onDeleted?: () => void }) {
     pending.current = true
     setSubmitting(true)
     setError("")
-    void deleteAccount(password).then(() => {
-      clearToken()
-      onDeleted?.()
-    }).catch((failure) => {
+    void deleteAccountAndClearSession(password, deleteAccount, onDeleted).catch((failure) => {
       pending.current = false
       setError(failure instanceof Error ? failure.message : "Couldn't delete account.")
       setSubmitting(false)

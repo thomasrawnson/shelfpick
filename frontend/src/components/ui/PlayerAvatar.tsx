@@ -7,6 +7,9 @@ type Props = {
 }
 
 function AvatarMotifIcon({ motif }: { motif: AvatarMotif }) {
+  if (motif === "forest") return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 13h4l-2 4h10l-2-4h4L12 3Z" /><path d="M12 17v4" /></svg>
+  if (motif === "gold") return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4L12 3Z" /></svg>
+  if (motif === "clay") return <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2" /><path d="M5 12h14M12 5v14" /></svg>
   if (motif === "dice") return <svg viewBox="0 0 24 24" aria-hidden="true">
     <rect x="4.5" y="4.5" width="15" height="15" rx="3" />
     <circle cx="9" cy="9" r="1.25" /><circle cx="15" cy="15" r="1.25" />
@@ -26,9 +29,7 @@ function AvatarMotifIcon({ motif }: { motif: AvatarMotif }) {
 function PlayerAvatar({ name, variant = "forest", className = "" }: Props) {
   const initials = name.trim().split(/\s+/).slice(0, 2)
     .map((part) => part[0]?.toLocaleUpperCase() ?? "").join("") || "?"
-  const motif: AvatarMotif = variant === "dice" || variant === "meeple" || variant === "cards"
-    ? variant
-    : null
+  const motif: AvatarMotif = variant
 
   return <span className={`player-avatar player-avatar-${variant} ${className}`}
     aria-hidden="true">

@@ -252,7 +252,7 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
     <section className="screen discover-screen">
       <header className="discover-header">
         <div>
-          <h1>Discover games</h1>
+          <h1>Discover</h1>
         </div>
         <button type="button" className="discover-wishlist-link" onClick={onViewWishlist}>
           Want to Play <span aria-hidden="true">→</span>

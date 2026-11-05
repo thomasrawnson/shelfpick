@@ -470,13 +470,15 @@ async function apiFetch(
     && token
   ) {
     if (getToken() !== token) throw new SessionExpiredError()
-    clearToken()
-
-    window.dispatchEvent(
-      new Event(
-        "boardgamepicker-auth-expired",
-      ),
-    )
+    try {
+      await clearToken()
+    } finally {
+      window.dispatchEvent(
+        new Event(
+          "boardgamepicker-auth-expired",
+        ),
+      )
+    }
   }
 
   if (response.status === 401 && token) throw new SessionExpiredError()
