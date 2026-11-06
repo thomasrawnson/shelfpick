@@ -123,8 +123,29 @@ def register_user(
             "email": email,
             "display_name": display_name,
             "password": password,
+            "age_13_or_over": True,
         },
     )
+
+
+@pytest.mark.parametrize("declaration", [None, False, 1, "true", "13"])
+def test_registration_rejects_missing_false_or_forged_age_declaration(
+    client, declaration, monkeypatch,
+):
+    sent = []
+    monkeypatch.setattr("api.routers.auth.send_email", lambda **kwargs: sent.append(kwargs))
+    payload = {
+        "email": "age-check@example.com",
+        "display_name": "Guest",
+        "password": "password123",
+    }
+    if declaration is not None:
+        payload["age_13_or_over"] = declaration
+    response = client.post("/auth/register", json=payload)
+    assert response.status_code == 422
+    assert sent == []
+    with TestingSessionLocal() as db:
+        assert db.query(User).filter(User.email == payload["email"]).count() == 0
 
 
 def mark_user_verified(email: str) -> None:
