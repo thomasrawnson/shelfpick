@@ -54,6 +54,14 @@ def _require_enhanced(current_user: User) -> None:
         )
 
 
+def _require_phone_voting() -> None:
+    if not settings.game_night_phone_voting_enabled:
+        raise HTTPException(
+            status_code=503,
+            detail="Phone voting is unavailable in this version.",
+        )
+
+
 def _voting_error(error: ValueError) -> HTTPException:
     if isinstance(error, VotingNotFoundError):
         return HTTPException(status_code=404, detail=str(error))
@@ -125,6 +133,7 @@ def open_game_night_voting(
         get_game_night_voting_repository
     ),
 ):
+    _require_phone_voting()
     _require_enhanced(current_user)
     try:
         return GameNightVotingService(repository).open_session(
@@ -145,6 +154,7 @@ def get_game_night_voting_host_state(
         get_game_night_voting_repository
     ),
 ):
+    _require_phone_voting()
     _require_enhanced(current_user)
     try:
         return GameNightVotingService(repository).host_session(
@@ -162,6 +172,7 @@ def close_game_night_voting(
         get_game_night_voting_repository
     ),
 ):
+    _require_phone_voting()
     _require_enhanced(current_user)
     try:
         return GameNightVotingService(repository).close(
@@ -181,6 +192,7 @@ def get_game_night_voting_guest_state(
         get_game_night_voting_repository
     ),
 ):
+    _require_phone_voting()
     try:
         return GameNightVotingService(repository).public_session(
             join_token, guest_credential,
@@ -198,6 +210,7 @@ def join_game_night_voting(
         get_game_night_voting_repository
     ),
 ):
+    _require_phone_voting()
     client = trusted_client_address(request)
     limiter_key = (
         f"{client}:"
@@ -230,6 +243,7 @@ def submit_game_night_ballot(
         get_game_night_voting_repository
     ),
 ):
+    _require_phone_voting()
     try:
         return GameNightVotingService(repository).vote(
             join_token,

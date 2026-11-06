@@ -1,4 +1,5 @@
 from types import SimpleNamespace
+from dataclasses import replace
 
 import pytest
 from fastapi.testclient import TestClient
@@ -9,6 +10,7 @@ from sqlalchemy.pool import StaticPool
 from api.current_user import get_current_user
 from api.dependencies import get_game_service
 from api.main import app
+from api.routers import game_night as game_night_router
 from auth.login_rate_limiter import game_night_join_rate_limiter
 from database.connection import Base, get_db
 from database.models import Game, User, UserGame
@@ -16,7 +18,11 @@ from services.game_night_voting_service import GameNightVotingService
 
 
 @pytest.fixture()
-def voting_api():
+def voting_api(monkeypatch):
+    monkeypatch.setattr(
+        game_night_router, "settings",
+        replace(game_night_router.settings, game_night_phone_voting_enabled=True),
+    )
     engine = create_engine(
         "sqlite://",
         connect_args={"check_same_thread": False},
@@ -218,3 +224,94 @@ def test_guest_rights_requests_are_throttled_without_logging_credentials(voting_
     assert limited.status_code == 429
     assert limited.headers["Retry-After"] == "900"
     assert invalid not in caplog.text
+
+
+def test_disabled_phone_voting_blocks_every_session_route_but_preserves_guest_rights(
+    voting_api, monkeypatch,
+):
+    client, _ = voting_api
+    opened = client.post(
+        "/game-night/voting", json={"candidate_bgg_ids": [1, 2, 3]},
+    ).json()
+    token = opened["join_url"].rsplit("/", 1)[-1]
+    session_id = opened["session_id"]
+    first = client.post(
+        f"/game-night/voting/{token}/join", json={"display_name": "First"},
+    ).json()["guest_credential"]
+    second = client.post(
+        f"/game-night/voting/{token}/join", json={"display_name": "Second"},
+    ).json()["guest_credential"]
+    first_headers = {"X-Game-Night-Guest": first}
+    second_headers = {"X-Game-Night-Guest": second}
+    assert client.put(
+        f"/game-night/voting/{token}/ballot",
+        json={"candidate_bgg_id": 1}, headers=first_headers,
+    ).status_code == 200
+    monkeypatch.setattr(
+        game_night_router, "settings",
+        replace(game_night_router.settings, game_night_phone_voting_enabled=False),
+    )
+
+    blocked = [
+        client.post("/game-night/voting", json={"candidate_bgg_ids": [1, 2, 3]}),
+        client.get(f"/game-night/voting/sessions/{session_id}"),
+        client.post(f"/game-night/voting/sessions/{session_id}/close"),
+        client.get(f"/game-night/voting/{token}", headers=first_headers),
+        client.get("/game-night/voting/invalid-token"),
+        client.post(f"/game-night/voting/{token}/join", json={"display_name": "Third"}),
+        client.put(
+            f"/game-night/voting/{token}/ballot",
+            json={"candidate_bgg_id": 2}, headers=first_headers,
+        ),
+    ]
+    assert all(response.status_code == 503 for response in blocked)
+    assert {response.json()["detail"] for response in blocked} == {
+        "Phone voting is unavailable in this version."
+    }
+
+    # Existing records survive the gate. Rights stay scoped and usable.
+    assert client.put(
+        f"/game-night/voting/{token}/guest",
+        json={"display_name": "Renamed"}, headers=first_headers,
+    ).status_code == 200
+    assert client.delete(
+        f"/game-night/voting/other-token/guest", headers=first_headers,
+    ).status_code == 404
+    assert client.delete(
+        f"/game-night/voting/{token}/guest",
+        headers={"X-Game-Night-Guest": "invalid"},
+    ).status_code == 404
+    assert client.delete(
+        f"/game-night/voting/{token}/guest", headers=first_headers,
+    ).status_code == 200
+    monkeypatch.setattr(
+        game_night_router, "settings",
+        replace(game_night_router.settings, game_night_phone_voting_enabled=True),
+    )
+    restored = client.get(f"/game-night/voting/{token}", headers=second_headers).json()
+    assert restored["participant_count"] == 1
+    assert restored["guest"]["display_name"] == "Second"
+    assert restored["ballots_submitted"] == 0
+    assert client.get(f"/game-night/voting/sessions/{session_id}").json()[
+        "participant_names"
+    ] == ["Second"]
+
+
+def test_phone_voting_route_inventory_has_only_the_scoped_rights_exception():
+    paths = {
+        (method, path)
+        for route in game_night_router.router.routes
+        for method in getattr(route, "methods", set())
+        for path in [getattr(route, "path", "")]
+        if path.startswith("/game-night/voting")
+    }
+    assert paths == {
+        ("POST", "/game-night/voting"),
+        ("GET", "/game-night/voting/sessions/{session_id}"),
+        ("POST", "/game-night/voting/sessions/{session_id}/close"),
+        ("GET", "/game-night/voting/{join_token}"),
+        ("POST", "/game-night/voting/{join_token}/join"),
+        ("PUT", "/game-night/voting/{join_token}/ballot"),
+        ("PUT", "/game-night/voting/{join_token}/guest"),
+        ("DELETE", "/game-night/voting/{join_token}/guest"),
+    }

@@ -11,6 +11,7 @@ import {
 import BrandLogo from "./ui/BrandLogo"
 import RetryNotice from "./ui/RetryNotice"
 import { clearCredential, getCredential, isNativeIos, saveCredential } from "../native-secure-storage"
+import { PHONE_VOTING_V1_AVAILABLE } from "../game-night-availability"
 
 
 type Props = {
@@ -91,7 +92,7 @@ function GameNightGuestVotingView({ joinToken }: Props) {
   }, [storageKey, refreshKey])
 
   useEffect(() => {
-    if (!credentialReady || guestRemoved) return
+    if (!PHONE_VOTING_V1_AVAILABLE || !credentialReady || guestRemoved) return
     let active = true
     const interval = setInterval(() => { void load() }, 4000)
 
@@ -194,6 +195,31 @@ function GameNightGuestVotingView({ joinToken }: Props) {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Couldn't remove your guest data.")
     } finally { setSubmitting(false) }
+  }
+
+  if (!PHONE_VOTING_V1_AVAILABLE) {
+    return <section className="screen game-night-screen game-night-guest-screen">
+      <BrandLogo />
+      <header>
+        <p className="eyebrow">ShelfPick Game Night</p>
+        <h1>Phone voting isn’t available</h1>
+      </header>
+      <p className="form-help">You can still choose a game together with your host. No new phone votes can be joined or cast in this version.</p>
+      {!credentialReady && !error && <p role="status">Checking this device for an earlier guest entry…</p>}
+      {error && !credential && <RetryNotice message={error} onRetry={() => setRefreshKey(value => value + 1)} />}
+      {credentialReady && !credential && !guestRemoved && !error &&
+        <p className="form-help">Guest information from an earlier vote can only be managed here on the device used to join.</p>}
+      {privacyMessage && <p role="status" className="form-success">{privacyMessage}</p>}
+      {credential && <section aria-labelledby="guest-privacy-heading" className="game-night-guest-privacy">
+        <h2 id="guest-privacy-heading">Your earlier guest information</h2>
+        <p className="form-help">This device holds the credential for your earlier entry. You can change its nickname or remove its nickname and vote, even though voting is unavailable.</p>
+        {error && <p className="form-error" role="alert">{error}</p>}
+        <label htmlFor="guest-corrected-name">New nickname</label>
+        <input id="guest-corrected-name" value={correctedName} maxLength={40} onChange={event => setCorrectedName(event.target.value)} />
+        <button type="button" className="secondary-button" disabled={submitting || !correctedName.trim()} onClick={() => void updateNickname()}>Update nickname</button>
+        <button type="button" className="secondary-button" disabled={submitting} onClick={() => void removeMyData()}>Remove my guest data</button>
+      </section>}
+    </section>
   }
 
   return (

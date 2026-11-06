@@ -92,6 +92,22 @@ def test_invalid_export_cover_artwork_setting_fails_fast(
         get_settings()
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [(None, False), ("false", False), ("0", False), ("true", True),
+     ("1", True), ("maybe", False), ("", False), ("truee", False)],
+)
+def test_phone_voting_setting_fails_closed(monkeypatch, value, expected):
+    monkeypatch.setenv("APP_ENV", "test")
+    monkeypatch.setenv("DATABASE_URL", "sqlite://")
+    monkeypatch.setenv("JWT_SECRET", "synthetic-test-only-secret")
+    if value is None:
+        monkeypatch.delenv("GAME_NIGHT_PHONE_VOTING_ENABLED", raising=False)
+    else:
+        monkeypatch.setenv("GAME_NIGHT_PHONE_VOTING_ENABLED", value)
+    assert get_settings().game_night_phone_voting_enabled is expected
+
+
 def test_public_registration_is_explicit_and_allows_no_invite_list(
     monkeypatch: pytest.MonkeyPatch,
 ):

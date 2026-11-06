@@ -69,6 +69,7 @@ class Settings:
     beta_invite_emails: frozenset[str]
     public_registration_enabled: bool
     export_cover_artwork_enabled: bool
+    game_night_phone_voting_enabled: bool
 
 
 def get_settings() -> Settings:
@@ -149,6 +150,11 @@ def get_settings() -> Settings:
             "EXPORT_COVER_ARTWORK_ENABLED",
             False,
         )
+    )
+
+    # Missing and unrecognised values keep V1 phone voting closed.
+    game_night_phone_voting_enabled = _get_bool(
+        "GAME_NIGHT_PHONE_VOTING_ENABLED", False,
     )
 
     if not database_url:
@@ -247,6 +253,7 @@ def get_settings() -> Settings:
         export_cover_artwork_enabled=(
             export_cover_artwork_enabled
         ),
+        game_night_phone_voting_enabled=game_night_phone_voting_enabled,
     )
 
 

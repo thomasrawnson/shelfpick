@@ -1,10 +1,12 @@
 from types import SimpleNamespace
+from dataclasses import replace
 
 from fastapi.testclient import TestClient
 
 from api.current_user import get_current_user
 from api.dependencies import get_game_service, get_play_repository
 from api.main import app
+from api.routers import game_night as game_night_router
 from models.game import Game, PlayerCountPoll
 
 
@@ -75,7 +77,11 @@ def test_game_night_endpoint_uses_entitlement_and_picker_rules():
     assert all("From your collection" in item["reasons"] for item in data)
 
 
-def test_free_host_cannot_open_enhanced_phone_voting():
+def test_free_host_cannot_open_enhanced_phone_voting(monkeypatch):
+    monkeypatch.setattr(
+        game_night_router, "settings",
+        replace(game_night_router.settings, game_night_phone_voting_enabled=True),
+    )
     app.dependency_overrides[get_current_user] = lambda: SimpleNamespace(
         id=1, tier="FREE",
     )

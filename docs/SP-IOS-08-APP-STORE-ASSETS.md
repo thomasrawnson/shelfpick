@@ -30,13 +30,13 @@ ShelfPick helps you get your board games to the table.
 
 Keep a collection of games you own and search it when you are ready to play. Tell Picker about your group and the time available, then explore recommendations with reasons for each suggestion. Record plays and look back at your history. Use basic Game Night to make a shortlist and choose a game together.
 
-Collection, basic Picker, Plays and basic Game Night are available with Free access. Phone voting requires Pro access and cannot be purchased in this version.
+Collection, basic Picker, Plays and basic Game Night are available with Free access.
 
-The public description is 521 characters, within Apple's 4,000-character limit. Recheck the published build against every claim before submitting. No subscription price, testimonial, or unsupported capability is claimed. It contains no internal test or review instructions.
+The public description is 447 characters, within Apple's 4,000-character limit. Recheck the published build against every claim before submitting. No subscription price, testimonial, or unsupported capability is claimed. It contains no internal test or review instructions.
 
 ### App Review notes draft
 
-Use the separately supplied maintained Free review account; **never put its credentials in this repository**. Open Collection to see and search the sample games; use Picker to choose group size and time and view a recommendation; use Plays to view sample history; use basic Game Night to create a shortlist and choose a game. Opening phone voting and its QR/join link requires Pro and must not be offered to the Free reviewer. Settings → Profile exposes account deletion. The final destructive action must use a disposable review account. The application has no available Pro purchase or active public registration. Verification/reset HTTPS links currently use the web fallback. Add precise reviewer instructions and credentials privately in App Store Connect only after the sample account and URL flows are ready.
+Use the separately supplied maintained Free review account; **never put its credentials in this repository**. Open Collection to see and search the sample games; use Picker to choose group size and time and view a recommendation; use Plays to view sample history; use basic Game Night to create a shortlist and choose a game. Phone/QR voting is unavailable to all accounts in this V1 candidate and must not appear in review instructions or screenshots. Settings → Profile exposes account deletion. The final destructive action must use a disposable review account. The application has no available Pro purchase or active public registration. Verification/reset HTTPS links currently use the web fallback. Add precise reviewer instructions and credentials privately in App Store Connect only after the sample account and URL flows are ready.
 
 ### Age rating preparation
 
@@ -44,7 +44,7 @@ Complete Apple's current questionnaire against the final app and any linked BGG 
 
 ## Screenshot plan and capture gate
 
-Apple permits 1–10 screenshots per required iPhone display size, PNG/JPEG without alpha. For this iPhone-only portrait candidate, use the accepted 6.9-inch 1320 × 2868 portrait size; confirm App Store Connect's currently requested display class at upload. Capture **actual app UI** at the final appearance, with clean 9:41 status bar and approved icon. Suggested Free-only order: (1) Collection overview with rights-safe sample games; (2) Collection search/detail; (3) Picker group/time selection; (4) recommendation and explanation; (5) Plays history/recording; (6) basic Game Night shortlist and host choice. Do not show phone voting or QR joining as Free. Optional marketing compositions must be separately labelled and must accurately reflect captured UI.
+Apple permits 1–10 screenshots per required iPhone display size, PNG/JPEG without alpha. For this iPhone-only portrait candidate, use the accepted 6.9-inch 1320 × 2868 portrait size; confirm App Store Connect's currently requested display class at upload. Capture **actual app UI** at the final appearance, with clean 9:41 status bar and approved icon. Suggested Free-only order: (1) Collection overview with rights-safe sample games; (2) Collection search/detail; (3) Picker group/time selection; (4) recommendation and explanation; (5) Plays history/recording; (6) basic Game Night shortlist and host choice. Do not show phone voting or QR joining in V1 screenshots. Optional marketing compositions must be separately labelled and must accurately reflect captured UI.
 
 The authenticated feature set was **not captured**: the simulator has no disposable, populated review account, and the owner's internal account may expose personal data or third-party game-cover art. Prepare a representative rights-safe review account and permitted sample content before final screenshot capture. Never paste credentials into documentation or export unlicensed covers.
 
