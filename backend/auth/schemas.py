@@ -2,12 +2,22 @@ from pydantic import (
     BaseModel,
     EmailStr,
     Field,
+    field_validator,
 )
 from typing import Literal
 
 
 class RegisterRequest(BaseModel):
     email: EmailStr
+
+    age_13_or_over: Literal[True]
+
+    @field_validator("age_13_or_over", mode="before")
+    @classmethod
+    def require_explicit_age_confirmation(cls, value):
+        if value is not True:
+            raise ValueError("Confirm you are at least 13 to create an account.")
+        return value
 
     display_name: str = Field(
         min_length=1,

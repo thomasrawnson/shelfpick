@@ -15,6 +15,7 @@ export default function AuthView({ onAuthenticated, sessionExpired }: Props) {
   const [email, setEmail] = useState("")
   const [displayName, setDisplayName] = useState("")
   const [password, setPassword] = useState("")
+  const [age13OrOver, setAge13OrOver] = useState(false)
   const [error, setError] = useState("")
   const [fields, setFields] = useState<Record<string, string>>({})
   const [submitting, setSubmitting] = useState(false)
@@ -25,13 +26,16 @@ export default function AuthView({ onAuthenticated, sessionExpired }: Props) {
 
   function showFields(next: Record<string, string>) {
     setFields(next)
-    const first = ["display_name", "email", "password"].find(key => next[key])
+    const first = ["age_13_or_over", "display_name", "email", "password"].find(key => next[key])
     if (first) requestAnimationFrame(() => form.current?.querySelector<HTMLInputElement>(`[name="${first}"]`)?.focus())
   }
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (pending.current) return
-    const invalid = mode === "register" ? registrationErrors(email, displayName, password) : {
+    const invalid = mode === "register" ? {
+      ...registrationErrors(email, displayName, password),
+      ...(!age13OrOver ? { age_13_or_over: "Confirm you are at least 13 to create an account." } : {}),
+    } : {
       ...(!email.trim() ? { email: "Enter your email address." } : {}),
       ...(!password ? { password: "Enter your password." } : {}),
     }
@@ -41,7 +45,7 @@ export default function AuthView({ onAuthenticated, sessionExpired }: Props) {
     pending.current = true
     setSubmitting(true)
     try {
-      const result = mode === "login" ? await login(email.trim(), password) : await register(email.trim(), displayName, password)
+      const result = mode === "login" ? await login(email.trim(), password) : await register(email.trim(), displayName, password, age13OrOver)
       if ("access_token" in result) {
         await saveToken(result.access_token)
         onAuthenticated(result.user)
@@ -74,6 +78,11 @@ export default function AuthView({ onAuthenticated, sessionExpired }: Props) {
       <button type="button" disabled={submitting} aria-pressed={mode === "register"} className={mode === "register" ? "active" : ""} onClick={() => switchMode("register")}>Register</button>
     </div>
     <form ref={form} className="auth-form" onSubmit={handleSubmit} noValidate aria-busy={submitting}>
+      {mode === "register" && <div>
+        <label className="age-confirmation"><input type="checkbox" name="age_13_or_over" checked={age13OrOver} onChange={event => setAge13OrOver(event.target.checked)} disabled={submitting} aria-invalid={!!fields.age_13_or_over} aria-describedby={fields.age_13_or_over ? "age-error" : undefined} /> I confirm I am at least 13 years old.</label>
+        {fields.age_13_or_over && <p id="age-error" className="field-error">{fields.age_13_or_over}</p>}
+        <p className="form-help">Under 13? Join an eligible Game Night as a guest. No account is needed.</p>
+      </div>}
       {registrationMessage && <p className="field-hint" role="status">{registrationMessage}</p>}
       {registrationMessage && <button type="button" className="auth-link-button" disabled={resending} onClick={() => {
         setResending(true); setError("")

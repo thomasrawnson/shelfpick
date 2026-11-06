@@ -278,6 +278,7 @@ function GameNightView({ enabled, votingEnabled, defaultTime = null, onBack, onV
             {votingSession.participant_names.length > 0 && (
               <p className="form-help">Joined: {votingSession.participant_names.join(", ")}</p>
             )}
+            <p className="form-help">Share the voting link only with your group. Ask children and other guests to use nicknames.</p>
             <button type="button" className="primary-button" disabled={loading} onClick={() => { void closeVoting() }}>
               {loading ? "Closing…" : "Close voting and show results"}
             </button>

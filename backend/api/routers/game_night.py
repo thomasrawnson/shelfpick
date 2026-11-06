@@ -11,6 +11,7 @@ from api.dependencies import (
     get_play_repository,
 )
 from auth.login_rate_limiter import game_night_join_rate_limiter
+from auth.login_rate_limiter import DatabaseAuthRateLimiter
 from config import settings
 from database.models import User
 from repositories.game_night_voting_repository import GameNightVotingRepository
@@ -37,6 +38,10 @@ class JoinVotingRequest(BaseModel):
     display_name: str = Field(min_length=1, max_length=40)
 
 
+class CorrectGuestRequest(BaseModel):
+    display_name: str = Field(min_length=1, max_length=40)
+
+
 class BallotRequest(BaseModel):
     candidate_bgg_id: int | None = Field(default=None, gt=0)
 
@@ -57,6 +62,18 @@ def _voting_error(error: ValueError) -> HTTPException:
     if isinstance(error, VotingClosedError):
         return HTTPException(status_code=409, detail=str(error))
     return HTTPException(status_code=400, detail=str(error))
+
+
+def _limit_guest_rights(request: Request, repository: GameNightVotingRepository) -> None:
+    # Persistent, hashed per-client limit covers both correction and removal.
+    if DatabaseAuthRateLimiter(repository.db).check_and_record(
+        "game-night-guest-rights:ip", trusted_client_address(request), 20, 15 * 60,
+    ):
+        raise HTTPException(
+            status_code=429,
+            detail="Too many guest information requests. Try again later.",
+            headers={"Retry-After": "900"},
+        )
 
 
 @router.get("/recommendations")
@@ -219,5 +236,38 @@ def submit_game_night_ballot(
             guest_credential,
             payload.candidate_bgg_id,
         )
+    except ValueError as error:
+        raise _voting_error(error) from error
+
+
+@router.put("/voting/{join_token}/guest")
+def correct_game_night_guest(
+    join_token: str,
+    payload: CorrectGuestRequest,
+    request: Request,
+    guest_credential: str | None = Header(default=None, alias="X-Game-Night-Guest"),
+    repository: GameNightVotingRepository = Depends(get_game_night_voting_repository),
+):
+    _limit_guest_rights(request, repository)
+    try:
+        GameNightVotingService(repository).correct_guest(
+            join_token, guest_credential, payload.display_name,
+        )
+        return {"message": "Nickname updated"}
+    except ValueError as error:
+        raise _voting_error(error) from error
+
+
+@router.delete("/voting/{join_token}/guest")
+def remove_game_night_guest(
+    join_token: str,
+    request: Request,
+    guest_credential: str | None = Header(default=None, alias="X-Game-Night-Guest"),
+    repository: GameNightVotingRepository = Depends(get_game_night_voting_repository),
+):
+    _limit_guest_rights(request, repository)
+    try:
+        GameNightVotingService(repository).remove_guest(join_token, guest_credential)
+        return {"message": "Guest data removed"}
     except ValueError as error:
         raise _voting_error(error) from error

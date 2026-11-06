@@ -74,6 +74,17 @@ class GameNightVotingRepository:
             .first()
         )
 
+    def rename_guest(self, guest: GameNightGuest, display_name: str) -> None:
+        guest.display_name = display_name
+        self.db.commit()
+
+    def delete_guest(self, guest: GameNightGuest) -> None:
+        self.db.query(GameNightBallot).filter(
+            GameNightBallot.guest_id == guest.id
+        ).delete(synchronize_session=False)
+        self.db.delete(guest)
+        self.db.commit()
+
     def guest_names(self, session_id: int) -> list[str]:
         return [
             name

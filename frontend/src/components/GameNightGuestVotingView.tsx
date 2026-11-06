@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import {
   getGameNightVotingGuestState,
   joinGameNightVoting,
   submitGameNightBallot,
+  correctGameNightGuest,
+  removeGameNightGuest,
   type GameNightVotingPublicState,
 } from "../api/client"
 import BrandLogo from "./ui/BrandLogo"
@@ -65,6 +67,10 @@ function GameNightGuestVotingView({ joinToken }: Props) {
   const credential = credentialReady ? savedCredential.value : null
   const [state, setState] = useState<GameNightVotingPublicState | null>(null)
   const [displayName, setDisplayName] = useState("")
+  const [correctedName, setCorrectedName] = useState("")
+  const nicknameDirty = useRef(false)
+  const [privacyMessage, setPrivacyMessage] = useState("")
+  const [guestRemoved, setGuestRemoved] = useState(false)
   const [selection, setSelection] = useState<Selection>(null)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -85,7 +91,7 @@ function GameNightGuestVotingView({ joinToken }: Props) {
   }, [storageKey, refreshKey])
 
   useEffect(() => {
-    if (!credentialReady) return
+    if (!credentialReady || guestRemoved) return
     let active = true
     const interval = setInterval(() => { void load() }, 4000)
 
@@ -94,6 +100,7 @@ function GameNightGuestVotingView({ joinToken }: Props) {
         const next = await getGameNightVotingGuestState(joinToken, credential)
         if (!active) return
         setState(next)
+        if (next.guest && !nicknameDirty.current) setCorrectedName(next.guest.display_name)
         setError("")
         if (credential && !next.guest) {
           await clearCredential(storageKey)
@@ -117,7 +124,7 @@ function GameNightGuestVotingView({ joinToken }: Props) {
       active = false
       clearInterval(interval)
     }
-  }, [credential, credentialReady, joinToken, refreshKey, storageKey])
+  }, [credential, credentialReady, guestRemoved, joinToken, refreshKey, storageKey])
 
   async function join() {
     setSubmitting(true)
@@ -127,6 +134,9 @@ function GameNightGuestVotingView({ joinToken }: Props) {
       if (!next.guest_credential) throw new Error("ShelfPick couldn't restore this guest session.")
       await saveCredential(storageKey, next.guest_credential)
       setSavedCredential({ key: storageKey, value: next.guest_credential })
+      setGuestRemoved(false)
+      nicknameDirty.current = false
+      setCorrectedName(next.guest?.display_name ?? "")
       setState(next)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Couldn't join this voting session.")
@@ -153,6 +163,39 @@ function GameNightGuestVotingView({ joinToken }: Props) {
     }
   }
 
+  async function updateNickname() {
+    if (!credential || !correctedName.trim()) return
+    setSubmitting(true)
+    setError("")
+    try {
+      const name = correctedName.trim()
+      await correctGameNightGuest(joinToken, credential, name)
+      nicknameDirty.current = false
+      setState(current => current?.guest ? {
+        ...current, guest: { ...current.guest, display_name: name },
+      } : current)
+      setPrivacyMessage("Nickname updated for this Game Night.")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't update your nickname.")
+    } finally { setSubmitting(false) }
+  }
+
+  async function removeMyData() {
+    if (!credential || !window.confirm("Remove your nickname and vote from this Game Night?")) return
+    setSubmitting(true)
+    setError("")
+    try {
+      await removeGameNightGuest(joinToken, credential)
+      await clearCredential(storageKey)
+      setSavedCredential({ key: storageKey, value: null })
+      setState(null)
+      setGuestRemoved(true)
+      setPrivacyMessage("Your guest nickname and vote were removed.")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't remove your guest data.")
+    } finally { setSubmitting(false) }
+  }
+
   return (
     <section className="screen game-night-screen game-night-guest-screen">
       <BrandLogo />
@@ -173,7 +216,7 @@ function GameNightGuestVotingView({ joinToken }: Props) {
 
       {state?.status === "open" && !state.guest && (
         <form onSubmit={(event) => { event.preventDefault(); void join() }} className="game-night-join-form">
-          <label htmlFor="game-night-guest-name">Your display name</label>
+          <label htmlFor="game-night-guest-name">Nickname (not your real name)</label>
           <input
             id="game-night-guest-name"
             value={displayName}
@@ -185,8 +228,7 @@ function GameNightGuestVotingView({ joinToken }: Props) {
             {submitting ? "Joining…" : "Join voting"}
           </button>
           <p className="form-help">
-            No ShelfPick account is needed. This {isNativeIos ? "app" : "browser"} identifies your ballot for this session.
-            A different {isNativeIos ? "app" : "browser"} or device could join again, so this cannot prove one vote per real person.
+            No account or email needed. Use a nickname. The host sees your nickname and group totals, not your individual choice. This {isNativeIos ? "app" : "browser"} keeps your vote for this Game Night; joining on another device could count twice.
           </p>
         </form>
       )}
@@ -231,6 +273,16 @@ function GameNightGuestVotingView({ joinToken }: Props) {
           <p className="form-help">Joined as {state.guest.display_name}. Keep this page open for results.</p>
         </form>
       )}
+      {privacyMessage && <p role="status" className="form-success">{privacyMessage}</p>}
+      {credential && <section aria-labelledby="guest-privacy-heading" className="game-night-guest-privacy">
+        <h2 id="guest-privacy-heading">Your guest information</h2>
+        <p className="form-help">Edit or remove your nickname and vote, even after voting closes. This device proves which entry is yours.</p>
+        {error && state && !(state.status === "open" && state.guest) && <p className="form-error" role="alert">{error}</p>}
+        <label htmlFor="guest-corrected-name">Your nickname</label>
+        <input id="guest-corrected-name" value={correctedName} maxLength={40} onChange={event => { nicknameDirty.current = true; setCorrectedName(event.target.value) }} />
+        <button type="button" className="secondary-button" disabled={submitting || !correctedName.trim()} onClick={() => void updateNickname()}>Update nickname</button>
+        <button type="button" className="secondary-button" disabled={submitting} onClick={() => void removeMyData()}>Remove my guest data</button>
+      </section>}
     </section>
   )
 }
