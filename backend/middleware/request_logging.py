@@ -7,6 +7,8 @@ from starlette.middleware.base import (
     BaseHTTPMiddleware,
 )
 
+from config import settings
+
 
 logger = logging.getLogger(
     "boardgamepicker.request"
@@ -33,12 +35,15 @@ class RequestLoggingMiddleware(
         request: Request,
         call_next,
     ):
-        request_id = (
-            request.headers.get(
-                "X-Request-ID"
-            )
-            or str(uuid.uuid4())
-        )
+        client_request_id = request.headers.get("X-Request-ID")
+        if (
+            settings.password_reset_issuance_diagnostic_enabled
+            and request.url.path == "/auth/password-reset/request"
+        ):
+            # Diagnostic correlation must not copy untrusted header content
+            # into an account-existence event.
+            client_request_id = None
+        request_id = client_request_id or str(uuid.uuid4())
 
         request.state.request_id = (
             request_id

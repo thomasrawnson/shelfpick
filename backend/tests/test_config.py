@@ -92,6 +92,32 @@ def test_invalid_export_cover_artwork_setting_fails_fast(
         get_settings()
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        (None, False),
+        ("false", False),
+        ("true", True),
+        ("1", True),
+        ("maybe", False),
+        ("", False),
+        ("truee", False),
+    ],
+)
+def test_reset_issuance_diagnostic_setting_fails_closed(
+    monkeypatch, value, expected,
+):
+    monkeypatch.setenv("APP_ENV", "test")
+    monkeypatch.setenv("DATABASE_URL", "sqlite://")
+    monkeypatch.setenv("JWT_SECRET", "synthetic-test-only-secret")
+    name = "PASSWORD_RESET_ISSUANCE_DIAGNOSTIC_ENABLED"
+    if value is None:
+        monkeypatch.delenv(name, raising=False)
+    else:
+        monkeypatch.setenv(name, value)
+    assert get_settings().password_reset_issuance_diagnostic_enabled is expected
+
+
 def test_public_registration_is_explicit_and_allows_no_invite_list(
     monkeypatch: pytest.MonkeyPatch,
 ):

@@ -69,6 +69,7 @@ class Settings:
     beta_invite_emails: frozenset[str]
     public_registration_enabled: bool
     export_cover_artwork_enabled: bool
+    password_reset_issuance_diagnostic_enabled: bool
 
 
 def get_settings() -> Settings:
@@ -149,6 +150,10 @@ def get_settings() -> Settings:
             "EXPORT_COVER_ARTWORK_ENABLED",
             False,
         )
+    )
+
+    password_reset_issuance_diagnostic_enabled = _get_bool(
+        "PASSWORD_RESET_ISSUANCE_DIAGNOSTIC_ENABLED", False,
     )
 
     if not database_url:
@@ -246,6 +251,9 @@ def get_settings() -> Settings:
         ),
         export_cover_artwork_enabled=(
             export_cover_artwork_enabled
+        ),
+        password_reset_issuance_diagnostic_enabled=(
+            password_reset_issuance_diagnostic_enabled
         ),
     )
 

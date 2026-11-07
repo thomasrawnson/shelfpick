@@ -1,3 +1,6 @@
+import logging
+import uuid
+from dataclasses import replace
 from datetime import (
     datetime,
     timedelta,
@@ -14,6 +17,8 @@ from sqlalchemy.orm import (
 from sqlalchemy.pool import StaticPool
 
 from api.main import app
+from api.routers import auth as auth_router
+from middleware import request_logging as request_logging_middleware
 from auth.security import (
     JWT_ALGORITHM,
     JWT_ISSUER,
@@ -405,6 +410,212 @@ def test_password_reset_request_is_generic(
     assert existing.status_code == 200
     assert missing.status_code == 200
     assert existing.json() == missing.json()
+
+
+def reset_diagnostic_messages(caplog):
+    return [
+        record.getMessage()
+        for record in caplog.records
+        if record.name == "boardgamepicker.auth"
+        and record.msg.startswith("reset_issuance_diagnostic ")
+    ]
+
+
+@pytest.mark.parametrize(
+    ("account_state", "committed"),
+    [
+        ("verified", True),
+        ("pending", True),
+        ("missing", False),
+    ],
+)
+def test_reset_issuance_diagnostic_records_only_branch_and_request_id(
+    client, monkeypatch, caplog, account_state, committed,
+):
+    sent = capture_sent_emails(monkeypatch)
+    monkeypatch.setattr(
+        auth_router,
+        "settings",
+        replace(settings, password_reset_issuance_diagnostic_enabled=True),
+    )
+    monkeypatch.setattr(
+        request_logging_middleware,
+        "settings",
+        replace(settings, password_reset_issuance_diagnostic_enabled=True),
+    )
+    if account_state != "missing":
+        assert register_user(client).status_code == 201
+    if account_state == "verified":
+        mark_user_verified("tom@example.com")
+
+    email = "missing@example.com" if account_state == "missing" else "tom@example.com"
+    sent_before = len(sent)
+    caplog.clear()
+    with caplog.at_level(logging.INFO, logger="boardgamepicker.auth"):
+        response = client.post(
+            "/auth/password-reset/request",
+            json={"email": email},
+            headers={"X-Request-ID": "private@example.com"},
+        )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "message": "If an account exists for that email, reset instructions will be sent."
+    }
+    assert len(sent) == sent_before + 1
+    request_id = response.headers["X-Request-ID"]
+    uuid.UUID(request_id)
+    assert request_id != "private@example.com"
+    assert reset_diagnostic_messages(caplog) == [
+        f"reset_issuance_diagnostic request_id={request_id} "
+        f"real_reset_token_committed={str(committed).lower()}"
+    ]
+    event = reset_diagnostic_messages(caplog)[0]
+    assert email not in event
+    assert "private@example.com" not in event
+    assert all(
+        "private@example.com" not in record.getMessage()
+        for record in caplog.records
+    )
+    assert "password123" not in event
+    assert settings.frontend_url not in event
+    assert token_from_email(sent[-1]) not in event
+    with TestingSessionLocal() as db:
+        tokens = db.query(AuthToken).filter_by(purpose="password_reset").all()
+        assert len(tokens) == int(committed)
+        for token in tokens:
+            assert token.token_hash not in event
+            assert str(token.user_id) not in event.split()
+
+
+def test_reset_issuance_diagnostic_does_not_claim_failed_commit(
+    client, monkeypatch, caplog,
+):
+    capture_sent_emails(monkeypatch)
+    monkeypatch.setattr(
+        auth_router,
+        "settings",
+        replace(settings, password_reset_issuance_diagnostic_enabled=True),
+    )
+    assert register_user(client).status_code == 201
+
+    def failed_creation(*args):
+        raise RuntimeError("synthetic commit failure")
+
+    monkeypatch.setattr(auth_router, "create_one_time_token", failed_creation)
+    caplog.clear()
+    with caplog.at_level(logging.INFO, logger="boardgamepicker.auth"):
+        with pytest.raises(RuntimeError, match="synthetic commit failure"):
+            client.post(
+                "/auth/password-reset/request",
+                json={"email": "tom@example.com"},
+            )
+    assert reset_diagnostic_messages(caplog) == []
+
+
+def test_reset_issuance_diagnostic_occurs_once_before_email_failure(
+    client, monkeypatch, caplog,
+):
+    monkeypatch.setattr(
+        auth_router,
+        "settings",
+        replace(settings, password_reset_issuance_diagnostic_enabled=True),
+    )
+    assert register_user(client).status_code == 201
+
+    def failed_email(**kwargs):
+        raise RuntimeError("synthetic mail failure")
+
+    monkeypatch.setattr(auth_router, "send_email", failed_email)
+    caplog.clear()
+    with caplog.at_level(logging.INFO, logger="boardgamepicker.auth"):
+        response = client.post(
+            "/auth/password-reset/request",
+            json={"email": "tom@example.com"},
+        )
+    assert response.status_code == 200
+    assert len(reset_diagnostic_messages(caplog)) == 1
+    assert reset_diagnostic_messages(caplog)[0].endswith(
+        "real_reset_token_committed=true"
+    )
+    assert all("user_id=" not in record.getMessage() for record in caplog.records)
+    with TestingSessionLocal() as db:
+        assert db.query(AuthToken).filter_by(purpose="password_reset").count() == 1
+
+
+@pytest.mark.parametrize("account_exists", [True, False])
+def test_reset_issuance_diagnostic_logging_failure_does_not_interrupt_reset(
+    client, monkeypatch, account_exists,
+):
+    sent = capture_sent_emails(monkeypatch)
+    monkeypatch.setattr(
+        auth_router,
+        "settings",
+        replace(settings, password_reset_issuance_diagnostic_enabled=True),
+    )
+    if account_exists:
+        assert register_user(client).status_code == 201
+
+    def failed_diagnostic(*args, **kwargs):
+        raise RuntimeError("synthetic logger failure")
+
+    monkeypatch.setattr(auth_router.logger, "info", failed_diagnostic)
+    sent_before = len(sent)
+    response = client.post(
+        "/auth/password-reset/request",
+        json={"email": "tom@example.com" if account_exists else "missing@example.com"},
+    )
+    assert response.status_code == 200
+    assert response.json() == {
+        "message": "If an account exists for that email, reset instructions will be sent."
+    }
+    assert len(sent) == sent_before + 1
+    with TestingSessionLocal() as db:
+        assert db.query(AuthToken).filter_by(purpose="password_reset").count() == int(account_exists)
+
+
+def test_reset_issuance_diagnostic_disabled_emits_nothing(
+    client, monkeypatch, caplog,
+):
+    capture_sent_emails(monkeypatch)
+    monkeypatch.setattr(
+        auth_router,
+        "settings",
+        replace(settings, password_reset_issuance_diagnostic_enabled=False),
+    )
+    assert register_user(client).status_code == 201
+    caplog.clear()
+    with caplog.at_level(logging.INFO, logger="boardgamepicker.auth"):
+        assert client.post(
+            "/auth/password-reset/request",
+            json={"email": "tom@example.com"},
+        ).status_code == 200
+    assert reset_diagnostic_messages(caplog) == []
+
+
+def test_reset_issuance_diagnostic_skips_invalid_and_limited_requests(
+    client, monkeypatch, caplog,
+):
+    capture_sent_emails(monkeypatch)
+    monkeypatch.setattr(
+        auth_router,
+        "settings",
+        replace(settings, password_reset_issuance_diagnostic_enabled=True),
+    )
+    with caplog.at_level(logging.INFO, logger="boardgamepicker.auth"):
+        assert client.post("/auth/password-reset/request", json={}).status_code == 422
+        assert reset_diagnostic_messages(caplog) == []
+        for _ in range(5):
+            assert client.post(
+                "/auth/password-reset/request",
+                json={"email": "missing@example.com"},
+            ).status_code == 200
+        assert len(reset_diagnostic_messages(caplog)) == 5
+        assert client.post(
+            "/auth/password-reset/request",
+            json={"email": "missing@example.com"},
+        ).status_code == 429
+    assert len(reset_diagnostic_messages(caplog)) == 5
 
 
 def test_valid_password_reset_token_changes_password_once(

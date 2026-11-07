@@ -648,6 +648,18 @@ def request_password_reset(
             )
         )
 
+    if settings.password_reset_issuance_diagnostic_enabled:
+        try:
+            logger.info(
+                "reset_issuance_diagnostic request_id=%s "
+                "real_reset_token_committed=%s",
+                http_request.state.request_id,
+                "true" if user is not None else "false",
+            )
+        except Exception:
+            # Optional diagnostics must not interrupt password recovery.
+            pass
+
     try:
         send_email(
             to_email=email,
@@ -656,8 +668,7 @@ def request_password_reset(
         )
     except Exception:
         logger.exception(
-            "password_reset_email_failed user_id=%s",
-            user.id if user is not None else "unknown",
+            "password_reset_email_failed",
         )
 
     # Deliberately identical response
