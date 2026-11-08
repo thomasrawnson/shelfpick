@@ -1,4 +1,5 @@
 import assert from "node:assert/strict"
+import { readFile } from "node:fs/promises"
 import { after, before, test } from "node:test"
 import React from "react"
 import { renderToStaticMarkup } from "react-dom/server"
@@ -8,6 +9,7 @@ import { createServer } from "vite"
 let server
 let SettingsView
 let SettingsSectionView
+let AppNavigation
 
 const user = {
   id: 1, email: "morgan@example.com", display_name: "Morgan Account", bgg_username: "morganbgg",
@@ -21,6 +23,7 @@ before(async () => {
   server = await createServer({ server: { middlewareMode: true, hmr: false }, appType: "custom" })
   SettingsView = (await server.ssrLoadModule("/src/components/SettingsView.tsx")).default
   SettingsSectionView = (await server.ssrLoadModule("/src/components/SettingsSectionView.tsx")).default
+  AppNavigation = (await server.ssrLoadModule("/src/components/AppNavigation.tsx")).default
 })
 
 after(async () => { await server?.close() })
@@ -133,4 +136,24 @@ test("Appearance offers the experimental Black theme without a plan gate", () =>
   assert.match(markup, />Dark</)
   assert.doesNotMatch(markup, /Pro|upgrade|unlock/i)
   delete globalThis.window
+})
+
+test("primary navigation keeps all five named buttons in order", () => {
+  const markup = render(AppNavigation, { view: "discover", onChangeView: () => {} })
+  assert.match(markup, /<nav class="app-nav" aria-label="Primary">/)
+  assert.deepEqual(
+    [...markup.matchAll(/<span class="nav-label">([^<]+)<\/span>/g)].map((match) => match[1]),
+    ["Pick", "Collection", "Game Night", "Discover", "Insights"],
+  )
+  assert.equal((markup.match(/<button /g) ?? []).length, 5)
+  assert.equal((markup.match(/aria-current="page"/g) ?? []).length, 1)
+})
+
+test("native navigation wraps complete destinations without horizontal scrolling", async () => {
+  const native = await readFile(new URL("./styles/native-dynamic-type.css", import.meta.url), "utf8")
+  assert.match(native, /:root\[data-native-ios\]\s+\.app-nav\s*\{[^}]*flex-wrap:\s*wrap;[^}]*overflow-x:\s*hidden;/s)
+  assert.match(native, /:root\[data-native-ios\]\s+\.nav-button\s*\{[^}]*flex:\s*1 0 max-content;[^}]*max-width:\s*100%;/s)
+  assert.match(native, /:root\[data-native-ios\]\s+\.nav-label\s*\{[^}]*overflow-wrap:\s*anywhere;/s)
+  assert.match(native, /:root\[data-native-ios\]\s+\.app-phone\s*\{[^}]*padding-bottom:\s*calc\(max\(128px, 8rem\)/s)
+  assert.doesNotMatch(native, /overflow-x:\s*auto;/)
 })
