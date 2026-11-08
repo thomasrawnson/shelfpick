@@ -13,10 +13,11 @@ test("public registration requires verification without exposing account existen
   assert.match(authSource, /role="status"/)
 })
 
-test("Top 100 has a dedicated unavailable state and returns to Hot", () => {
+test("Top 100 implementation remains unavailable while V1 tabs omit it", () => {
   assert.match(discoverSource, /Top 100 is temporarily unavailable/)
   assert.match(discoverSource, /authorised official rankings source/)
   assert.match(discoverSource, /selectMode\("hot"\)/)
+  assert.doesNotMatch(discoverSource.match(/const tabs:[\s\S]*?\]/)?.[0] ?? "", /top100/)
 })
 
 test("verification failure distinguishes invalid expired or reused links", () => {

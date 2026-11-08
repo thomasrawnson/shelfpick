@@ -4,9 +4,10 @@ import { FieldValidationError } from "../api/request"
 import { passwordError } from "../auth-validation"
 import PasswordField from "./ui/PasswordField"
 import BrandLogo from "./ui/BrandLogo"
+import { resetTokenFromSearch } from "../reset-link"
 
 export default function ResetPasswordView() {
-  const token = new URLSearchParams(window.location.search).get("token") ?? ""
+  const token = resetTokenFromSearch(window.location.search)
   const [password, setPassword] = useState("")
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")

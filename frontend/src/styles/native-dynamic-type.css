@@ -80,26 +80,26 @@
 
   :root[data-native-ios] .app-nav {
     display: flex;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
+    flex-wrap: wrap;
+    overflow-x: hidden;
   }
   :root[data-native-ios] .nav-button {
-    flex: 1 0 3.5rem;
+    flex: 1 0 max-content;
     min-width: 3.5rem;
+    max-width: 100%;
     font-size: 0.764706rem;
   }
   :root[data-native-ios] .nav-label {
     max-width: 100%;
     font-size: 0.764706rem;
     white-space: normal;
-    overflow-wrap: normal;
-    word-break: keep-all;
+    overflow-wrap: anywhere;
+    word-break: normal;
     text-align: center;
   }
   :root[data-native-ios] .app-phone {
-    padding-bottom: calc(max(128px, 6rem) + env(safe-area-inset-bottom));
-    scroll-padding-bottom: calc(max(128px, 6rem) + env(safe-area-inset-bottom));
+    padding-bottom: calc(max(128px, 8rem) + env(safe-area-inset-bottom));
+    scroll-padding-bottom: calc(max(128px, 8rem) + env(safe-area-inset-bottom));
   }
 
   :root[data-native-ios] :is(.auth-tabs, .collection-section-tabs, .collection-filter-tabs, .filter-tabs),
