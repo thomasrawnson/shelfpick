@@ -52,12 +52,6 @@ const featureGroups: FeatureGroup[] = [
       { name: "Core Picker", detail: "Recommendations from your shelf", free: included, pro: included },
       { name: "Picker ranking influence", detail: "Count-based sessions only", free: proOnly, pro: included },
       { name: "Discover Hot", detail: "Current popular games", free: included, pro: included },
-      {
-        name: "Discover Top 100",
-        detail: "Free by policy; ranked source is currently blocked",
-        free: { label: "Unavailable", tone: "unavailable" },
-        pro: { label: "Unavailable", tone: "unavailable" },
-      },
       { name: "Discover For You", detail: "Personalised recommendations", free: proOnly, pro: included },
     ],
   },

@@ -93,18 +93,19 @@ test("comparison distinguishes Pro gates and V1 unavailable features", () => {
   assert.match(row("Live play timer"), /Not included.*Included/)
   assert.match(row("Phone voting"), /Unavailable.*Unavailable/)
   assert.match(row("Join a hosted vote"), /Unavailable.*Unavailable/)
-  assert.match(row("Discover Top 100"), /Unavailable.*Unavailable/)
-  assert.match(markup, /Free by policy; ranked source is currently blocked/)
+  assert.equal(row("Discover Top 100"), undefined)
+  assert.doesNotMatch(markup, /Free by policy; ranked source is currently blocked/)
 })
 
-test("Discover continues to use the Top 100 label while comparison records its limitation", () => {
+test("V1 Discover and plan comparison omit Top 100 without changing Hot or For You", () => {
   const discover = renderToStaticMarkup(React.createElement(DiscoverView, {
     personalized: false, onViewWishlist: () => {}, onUnlockPro: () => {}, onPersonalize: () => {},
   }))
   const comparison = render(ProComparisonView, { user })
-  assert.match(discover, /role="tab"[^>]*>Top 100<\/button>/)
-  assert.match(comparison, /Discover Top 100/)
-  assert.match(comparison, /ranked source is currently blocked/)
+  assert.doesNotMatch(discover, /role="tab"[^>]*>Top 100<\/button>/)
+  assert.match(discover, /role="tab"[^>]*>Hot<\/button>/)
+  assert.match(discover, /role="tab"[^>]*>For You/)
+  assert.doesNotMatch(comparison, /Discover Top 100/)
 })
 
 test("locked feature presentations use the comparison-screen language", () => {

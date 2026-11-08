@@ -30,10 +30,10 @@ export function discoverEmptyCopy(
   return {
     title: "No new games to show right now",
     body: mode === "hot"
-      ? "No unowned Hot games are available right now. Top 100 may have more ideas."
+      ? "No unowned Hot games are available right now. Check again later for new ideas."
       : "No unowned Top 100 games are available right now. Hot may have something different.",
-    actionLabel: mode === "hot" ? "Browse Top 100" : "Browse Hot",
-    actionMode: mode === "hot" ? "top100" as const : "hot" as const,
+    actionLabel: mode === "hot" ? "Reload list" : "Browse Hot",
+    actionMode: "hot" as const,
   }
 }
 

@@ -81,7 +81,7 @@ export default function AuthView({ onAuthenticated, sessionExpired }: Props) {
       {mode === "register" && <div>
         <label className="age-confirmation"><input type="checkbox" name="age_13_or_over" checked={age13OrOver} onChange={event => setAge13OrOver(event.target.checked)} disabled={submitting} aria-invalid={!!fields.age_13_or_over} aria-describedby={fields.age_13_or_over ? "age-error" : undefined} /> I confirm I am at least 13 years old.</label>
         {fields.age_13_or_over && <p id="age-error" className="field-error">{fields.age_13_or_over}</p>}
-        <p className="form-help">Under 13? Join an eligible Game Night as a guest. No account is needed.</p>
+        <p className="form-help">Under 13? You cannot create an account. Game Night phone voting is unavailable in this release.</p>
       </div>}
       {registrationMessage && <p className="field-hint" role="status">{registrationMessage}</p>}
       {registrationMessage && <button type="button" className="auth-link-button" disabled={resending} onClick={() => {

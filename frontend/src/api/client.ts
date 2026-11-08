@@ -1,4 +1,5 @@
 import { request, responseError, SessionExpiredError } from "./request"
+import { resetConfirmationBody } from "../reset-link"
 import {
   clearToken,
   getToken,
@@ -1633,10 +1634,7 @@ export async function confirmPasswordReset(
         "Content-Type":
           "application/json",
       },
-      body: JSON.stringify({
-        token,
-        password,
-      }),
+      body: resetConfirmationBody(token, password),
     },
   )
 

@@ -104,6 +104,13 @@ test("About links to Pluto Night Labs with an accessible new-tab indication", ()
   assert.match(markup, /src="\/branding\/powered-by-bgg-rgb\.svg"/)
   assert.match(markup, /href="https:\/\/boardgamegeek\.com\/"/)
   assert.match(markup, /alt="Powered by BoardGameGeek"/)
+  assert.doesNotMatch(markup, /shelfpick\/privacy|shelfpick\/terms|Privacy Policy draft/)
+})
+
+test("Help exposes support contact without publishing legal drafts", () => {
+  const markup = render(SettingsSectionView, { section: "help", user, onUserChange: () => {} }, "/settings/help")
+  assert.match(markup, /href="mailto:hello@plutonightlabs\.com\?subject=ShelfPick%20support"/)
+  assert.match(markup, /Contact support/)
 })
 
 test("Appearance offers the experimental Black theme without a plan gate", () => {
