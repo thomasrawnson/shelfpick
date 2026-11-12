@@ -9,6 +9,7 @@ import ProfileSettings from "./ProfileSettings"
 import SetupView from "./SetupView"
 import { deleteAccount } from "../api/client"
 import { LEGAL_DRAFTS_ENABLED } from "../legal-drafts"
+import { PUBLIC_LEGAL_LINKS_ENABLED, PRIVACY_POLICY_URL, TERMS_URL, SUPPORT_EMAIL_URL } from "../public-legal-links"
 import { deleteAccountAndClearSession } from "../account-deletion-session"
 
 type Section = "profile" | "preferences" | "appearance" | "collection-data" | "plays" | "help" | "about"
@@ -113,6 +114,7 @@ function SettingsSectionView({ section, user, onUserChange, onAccountDeleted }: 
     {section === "help" && <div className="settings-info-panel">
       <h2>Using ShelfPick</h2>
       <p>Use Picker for a recommendation from your shelf, Collection to manage games, and Insights to review recorded plays.</p>
+      <a className="secondary-button settings-section-action" href={SUPPORT_EMAIL_URL}>Contact support</a>
     </div>}
     {section === "about" && <div className="settings-info-panel">
       <h2>ShelfPick</h2>
@@ -122,6 +124,10 @@ function SettingsSectionView({ section, user, onUserChange, onAccountDeleted }: 
       {LEGAL_DRAFTS_ENABLED && <nav className="settings-legal-links" aria-label="Draft legal documents">
         <Link to={APP_PATHS.privacyDraft}>Privacy Policy draft</Link>
         <Link to={APP_PATHS.termsDraft}>Terms of Use draft</Link>
+      </nav>}
+      {PUBLIC_LEGAL_LINKS_ENABLED && <nav className="settings-legal-links" aria-label="Legal information">
+        <a href={PRIVACY_POLICY_URL} target="_blank" rel="noopener noreferrer">Privacy Policy<span className="sr-only"> (opens in a new tab)</span></a>
+        <a href={TERMS_URL} target="_blank" rel="noopener noreferrer">Terms of Use<span className="sr-only"> (opens in a new tab)</span></a>
       </nav>}
       <a className="secondary-button settings-section-action" href="https://plutonightlabs.com/"
         target="_blank" rel="noopener noreferrer">

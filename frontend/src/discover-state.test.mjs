@@ -12,10 +12,12 @@ test("Discover empty copy distinguishes personalised no-match results", () => {
     actionMode: "hot",
   })
 
-  assert.match(
-    discoverEmptyCopy("hot").body,
-    /unowned Hot games/,
-  )
+  assert.deepEqual(discoverEmptyCopy("hot"), {
+    title: "No new games to show right now",
+    body: "No unowned Hot games are available right now. Check again later for new ideas.",
+    actionLabel: "Reload list",
+    actionMode: "hot",
+  })
   assert.match(
     discoverEmptyCopy("top100").body,
     /unowned Top 100 games/,

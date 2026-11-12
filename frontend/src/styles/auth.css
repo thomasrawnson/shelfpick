@@ -2,7 +2,7 @@
 .auth-loading {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: safe center;
 
   min-height: 100%;
 
@@ -109,6 +109,25 @@
 
   box-shadow: 0 0 0 2px
     var(--color-shadow);
+}
+
+.auth-form .age-confirmation {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  min-height: 44px;
+  gap: 10px;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.auth-form .age-confirmation input {
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  margin: 0;
+  accent-color: var(--color-brand-primary);
 }
 
 .auth-hint {

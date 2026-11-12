@@ -16,6 +16,7 @@ type FeatureGroup = { activity: string; features: ComparisonFeature[] }
 
 const included = { label: "Included", tone: "included" } as const
 const proOnly = { label: "Not included", tone: "pro" } as const
+const unavailable = { label: "Unavailable", tone: "unavailable" } as const
 
 const freeBenefits = [
   "Manage your Owned and Want to Play shelves",
@@ -35,11 +36,6 @@ const proBenefits = [
     summary: "Start, pause and finish a play timer without leaving ShelfPick.",
     detail: "An in-app indicator brings you back to the timer while you move around the app. Lock-screen timers and notifications are not included.",
   },
-  {
-    title: "Game Night voting from players’ phones",
-    summary: "Open voting for your shortlist and let players join by QR code or link.",
-    detail: "Creating the voting session needs Pro. Guests join in their browser without an account or Pro.",
-  },
 ]
 
 const featureGroups: FeatureGroup[] = [
@@ -56,12 +52,6 @@ const featureGroups: FeatureGroup[] = [
       { name: "Core Picker", detail: "Recommendations from your shelf", free: included, pro: included },
       { name: "Picker ranking influence", detail: "Count-based sessions only", free: proOnly, pro: included },
       { name: "Discover Hot", detail: "Current popular games", free: included, pro: included },
-      {
-        name: "Discover Top 100",
-        detail: "Free by policy; ranked source is currently blocked",
-        free: { label: "Unavailable", tone: "unavailable" },
-        pro: { label: "Unavailable", tone: "unavailable" },
-      },
       { name: "Discover For You", detail: "Personalised recommendations", free: proOnly, pro: included },
     ],
   },
@@ -77,12 +67,12 @@ const featureGroups: FeatureGroup[] = [
     activity: "Plan together",
     features: [
       { name: "Basic Game Night", detail: "Group shortlist and host selection", free: included, pro: included },
-      { name: "Open phone voting", detail: "Host QR code and join link", free: proOnly, pro: included },
+      { name: "Phone voting", detail: "Not offered in this release", free: unavailable, pro: unavailable },
       {
         name: "Join a hosted vote",
-        detail: "Guest browser access",
-        free: { label: "No plan needed", tone: "guest" },
-        pro: { label: "No plan needed", tone: "guest" },
+        detail: "Not offered in this release",
+        free: unavailable,
+        pro: unavailable,
       },
     ],
   },
@@ -112,7 +102,7 @@ function ProComparisonView({ user }: { user: AuthUser }) {
       <BrandLogo className="pro-comparison-brand" />
       <p className="eyebrow">Free and Pro</p>
       <h1 id="pro-comparison-heading">Free covers the essentials. Pro makes ShelfPick more personal.</h1>
-      <p>Your collection and everyday play stay free. Pro adds three optional upgrades for choosing, timing and deciding together.</p>
+      <p>Your collection and everyday play stay free. Pro adds optional tools for choosing and timing.</p>
       <div className={`pro-account-state${isPro ? " is-pro" : ""}`} role="status">
         <strong>{isPro ? "Pro is active" : "You’re on Free"}</strong>
         <span>{isPro ? "All benefits below are available on your account." : "All Free features below are available on your account."}</span>
@@ -122,7 +112,7 @@ function ProComparisonView({ user }: { user: AuthUser }) {
     <section className="pro-value-section" aria-labelledby="pro-value-heading">
       <div className="pro-section-heading">
         <h2 id="pro-value-heading">What Pro adds</h2>
-        <p>Three benefits already implemented in ShelfPick.</p>
+        <p>Two benefits available with Pro access.</p>
       </div>
       <div className="pro-value-grid">
         {proBenefits.map((benefit, index) => <article className="pro-value-card" key={benefit.title}>
@@ -149,7 +139,7 @@ function ProComparisonView({ user }: { user: AuthUser }) {
           <h2 id="pro-plan-heading">Pro</h2>
           <span className="pro-plan-state">{isPro ? "Your plan" : "One-off unlock"}</span>
         </div>
-        <p className="pro-plan-intro">Keep everything in Free, then add all three Pro benefits above.</p>
+        <p className="pro-plan-intro">Keep everything in Free, then add both Pro benefits above.</p>
         {isPro ? (
           <p className="pro-current-note">Your Pro access is active.</p>
         ) : (

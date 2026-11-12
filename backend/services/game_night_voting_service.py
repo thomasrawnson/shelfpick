@@ -154,6 +154,31 @@ class GameNightVotingService:
         )
         return self.public_state(session, guest)
 
+    def correct_guest(
+        self, join_token: str, credential: str | None, display_name: str,
+    ) -> None:
+        guest = self._verified_guest(join_token, credential)
+        name = " ".join(display_name.split())
+        if not 1 <= len(name) <= 40:
+            raise ValueError("Nickname must be 1 to 40 characters.")
+        self.repository.rename_guest(guest, name)
+
+    def remove_guest(self, join_token: str, credential: str | None) -> None:
+        guest = self._verified_guest(join_token, credential)
+        self.repository.delete_guest(guest)
+
+    def _verified_guest(
+        self, join_token: str, credential: str | None,
+    ) -> GameNightGuest:
+        # Correction and removal remain available after voting closes or expires.
+        session = self.repository.get_by_join_hash(token_hash(join_token))
+        if session is None:
+            raise VotingNotFoundError("Guest record not found.")
+        guest = self._guest_for_credential(session, credential)
+        if guest is None:
+            raise VotingNotFoundError("Guest record not found.")
+        return guest
+
     def host_state(self, session: GameNightVotingSession) -> dict:
         ballots = self.repository.ballots(session.id)
         status = "expired" if self._is_expired(session) else session.status

@@ -1,4 +1,5 @@
 import { request, responseError, SessionExpiredError } from "./request"
+import { resetConfirmationBody } from "../reset-link"
 import {
   clearToken,
   getToken,
@@ -512,6 +513,7 @@ export async function register(
   email: string,
   displayName: string,
   password: string,
+  age13OrOver: boolean,
 ): Promise<AuthResult | { message: string }> {
   const response = await request(
     `${API_BASE_URL}/auth/register`,
@@ -526,6 +528,7 @@ export async function register(
         display_name:
           displayName,
         password,
+        age_13_or_over: age13OrOver,
       }),
     },
   )
@@ -1301,6 +1304,30 @@ export async function submitGameNightBallot(
   return response.json()
 }
 
+export async function correctGameNightGuest(
+  joinToken: string,
+  credential: string,
+  displayName: string,
+): Promise<void> {
+  const response = await apiFetch(`/game-night/voting/${joinToken}/guest`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...guestVotingHeaders(credential) },
+    body: JSON.stringify({ display_name: displayName }),
+  })
+  if (!response.ok) throw await responseError(response, "Couldn't update your nickname.")
+}
+
+export async function removeGameNightGuest(
+  joinToken: string,
+  credential: string,
+): Promise<void> {
+  const response = await apiFetch(`/game-night/voting/${joinToken}/guest`, {
+    method: "DELETE",
+    headers: guestVotingHeaders(credential),
+  })
+  if (!response.ok) throw await responseError(response, "Couldn't remove your guest data.")
+}
+
 export async function deletePlay(
   playId: number,
 ): Promise<void> {
@@ -1607,10 +1634,7 @@ export async function confirmPasswordReset(
         "Content-Type":
           "application/json",
       },
-      body: JSON.stringify({
-        token,
-        password,
-      }),
+      body: resetConfirmationBody(token, password),
     },
   )
 

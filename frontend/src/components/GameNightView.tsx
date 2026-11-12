@@ -13,6 +13,7 @@ import PlayLogForm from "./collection/PlayLogForm"
 import PlayerSelectionStep from "./picker/PlayerSelectionStep"
 import TimeStep from "./picker/TimeStep"
 import { timeBand, trackEvent } from "../telemetry"
+import { PHONE_VOTING_V1_AVAILABLE } from "../game-night-availability"
 
 
 type Props = {
@@ -203,7 +204,7 @@ function GameNightView({ enabled, votingEnabled, defaultTime = null, onBack, onV
           </ol>
         )}
 
-        {matches.length >= 3 && votingEnabled && (
+        {PHONE_VOTING_V1_AVAILABLE && matches.length >= 3 && votingEnabled && (
           <button
             type="button"
             className="primary-button"
@@ -219,12 +220,6 @@ function GameNightView({ enabled, votingEnabled, defaultTime = null, onBack, onV
                 ? "Return to phone voting"
                 : "Open phone voting"}
           </button>
-        )}
-        {matches.length >= 3 && !votingEnabled && (
-          <div className="game-night-voting-upsell">
-            <p>Phone voting is a ShelfPick Pro feature. You can still choose a game together here.</p>
-            <button type="button" className="secondary-button" onClick={onUnlockPro}>See Pro features</button>
-          </div>
         )}
         {error && <p className="form-error" role="alert">{error}</p>}
 
@@ -278,6 +273,7 @@ function GameNightView({ enabled, votingEnabled, defaultTime = null, onBack, onV
             {votingSession.participant_names.length > 0 && (
               <p className="form-help">Joined: {votingSession.participant_names.join(", ")}</p>
             )}
+            <p className="form-help">Share the voting link only with your group. Ask children and other guests to use nicknames.</p>
             <button type="button" className="primary-button" disabled={loading} onClick={() => { void closeVoting() }}>
               {loading ? "Closing…" : "Close voting and show results"}
             </button>

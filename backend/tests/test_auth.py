@@ -3,6 +3,8 @@ from datetime import (
     timedelta,
     timezone,
 )
+from html.parser import HTMLParser
+from urllib.parse import parse_qs, urlsplit
 
 import jwt
 import pytest
@@ -123,8 +125,29 @@ def register_user(
             "email": email,
             "display_name": display_name,
             "password": password,
+            "age_13_or_over": True,
         },
     )
+
+
+@pytest.mark.parametrize("declaration", [None, False, 1, "true", "13"])
+def test_registration_rejects_missing_false_or_forged_age_declaration(
+    client, declaration, monkeypatch,
+):
+    sent = []
+    monkeypatch.setattr("api.routers.auth.send_email", lambda **kwargs: sent.append(kwargs))
+    payload = {
+        "email": "age-check@example.com",
+        "display_name": "Guest",
+        "password": "password123",
+    }
+    if declaration is not None:
+        payload["age_13_or_over"] = declaration
+    response = client.post("/auth/register", json=payload)
+    assert response.status_code == 422
+    assert sent == []
+    with TestingSessionLocal() as db:
+        assert db.query(User).filter(User.email == payload["email"]).count() == 0
 
 
 def mark_user_verified(email: str) -> None:
@@ -429,6 +452,10 @@ def test_valid_password_reset_token_changes_password_once(
     reset_token = token_from_email(
         sent_emails[-1]
     )
+    assert (
+        f'{settings.frontend_url}/reset-password?token={reset_token}'
+        in sent_emails[-1]["html"]
+    )
 
     response = client.post(
         "/auth/password-reset/confirm",
@@ -469,6 +496,54 @@ def test_valid_password_reset_token_changes_password_once(
     assert reused.status_code == 400
 
 
+def test_generated_reset_email_link_round_trip_for_verified_account(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch,
+):
+    class LinkParser(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.links: list[str] = []
+
+        def handle_starttag(self, tag, attrs):
+            if tag == "a":
+                self.links.extend(value for name, value in attrs if name == "href")
+
+    sent = capture_sent_emails(monkeypatch)
+    login = register_verified_user(client)
+    assert login.status_code == 200
+    old_session = {"Authorization": f"Bearer {login.json()['access_token']}"}
+    assert client.post(
+        "/auth/password-reset/request", json={"email": "tom@example.com"},
+    ).status_code == 200
+
+    parser = LinkParser()
+    parser.feed(sent[-1]["html"])
+    assert len(parser.links) == 1
+    link = urlsplit(parser.links[0])
+    expected_origin = urlsplit(settings.frontend_url)
+    assert (link.scheme, link.netloc, link.path) == (
+        expected_origin.scheme, expected_origin.netloc, "/reset-password",
+    )
+    query = parse_qs(link.query, strict_parsing=True)
+    assert list(query) == ["token"]
+    token = query["token"][0]
+    from auth.one_time_tokens import PASSWORD_RESET, hash_token
+    with TestingSessionLocal() as db:
+        assert db.query(AuthToken).filter_by(
+            token_hash=hash_token(token), purpose=PASSWORD_RESET,
+        ).count() == 1
+
+    assert client.post(
+        "/auth/password-reset/confirm",
+        json={"token": token, "password": "new-password123"},
+    ).status_code == 200
+    assert client.get("/auth/me", headers=old_session).status_code == 401
+    assert client.post(
+        "/auth/password-reset/confirm",
+        json={"token": token, "password": "third-password123"},
+    ).status_code == 400
+
+
 def test_invalid_password_reset_token_returns_400(
     client: TestClient,
 ):
@@ -481,6 +556,96 @@ def test_invalid_password_reset_token_returns_400(
     )
 
     assert response.status_code == 400
+
+
+def test_password_reset_for_missing_account_emails_unusable_link(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch,
+):
+    sent = capture_sent_emails(monkeypatch)
+    assert client.post("/auth/password-reset/request", json={}).status_code == 422
+    assert sent == []
+    response = client.post(
+        "/auth/password-reset/request", json={"email": "missing@example.com"},
+    )
+    assert response.status_code == 200
+    assert len(sent) == 1
+    token = token_from_email(sent[0])
+    confirm = client.post(
+        "/auth/password-reset/confirm",
+        json={"token": token, "password": "new-password123"},
+    )
+    assert confirm.status_code == 400
+    with TestingSessionLocal() as db:
+        assert db.query(AuthToken).count() == 0
+
+
+def test_password_reset_for_pending_account_does_not_verify_it(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch,
+):
+    sent = capture_sent_emails(monkeypatch)
+    assert register_user(client).status_code == 201
+    pending = client.post(
+        "/auth/password-reset/request", json={"email": "tom@example.com"},
+    )
+    missing = client.post(
+        "/auth/password-reset/request", json={"email": "missing@example.com"},
+    )
+    assert pending.status_code == missing.status_code == 200
+    assert pending.json() == missing.json()
+    reset_token = token_from_email(sent[-2])
+    assert client.post(
+        "/auth/password-reset/confirm",
+        json={"token": reset_token, "password": "new-password123"},
+    ).status_code == 200
+    assert client.post(
+        "/auth/login", json={"email": "tom@example.com", "password": "new-password123"},
+    ).status_code == 403
+    with TestingSessionLocal() as db:
+        assert db.query(User).filter_by(email="tom@example.com").one().email_verified_at is None
+
+
+def test_second_reset_request_invalidates_first_link(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch,
+):
+    sent = capture_sent_emails(monkeypatch)
+    assert register_verified_user(client).status_code == 200
+    for _ in range(2):
+        assert client.post(
+            "/auth/password-reset/request", json={"email": "tom@example.com"},
+        ).status_code == 200
+    first, second = (token_from_email(email) for email in sent[-2:])
+    assert first != second
+    with TestingSessionLocal() as db:
+        assert db.query(AuthToken).filter_by(purpose="password_reset", used_at=None).count() == 1
+    assert client.post(
+        "/auth/password-reset/confirm", json={"token": first, "password": "first-password123"},
+    ).status_code == 400
+    assert client.post(
+        "/auth/password-reset/confirm", json={"token": second, "password": "second-password123"},
+    ).status_code == 200
+
+
+def test_expired_reset_link_is_rejected_without_password_change(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch,
+):
+    sent = capture_sent_emails(monkeypatch)
+    assert register_verified_user(client).status_code == 200
+    assert client.post(
+        "/auth/password-reset/request", json={"email": "tom@example.com"},
+    ).status_code == 200
+    token = token_from_email(sent[-1])
+    from auth.one_time_tokens import PASSWORD_RESET, hash_token
+    with TestingSessionLocal() as db:
+        stored = db.query(AuthToken).filter_by(token_hash=hash_token(token), purpose=PASSWORD_RESET).one()
+        assert 0 < (stored.expires_at.replace(tzinfo=timezone.utc) - datetime.now(timezone.utc)).total_seconds() <= 1800
+        stored.expires_at = datetime.now(timezone.utc) - timedelta(seconds=1)
+        db.commit()
+    assert client.post(
+        "/auth/password-reset/confirm", json={"token": token, "password": "new-password123"},
+    ).status_code == 400
+    assert client.post(
+        "/auth/login", json={"email": "tom@example.com", "password": "password123"},
+    ).status_code == 200
 
 def test_duplicate_registration_is_indistinguishable(
     client: TestClient,
@@ -1196,6 +1361,46 @@ def test_account_deletion_requires_correct_password(client: TestClient):
 
     assert response.status_code == 403
     assert client.get("/auth/me", headers=headers).status_code == 200
+
+
+def test_account_deletion_is_current_user_only_and_repeat_is_unauthorised(
+    client: TestClient,
+):
+    owner = register_verified_user(client)
+    other = register_verified_user(
+        client, email="other@example.com", password="other-password123",
+    )
+    owner_headers = {"Authorization": f"Bearer {owner.json()['access_token']}"}
+    other_headers = {"Authorization": f"Bearer {other.json()['access_token']}"}
+
+    # The request body cannot select another account for deletion.
+    cross_account = client.request(
+        "DELETE", "/auth/account", headers=other_headers,
+        json={"password": "password123", "user_id": owner.json()["user"]["id"]},
+    )
+    assert cross_account.status_code == 403
+    assert client.get("/auth/me", headers=owner_headers).status_code == 200
+    assert client.get("/auth/me", headers=other_headers).status_code == 200
+
+    # Even with a forged target ID, a valid password deletes only its bearer.
+    own_deletion = client.request(
+        "DELETE", "/auth/account", headers=other_headers,
+        json={"password": "other-password123", "user_id": owner.json()["user"]["id"]},
+    )
+    assert own_deletion.status_code == 200
+    assert client.get("/auth/me", headers=owner_headers).status_code == 200
+    assert client.get("/auth/me", headers=other_headers).status_code == 401
+
+    deleted = client.request(
+        "DELETE", "/auth/account", headers=owner_headers,
+        json={"password": "password123"},
+    )
+    assert deleted.status_code == 200
+    assert client.request(
+        "DELETE", "/auth/account", headers=owner_headers,
+        json={"password": "password123"},
+    ).status_code == 401
+    assert client.get("/auth/me", headers=other_headers).status_code == 401
 
 
 def test_account_deletion_rolls_back_if_commit_fails(
