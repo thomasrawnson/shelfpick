@@ -40,7 +40,7 @@ Use the separately supplied maintained Free review account; **never put its cred
 
 ### Age rating preparation
 
-Complete Apple's current questionnaire against the final app and any linked BGG content: user-created Game Night names/votes, externally opened pages, potentially unrestricted web access, gambling-related board-game themes, advertising, and in-app purchases must be answered from the actual build. Do not assign an age rating by inference from this draft. Owner/legal review is required.
+The owner records that Apple calculated a **4+** content rating. Preserve that App Store Connect result only while the submitted answers still match the final app and linked BGG content. The 4+ storefront content rating does not lower ShelfPick's account-registration rule: registration continues to require an explicit declaration that the person is 13 or over. Recheck user-created names, external links/content, gambling-related board-game themes, advertising and in-app purchases against the final build before submission; qualified review of children's-data obligations remains required.
 
 ## Screenshot plan and capture gate
 

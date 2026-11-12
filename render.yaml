@@ -29,6 +29,8 @@ services:
         value: "false"
       - key: RETENTION_CLEANUP_ENABLED
         value: "false"
+      - key: GAME_NIGHT_PHONE_VOTING_ENABLED
+        value: "false"
       - key: CORS_ORIGINS
         sync: false
       - key: FRONTEND_URL
@@ -62,6 +64,8 @@ services:
       - key: VITE_API_BASE_URL
         sync: false
       - key: VITE_LEGAL_DRAFTS_ENABLED
+        value: "false"
+      - key: VITE_PUBLIC_LEGAL_LINKS_ENABLED
         value: "false"
     routes:
       - type: rewrite
