@@ -14,6 +14,8 @@ import PlayerAvatar from "../ui/PlayerAvatar"
 
 import LoadingMessage
   from "../ui/LoadingMessage"
+import { selectedPlayerNamesInOrder }
+  from "../../player-selection"
 
 
 type Props = {
@@ -103,9 +105,7 @@ function PlayerSelectionStep({
 
     onChange(
       nextIds,
-      players
-        .filter((player) => nextIds.includes(player.id))
-        .map((player) => player.name),
+      selectedPlayerNamesInOrder(players, nextIds),
     )
   }
 

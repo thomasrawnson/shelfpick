@@ -56,7 +56,7 @@ test("recap copy distinguishes partial and missing duration without private data
   assert.equal(JSON.stringify(recap).includes("location"), false)
 })
 
-test("one-game, missing-artwork and long-title recaps render a 1200x1500 PNG", async () => {
+test("one-game, rights-safe artwork and long-title recaps render a 1200x1500 PNG", async () => {
   const originalDocument = globalThis.document
   const originalImage = globalThis.Image
   const originalWindow = globalThis.window
@@ -91,7 +91,8 @@ test("one-game, missing-artwork and long-title recaps render a 1200x1500 PNG", a
       collage_games: [recap.collage_games[3]],
     })
     assert.equal(await blob.text(), "1200x1500")
-    assert.ok(drawn.some(item => item.value === "Cover not available"))
+    assert.ok(drawn.some(item => item.value === "1 PLAY THIS MONTH"))
+    assert.equal(drawn.some(item => item.value === "Cover not available"), false)
     assert.ok(drawn.some(item => item.value.endsWith("…")))
     assert.ok(drawn.every(item => item.y < 1500))
   } finally {
