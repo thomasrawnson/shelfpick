@@ -2,7 +2,6 @@ import type { MonthlyRecap, MonthlyRecapGame } from "./api/client"
 import {
   SHARE_CARD,
   containImageRect,
-  drawShareArtworkFallback,
   fillRoundedRect,
   fitShareText,
   loadShareImage,
@@ -54,6 +53,58 @@ function collageRects(count: number): ImageRect[] {
   }))
 }
 
+function recapInitials(gameName: string): string {
+  return gameName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(word => word[0]?.toUpperCase())
+    .join("") || "SP"
+}
+
+function drawRecapArtworkFallback(
+  context: CanvasRenderingContext2D,
+  game: MonthlyRecapGame,
+  bounds: ImageRect,
+) {
+  context.fillStyle = SHARE_CARD.background
+  fillRoundedRect(context, bounds.x, bounds.y, bounds.width, bounds.height, 22)
+
+  const markerWidth = Math.min(84, bounds.width * 0.18)
+  context.fillStyle = SHARE_CARD.goldSoft
+  fillRoundedRect(
+    context,
+    bounds.x + 22,
+    bounds.y + 22,
+    markerWidth,
+    10,
+    5,
+  )
+
+  context.fillStyle = SHARE_CARD.forest
+  context.textAlign = "center"
+  const initialsSize = Math.min(142, bounds.width * 0.28, bounds.height * 0.42)
+  context.font = `600 ${initialsSize}px Lora, Georgia, serif`
+  context.fillText(
+    recapInitials(game.name),
+    bounds.x + bounds.width / 2,
+    bounds.y + bounds.height * 0.59,
+  )
+
+  context.fillStyle = SHARE_CARD.goldText
+  const detailSize = Math.min(24, Math.max(16, bounds.width / 21))
+  context.font = `800 ${detailSize}px 'Nunito Sans', system-ui, sans-serif`
+  const playLabel = game.play_count === 1
+    ? "1 PLAY THIS MONTH"
+    : `${game.play_count} PLAYS THIS MONTH`
+  context.fillText(
+    playLabel,
+    bounds.x + bounds.width / 2,
+    bounds.y + bounds.height - 28,
+  )
+  context.textAlign = "left"
+}
+
 async function drawGameTile(
   context: CanvasRenderingContext2D,
   game: MonthlyRecapGame,
@@ -81,7 +132,7 @@ async function drawGameTile(
       loaded = false
     }
   }
-  if (!loaded) drawShareArtworkFallback(context, game.name, artworkBounds)
+  if (!loaded) drawRecapArtworkFallback(context, game, artworkBounds)
   context.fillStyle = SHARE_CARD.ink
   context.font = "700 25px 'Nunito Sans', system-ui, sans-serif"
   context.fillText(fitShareText(context, game.name, bounds.width - 40), bounds.x + 20, bounds.y + bounds.height - 27)

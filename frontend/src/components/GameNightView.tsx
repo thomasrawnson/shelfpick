@@ -28,6 +28,32 @@ type Props = {
 type Step = "players" | "player_selection" | "time" | "shortlist" | "voting" | "reveal"
 
 
+type GameNightPlayLogProps = {
+  game: PickerMatch["game"]
+  selectedPlayerIds: number[]
+  selectedPlayerNames: string[]
+  presentation?: "inline" | "dedicated"
+}
+
+
+export function GameNightPlayLog({
+  game,
+  selectedPlayerIds,
+  selectedPlayerNames,
+  presentation = "inline",
+}: GameNightPlayLogProps) {
+  return (
+    <PlayLogForm
+      game={game}
+      initialPlayerCount={selectedPlayerIds.length}
+      initialPlayerNames={selectedPlayerNames.slice(0, selectedPlayerIds.length)}
+      presentation={presentation}
+      onSaved={() => Promise.resolve()}
+    />
+  )
+}
+
+
 function GameNightView({ enabled, votingEnabled, defaultTime = null, onBack, onViewGame, onUnlockPro }: Props) {
   const [step, setStep] = useState<Step>("players")
   const [selectedPlayerIds, setSelectedPlayerIds] = useState<number[]>([])
@@ -330,10 +356,10 @@ function GameNightView({ enabled, votingEnabled, defaultTime = null, onBack, onV
         <ul className="game-night-reasons">
           {selectedMatch.reasons.map((reason) => <li key={reason}>{reason}</li>)}
         </ul>
-        <PlayLogForm
+        <GameNightPlayLog
           game={selectedMatch.game}
-          initialPlayerCount={selectedPlayerIds.length}
-          onSaved={() => Promise.resolve()}
+          selectedPlayerIds={selectedPlayerIds}
+          selectedPlayerNames={selectedPlayerNames}
         />
         <button type="button" className="secondary-button" onClick={() => onViewGame(selectedMatch.game.bgg_id)}>
           View game
