@@ -1,17 +1,25 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
+import { Link } from "react-router-dom"
 import { addGameToCollection, completeOnboarding, searchBGGGames, syncBGGCollection, type BGGSearchResult } from "../api/client"
 import type { AuthUser } from "../auth"
 import BrandLogo from "./ui/BrandLogo"
 import AvatarPicker from "./ui/AvatarPicker"
 import type { AvatarId } from "../avatar-catalog"
 import { timeBand, trackEvent } from "../telemetry"
+import { APP_PATHS } from "../routes"
 
-type Props = { displayName: string | null; onComplete: (user: AuthUser) => void }
+type Props = {
+  displayName: string | null
+  onComplete: (user: AuthUser) => void
+  hidden?: boolean
+  restoreAccountOptionsFocus?: boolean
+}
 const counts = [1, 2, 3, 4, 5, 6]
 const times = [30, 60, 90, 120, 0]
 
-function OnboardingView({ displayName, onComplete }: Props) {
+function OnboardingView({ displayName, onComplete, hidden = false, restoreAccountOptionsFocus = false }: Props) {
   const screenRef = useRef<HTMLElement>(null)
+  const accountOptionsRef = useRef<HTMLAnchorElement>(null)
   const syncPending = useRef(false)
   const finishPending = useRef(false)
   const [step, setStep] = useState(0)
@@ -35,6 +43,10 @@ function OnboardingView({ displayName, onComplete }: Props) {
     screenRef.current?.closest(".phone")?.scrollTo(0, 0)
     window.scrollTo(0, 0)
   }, [step])
+
+  useLayoutEffect(() => {
+    if (restoreAccountOptionsFocus) accountOptionsRef.current?.focus()
+  }, [restoreAccountOptionsFocus])
 
   async function importShelf() {
     if (!username.trim() || syncPending.current) return
@@ -80,7 +92,7 @@ function OnboardingView({ displayName, onComplete }: Props) {
     } finally { finishPending.current = false; setBusy(false) }
   }
 
-  return <section className="onboarding-screen" ref={screenRef}>
+  return <section className="onboarding-screen" ref={screenRef} hidden={hidden}>
     <header className="onboarding-header">
       <BrandLogo />
       <p className="eyebrow">Welcome to ShelfPick</p>
@@ -168,6 +180,12 @@ function OnboardingView({ displayName, onComplete }: Props) {
     {error && <p className="error-message" role="alert">{error}</p>}
     {step > 0 && <button type="button" className="onboarding-skip" disabled={busy || syncing}
       onClick={() => { setError(""); setStep(step - 1) }}>Back</button>}
+    <footer className="onboarding-account-entry">
+      <p>Need to leave setup?</p>
+      <Link ref={accountOptionsRef} className="onboarding-account-link" to={APP_PATHS.onboardingAccount}>
+        Account options
+      </Link>
+    </footer>
   </section>
 }
 export default OnboardingView

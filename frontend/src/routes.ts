@@ -15,6 +15,7 @@ export const APP_PATHS = {
   privacyDraft: "/legal/privacy-draft",
   termsDraft: "/legal/terms-draft",
   onboarding: "/onboarding",
+  onboardingAccount: "/onboarding/account",
   picker: "/picker",
   pickerPlay: "/picker/log-play",
   collection: "/collection",
@@ -40,6 +41,10 @@ export const APP_PATHS = {
   settingsAbout: "/settings/about",
   settingsPro: "/settings/pro",
 } as const
+
+export function isIncompleteOnboardingPath(pathname: string): boolean {
+  return pathname === APP_PATHS.onboarding || pathname === APP_PATHS.onboardingAccount
+}
 
 
 export function gameNightJoinToken(pathname: string): string | null {
