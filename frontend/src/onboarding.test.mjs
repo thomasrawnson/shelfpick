@@ -2,10 +2,12 @@ import assert from "node:assert/strict"
 import { after, before, test } from "node:test"
 import React from "react"
 import { renderToStaticMarkup } from "react-dom/server"
+import { MemoryRouter } from "react-router-dom"
 import { createServer } from "vite"
 
 let server
 let OnboardingView
+let OnboardingAccountOptions
 let ProfileSettings
 let PlayerAvatar
 let AvatarPicker
@@ -14,6 +16,7 @@ let avatarCatalog
 before(async () => {
   server = await createServer({ server: { middlewareMode: true }, appType: "custom" })
   OnboardingView = (await server.ssrLoadModule("/src/components/OnboardingView.tsx")).default
+  OnboardingAccountOptions = (await server.ssrLoadModule("/src/components/OnboardingAccountOptions.tsx")).default
   ProfileSettings = (await server.ssrLoadModule("/src/components/ProfileSettings.tsx")).default
   PlayerAvatar = (await server.ssrLoadModule("/src/components/ui/PlayerAvatar.tsx")).default
   AvatarPicker = (await server.ssrLoadModule("/src/components/ui/AvatarPicker.tsx")).default
@@ -23,13 +26,29 @@ before(async () => {
 after(async () => { await server?.close() })
 
 test("first run opens with a short welcome and no paywall", () => {
-  const markup = renderToStaticMarkup(React.createElement(OnboardingView, {
-    displayName: "Morgan", onComplete: () => {},
-  }))
+  const markup = renderToStaticMarkup(React.createElement(MemoryRouter, null,
+    React.createElement(OnboardingView, {
+      displayName: "Morgan", onComplete: () => {},
+    }),
+  ))
   assert.match(markup, /Spend less time choosing. Spend more time playing./)
   assert.match(markup, /Step 1 of 4/)
   assert.match(markup, /Get started/)
+  assert.match(markup, /href="\/onboarding\/account"[^>]*>Account options/)
   assert.doesNotMatch(markup, /paywall|Unlock Pro/i)
+})
+
+test("incomplete onboarding exposes existing logout and password-confirmed deletion controls", () => {
+  const markup = renderToStaticMarkup(React.createElement(MemoryRouter, null,
+    React.createElement(OnboardingAccountOptions, {
+      onLogout: async () => {}, onAccountDeleted: () => {},
+    }),
+  ))
+  assert.match(markup, /href="\/onboarding"/)
+  assert.match(markup, />Log out</)
+  assert.match(markup, /Confirm your password/)
+  assert.match(markup, /I understand this cannot be undone/)
+  assert.match(markup, /Delete my account/)
 })
 
 test("profile shows the saved identity and preferences", () => {

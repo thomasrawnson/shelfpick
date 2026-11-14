@@ -39,6 +39,7 @@ import GameNightView from "./components/GameNightView";
 import GameNightGuestVotingView from "./components/GameNightGuestVotingView";
 
 import OnboardingView from "./components/OnboardingView";
+import OnboardingAccountOptions from "./components/OnboardingAccountOptions";
 
 import SetupView from "./components/SetupView";
 import SettingsView from "./components/SettingsView";
@@ -70,6 +71,7 @@ import {
   appViewForPath,
   collectionGamePath,
   collectionPath,
+  isIncompleteOnboardingPath,
   isProtectedAppPath,
   gameNightJoinToken,
   safeReturnPath,
@@ -81,6 +83,7 @@ import "./App.css";
 type NavigationState = {
   from?: string;
   detailOrigin?: "collection";
+  focusAccountOptions?: boolean;
 };
 
 type CollectionRouteProps = {
@@ -477,7 +480,9 @@ function App() {
   }
 
   if (!user.onboarding_completed) {
-    if (location.pathname !== APP_PATHS.onboarding) {
+    const isAccountOptionsRoute = location.pathname === APP_PATHS.onboardingAccount;
+
+    if (!isIncompleteOnboardingPath(location.pathname)) {
       const from = isProtectedAppPath(location.pathname)
         ? `${location.pathname}${location.search}`
         : intendedRoute;
@@ -492,13 +497,21 @@ function App() {
     }
 
     return pageShell(
-      <OnboardingView
-        displayName={user.display_name}
-        onComplete={(updatedUser) => {
-          setUser(updatedUser);
-          navigate(intendedRoute ?? APP_PATHS.picker, { replace: true });
-        }}
-      />,
+      <>
+        <OnboardingView
+          displayName={user.display_name}
+          hidden={isAccountOptionsRoute}
+          restoreAccountOptionsFocus={navigationState?.focusAccountOptions === true}
+          onComplete={(updatedUser) => {
+            setUser(updatedUser);
+            navigate(intendedRoute ?? APP_PATHS.picker, { replace: true });
+          }}
+        />
+        {isAccountOptionsRoute && <OnboardingAccountOptions
+          onLogout={handleLogout}
+          onAccountDeleted={finishLogout}
+        />}
+      </>,
     );
   }
 

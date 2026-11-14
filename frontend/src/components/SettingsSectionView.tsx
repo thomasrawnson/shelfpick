@@ -51,7 +51,7 @@ function AppearanceSettings() {
   </fieldset>
 }
 
-function AccountDeletion({ onDeleted }: { onDeleted?: () => void }) {
+export function AccountDeletion({ onDeleted }: { onDeleted?: () => void }) {
   const [password, setPassword] = useState("")
   const [confirmed, setConfirmed] = useState(false)
   const [submitting, setSubmitting] = useState(false)

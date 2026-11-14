@@ -7,9 +7,17 @@ import {
   collectionGamePath,
   collectionPath,
   gameNightJoinToken,
+  isIncompleteOnboardingPath,
   safeReturnPath,
   wishlistGamePath,
 } from "./routes.ts"
+
+test("incomplete onboarding permits only onboarding and account options", () => {
+  assert.equal(isIncompleteOnboardingPath(APP_PATHS.onboarding), true)
+  assert.equal(isIncompleteOnboardingPath(APP_PATHS.onboardingAccount), true)
+  assert.equal(isIncompleteOnboardingPath(APP_PATHS.picker), false)
+  assert.equal(isIncompleteOnboardingPath(APP_PATHS.settingsProfile), false)
+})
 
 
 test("collection routes represent section and game selection", () => {
