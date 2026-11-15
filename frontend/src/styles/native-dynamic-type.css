@@ -10,9 +10,12 @@
     --text-overline: 0.647059rem;
   }
 
+  /* At the largest accessibility sizes a 1.82rem heading is wider than the
+     screen for single words ("Welcome", "choosing."). Cap it against the
+     viewport so whole words fit; default text sizes stay at 1.82rem. */
   :root[data-native-ios] h1 {
-    font-size: 1.823529rem;
-    overflow-wrap: anywhere;
+    font-size: min(1.823529rem, 11vw);
+    overflow-wrap: break-word;
   }
   :root[data-native-ios] .subtitle,
   :root[data-native-ios] :is(.primary-button, .secondary-button, .ghost-button) {
@@ -106,9 +109,22 @@
   :root[data-native-ios] .player-grid {
     min-width: 0;
   }
-  :root[data-native-ios] :is(.auth-tabs button, .collection-section-tabs button, .collection-filter-tabs button, .filter-tabs button) {
+  :root[data-native-ios] :is(.collection-section-tabs button, .collection-filter-tabs button, .filter-tabs button) {
     overflow-wrap: anywhere;
     white-space: normal;
+  }
+  /* Log in / Register stack into one column when both labels cannot fit
+     side by side, instead of splitting "REGI/STER". */
+  :root[data-native-ios] .auth-tabs {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 6.5em), 1fr));
+  }
+  :root[data-native-ios] .auth-tabs button {
+    /* Uppercase, letter-spaced "REGISTER" needs a width cap on 320pt screens. */
+    font-size: min(var(--text-support), 11vw);
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: keep-all;
   }
   :root[data-native-ios] .player-chip {
     min-height: max(70px, 4.5rem);

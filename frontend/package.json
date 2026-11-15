@@ -13,6 +13,7 @@
     "check:colors": "node scripts/check-colors.mjs",
     "lint": "eslint .",
     "test": "node --test src/reset-link.test.ts src/public-legal-links.test.mjs src/beta-access.test.mjs src/routes.test.ts src/auth-validation.test.ts src/auth-storage.test.ts src/native-session.test.ts src/api/request.test.ts src/collection-add-game.test.mjs src/discover-state.test.mjs src/export-artwork-policy.test.mjs src/game-night-play-prefill.test.mjs src/game-night-voting.test.mjs src/insights-format.test.mjs src/legal-drafts.test.mjs src/live-timer.test.mjs src/share-card.test.mjs src/monthly-recap.test.mjs src/ui-empty-state.test.ts src/onboarding.test.mjs src/picker-defaults.test.mjs src/picker-presentation.test.mjs src/picker-player-mode.test.mjs src/picker-play-entry.test.mjs src/pro-comparison.test.mjs src/settings-navigation.test.mjs src/telemetry.test.mjs scripts/theme.test.mjs",
+    "test:e2e": "playwright test",
     "preview": "vite preview",
     "build:ios": "node --env-file=.env.ios scripts/check-ios-api.mjs && tsc -b && vite build --mode ios && node scripts/check-legal-drafts.mjs && cap sync ios"
   },
@@ -26,8 +27,10 @@
     "react-router-dom": "^7.18.3"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
     "@capacitor/cli": "8.6.0",
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "1.65.1",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
