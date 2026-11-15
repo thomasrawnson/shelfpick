@@ -86,3 +86,17 @@ test("terms draft states the legal and commercial limits", () => {
   assert.match(markup, /No binding Terms of Use will be published/)
   assert.match(markup, /href="\/legal\/privacy-draft"/)
 })
+
+
+test("legal copy states the final age, plan, contact and controller", () => {
+  for (const kind of ["privacy", "terms"]) {
+    const markup = render(kind)
+    assert.match(markup, /at least 13 years old to create a ShelfPick account/)
+    assert.match(markup, /Free-only/)
+    assert.match(markup, /hello@plutonightlabs\.com/)
+    assert.match(markup, /company number 17485329/)
+    assert.doesNotMatch(markup, /proposed/i)
+    assert.doesNotMatch(markup, /Children(&#x27;|')s Code/)
+  }
+  assert.match(render("privacy"), /Pluto Night Labs Ltd is the data controller/)
+})

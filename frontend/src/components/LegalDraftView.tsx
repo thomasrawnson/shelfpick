@@ -38,9 +38,9 @@ function PrivacyDraft() {
   return <>
     <section>
       <h2>Who operates ShelfPick</h2>
-      <p>ShelfPick is operated by Pluto Night Labs Ltd. The registered company number and postal address are still awaiting owner evidence and legal review.</p>
+      <p>ShelfPick is operated by Pluto Night Labs Ltd, registered in England and Wales under company number 17485329. Pluto Night Labs Ltd is the data controller of the personal information described in this policy.</p>
       <p>Public privacy and support contact: <a href="mailto:hello@plutonightlabs.com">hello@plutonightlabs.com</a>.</p>
-      <p>The proposed launch is UK-first and Free-only. The proposed minimum age is 13+, subject to qualified legal and Children&apos;s Code review.</p>
+      <p>ShelfPick 1.0 is Free-only. You must be at least 13 years old to create a ShelfPick account.</p>
     </section>
 
     <section>
@@ -87,8 +87,8 @@ function TermsDraft() {
   return <>
     <section>
       <h2>Service provider and eligibility</h2>
-      <p>ShelfPick is operated by Pluto Night Labs Ltd. The registered company number, postal address, governing law wording and consumer terms still require evidence and qualified legal review.</p>
-      <p>Contact: <a href="mailto:hello@plutonightlabs.com">hello@plutonightlabs.com</a>. The proposed launch is UK-first and Free-only, with a proposed minimum age of 13+ subject to legal and Children&apos;s Code review.</p>
+      <p>ShelfPick is operated by Pluto Night Labs Ltd, registered in England and Wales under company number 17485329.</p>
+      <p>Contact: <a href="mailto:hello@plutonightlabs.com">hello@plutonightlabs.com</a>. ShelfPick 1.0 is Free-only. You must be at least 13 years old to create a ShelfPick account.</p>
     </section>
 
     <section>
