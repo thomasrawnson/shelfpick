@@ -5,6 +5,8 @@ import pytest
 from scripts.local_test_accounts import (
     LOCAL_ACCOUNT_MARKER,
     LocalSetupSafetyError,
+    ONBOARDING_ACCOUNT,
+    validate_disposable_email,
     validate_local_database_target,
     validate_reserved_account,
 )
@@ -56,3 +58,29 @@ def test_local_account_tool_accepts_only_its_marked_account_for_refresh():
     existing = SimpleNamespace(bgg_username=LOCAL_ACCOUNT_MARKER)
 
     validate_reserved_account(existing, "local-free@shelfpick.app")
+
+
+def test_onboarding_account_uses_a_reserved_local_address():
+    assert ONBOARDING_ACCOUNT["email"] == "local-onboarding@shelfpick.app"
+
+
+def test_disposable_verification_accepts_only_reserved_e2e_addresses():
+    assert (
+        validate_disposable_email(" E2E-Disposable-1731600000-ab12cd@shelfpick.app ")
+        == "e2e-disposable-1731600000-ab12cd@shelfpick.app"
+    )
+
+
+@pytest.mark.parametrize(
+    "email",
+    [
+        "someone@example.com",
+        "local-free@shelfpick.app",
+        "e2e-disposable-abc123@example.com",
+        "e2e-disposable-@shelfpick.app",
+        "xe2e-disposable-abc123@shelfpick.app",
+    ],
+)
+def test_disposable_verification_rejects_other_addresses(email):
+    with pytest.raises(LocalSetupSafetyError, match="e2e-disposable"):
+        validate_disposable_email(email)
