@@ -13,37 +13,37 @@ rendering chunks...
 computing gzip size...
 dist/manifest.webmanifest                          0.62 kB
 dist/index.html                                    1.00 kB │ gzip:   0.48 kB
-dist/assets/index-BTIUxphx.css                   178.81 kB │ gzip:  27.75 kB
-dist/assets/native-D2B0DmaN.js                     0.77 kB │ gzip:   0.33 kB
-dist/assets/web-DbJTEVUt.js                        0.79 kB │ gzip:   0.39 kB
-dist/assets/base-CHdJG4WM.js                       2.78 kB │ gzip:   0.98 kB
+dist/assets/index-C_rTiIee.css                   179.07 kB │ gzip:  27.80 kB
+dist/assets/native-CqHTx8jx.js                     0.77 kB │ gzip:   0.33 kB
+dist/assets/web-CZwwD40x.js                        0.79 kB │ gzip:   0.38 kB
+dist/assets/base-Buo6smiY.js                       2.78 kB │ gzip:   0.98 kB
 dist/assets/workbox-window.prod.es5-Bd17z0YL.js    5.65 kB │ gzip:   2.20 kB
-dist/assets/index-BehO3GFX.js                    461.77 kB │ gzip: 134.08 kB
+dist/assets/index-DdU3KpXt.js                    461.77 kB │ gzip: 134.08 kB
 
-✓ built in 159ms
+✓ built in 171ms
 
 PWA v1.3.0
 mode      generateSW
-precache  27 entries (1383.46 KiB)
+precache  27 entries (1383.71 KiB)
 files generated
   dist/sw.js
   dist/workbox-9c191d2f.js
 Legal draft build gate passed (enabled=false).
 
 ==> npx cap sync ios
-✔ Copying web assets from dist to ios/App/App/public in 5.93ms
-✔ Creating capacitor.config.json in ios/App/App in 675.63μs
-✔ copy ios in 12.87ms
-✔ Updating iOS plugins in 1.15ms
+✔ Copying web assets from dist to ios/App/App/public in 6.22ms
+✔ Creating capacitor.config.json in ios/App/App in 271.29μs
+✔ copy ios in 12.72ms
+✔ Updating iOS plugins in 1.14ms
 [info] All Capacitor plugins have a Package.swift file and will be included in Package.swift
 [info] Writing Package.swift
 [info] Found 1 Capacitor plugin for ios:
        @aparajita/capacitor-secure-storage@8.0.1
-✔ update ios in 10.74ms
-[info] Sync finished in 0.033s
+✔ update ios in 15.44ms
+[info] Sync finished in 0.042s
 
 ==> xcodebuild (Debug, iOS Simulator, ad hoc signed)
-2026-11-15 11:32:34.927 xcodebuild[34975:4543791] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2026-11-15 11:41:35.391 xcodebuild[40177:4606445] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
 
 ==> Boot Simulator
 Simulator window not opened (headless boot); screenshots still work.
@@ -51,7 +51,7 @@ Simulator window not opened (headless boot); screenshots still work.
 ==> Set Dynamic Type content size to accessibility-extra-extra-extra-large
 
 ==> Install and launch com.shelfpick.prototype
-com.shelfpick.prototype: 35102
+com.shelfpick.prototype: 40394
 
 ==> Capture sign-in
 Note: No display specified. Defaulting to display: 2F409159-3617-416F-BD79-FC6C573D6613 (screenID: 1, name: LCD)
@@ -64,4 +64,4 @@ Sign-in captured. To finish without a terminal prompt:
   3. scripts/sim-smoke.sh restore
 
 Evidence label: SIMULATOR PASS candidate only. Not physical-device, VoiceOver or owner evidence.
-SIMULATOR screenshot: /Users/tomrawnson/Developer/_worktrees/shelfpick/sp-test-01a/docs/screenshots/sp-test-01a/onboarding-ax3xl.png (iPhone 17, iOS 27.0, content size accessibility-extra-extra-extra-large)
+SIMULATOR screenshot: /Users/tomrawnson/Developer/_worktrees/shelfpick/sp-test-01a/docs/screenshots/sp-test-01a/sign-in-ax3xl.png (iPhone 17, iOS 27.0, content size accessibility-extra-extra-extra-large)

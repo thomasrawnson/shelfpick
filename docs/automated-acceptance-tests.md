@@ -20,6 +20,7 @@ PostgreSQL database (no request mocking).
 | e | A fresh `e2e-disposable-…@shelfpick.app` account registers through the UI, is verified, signs in with onboarding incomplete, deletes itself with its password, is signed out, and its login is then rejected. |
 | f | axe-core (WCAG 2.0/2.1 A+AA and 2.2 AA tags; fails on serious/critical) on onboarding and Account options; accessible names for Account options, Back to onboarding, Log out, password, confirmation and Delete my account; keyboard order. |
 | g | iPhone SE with root `font-size: 200%`: no horizontal scroll; every visible control on steps 1–2 and Account options scrolls into the viewport and passes a trial click; the focused password field sits inside the visual viewport and is not covered. |
+| h | `dynamic-type.spec.ts`: emulates the native iOS Dynamic Type path (`data-native-ios`, root/body 28, 40 and 53px = AX1, AX3, AX5) and asserts no word on sign-in, Register, onboarding steps 1–4 or Account options renders across two lines, with no horizontal overflow. |
 
 ### Known findings and test-design notes
 
@@ -119,8 +120,15 @@ none was created), Xcode 27.2, scheme `App`, Debug, ad hoc signed, content size
 - `docs/screenshots/sp-test-01a/onboarding-ax3xl.png`: after the owner signed in
   as `local-onboarding@shelfpick.app` at normal size, the session persisted
   across a relaunch and onboarding step 1 rendered at AX3XL.
-- Observed: large headings and the Log in/Register tabs break mid-word
-  ("Welco/me", "REGI/STER", "choosi/ng."). Not changed in this task.
+- First captures showed headings and the Log in/Register tabs breaking
+  mid-word ("Welco/me", "REGI/STER", "choosi/ng."), caused by
+  `overflow-wrap: anywhere` with 1.82rem native h1s. Fixed in
+  `native-dynamic-type.css`: native h1 is capped at `min(1.823529rem, 11vw)`,
+  auth tab labels at `min(var(--text-support), 11vw)`, and the tabs stack when
+  both labels cannot fit. Default text sizes are unchanged. The current
+  screenshots show the fixed layout; test h guards it.
+- Still observed: the onboarding step-number circles are smaller than their
+  digits at AX3XL (not a word break; not changed).
 - Automated text entry through the Simulator tool was unreliable in this
   WKWebView (dropped characters, focus jumps), so sign-in was manual.
 
@@ -142,8 +150,8 @@ Automated checks can't show what VoiceOver says or how a person moves through it
   with an understandable announcement, and error alerts (wrong password) are
   spoken.
 - **Real Dynamic Type at accessibility sizes:** sign-in, onboarding and Account
-  options, including the mid-word heading and tab breaks seen in the Simulator
-  sign-in capture at AX3XL.
+  options on a physical iPhone, confirming the heading and tab word-break fix
+  (verified so far in browser emulation and the Simulator only).
 - **Keyboard with the on-screen keyboard open:** the deletion password field
   stays visible above the real iOS keyboard. Browser emulation has no
   software keyboard.
