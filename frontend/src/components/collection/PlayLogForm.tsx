@@ -19,6 +19,13 @@ import {
   useLiveTimer,
 } from "../../live-timer"
 import { elapsedSeconds, formatElapsed } from "../../live-timer-utils"
+import {
+  calculateScoresheet,
+  createScoresheetEntries,
+  getScoresheetTemplate,
+  type ScoresheetEntry,
+} from "../../scoresheets"
+import ScoresheetPanel from "./ScoresheetPanel"
 
 
 type PlayerForm = {
@@ -117,6 +124,7 @@ function PlayLogForm({
 
   const [location, setLocation] = useState(initialLocation)
   const [, redrawTimer] = useState(0)
+  const scoresheetTemplate = getScoresheetTemplate(game.bgg_id)
 
   const [
     players,
@@ -132,6 +140,15 @@ function PlayLogForm({
     knownPlayers,
     setKnownPlayers,
   ] = useState<Player[]>([])
+
+  const [scoresheetActive, setScoresheetActive] = useState(false)
+  const [scoresheetEntries, setScoresheetEntries] = useState<ScoresheetEntry[]>(
+    createScoresheetEntries(initialPlayerCount),
+  )
+  const [activeExpansionIds, setActiveExpansionIds] = useState<string[]>([])
+  const scoresheetCalculation = scoresheetTemplate === null
+    ? null
+    : calculateScoresheet(scoresheetTemplate, scoresheetEntries, activeExpansionIds)
 
   const [
     saving,
@@ -209,6 +226,10 @@ function PlayLogForm({
       },
     ])
 
+    setScoresheetActive(false)
+    setScoresheetEntries(createScoresheetEntries(1))
+    setActiveExpansionIds([])
+
     setError("")
   }
 
@@ -243,6 +264,11 @@ function PlayLogForm({
         isWinner: false,
       },
     ])
+
+    setScoresheetEntries([
+      ...scoresheetEntries,
+      {},
+    ])
   }
 
 
@@ -263,6 +289,10 @@ function PlayLogForm({
         ) =>
           playerIndex !== index,
       ),
+    )
+
+    setScoresheetEntries(
+      scoresheetEntries.filter((_, playerIndex) => playerIndex !== index),
     )
   }
 
@@ -286,26 +316,30 @@ function PlayLogForm({
       return
     }
 
-    const participants =
-      players.map(
-        (
-          player,
-        ): PlayParticipant => ({
-          name:
-            player.name.trim(),
-
-          score:
-            player.score.trim() ===
-            ""
-              ? null
-              : Number(
-                  player.score,
-                ),
-
-          is_winner:
-            player.isWinner,
-        }),
+    if (scoresheetActive && (scoresheetCalculation === null || !scoresheetCalculation.complete)) {
+      setError(
+        scoresheetCalculation?.invalidFieldIds.length
+          ? "Scoresheet values must be whole numbers of zero or more."
+          : "Complete the scoresheet before saving this play.",
       )
+      return
+    }
+
+    const participants = players.map((player, index): PlayParticipant => {
+      if (scoresheetActive && scoresheetCalculation !== null) {
+        return {
+          name: player.name.trim(),
+          score: scoresheetCalculation.totals[index],
+          is_winner: scoresheetCalculation.winnerIndexes.includes(index),
+        }
+      }
+
+      return {
+        name: player.name.trim(),
+        score: player.score.trim() === "" ? null : Number(player.score),
+        is_winner: player.isWinner,
+      }
+    })
 
     if (
       participants.some(
@@ -654,7 +688,7 @@ function PlayLogForm({
                     )}
                   </div>
 
-                  <div className="player-input-row">
+                  <div className={scoresheetActive ? "player-input-row scoresheet-name-row" : "player-input-row"}>
                     <label>
                       <span>
                         Name
@@ -684,7 +718,7 @@ function PlayLogForm({
                       />
                     </label>
 
-                    <label className="score-field">
+                    {!scoresheetActive && <label className="score-field">
                       <span>
                         Score
                       </span>
@@ -710,10 +744,10 @@ function PlayLogForm({
                           )
                         }
                       />
-                    </label>
+                    </label>}
                   </div>
 
-                  <label className="winner-toggle">
+                  {!scoresheetActive && <label className="winner-toggle">
                     <input
                       type="checkbox"
                       checked={
@@ -737,7 +771,7 @@ function PlayLogForm({
                     <span>
                       Winner
                     </span>
-                  </label>
+                  </label>}
                 </div>
               ),
             )}
@@ -752,6 +786,39 @@ function PlayLogForm({
           >
             + Add player
           </button>
+
+          {scoresheetTemplate !== null && !scoresheetActive && (
+            <button
+              type="button"
+              className="secondary-button use-scoresheet-button"
+              onClick={() => {
+                setScoresheetActive(true)
+                setError("")
+              }}
+            >
+              Use {scoresheetTemplate.gameName} scoresheet
+            </button>
+          )}
+
+          {scoresheetTemplate !== null && scoresheetActive && scoresheetCalculation !== null && (
+            <ScoresheetPanel
+              template={scoresheetTemplate}
+              playerNames={players.map(player => player.name)}
+              entries={scoresheetEntries}
+              activeExpansionIds={activeExpansionIds}
+              calculation={scoresheetCalculation}
+              onEntriesChange={setScoresheetEntries}
+              onExpansionChange={(expansionId, active) => {
+                setActiveExpansionIds(current => active
+                  ? [...current, expansionId]
+                  : current.filter(id => id !== expansionId))
+              }}
+              onUseManual={() => {
+                setScoresheetActive(false)
+                setError("")
+              }}
+            />
+          )}
 
           {error && (
             <p className="error-message" role="alert">
