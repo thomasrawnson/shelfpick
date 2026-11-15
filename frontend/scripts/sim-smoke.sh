@@ -25,7 +25,6 @@ SIM_DEVICE="${SIM_DEVICE:-iPhone 15}"
 BUNDLE_ID="com.shelfpick.prototype"
 CONTENT_SIZE="accessibility-extra-extra-extra-large"
 DERIVED_DATA="${DERIVED_DATA:-/private/tmp/shelfpick-sp-test-01a-derived}"
-STATE_FILE="$DERIVED_DATA/sim-smoke-previous-content-size"
 export VITE_API_BASE_URL="${VITE_API_BASE_URL:-http://127.0.0.1:8000}"
 
 log() { printf '\n==> %s\n' "$*"; }
@@ -59,6 +58,7 @@ require_udid() {
     exit 3
   fi
   DEVICE_LABEL="$(xcrun simctl list devices available | grep "$UDID" | sed -E 's/^ +//; s/ \(.*$//')"
+  STATE_FILE="$DERIVED_DATA/sim-smoke-previous-content-size-$UDID"
   RUNTIME_LABEL="$(xcrun simctl list devices available | awk -v id="$UDID" '/^-- /{rt=$0} index($0, id){print rt}' | sed 's/-- //; s/ --//')"
 }
 
@@ -110,11 +110,16 @@ npm run build
 log "npx cap sync ios"
 npx cap sync ios
 
-log "xcodebuild (Debug, iOS Simulator, unsigned)"
+# Ad hoc ("-") Simulator signature, set only on this command line: no team,
+# certificate or profile, and no project signing change. A fully unsigned
+# build (CODE_SIGNING_ALLOWED=NO) has no entitlements, so Keychain-backed
+# session storage fails with OSStatus -34018 and sign-in cannot persist.
+log "xcodebuild (Debug, iOS Simulator, ad hoc signed)"
 xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug \
   -destination "platform=iOS Simulator,id=$UDID" \
   -derivedDataPath "$DERIVED_DATA" \
-  CODE_SIGNING_ALLOWED=NO build -quiet
+  CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM= \
+  build -quiet
 APP_PATH="$DERIVED_DATA/Build/Products/Debug-iphonesimulator/App.app"
 [[ -d "$APP_PATH" ]] || { echo "Built app not found at $APP_PATH" >&2; exit 1; }
 

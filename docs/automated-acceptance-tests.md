@@ -86,8 +86,8 @@ npm run test:e2e
 ## Simulator smoke capture
 
 `frontend/scripts/sim-smoke.sh` builds the web app (`npm run build`, API
-`http://127.0.0.1:8000` by default), runs `npx cap sync ios`, runs an unsigned
-Debug `xcodebuild` for the chosen Simulator, boots it, sets
+`http://127.0.0.1:8000` by default), runs `npx cap sync ios`, runs a Debug
+`xcodebuild` for the chosen Simulator with an ad hoc (`-`) signature, boots it, sets
 `content_size accessibility-extra-extra-extra-large`, installs and launches
 `com.shelfpick.prototype`, and saves screenshots to
 `docs/screenshots/sp-test-01a/`.
@@ -99,10 +99,32 @@ frontend/scripts/sim-smoke.sh capture onboarding      # non-interactive follow-u
 frontend/scripts/sim-smoke.sh restore                 # put the previous text size back
 ```
 
+The ad hoc signature is set only on the xcodebuild command line: no team,
+certificate or profile is used and project signing is unchanged. A fully
+unsigned build (`CODE_SIGNING_ALLOWED=NO`) cannot use the Keychain, so sign-in
+fails with "An OS error occurred (-34018)" after the API accepts the login.
+
 The script never creates, erases or downloads a Simulator or runtime. If
 `SIM_DEVICE` is missing, it exits with code 3 (BLOCKED) and lists the existing
 devices. Signing in inside the Simulator is a manual (or separately authorised
 automation) step. It is **Simulator evidence only**.
+
+### SP-TEST-01A Simulator result (15 November 2026)
+
+`SIMULATOR PASS` on iPhone 17, iOS 27.0 (no iPhone 15 Simulator is installed;
+none was created), Xcode 27.2, scheme `App`, Debug, ad hoc signed, content size
+`accessibility-extra-extra-extra-large`:
+
+- `docs/screenshots/sp-test-01a/sign-in-ax3xl.png`: sign-in renders and scrolls.
+- `docs/screenshots/sp-test-01a/onboarding-ax3xl.png`: after the owner signed in
+  as `local-onboarding@shelfpick.app` at normal size, the session persisted
+  across a relaunch and onboarding step 1 rendered at AX3XL.
+- Observed: large headings and the Log in/Register tabs break mid-word
+  ("Welco/me", "REGI/STER", "choosi/ng."). Not changed in this task.
+- Automated text entry through the Simulator tool was unreliable in this
+  WKWebView (dropped characters, focus jumps), so sign-in was manual.
+
+Log: `docs/test-evidence/sp-test-01a/sim-smoke.txt`.
 
 ## Still needs a manual pass on a real device
 
