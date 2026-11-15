@@ -1,0 +1,39 @@
+
+> frontend@0.0.0 test:e2e
+> playwright test
+
+[WebServer] INFO:     Started server process [39463]
+[WebServer] INFO:     Waiting for application startup.
+[WebServer] INFO:     Application startup complete.
+[WebServer] INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+Local Free, Pro and onboarding accounts are ready.
+Free: local-free@shelfpick.app
+Pro:  local-pro@shelfpick.app
+Onboarding (incomplete): local-onboarding@shelfpick.app
+Password: SHELFPICK_LOCAL_TEST_PASSWORD or the documented local default.
+
+Running 20 tests using 1 worker
+
+  ✓   1 [iPhone 15] › e2e/dynamic-type.spec.ts:67:3 › Native Dynamic Type at AX1 › h) AX1: sign-in, onboarding and Account options keep words whole (1.3s)
+  ✓   2 [iPhone 15] › e2e/dynamic-type.spec.ts:67:3 › Native Dynamic Type at AX3 › h) AX3: sign-in, onboarding and Account options keep words whole (776ms)
+  ✓   3 [iPhone 15] › e2e/dynamic-type.spec.ts:67:3 › Native Dynamic Type at AX5 › h) AX5: sign-in, onboarding and Account options keep words whole (816ms)
+  ✓   4 [iPhone 15] › e2e/onboarding-account.spec.ts:162:3 › Onboarding account options › a) Account options is visible and opens for an incomplete account (527ms)
+  ✓   5 [iPhone 15] › e2e/onboarding-account.spec.ts:171:3 › Onboarding account options › b) Back to onboarding restores the same step and field value (570ms)
+  ✓   6 [iPhone 15] › e2e/onboarding-account.spec.ts:188:3 › Onboarding account options › c) Log out returns to sign-in and the account can sign back in (854ms)
+  ✓   7 [iPhone 15] › e2e/onboarding-account.spec.ts:200:3 › Onboarding account options › d) Deletion shows password and warning; leaving it keeps the account (996ms)
+  ✓   8 [iPhone 15] › e2e/onboarding-account.spec.ts:229:3 › Onboarding account options › e) A fresh account with incomplete onboarding can be deleted (1.4s)
+  ✓   9 [iPhone 15] › e2e/onboarding-account.spec.ts:269:3 › Onboarding account options › f) Accessibility: axe, accessible names and keyboard order (1.4s)
+  -  10 [iPhone 15] › e2e/onboarding-account.spec.ts:318:3 › Onboarding account options › g) iPhone SE at 200% root font size keeps controls reachable
+  ✓  11 [iPhone SE] › e2e/dynamic-type.spec.ts:67:3 › Native Dynamic Type at AX1 › h) AX1: sign-in, onboarding and Account options keep words whole (942ms)
+  ✓  12 [iPhone SE] › e2e/dynamic-type.spec.ts:67:3 › Native Dynamic Type at AX3 › h) AX3: sign-in, onboarding and Account options keep words whole (888ms)
+  ✓  13 [iPhone SE] › e2e/dynamic-type.spec.ts:67:3 › Native Dynamic Type at AX5 › h) AX5: sign-in, onboarding and Account options keep words whole (909ms)
+  ✓  14 [iPhone SE] › e2e/onboarding-account.spec.ts:162:3 › Onboarding account options › a) Account options is visible and opens for an incomplete account (561ms)
+  ✓  15 [iPhone SE] › e2e/onboarding-account.spec.ts:171:3 › Onboarding account options › b) Back to onboarding restores the same step and field value (616ms)
+  ✓  16 [iPhone SE] › e2e/onboarding-account.spec.ts:188:3 › Onboarding account options › c) Log out returns to sign-in and the account can sign back in (712ms)
+  ✓  17 [iPhone SE] › e2e/onboarding-account.spec.ts:200:3 › Onboarding account options › d) Deletion shows password and warning; leaving it keeps the account (782ms)
+  ✓  18 [iPhone SE] › e2e/onboarding-account.spec.ts:229:3 › Onboarding account options › e) A fresh account with incomplete onboarding can be deleted (1.2s)
+  ✓  19 [iPhone SE] › e2e/onboarding-account.spec.ts:269:3 › Onboarding account options › f) Accessibility: axe, accessible names and keyboard order (1.3s)
+  ✓  20 [iPhone SE] › e2e/onboarding-account.spec.ts:318:3 › Onboarding account options › g) iPhone SE at 200% root font size keeps controls reachable (1.4s)
+
+  1 skipped
+  19 passed (20.8s)
