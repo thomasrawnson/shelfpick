@@ -44,7 +44,7 @@ services:
       - key: BETA_INVITE_EMAILS
         sync: false
       - key: PUBLIC_REGISTRATION_ENABLED
-        value: "false"
+        value: "true"
       # Render's edge is the only public route to this service. Uvicorn uses
       # forwarded scheme metadata; security limits separately use Render's
       # edge-overwritten CF-Connecting-IP header, never client X-Forwarded-For.
