@@ -1,0 +1,66 @@
+
+==> Target: iPhone 17 (002D7BBB-7391-4492-B348-8DC5FE12D027), iOS 27.2; API http://127.0.0.1:8000
+
+==> npm run build
+
+> frontend@0.0.0 build
+> tsc -b && vite build && node scripts/check-legal-drafts.mjs
+
+vite v8.2.4 building client environment for production...
+transforming...
+✓ 118 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/manifest.webmanifest                          0.62 kB
+dist/index.html                                    1.00 kB │ gzip:   0.48 kB
+dist/assets/index-BTIUxphx.css                   178.81 kB │ gzip:  27.75 kB
+dist/assets/native-D2B0DmaN.js                     0.77 kB │ gzip:   0.33 kB
+dist/assets/web-DbJTEVUt.js                        0.79 kB │ gzip:   0.39 kB
+dist/assets/base-CHdJG4WM.js                       2.78 kB │ gzip:   0.98 kB
+dist/assets/workbox-window.prod.es5-Bd17z0YL.js    5.65 kB │ gzip:   2.20 kB
+dist/assets/index-BehO3GFX.js                    461.77 kB │ gzip: 134.08 kB
+
+✓ built in 302ms
+
+PWA v1.3.0
+mode      generateSW
+precache  27 entries (1383.46 KiB)
+files generated
+  dist/sw.js
+  dist/workbox-9c191d2f.js
+Legal draft build gate passed (enabled=false).
+
+==> npx cap sync ios
+✔ Copying web assets from dist to ios/App/App/public in 5.95ms
+✔ Creating capacitor.config.json in ios/App/App in 271.75μs
+✔ copy ios in 12.11ms
+✔ Updating iOS plugins in 933.83μs
+[info] All Capacitor plugins have a Package.swift file and will be included in Package.swift
+[info] Writing Package.swift
+[info] Found 1 Capacitor plugin for ios:
+       @aparajita/capacitor-secure-storage@8.0.1
+✔ update ios in 9.96ms
+[info] Sync finished in 0.03s
+
+==> xcodebuild (Debug, iOS Simulator, unsigned)
+2026-11-15 10:42:16.218 xcodebuild[9449:4367494] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+
+==> Boot Simulator
+Unable to find application named 'Simulator'
+
+==> Set Dynamic Type content size to accessibility-extra-extra-extra-large
+
+==> Install and launch com.shelfpick.prototype
+com.shelfpick.prototype: 10190
+
+==> Capture sign-in
+Note: No display specified. Defaulting to display: 9C8D63FE-FF04-4C05-ADF1-6334D65AD845 (screenID: 1, name: LCD)
+Wrote screenshot to: /Users/tomrawnson/Developer/_worktrees/shelfpick/sp-test-01a/docs/screenshots/sp-test-01a/sign-in-ax3xl.png
+SIMULATOR screenshot: /Users/tomrawnson/Developer/_worktrees/shelfpick/sp-test-01a/docs/screenshots/sp-test-01a/sign-in-ax3xl.png (iPhone 17, iOS 27.2, content size accessibility-extra-extra-extra-large)
+
+Sign-in captured. To finish without a terminal prompt:
+  1. Sign in as local-onboarding@shelfpick.app in the Simulator.
+  2. scripts/sim-smoke.sh capture onboarding
+  3. scripts/sim-smoke.sh restore
+
+Evidence label: SIMULATOR PASS candidate only. Not physical-device, VoiceOver or owner evidence.

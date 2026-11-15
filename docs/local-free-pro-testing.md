@@ -42,6 +42,11 @@ The logins are:
 | --- | --- | --- |
 | Free | `local-free@shelfpick.app` | `ShelfPickLocal123!` |
 | Pro | `local-pro@shelfpick.app` | `ShelfPickLocal123!` |
+| Free, onboarding incomplete | `local-onboarding@shelfpick.app` | `ShelfPickLocal123!` |
+
+Every `setup` run resets `local-onboarding@shelfpick.app` to a verified Free
+account with onboarding incomplete and no onboarding answers. The automated
+acceptance suite uses it (see `docs/automated-acceptance-tests.md`).
 
 To use a different local password, set
 `SHELFPICK_LOCAL_TEST_PASSWORD` to at least 12 characters for every `setup`
@@ -60,8 +65,8 @@ npm run dev -- --host 127.0.0.1 --port 5173
 ```
 
 Open `http://127.0.0.1:5173`, then use a private/incognito window when switching
-accounts. Each account owns the same three synthetic `[Local Dev]` games and
-has an account player plus `Guest Tester`, which is enough to build a Game
+accounts. The Free and Pro accounts each own the same three synthetic `[Local Dev]` games and
+have an account player plus `Guest Tester`, which is enough to build a Game
 Night shortlist. The Free account can use that basic shortlist but the backend
 rejects hosting phone voting and starting a live timer. The Pro account can
 open voting and start a timer. Open the voting join link in a separate private
@@ -102,7 +107,7 @@ check until it has actually been performed.
 
 ## Remove the dedicated data
 
-Removal is subject to the same local-only safeguards. It deletes the two marked
+Removal is subject to the same local-only safeguards. It deletes the three marked
 accounts and their dependent test activity. It deletes a synthetic game only
 when nothing outside those accounts references it.
 
@@ -112,4 +117,4 @@ cd ~/Developer/shelfpick/backend
 .venv/bin/python -m scripts.local_test_accounts status
 ```
 
-The final status should report both accounts missing and `0/3` synthetic games.
+The final status should report all three accounts missing and `0/3` synthetic games.

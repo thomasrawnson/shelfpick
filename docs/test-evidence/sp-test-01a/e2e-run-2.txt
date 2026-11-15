@@ -1,0 +1,33 @@
+
+> frontend@0.0.0 test:e2e
+> playwright test
+
+[WebServer] INFO:     Started server process [8822]
+[WebServer] INFO:     Waiting for application startup.
+[WebServer] INFO:     Application startup complete.
+[WebServer] INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+Local Free, Pro and onboarding accounts are ready.
+Free: local-free@shelfpick.app
+Pro:  local-pro@shelfpick.app
+Onboarding (incomplete): local-onboarding@shelfpick.app
+Password: SHELFPICK_LOCAL_TEST_PASSWORD or the documented local default.
+
+Running 14 tests using 1 worker
+
+  ✓   1 [iPhone 15] › e2e/onboarding-account.spec.ts:162:3 › Onboarding account options › a) Account options is visible and opens for an incomplete account (598ms)
+  ✓   2 [iPhone 15] › e2e/onboarding-account.spec.ts:171:3 › Onboarding account options › b) Back to onboarding restores the same step and field value (584ms)
+  ✓   3 [iPhone 15] › e2e/onboarding-account.spec.ts:188:3 › Onboarding account options › c) Log out returns to sign-in and the account can sign back in (684ms)
+  ✓   4 [iPhone 15] › e2e/onboarding-account.spec.ts:200:3 › Onboarding account options › d) Deletion shows password and warning; leaving it keeps the account (876ms)
+  ✓   5 [iPhone 15] › e2e/onboarding-account.spec.ts:229:3 › Onboarding account options › e) A fresh account with incomplete onboarding can be deleted (1.3s)
+  ✓   6 [iPhone 15] › e2e/onboarding-account.spec.ts:269:3 › Onboarding account options › f) Accessibility: axe, accessible names and keyboard order (1.3s)
+  -   7 [iPhone 15] › e2e/onboarding-account.spec.ts:318:3 › Onboarding account options › g) iPhone SE at 200% root font size keeps controls reachable
+  ✓   8 [iPhone SE] › e2e/onboarding-account.spec.ts:162:3 › Onboarding account options › a) Account options is visible and opens for an incomplete account (560ms)
+  ✓   9 [iPhone SE] › e2e/onboarding-account.spec.ts:171:3 › Onboarding account options › b) Back to onboarding restores the same step and field value (527ms)
+  ✓  10 [iPhone SE] › e2e/onboarding-account.spec.ts:188:3 › Onboarding account options › c) Log out returns to sign-in and the account can sign back in (652ms)
+  ✓  11 [iPhone SE] › e2e/onboarding-account.spec.ts:200:3 › Onboarding account options › d) Deletion shows password and warning; leaving it keeps the account (761ms)
+  ✓  12 [iPhone SE] › e2e/onboarding-account.spec.ts:229:3 › Onboarding account options › e) A fresh account with incomplete onboarding can be deleted (1.3s)
+  ✓  13 [iPhone SE] › e2e/onboarding-account.spec.ts:269:3 › Onboarding account options › f) Accessibility: axe, accessible names and keyboard order (1.3s)
+  ✓  14 [iPhone SE] › e2e/onboarding-account.spec.ts:318:3 › Onboarding account options › g) iPhone SE at 200% root font size keeps controls reachable (1.1s)
+
+  1 skipped
+  13 passed (13.6s)
