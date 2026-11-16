@@ -32,3 +32,6 @@ docs/test-users.local.md
 
 # Backup files
 *.backup
+
+# Local agent instructions (point at private studio paths)
+AGENTS.md
