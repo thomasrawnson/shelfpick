@@ -319,48 +319,6 @@ Before adding alpha testers:
 Do not rehearse a restore over the live database. Render creates a separate
 database for point-in-time recovery so it can be validated safely first.
 
-### Proven logical-export restore to a disposable local database (SP-IOS-20B, 2026-11-15)
-
-These steps were executed end to end against production in about 4.5 minutes
-(export about 3.5 minutes; download, restore, verification and deletion about
-1 minute for a 71 KB export). They do not touch the live database and need no
-IP allowlist change. The export contains personal data: keep it only in a
-private (`chmod 700`) scratch directory, never in the repository or
-`~/Downloads`, and delete it in the same session.
-
-1. In Render, open `board-game-picker-db` → **Recovery** → **Export** →
-   **Create export**. Reload the page until the new row shows a
-   `.dir.tar.gz` file.
-2. Download that file with the row's link. The link carries a short-lived
-   signed `auth` query string: treat it as a secret and never paste it into
-   logs, reports or tickets. Record the archive's SHA-256.
-3. Unpack it. The archive holds a `pg_dump` directory-format dump under
-   `<timestamp>/boardgamepicker/`. Move that directory to a path without a
-   colon (Docker bind mounts reject `:` in the source path).
-4. Start a throwaway PostgreSQL 16 container with tmpfs storage and no
-   published port, mounting the dump read-only:
-
-   ```bash
-   docker run -d --rm --name sp-restore -e POSTGRES_PASSWORD=<local-only> \
-     -e POSTGRES_DB=restore --tmpfs /var/lib/postgresql/data:rw,size=512m \
-     --mount type=bind,src=<dump-dir>,dst=/dump,readonly postgres:16
-   docker exec sp-restore pg_restore -U postgres -d restore \
-     --no-owner --no-acl --exit-on-error -j 2 /dump
-   ```
-
-5. Verify: `select version_num from alembic_version` equals the repository
-   Alembic head; for every `TABLE DATA` entry in `pg_restore -l /dump`, the
-   restored `count(*)` equals the number of non-empty data lines in the
-   matching `<id>.dat` file excluding the `\.` terminator; and
-   `select count(*) from pg_constraint where not convalidated` returns 0.
-   Record counts only, never row contents.
-6. `docker stop sp-restore` (the `--rm` flag and tmpfs discard the data),
-   delete the scratch directory and archive, and confirm that no container,
-   new Docker volume or downloaded copy remains.
-
-Render keeps its own copy of each export for at least 7 days; that retention
-is Render-managed.
-
 Repeat the logical export before any risky migration and perform a recovery
 rehearsal at least once before closed alpha.
 
