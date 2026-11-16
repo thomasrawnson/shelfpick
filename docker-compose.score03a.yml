@@ -1,0 +1,12 @@
+services:
+  score03a-postgres:
+    image: postgres:16
+    container_name: shelfpick-score03a-postgres
+    environment:
+      POSTGRES_DB: shelfpick_score03a_test
+      POSTGRES_USER: shelfpick_test
+      POSTGRES_PASSWORD: shelfpick_score03a_local
+    ports:
+      - "127.0.0.1:55433:5432"
+    tmpfs:
+      - /var/lib/postgresql/data:rw,noexec,nosuid,size=512m
