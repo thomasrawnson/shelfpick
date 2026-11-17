@@ -27,6 +27,11 @@
   border-radius: var(--radius-lg);
 }
 
+/* Games without cover art have no image column; do not squeeze the text into one. */
+.game-night-shortlist li.no-art {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .game-night-shortlist img {
   width: 72px;
   height: 92px;
@@ -254,6 +259,10 @@
   .game-night-shortlist img {
     width: 60px;
     height: 78px;
+  }
+
+  .game-night-shortlist li.no-art {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
