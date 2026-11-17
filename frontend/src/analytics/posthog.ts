@@ -3,8 +3,8 @@ import type { PostHog } from "posthog-js"
 
 import { createAnalytics, type AnalyticsSdk, type CommonProperties, type KeyValueStore, EVENT_SPECS } from "./core"
 
-// Public client key (safe to ship). Empty until the owner supplies it: analytics then stays off.
-export const POSTHOG_PROJECT_KEY = ""
+// Public client key (safe to ship). If empty, analytics stays off.
+export const POSTHOG_PROJECT_KEY = "phc_CqaVeMi2k48rkJfmp7s58HN9j3A3ScxhHRKAccQtjCic"
 export const POSTHOG_HOST = "https://eu.i.posthog.com"
 
 declare const __SHELFPICK_BUILD_ID__: string
