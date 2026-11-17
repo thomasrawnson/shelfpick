@@ -219,7 +219,7 @@ function GameNightView({ enabled, votingEnabled, defaultTime = null, onBack, onV
         ) : (
           <ol className="game-night-shortlist">
             {matches.map((match) => (
-              <li key={match.game.bgg_id}>
+              <li key={match.game.bgg_id} className={match.game.thumbnail_url ? undefined : "no-art"}>
                 {match.game.thumbnail_url && <img src={match.game.thumbnail_url} alt="" />}
                 <div>
                   <h2>{match.game.name}</h2>
