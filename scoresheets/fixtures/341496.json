@@ -1,0 +1,58 @@
+{
+  "bgg_id": 341496,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "road_points": 40,
+        "cities": 22,
+        "different_treasures": 14,
+        "same_treasures": 14,
+        "gold_points": 4,
+        "roads_bonus": true,
+        "city_colours": 6,
+        "gold_tokens": 2,
+        "roads_left": 7
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "road_points": 43,
+        "cities": 22,
+        "different_treasures": 14,
+        "same_treasures": 6,
+        "gold_points": 9,
+        "roads_bonus": true,
+        "city_colours": 5,
+        "gold_tokens": 3,
+        "roads_left": 7
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "road_points": 30,
+        "cities": 17,
+        "different_treasures": 5,
+        "same_treasures": 4,
+        "gold_points": 1,
+        "roads_bonus": false,
+        "city_colours": 5,
+        "gold_tokens": 1,
+        "roads_left": 3
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 104,
+      "Ben": 104,
+      "Cleo": 57
+    },
+    "winner": [
+      "Ana"
+    ]
+  }
+}

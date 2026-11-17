@@ -1,0 +1,49 @@
+{
+  "bgg_id": 28023,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "race_position": 8,
+        "doubloons": 12,
+        "treasures": 7,
+        "cursed_treasures": 4,
+        "behind_minus_five": false,
+        "race_order": 2
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "race_position": 15,
+        "doubloons": 5,
+        "treasures": 3,
+        "cursed_treasures": 0,
+        "behind_minus_five": false,
+        "race_order": 1
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "race_position": 0,
+        "doubloons": 9,
+        "treasures": 6,
+        "cursed_treasures": 0,
+        "behind_minus_five": true,
+        "race_order": 3
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 23,
+      "Ben": 23,
+      "Cleo": 10
+    },
+    "winner": [
+      "Ben"
+    ]
+  }
+}

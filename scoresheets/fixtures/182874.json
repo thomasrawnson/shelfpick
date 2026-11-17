@@ -1,0 +1,69 @@
+{
+  "bgg_id": 182874,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "vp_track": 70,
+        "staff_end_points": 6,
+        "rooms_row_1": 3,
+        "rooms_row_2": 2,
+        "rooms_row_3": 2,
+        "rooms_row_4": 0,
+        "leftover_supplies": 5,
+        "cafe_guests": 1
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "vp_track": 64,
+        "staff_end_points": 10,
+        "rooms_row_1": 3,
+        "rooms_row_2": 3,
+        "rooms_row_3": 1,
+        "rooms_row_4": 1,
+        "leftover_supplies": 3,
+        "cafe_guests": 0
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "vp_track": 68,
+        "staff_end_points": 4,
+        "rooms_row_1": 2,
+        "rooms_row_2": 2,
+        "rooms_row_3": 2,
+        "rooms_row_4": 1,
+        "leftover_supplies": 2,
+        "cafe_guests": 1
+      }
+    },
+    {
+      "name": "Dan",
+      "scores": {
+        "vp_track": 69,
+        "staff_end_points": 8,
+        "rooms_row_1": 3,
+        "rooms_row_2": 2,
+        "rooms_row_3": 1,
+        "rooms_row_4": 1,
+        "leftover_supplies": 2,
+        "cafe_guests": 0
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 89,
+      "Ben": 93,
+      "Cleo": 85,
+      "Dan": 93
+    },
+    "winner": [
+      "Ben"
+    ]
+  }
+}

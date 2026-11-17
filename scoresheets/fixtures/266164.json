@@ -1,0 +1,52 @@
+{
+  "bgg_id": 266164,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "ziggurat_points": 22,
+        "crop_fields": 18,
+        "city_nobles": 40,
+        "city_tiles": 20,
+        "ziggurat_card_city_bonus": 0,
+        "ziggurat_card_ten": true,
+        "cities_owned": 4
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "ziggurat_points": 25,
+        "crop_fields": 12,
+        "city_nobles": 52,
+        "city_tiles": 16,
+        "ziggurat_card_city_bonus": 5,
+        "ziggurat_card_ten": false,
+        "cities_owned": 3
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "ziggurat_points": 20,
+        "crop_fields": 24,
+        "city_nobles": 30,
+        "city_tiles": 12,
+        "ziggurat_card_city_bonus": 0,
+        "ziggurat_card_ten": false,
+        "cities_owned": 2
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 110,
+      "Ben": 110,
+      "Cleo": 86
+    },
+    "winner": [
+      "Ana"
+    ]
+  }
+}

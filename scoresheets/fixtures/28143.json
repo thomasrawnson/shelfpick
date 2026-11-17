@@ -1,0 +1,46 @@
+{
+  "bgg_id": 28143,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "world_vp": 20,
+        "development_vp": 9,
+        "vp_chips": 18,
+        "six_cost_bonus": 6,
+        "cards_and_goods": 4
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "world_vp": 22,
+        "development_vp": 7,
+        "vp_chips": 15,
+        "six_cost_bonus": 9,
+        "cards_and_goods": 6
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "world_vp": 17,
+        "development_vp": 10,
+        "vp_chips": 12,
+        "six_cost_bonus": 0,
+        "cards_and_goods": 3
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 53,
+      "Ben": 53,
+      "Cleo": 39
+    },
+    "winner": [
+      "Ben"
+    ]
+  }
+}

@@ -1,6 +1,6 @@
 # SP-SCORE-00b: proposed next templates (awaiting owner approval)
 
-Status: PROPOSAL ONLY. No templates are written until the owner approves this list.
+Status: APPROVED by the owner on 2026-11-17 (all 20). Templates written; 19 delivered, High Society not written (see below).
 Games were chosen from the owner's own play history (play counts only; no names or dates are kept here),
 keeping games that end in category-based scoring. Scoring shapes below are from my memory of the games
 and are unchecked; every template will be built from the publisher rulebook as in SP-SCORE-00.
@@ -42,6 +42,11 @@ BGG ids are the ids used in the owner's export, so they match the owner's plays.
 - High Society and Ra have rules (eliminating a player, penalty tokens) that may not fit the schema without a change; I would raise that rather than add a special case.
 - Dwellings of Eldervale, Babylonia, Caesar's Empire and Jamaica: I am least sure of the scoring, so they are last and can be dropped.
 
-## Decision needed
+## Outcome
 
-Approve all 20, name swaps or drops, or say how many to do (the first 10 give the most coverage of your plays).
+- High Society (220) was not written. The rulebook eliminates the player with the least money, doubles and halves status with cards, and applies a -5 card before the doubling. The schema has no eligibility rule or multiplicative scoring, and the task bars game-specific special cases. Supporting it needs a schema change, which is the owner's decision.
+- Some rulebooks were read from mirrors, translations (Castles of Burgundy Special Edition from Hungarian, Concordia Venus and Caylus 1303 from German) or by OCR; each template's `notes` says which.
+
+## Decision (original)
+
+Approved: all 20.

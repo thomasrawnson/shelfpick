@@ -1,0 +1,55 @@
+{
+  "bgg_id": 164928,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "coins": 12,
+        "brocade": 2,
+        "wool": 3,
+        "wine": 1,
+        "cheese": 4,
+        "grain": 5,
+        "stations_and_citizens": 36,
+        "development_position": 14
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "coins": 22,
+        "brocade": 1,
+        "wool": 2,
+        "wine": 4,
+        "cheese": 3,
+        "grain": 6,
+        "stations_and_citizens": 27,
+        "development_position": 11
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "coins": 9,
+        "brocade": 0,
+        "wool": 1,
+        "wine": 2,
+        "cheese": 2,
+        "grain": 3,
+        "stations_and_citizens": 12,
+        "development_position": 8
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 86,
+      "Ben": 86,
+      "Cleo": 38
+    },
+    "winner": [
+      "Ana"
+    ]
+  }
+}

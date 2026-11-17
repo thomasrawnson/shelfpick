@@ -10,9 +10,9 @@ const root = dirname(fileURLToPath(import.meta.url));
 const load = (...p) => JSON.parse(readFileSync(join(root, ...p), 'utf8'));
 const clone = (v) => structuredClone(v);
 
-test('there are 25 templates and each validates against the schema and its fixture', () => {
+test('there are 44 templates and each validates against the schema and its fixture', () => {
   const results = validateAll();
-  assert.equal(results.length, 25);
+  assert.equal(results.length, 44);
   for (const r of results) assert.deepEqual(r.problems, [], r.file);
 });
 

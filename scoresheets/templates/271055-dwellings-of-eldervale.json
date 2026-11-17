@@ -1,0 +1,96 @@
+{
+  "format_version": 1,
+  "bgg_id": 271055,
+  "name": "Dwellings of Eldervale",
+  "supported_players": [
+    2,
+    5
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "points_in_play",
+      "label": "Points earned during play",
+      "help": "The score your marker shows on the Victory Point track before end-game scoring.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "tableau_cards",
+      "label": "Tableau cards",
+      "help": "Points from your starter card and Adventure cards, by your Elemental power for each card (up to 3 Adventure cards per Dwelling built).",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "vaults",
+      "label": "Vaults",
+      "help": "Points from your Vault cards, as each card describes.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "orbs",
+      "label": "Unspent Orbs",
+      "help": "One point for each Orb you did not spend.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "elemental_markers",
+      "label": "Elemental power markers",
+      "help": "Points equal to the number each of your power markers sits on; a marker off the tracks is worth nothing.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "dwellings",
+      "label": "Dwellings",
+      "help": "Points for each Dwelling, by your Elemental power in the Realm where it stands.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "prophecies",
+      "label": "Prophecy cards",
+      "help": "Points from prophecy cards still in your hand, as each card describes.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "resources_left",
+      "label": "Resources and Magic cards",
+      "help": "Resources plus Magic cards you hold. Scores nothing; the most wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "resources_left",
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "Dwellings of Eldervale Rules of Play",
+    "edition_or_year": "2024 rulebook (Breaking Games)",
+    "url": "https://www.dropbox.com/scl/fi/1lgh0y8nb65s5fnar7vat/DoERulebook2024.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Base game only; solo (Ghosts of Eldervale), 2v2 mode, mercenaries, Oracle and mini-expansions excluded. Publisher PDF linked from the Breaking Games product page; it is image-only so it was read via OCR (macOS Vision) and numbers should be verified against the printed book. Player count 2-5 is inferred from setup tables and 5 scoring markers; the rulebook has no explicit player-count line. Rulebook lists six end-game steps; points during play are the marker position before them."
+}

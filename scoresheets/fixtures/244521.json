@@ -1,0 +1,70 @@
+{
+  "bgg_id": 244521,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "round_vp": [
+          3,
+          5,
+          8,
+          6,
+          10,
+          9,
+          12,
+          14,
+          15
+        ],
+        "bought_vp": 2,
+        "last_round_pot_space": 27
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "round_vp": [
+          4,
+          4,
+          7,
+          9,
+          8,
+          11,
+          10,
+          13,
+          15
+        ],
+        "bought_vp": 3,
+        "last_round_pot_space": 31
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "round_vp": [
+          2,
+          6,
+          6,
+          7,
+          9,
+          8,
+          11,
+          12,
+          13
+        ],
+        "bought_vp": 1,
+        "last_round_pot_space": 24
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 84,
+      "Ben": 84,
+      "Cleo": 75
+    },
+    "winner": [
+      "Ben"
+    ]
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "bgg_id": 224517,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "link_points": [
+          10,
+          18
+        ],
+        "industry_points": [
+          14,
+          22
+        ],
+        "income_level": 20,
+        "money": 12
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "link_points": [
+          12,
+          16
+        ],
+        "industry_points": [
+          12,
+          24
+        ],
+        "income_level": 20,
+        "money": 15
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "link_points": [
+          8,
+          15
+        ],
+        "industry_points": [
+          10,
+          19
+        ],
+        "income_level": 18,
+        "money": 5
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 64,
+      "Ben": 64,
+      "Cleo": 52
+    },
+    "winner": [
+      "Ben"
+    ]
+  }
+}

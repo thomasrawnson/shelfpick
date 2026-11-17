@@ -1,0 +1,70 @@
+{
+  "format_version": 1,
+  "bgg_id": 262712,
+  "name": "Res Arcana",
+  "supported_players": [
+    2,
+    4
+  ],
+  "win_condition": "target",
+  "target_score": 10,
+  "rounds": null,
+  "categories": [
+    {
+      "id": "artifact_points",
+      "label": "Artifacts",
+      "help": "Points printed on the artifacts you have placed, including any on turned (tapped) ones.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "monument_points",
+      "label": "Monuments",
+      "help": "Points from the monuments you have claimed.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "place_of_power_points",
+      "label": "Places of Power",
+      "help": "Points from the Places of Power you have claimed, including points they award for essences or other conditions.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "first_player_token",
+      "label": "First Player token",
+      "help": "Tick if you hold the First Player token when victory is checked; it is worth 1 point.",
+      "type": "boolean",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "pool_essences",
+      "label": "Essences in pool",
+      "help": "Essences in your pool, counting each Gold as two; the most breaks a tie among leaders.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "pool_essences",
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "Res Arcana Rules",
+    "edition_or_year": "Sand Castle Games, 2019",
+    "url": "https://cdn.1j1ju.com/medias/40/6f/1b-res-arcana-rulebook.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Victory is checked at the end of each round; the game ends once at least one player has 10 or more points, and a total below 10 cannot win. Enter totals at that check. Read from a retailer-CDN mirror of the publisher PDF (page 1 cover was OCR; the body text was extractable). Temporary points such as the Golden Statue react power are counted if used at the check. Draft variants, the two-game match format and expansions are excluded."
+}

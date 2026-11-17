@@ -1,0 +1,69 @@
+{
+  "format_version": 1,
+  "bgg_id": 28143,
+  "name": "Race for the Galaxy",
+  "supported_players": [
+    2,
+    4
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "world_vp",
+      "label": "Worlds",
+      "help": "Victory points printed on the worlds in your tableau.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "development_vp",
+      "label": "Developments",
+      "help": "Victory points printed on the developments in your tableau.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "vp_chips",
+      "label": "Victory point chips",
+      "help": "Total value of the victory point chips you have collected.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "six_cost_bonus",
+      "label": "Six-cost developments",
+      "help": "Extra points from your six-cost developments, worked out from what is in your tableau.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "cards_and_goods",
+      "label": "Cards in hand and goods",
+      "help": "Cards left in your hand after discarding plus goods on your worlds; the most wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "cards_and_goods",
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "Race for the Galaxy rules",
+    "edition_or_year": "Rio Grande Games edition, 2018 print (rftg2_rules)",
+    "url": "https://cs.uwaterloo.ca/~dtompkin/archive/dtlib/base/Race%20for%20the%20Galaxy.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Base game only; the game ends after the round in which someone has 12 cards in their tableau or the VP chips run out. Read from a university mirror of the rulebook PDF (not publisher-hosted). Player count 2 to 4 is inferred from the setup text, which gives start worlds and chip counts for 2, 3 and 4 players. Solo, expansions and the Jump Drive card game are excluded."
+}
