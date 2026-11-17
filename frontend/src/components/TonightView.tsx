@@ -4,6 +4,7 @@ import type { PickerPlayStyle } from "../api/client"
 import { APP_PATHS } from "../routes"
 import GameNightView from "./GameNightView"
 import PickerView from "./picker/PickerView"
+import RecentlyPlayed from "./tonight/RecentlyPlayed"
 
 type Props = {
   defaultPlayers: number | null
@@ -51,6 +52,7 @@ function TonightView({
       onViewGame={onViewGame}
       onViewCollection={onViewShelf}
       onGroupVote={() => setSearchParams({ mode: "vote" })}
+      playerStepFooter={<RecentlyPlayed onOpenGame={onViewGame} />}
       defaultPlayers={defaultPlayers}
       defaultTime={defaultTime}
       defaultPlayStyle={defaultPlayStyle}

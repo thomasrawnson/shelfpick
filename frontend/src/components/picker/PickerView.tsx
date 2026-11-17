@@ -1,5 +1,6 @@
 import RetryNotice from "../ui/RetryNotice";
 import {
+  type ReactNode,
   useEffect,
   useRef,
   useState,
@@ -45,6 +46,7 @@ type Props = {
   onViewGame: (bggId: number) => void;
   onViewCollection: () => void;
   onGroupVote?: () => void;
+  playerStepFooter?: ReactNode;
   defaultPlayers?: number | null;
   defaultTime?: number | null;
   defaultPlayStyle?: PickerPlayStyle | null;
@@ -58,6 +60,7 @@ function PickerView({
   onViewGame,
   onViewCollection,
   onGroupVote,
+  playerStepFooter,
   defaultPlayers = null,
   defaultTime = null,
   defaultPlayStyle = null,
@@ -356,6 +359,7 @@ function PickerView({
           onClearFineTune={clearFineTune}
           onContinue={() => setStep("time")}
           onGroupVote={onGroupVote}
+          footer={playerStepFooter}
         />
       )}
 

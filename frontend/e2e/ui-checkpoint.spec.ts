@@ -24,7 +24,7 @@ async function mockShelf(page: Page) {
   }))
   await page.route(/\/games(\?.*)?$/, route => route.fulfill({ json: games }))
   await page.route("**/collection/stats**", route => route.fulfill({
-    json: games.map((game, index) => ({ bgg_id: game.bgg_id, play_count: [14, 0, 9, 3, 0, 7, 1, 0][index], last_played_at: null })),
+    json: games.map((game, index) => ({ bgg_id: game.bgg_id, play_count: [14, 0, 9, 3, 0, 7, 1, 0][index], last_played_at: [ "2026-11-16", null, "2026-11-10", "2026-10-30", null, "2026-11-12", "2026-09-01", null ][index] })),
   }))
 }
 

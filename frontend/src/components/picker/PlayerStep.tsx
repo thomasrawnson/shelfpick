@@ -1,3 +1,4 @@
+import type { ReactNode } from "react"
 import type {
   PickerComplexityBand,
   PickerMode,
@@ -37,6 +38,7 @@ type Props = {
   onClearFineTune: () => void
   onContinue: () => void
   onGroupVote?: () => void
+  footer?: ReactNode
 }
 
 
@@ -118,6 +120,7 @@ function PlayerStep({
   onClearFineTune,
   onContinue,
   onGroupVote,
+  footer,
 }: Props) {
   const activeFineTuneCount = [
     mode !== "best_match",
@@ -347,6 +350,8 @@ function PlayerStep({
             </button>
           )}
         </div>
+
+        {footer}
       </div>
     </section>
   )
