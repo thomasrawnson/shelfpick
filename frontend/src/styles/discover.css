@@ -11,7 +11,9 @@
 
 .discover-tabs {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* One equal column per tab; there are two tabs (Hot, For You). */
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
   gap: var(--space-1);
   margin-top: var(--space-4);
   padding: var(--space-1);
