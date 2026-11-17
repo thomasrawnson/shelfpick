@@ -46,6 +46,8 @@ const sdk: AnalyticsSdk = {
         disable_external_dependency_loading: true,
         advanced_disable_flags: true,
         persistence: "localStorage",
+        // Capacitor's native HTTP layer cannot send the SDK's gzip (Blob) body, so events never left the iOS app.
+        disable_compression: true,
         opt_out_capturing_by_default: startOptedOut,
         // Only events in the tracking plan leave the device, with URL-bearing properties removed
         // (reset-password links carry tokens).
