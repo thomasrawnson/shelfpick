@@ -20,6 +20,9 @@ class BGStatsParticipant:
     name: str
     score: float | None
     is_winner: bool
+    team: str | None = None
+    rank: int | None = None
+    role: str | None = None
 
 
 @dataclass(frozen=True)
@@ -30,6 +33,8 @@ class BGStatsPlay:
     played_at: datetime
     duration_minutes: int | None
     participants: list[BGStatsParticipant]
+    outcome_type: str = "competitive"
+    coop_result: str | None = None
 
 
 def parse_bgstats_plays(
@@ -51,6 +56,12 @@ def parse_bgstats_plays(
         raise BGStatsImportLimitError("BG Stats export has too many players")
     if len(raw_plays) > MAX_BGSTATS_PLAYS:
         raise BGStatsImportLimitError("BG Stats export has too many plays")
+
+    cooperative_game_ids = {
+        game["id"]
+        for game in games
+        if game.get("id") is not None and game.get("cooperative")
+    }
 
     games_by_ref_id = {
         game["id"]: game["bggId"]
@@ -134,6 +145,9 @@ def parse_bgstats_plays(
                     is_winner=bool(
                         player_score.get("winner")
                     ),
+                    team=_parse_label(player_score.get("team")),
+                    rank=_parse_rank(player_score.get("rank")),
+                    role=_parse_label(player_score.get("role")),
                 )
             )
 
@@ -153,6 +167,12 @@ def parse_bgstats_plays(
                     "A BG Stats play duration is outside the safe range"
                 )
 
+        outcome_type, coop_result = _classify(
+            participant_rows,
+            is_cooperative=game_ref_id in cooperative_game_ids,
+            uses_teams=bool(item.get("usesTeams")),
+        )
+
         plays.append(
             BGStatsPlay(
                 source_play_id=source_play_id,
@@ -163,10 +183,48 @@ def parse_bgstats_plays(
                 played_at=played_at,
                 duration_minutes=duration_minutes,
                 participants=participant_rows,
+                outcome_type=outcome_type,
+                coop_result=coop_result,
             )
         )
 
     return plays
+
+
+def _parse_label(value) -> str | None:
+    if not isinstance(value, str):
+        return None
+    cleaned = " ".join(value.split())
+    return cleaned[:50] or None
+
+
+def _parse_rank(value) -> int | None:
+    if isinstance(value, bool) or not isinstance(value, (int, float, str)):
+        return None
+    try:
+        rank = int(float(value))
+    except (TypeError, ValueError):
+        return None
+    return rank if 1 <= rank <= 99 else None
+
+
+def _classify(
+    participants: list[BGStatsParticipant],
+    is_cooperative: bool,
+    uses_teams: bool,
+) -> tuple[str, str | None]:
+    """Pick the outcome type the export supports; plain otherwise."""
+    if is_cooperative:
+        won = all(p.is_winner for p in participants)
+        return "cooperative", "won" if won else "lost"
+    teams = {p.team.casefold() for p in participants if p.team}
+    if (
+        uses_teams
+        and len(teams) >= 2
+        and all(p.team for p in participants)
+    ):
+        return "team", None
+    return "competitive", None
 
 
 def _parse_score(

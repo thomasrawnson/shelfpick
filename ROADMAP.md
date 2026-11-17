@@ -30,6 +30,17 @@ and validate the work before asking Tom to resume beta. Internal testing
 continues. This instruction supersedes older immediate-beta and post-launch
 timing below; existing completed slices remain historical implementation facts.
 
+### SP-PLAY-01 Play logging foundation — LOCAL CANDIDATE, 17 November 2026
+
+Branch `sp-play-01`, draft PR for owner review; not merged, deployed or
+submitted. Saved plays can be edited (`PATCH /plays/{id}`), and plays record an
+outcome type (competitive, co-op, team, solo), a co-op Won/Lost result and per
+player team, place and role. Outcomes (player win rate, Insights, history) read
+these; plays without results stay "unknown". BG Stats import maps them, and
+Rematch prefills game, players, teams and location. Migration `a7c1e9d3b5f2`
+is additive and must be applied before the new app build. iOS build number is 8.
+Evidence and rollback plan: `docs/SP-PLAY-01-REPORT.md`.
+
 ### SP-YIR-01 Year in Review 2026 — IMPLEMENTED; DRAFT PR OPEN (17 November 2026)
 
 Free swipeable Year in Review story (8 slides, short version under 3 plays,

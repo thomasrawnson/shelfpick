@@ -21,6 +21,8 @@ class FakePlayRepository:
         participants: list[dict],
         location: str | None = None,
         timer_session_id: str | None = None,
+        outcome_type: str = "competitive",
+        coop_result: str | None = None,
     ) -> Play:
         self.created = {
             "bgg_id": bgg_id,
@@ -31,6 +33,8 @@ class FakePlayRepository:
             "participants": participants,
             "location": location,
             "timer_session_id": timer_session_id,
+            "outcome_type": outcome_type,
+            "coop_result": coop_result,
         }
 
         return Play(
@@ -79,9 +83,14 @@ def test_record_play_uses_repository():
         "bgg_id": 167791,
         "played_at": played_at,
         "duration_minutes": 75,
-        "participants": participants,
+        "participants": [
+            {**participant, "team": None, "role": None, "rank": None}
+            for participant in participants
+        ],
         "location": "The Dice Cup",
         "timer_session_id": None,
+        "outcome_type": "competitive",
+        "coop_result": None,
     }
 
     assert play.bgg_id == 167791

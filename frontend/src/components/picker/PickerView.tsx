@@ -320,8 +320,8 @@ function PickerView({
         onCancel={() => navigate(-1)}
         onSaved={async () => {
           setPlaySavedMessage(`Play saved for ${match.game.name}.`);
-          navigate(-1);
         }}
+        onDone={() => navigate(-1)}
       />
     );
   }

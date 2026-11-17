@@ -2,6 +2,7 @@ from datetime import datetime
 import secrets
 
 from sqlalchemy import (
+    CheckConstraint,
     Boolean,
     Column,
     DateTime,
@@ -600,6 +601,15 @@ class Play(Base):
             "user_id",
             "played_at",
         ),
+        CheckConstraint(
+            "outcome_type IN "
+            "('competitive', 'cooperative', 'team', 'solo')",
+            name="ck_plays_outcome_type",
+        ),
+        CheckConstraint(
+            "coop_result IN ('won', 'lost')",
+            name="ck_plays_coop_result",
+        ),
     )
 
     id: Mapped[int] = mapped_column(
@@ -658,6 +668,18 @@ class Play(Base):
         String(100),
     )
 
+    outcome_type: Mapped[str] = mapped_column(
+        String(12),
+        nullable=False,
+        server_default="competitive",
+    )
+
+    # Shared result for cooperative and solo plays; null when unknown.
+    coop_result: Mapped[str | None] = mapped_column(
+        String(4),
+        nullable=True,
+    )
+
     participants = relationship(
         "PlayParticipant",
         back_populates="play",
@@ -690,6 +712,13 @@ class LivePlayTimer(Base):
 class PlayParticipant(Base):
     __tablename__ = "play_participants"
 
+    __table_args__ = (
+        CheckConstraint(
+            "rank IS NULL OR rank > 0",
+            name="ck_play_participants_rank_positive",
+        ),
+    )
+
     id: Mapped[int] = mapped_column(
         Integer,
         primary_key=True,
@@ -717,6 +746,22 @@ class PlayParticipant(Base):
         Boolean,
         nullable=False,
         default=False,
+    )
+
+    team: Mapped[str | None] = mapped_column(
+        String(50),
+        nullable=True,
+    )
+
+    # 1 is first place; equal ranks are a tie.
+    rank: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+    )
+
+    role: Mapped[str | None] = mapped_column(
+        String(50),
+        nullable=True,
     )
 
     play = relationship(
