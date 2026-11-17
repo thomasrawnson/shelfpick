@@ -1,0 +1,86 @@
+{
+  "format_version": 1,
+  "bgg_id": 266192,
+  "name": "Wingspan",
+  "supported_players": [
+    1,
+    5
+  ],
+  "win_condition": "highest",
+  "rounds": 4,
+  "categories": [
+    {
+      "id": "birds",
+      "label": "Birds",
+      "help": "Total of the point values printed on every bird in your three habitats.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "bonus_cards",
+      "label": "Bonus cards",
+      "help": "Points from your bonus cards, using the tier each card reaches.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "round_goals",
+      "label": "Round goals",
+      "help": "Points from the four end-of-round goals, by your ranking in each.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "eggs",
+      "label": "Eggs",
+      "help": "One point for each egg sitting on your birds.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "cached_food",
+      "label": "Cached food",
+      "help": "One point for each food token stored on your birds.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "tucked_cards",
+      "label": "Tucked cards",
+      "help": "One point for each card tucked under your birds.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "food_left",
+      "label": "Food left over",
+      "help": "Unused food tokens still in your supply; the most wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "food_left"
+  ],
+  "source": {
+    "rulebook_title": "Wingspan rulebook",
+    "edition_or_year": "Base game, 2019",
+    "url": "https://cs.uwaterloo.ca/~dtompkin/archive/dtlib/base/Wingspan.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Base game only; expansion scoring such as nectar is out of scope. Read from a university mirror of the publisher PDF; Stonemaier's Rulepop agrees on scoring and the tie-break."
+}

@@ -1,0 +1,77 @@
+{
+  "format_version": 1,
+  "bgg_id": 110327,
+  "name": "Lords of Waterdeep",
+  "supported_players": [
+    2,
+    5
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "quests",
+      "label": "Quests",
+      "help": "Victory points from the quests you completed.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "buildings",
+      "label": "Buildings",
+      "help": "Points collected from buildings you built or used.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "adventurers",
+      "label": "Adventurers",
+      "help": "One point for each adventurer cube left in your tavern.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "coin_pairs",
+      "label": "Coins",
+      "help": "One point for every full pair of coins you hold.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "lord_bonus",
+      "label": "Lord of Waterdeep bonus",
+      "help": "Bonus points from your secret lord card.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "gold",
+      "label": "Gold",
+      "help": "Gold coins you hold; the most wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "gold"
+  ],
+  "source": {
+    "rulebook_title": "Lords of Waterdeep rulebook",
+    "edition_or_year": "Base game, 2012",
+    "url": "https://cdn.shopify.com/s/files/1/2546/6116/files/rules-lords-of-waterdeep.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Tie-break: most gold. Coins score one point per full pair, so enter pairs for scoring and total gold for the tie-break."
+}

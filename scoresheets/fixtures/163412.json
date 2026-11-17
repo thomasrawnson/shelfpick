@@ -1,0 +1,33 @@
+{
+  "bgg_id": 163412,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "buttons": 38,
+        "special_tile": true,
+        "empty_spaces": 4,
+        "reached_end_first": false
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "buttons": 45,
+        "special_tile": false,
+        "empty_spaces": 4,
+        "reached_end_first": true
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 37,
+      "Ben": 37
+    },
+    "winner": [
+      "Ben"
+    ]
+  }
+}

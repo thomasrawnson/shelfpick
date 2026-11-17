@@ -1,0 +1,33 @@
+{
+  "format_version": 1,
+  "bgg_id": 432,
+  "name": "6 nimmt!",
+  "supported_players": [
+    2,
+    10
+  ],
+  "win_condition": "lowest",
+  "target_score": 67,
+  "rounds": null,
+  "categories": [
+    {
+      "id": "penalty_heads",
+      "label": "Penalty heads",
+      "help": "Bull heads on the cards you collected this round.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "per_round"
+    }
+  ],
+  "tie_breakers": [
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "6 nimmt! Spielregel (German)",
+    "edition_or_year": "AMIGO, 1998 print",
+    "url": "https://kramer-spiele.hier-im-netz.de/spielregeln/6nimmt_Regel.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Fewest penalty heads wins. The game ends when a player has more than 66, so target_score is 67; the group may agree another target. Only the German rulebook was read. Ties are shared."
+}

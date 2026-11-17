@@ -1,0 +1,95 @@
+{
+  "format_version": 1,
+  "bgg_id": 68448,
+  "name": "7 Wonders",
+  "supported_players": [
+    2,
+    7
+  ],
+  "win_condition": "highest",
+  "rounds": 3,
+  "categories": [
+    {
+      "id": "military",
+      "label": "Military",
+      "help": "Total of all military victory tokens (+1, +3, +5) minus defeat tokens (-1 each).",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": true,
+      "scope": "once"
+    },
+    {
+      "id": "coin_sets",
+      "label": "Coins",
+      "help": "One point for every full set of three coins in your treasury.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "wonder",
+      "label": "Wonder",
+      "help": "Points from the stages of your wonder you have built.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "civilian",
+      "label": "Civilian buildings",
+      "help": "Points printed on your blue cards.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "commercial",
+      "label": "Commercial buildings",
+      "help": "Points from your yellow cards that pay at the end.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "guilds",
+      "label": "Guilds",
+      "help": "Points from your purple guild cards.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "science",
+      "label": "Science",
+      "help": "For each symbol type, its count squared (including symbols from wonder stages), plus 7 for every complete set of all three.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "coins_left",
+      "label": "Coins left over",
+      "help": "Total coins in your treasury; the most wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "coins_left"
+  ],
+  "source": {
+    "rulebook_title": "7 Wonders rulebook",
+    "edition_or_year": "2020 (Repos Production)",
+    "url": "https://cdn.svc.asmodee.net/production-rprod/storage/downloads/games/7wonders/en/sev-en02-rules-1716388903zBEZx.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Three ages, scored once in total. Player count 2-7 comes from the box; the rulebook text does not state it. Base game only."
+}

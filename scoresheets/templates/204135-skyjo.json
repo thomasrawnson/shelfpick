@@ -1,0 +1,33 @@
+{
+  "format_version": 1,
+  "bgg_id": 204135,
+  "name": "Skyjo",
+  "supported_players": [
+    2,
+    8
+  ],
+  "win_condition": "lowest",
+  "target_score": 100,
+  "rounds": null,
+  "categories": [
+    {
+      "id": "round_points",
+      "label": "Round score",
+      "help": "Sum of all your cards at the end of the round (hidden cards included), after any doubling penalty.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": true,
+      "scope": "per_round"
+    }
+  ],
+  "tie_breakers": [
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "Skyjo rules sheet",
+    "edition_or_year": "Magilano, 2021 print (game 2015)",
+    "url": "https://www.philibertnet.com/fr/product/attachment/5943",
+    "checked_against_rulebook": true
+  },
+  "notes": "Lowest total wins. The game ends after the round in which a player reaches 100, recorded as target_score. Ties are shared. The 2-8 player range is from the box; the BGG id is from search results only."
+}

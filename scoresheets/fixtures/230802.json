@@ -1,0 +1,82 @@
+{
+  "bgg_id": 230802,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "wall_placement": [
+          8,
+          11,
+          14,
+          18,
+          17
+        ],
+        "floor_penalty": [
+          1,
+          2,
+          0,
+          3,
+          1
+        ],
+        "rows": 2,
+        "columns": 1,
+        "colours": 1
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "wall_placement": [
+          9,
+          10,
+          13,
+          16,
+          18
+        ],
+        "floor_penalty": [
+          0,
+          1,
+          2,
+          1,
+          0
+        ],
+        "rows": 3,
+        "columns": 2,
+        "colours": 0
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "wall_placement": [
+          7,
+          9,
+          12,
+          15,
+          14
+        ],
+        "floor_penalty": [
+          2,
+          1,
+          1,
+          0,
+          2
+        ],
+        "rows": 2,
+        "columns": 0,
+        "colours": 1
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 82,
+      "Ben": 82,
+      "Cleo": 65
+    },
+    "winner": [
+      "Ben"
+    ]
+  }
+}

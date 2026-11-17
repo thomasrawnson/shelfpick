@@ -1,0 +1,40 @@
+{
+  "bgg_id": 283155,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "cat_points": 16,
+        "buttons": 5,
+        "design_goals": 20
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "cat_points": 21,
+        "buttons": 4,
+        "design_goals": 23
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "cat_points": 14,
+        "buttons": 6,
+        "design_goals": 17
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 51,
+      "Ben": 56,
+      "Cleo": 49
+    },
+    "winner": [
+      "Ben"
+    ]
+  }
+}

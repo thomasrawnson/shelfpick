@@ -1,0 +1,46 @@
+{
+  "bgg_id": 110327,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "quests": 70,
+        "buildings": 12,
+        "adventurers": 6,
+        "coin_pairs": 4,
+        "lord_bonus": 18
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "quests": 55,
+        "buildings": 20,
+        "adventurers": 3,
+        "coin_pairs": 6,
+        "lord_bonus": 30
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "quests": 80,
+        "buildings": 5,
+        "adventurers": 9,
+        "coin_pairs": 2,
+        "lord_bonus": 10
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 110,
+      "Ben": 114,
+      "Cleo": 106
+    },
+    "winner": [
+      "Ben"
+    ]
+  }
+}

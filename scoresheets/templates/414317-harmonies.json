@@ -1,0 +1,96 @@
+{
+  "format_version": 1,
+  "bgg_id": 414317,
+  "name": "Harmonies",
+  "supported_players": [
+    1,
+    4
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "trees",
+      "label": "Trees",
+      "help": "Points from the trees on your board.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "mountains",
+      "label": "Mountains",
+      "help": "Points from the mountains on your board.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "fields",
+      "label": "Fields",
+      "help": "Points from the fields on your board.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "buildings",
+      "label": "Buildings",
+      "help": "Points from the buildings on your board.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "water",
+      "label": "Water",
+      "help": "Points from your rivers by length, or 5 per island on the reverse board.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "animal_cards",
+      "label": "Animal cards",
+      "help": "Points shown on the topmost uncovered space of each animal card; a card with no cube placed scores 0.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "spirit_cards",
+      "label": "Nature's spirit cards",
+      "help": "Points from spirit cards, if you play with them.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "animal_cubes",
+      "label": "Animal cubes placed",
+      "help": "Animal cubes you placed; the most wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "animal_cubes",
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "Harmonies rules",
+    "edition_or_year": "Libellud, 2024",
+    "url": "https://cdn.svc.asmodee.net/production-libellud/uploads/2024/12/HARMONIES_Rules_EN.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Tie-break: most animal cubes, then shared. Whether a Nature's Spirit cube counts as an animal cube is not specified."
+}

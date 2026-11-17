@@ -1,0 +1,69 @@
+{
+  "format_version": 1,
+  "bgg_id": 266524,
+  "name": "Parks",
+  "supported_players": [
+    1,
+    5
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "park_points",
+      "label": "Park cards",
+      "help": "Points printed on the parks you visited.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "photos",
+      "label": "Photos",
+      "help": "One point for each photo you took.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "bonus_points",
+      "label": "Personal bonus",
+      "help": "Points on your personal bonus year card (2 or 3).",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "first_hiker_marker",
+      "label": "First hiker marker",
+      "help": "Tick if you hold the first hiker marker at the end (1 point).",
+      "type": "boolean",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "parks_visited",
+      "label": "Parks visited",
+      "help": "How many park cards you collected; the most wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "parks_visited",
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "PARKS rulebook",
+    "edition_or_year": "Version 1.1 (first edition), 2019",
+    "url": "https://lot.ahml.info/Parks%20Rules.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "First-edition rules from a library mirror; second-edition scoring was not checked."
+}

@@ -1,0 +1,65 @@
+{
+  "bgg_id": 266192,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "birds": 52,
+        "bonus_cards": 9,
+        "round_goals": 14,
+        "eggs": 21,
+        "cached_food": 6,
+        "tucked_cards": 11,
+        "food_left": 2
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "birds": 48,
+        "bonus_cards": 12,
+        "round_goals": 10,
+        "eggs": 27,
+        "cached_food": 4,
+        "tucked_cards": 9,
+        "food_left": 1
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "birds": 55,
+        "bonus_cards": 7,
+        "round_goals": 8,
+        "eggs": 18,
+        "cached_food": 3,
+        "tucked_cards": 8,
+        "food_left": 4
+      }
+    },
+    {
+      "name": "Dev",
+      "scores": {
+        "birds": 50,
+        "bonus_cards": 10,
+        "round_goals": 12,
+        "eggs": 22,
+        "cached_food": 8,
+        "tucked_cards": 11,
+        "food_left": 3
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 113,
+      "Ben": 110,
+      "Cleo": 99,
+      "Dev": 113
+    },
+    "winner": [
+      "Dev"
+    ]
+  }
+}
