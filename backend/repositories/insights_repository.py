@@ -21,6 +21,9 @@ from models.collection_insights import (
     PlayerGroupSummary,
     PlayerSummary,
     PlayerTopGame,
+    YearRecapGame,
+    YearRecapLongestPlay,
+    YearRecapPlayer,
 )
 from datetime import (
     datetime,
@@ -558,6 +561,15 @@ class InsightsRepository:
         end: datetime,
         limit: int = 4,
     ) -> dict:
+        return self.get_period_summary(start, end, limit)
+
+    def get_period_summary(
+        self,
+        start: datetime,
+        end: datetime,
+        limit: int,
+    ) -> dict:
+        """Totals and top games for plays in the half-open range [start, end)."""
         if self.user_id is None:
             return {
                 "total_plays": 0,
@@ -567,20 +579,21 @@ class InsightsRepository:
                 "games": [],
             }
 
-        scoped_plays = (
-            self.db.query(Play)
-            .filter(
-                Play.user_id == self.user_id,
-                Play.played_at >= start,
-                Play.played_at < end,
-            )
+        in_period = (
+            Play.user_id == self.user_id,
+            Play.played_at >= start,
+            Play.played_at < end,
         )
-        totals = scoped_plays.with_entities(
-            func.count(Play.id).label("total_plays"),
-            func.count(func.distinct(Play.game_id)).label("unique_games"),
-            func.sum(Play.duration_minutes).label("total_duration_minutes"),
-            func.count(Play.duration_minutes).label("duration_plays"),
-        ).one()
+        totals = (
+            self.db.query(
+                func.count(Play.id).label("total_plays"),
+                func.count(func.distinct(Play.game_id)).label("unique_games"),
+                func.sum(Play.duration_minutes).label("total_duration_minutes"),
+                func.count(Play.duration_minutes).label("duration_plays"),
+            )
+            .filter(*in_period)
+            .one()
+        )
 
         rows = (
             self.db.query(
@@ -591,11 +604,7 @@ class InsightsRepository:
                 func.max(Play.played_at).label("last_played_at"),
             )
             .join(Play, Play.game_id == Game.id)
-            .filter(
-                Play.user_id == self.user_id,
-                Play.played_at >= start,
-                Play.played_at < end,
-            )
+            .filter(*in_period)
             .group_by(Game.id, Game.bgg_id, Game.name, Game.image_url)
             .order_by(
                 func.count(Play.id).desc(),
@@ -623,6 +632,157 @@ class InsightsRepository:
             ],
         }
 
+    def get_year_recap(
+        self,
+        start: datetime,
+        end: datetime,
+        timezone_name: str,
+    ) -> dict:
+        """Year recap for [start, end); month and weekday use the user's timezone."""
+        summary = self.get_period_summary(start, end, 5)
+        if self.user_id is None or summary["total_plays"] == 0:
+            return {
+                **summary,
+                "new_games_count": 0,
+                "new_games": [],
+                "plays_by_month": [0] * 12,
+                "plays_by_weekday": [0] * 7,
+                "longest_play": None,
+                "co_players": [],
+            }
+
+        in_period = (
+            Play.user_id == self.user_id,
+            Play.played_at >= start,
+            Play.played_at < end,
+        )
+        local_played = func.timezone(timezone_name, Play.played_at)
+
+        def bucketed(part: str, size: int, offset: int) -> list[int]:
+            field = func.extract(part, local_played)
+            rows = (
+                self.db.query(field.label("bucket"), func.count(Play.id))
+                .filter(*in_period)
+                .group_by(field)
+                .all()
+            )
+            counts = [0] * size
+            for bucket, count in rows:
+                counts[int(bucket) - offset] = count
+            return counts
+
+        plays_by_month = bucketed("month", 12, 1)
+        plays_by_weekday = bucketed("isodow", 7, 1)
+
+        first_play = (
+            self.db.query(
+                Play.game_id.label("game_id"),
+                func.min(Play.played_at).label("first_played_at"),
+            )
+            .filter(Play.user_id == self.user_id)
+            .group_by(Play.game_id)
+            .subquery()
+        )
+        new_filter = (
+            first_play.c.first_played_at >= start,
+            first_play.c.first_played_at < end,
+        )
+        new_games_count = (
+            self.db.query(func.count())
+            .select_from(first_play)
+            .filter(*new_filter)
+            .scalar()
+            or 0
+        )
+        new_rows = (
+            self.db.query(
+                Game.bgg_id,
+                Game.name,
+                func.count(Play.id).label("play_count"),
+            )
+            .select_from(first_play)
+            .join(Game, Game.id == first_play.c.game_id)
+            .join(
+                Play,
+                (Play.game_id == first_play.c.game_id)
+                & (Play.user_id == self.user_id)
+                & (Play.played_at >= start)
+                & (Play.played_at < end),
+            )
+            .filter(*new_filter)
+            .group_by(Game.id, Game.bgg_id, Game.name)
+            .order_by(
+                func.count(Play.id).desc(),
+                func.lower(Game.name).asc(),
+                Game.bgg_id.asc(),
+            )
+            .limit(5)
+            .all()
+        )
+
+        longest = (
+            self.db.query(
+                Game.bgg_id,
+                Game.name,
+                Play.duration_minutes,
+                local_played.label("local_played_at"),
+            )
+            .join(Game, Game.id == Play.game_id)
+            .filter(*in_period, Play.duration_minutes.isnot(None))
+            .order_by(
+                Play.duration_minutes.desc(),
+                Play.played_at.asc(),
+                Play.id.asc(),
+            )
+            .first()
+        )
+
+        co_rows = (
+            self.db.query(
+                Player.name,
+                func.count(PlayParticipant.id).label("play_count"),
+            )
+            .join(PlayParticipant, PlayParticipant.player_id == Player.id)
+            .join(Play, Play.id == PlayParticipant.play_id)
+            .filter(Player.user_id == self.user_id, *in_period)
+            .group_by(Player.id, Player.name)
+            .order_by(
+                func.count(PlayParticipant.id).desc(),
+                func.lower(Player.name).asc(),
+                Player.id.asc(),
+            )
+            .limit(3)
+            .all()
+        )
+
+        return {
+            **summary,
+            "new_games_count": new_games_count,
+            "new_games": [
+                YearRecapGame(
+                    bgg_id=row.bgg_id,
+                    name=row.name,
+                    play_count=row.play_count,
+                )
+                for row in new_rows
+            ],
+            "plays_by_month": plays_by_month,
+            "plays_by_weekday": plays_by_weekday,
+            "longest_play": (
+                YearRecapLongestPlay(
+                    bgg_id=longest.bgg_id,
+                    name=longest.name,
+                    duration_minutes=longest.duration_minutes,
+                    played_on=longest.local_played_at.date().isoformat(),
+                )
+                if longest
+                else None
+            ),
+            "co_players": [
+                YearRecapPlayer(name=row.name, play_count=row.play_count)
+                for row in co_rows
+            ],
+        }
 
     def get_neglected_games(
         self,
