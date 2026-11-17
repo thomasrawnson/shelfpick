@@ -51,8 +51,9 @@
   ],
   "source": {
     "rulebook_title": "Carcassonne rulebook",
-    "edition_or_year": "Base game, current edition",
-    "checked_against_rulebook": false
+    "edition_or_year": "Z-Man v3 rules, 2021 text",
+    "url": "https://cdn.svc.asmodee.net/production-zman/uploads/2024/09/carcassonne_v3_rulesheet_en-1.pdf",
+    "checked_against_rulebook": true
   },
-  "notes": "Enter running totals from the board track plus end-of-game scoring. Ties are shared. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+  "notes": "Enter running totals from the board track plus end-of-game scoring. The game ends when the tiles run out. Ties are shared. Player count 2-5 comes from the box."
 }

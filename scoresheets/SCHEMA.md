@@ -18,7 +18,7 @@ The reference scoring engine is [`score.mjs`](score.mjs); SP-SCORE-01 should rep
 | `categories` | array | Ordered scoring lines. See below. |
 | `tie_breakers` | array of strings | Ordered category ids; may end with `"shared"`. |
 | `result_bands` | array, optional | `{min_total, label}` bands, typically for cooperative games. |
-| `source` | object | `rulebook_title`, `edition_or_year`, `checked_against_rulebook`. |
+| `source` | object | `rulebook_title`, `edition_or_year`, optional `url` of the text that was read, and `checked_against_rulebook`. |
 | `notes` | string | Scope limits and caveats. |
 
 ### Category
@@ -53,7 +53,7 @@ Ties are resolved by walking `tie_breakers` in order. Each id compares the playe
 
 ## Source and checking
 
-`source.checked_against_rulebook` is `false` until someone compares the template with the printed rulebook for the named edition, and `true` afterwards. All 25 initial templates are `false`.
+`source.checked_against_rulebook` is `true` only when the template was compared with the rulebook text named in `source`. It is not a claim about the BGG id or the box player count; both are noted in `notes` where they could not be confirmed. Some texts were read from third-party mirrors of the publisher PDF; `notes` says so.
 
 ## Fixtures
 

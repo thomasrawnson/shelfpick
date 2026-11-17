@@ -20,7 +20,7 @@ Categories will come from each publisher's rulebook, with labels and help in our
 | 12 | The Castles of Burgundy | 84876 | 1-4 | highest | Per-phase scoring, colour areas, leftover goods and silverlings |
 | 13 | Lords of Waterdeep | 110327 | 2-5 | highest | Quest points, buildings, leftover resources, lord bonus |
 | 14 | Sushi Go! | 133473 | 2-5 | highest | **Per-round** (3 rounds), set collection plus pudding at game end |
-| 15 | Skyjo | 155987 | 2-8 | **lowest** | **Low score wins**, per-round, ends when someone passes 100 |
+| 15 | Skyjo | 204135 | 2-8 | **lowest** | **Low score wins**, per-round, ends when someone passes 100 |
 | 16 | Hanabi | 98778 | 2-5 | **cooperative** | **Co-op with a score** (0-25), result bands |
 | 17 | Catan (5th ed.) | 13 | 3-4 | **target** (10 VP) | Race to a target; settlements, cities, cards, longest road, largest army |
 | 18 | Patchwork | 163412 | 2 | highest | Buttons minus empty spaces, 7x7 bonus, tie-break on last player |
@@ -40,6 +40,10 @@ Categories will come from each publisher's rulebook, with labels and help in our
 - Target score: Catan (17), 6 nimmt! (24)
 - Negative-allowed categories: Ticket to Ride, Agricola, Sagrada, Patchwork, Azul
 - Tie-breakers: Splendor, Patchwork, Dominion, 7 Wonders, Scythe
+
+## Post-approval corrections
+
+- Skyjo's BGG id changed from 155987 to 204135 during rulebook checking (found by search only; BGG blocks automated fetches).
 
 ## Risks
 

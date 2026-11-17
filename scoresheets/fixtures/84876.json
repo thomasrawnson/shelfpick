@@ -8,7 +8,7 @@
         "board_points": 171,
         "unsold_goods": 2,
         "silverlings": 3,
-        "workers": 1
+        "worker_pairs": 0
       }
     },
     {
@@ -17,7 +17,7 @@
         "board_points": 160,
         "unsold_goods": 4,
         "silverlings": 1,
-        "workers": 3
+        "worker_pairs": 1
       }
     },
     {
@@ -26,14 +26,14 @@
         "board_points": 184,
         "unsold_goods": 0,
         "silverlings": 2,
-        "workers": 0
+        "worker_pairs": 0
       }
     }
   ],
   "expected": {
     "totals": {
-      "Ana": 177,
-      "Ben": 168,
+      "Ana": 176,
+      "Ben": 166,
       "Cleo": 186
     },
     "winner": [

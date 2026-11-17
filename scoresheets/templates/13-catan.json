@@ -60,9 +60,10 @@
     "shared"
   ],
   "source": {
-    "rulebook_title": "Catan rulebook",
-    "edition_or_year": "Fifth edition, 2015",
-    "checked_against_rulebook": false
+    "rulebook_title": "Catan Game Rules & Almanac",
+    "edition_or_year": "2015 text, 2020 print",
+    "url": "https://www.catan.com/sites/default/files/2021-06/catan_base_rules_2020_200707.pdf",
+    "checked_against_rulebook": true
   },
-  "notes": "First to the target on their own turn wins; the winner is the player at or above target_score. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+  "notes": "First to the target on their own turn wins; the winner is the player at or above target_score. Longest road needs 5 segments; largest army needs 3 knights. Player count 3-4 is from the box."
 }

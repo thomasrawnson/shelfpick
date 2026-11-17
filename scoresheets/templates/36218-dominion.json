@@ -66,12 +66,14 @@
     }
   ],
   "tie_breakers": [
-    "turns_taken"
+    "turns_taken",
+    "shared"
   ],
   "source": {
-    "rulebook_title": "Dominion rulebook",
+    "rulebook_title": "Dominion rules",
     "edition_or_year": "Second edition, 2016",
-    "checked_against_rulebook": false
+    "url": "https://world-of-board-games.com.sg/docs/Dominion-2ed.pdf",
+    "checked_against_rulebook": true
   },
-  "notes": "Base cards plus a free-entry line for kingdom-specific victory cards. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+  "notes": "Base cards plus a free-entry line for kingdom victory cards such as Gardens. Read from a third-party mirror of the Rio Grande PDF; the 5-6 player rules are not included."
 }

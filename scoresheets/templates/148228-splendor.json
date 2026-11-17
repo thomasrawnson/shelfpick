@@ -31,7 +31,7 @@
     {
       "id": "cards_owned",
       "label": "Cards owned",
-      "help": "How many development cards you own; fewer wins a tie.",
+      "help": "How many development cards you purchased (reserved cards do not count); fewer wins a tie.",
       "type": "count",
       "points_per": 0,
       "allow_negative": false,
@@ -43,9 +43,10 @@
     "cards_owned"
   ],
   "source": {
-    "rulebook_title": "Splendor rulebook",
-    "edition_or_year": "Base game, 2014",
-    "checked_against_rulebook": false
+    "rulebook_title": "Splendor rules",
+    "edition_or_year": "10th Anniversary Edition, 2024",
+    "url": "https://cdn.svc.asmodee.net/production-spacecowboys/uploads/2025/10/SCSPL01EN_SPLENDOR_RULES_LIGHT.pdf",
+    "checked_against_rulebook": true
   },
-  "notes": "The game ends after the round in which someone reaches 15, recorded as target_score. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+  "notes": "The game ends after the round in which someone reaches 15, recorded as target_score. The 2014 rulebook was not found; the 10th anniversary text was read."
 }

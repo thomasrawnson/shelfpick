@@ -10,7 +10,9 @@
         "basic_events": 2,
         "special_events": 8,
         "prosperity": 7,
-        "journey": 4
+        "journey": 4,
+        "events_achieved": 4,
+        "resources_left": 3
       }
     },
     {
@@ -21,7 +23,9 @@
         "basic_events": 3,
         "special_events": 6,
         "prosperity": 11,
-        "journey": 0
+        "journey": 0,
+        "events_achieved": 5,
+        "resources_left": 1
       }
     },
     {
@@ -32,7 +36,9 @@
         "basic_events": 1,
         "special_events": 0,
         "prosperity": 9,
-        "journey": 3
+        "journey": 3,
+        "events_achieved": 1,
+        "resources_left": 5
       }
     }
   ],

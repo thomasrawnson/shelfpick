@@ -21,7 +21,7 @@ Both need only Node 22 or newer. The validator checks every template against `sc
 
 1. Read the publisher's rulebook for a named edition. Take the scoring categories from it.
 2. Write labels and help text in your own words. Do not copy another app's sheets, categories or wording.
-3. Create `templates/<bgg_id>-<slug>.json` following `SCHEMA.md`. Set `source.rulebook_title` and `edition_or_year`, and set `checked_against_rulebook` to `true` only once you have compared it with the printed rulebook.
+3. Create `templates/<bgg_id>-<slug>.json` following `SCHEMA.md`. Set `source.rulebook_title` and `edition_or_year`, add the `url` you read, and set `checked_against_rulebook` to `true` only once you have compared it with that rulebook text.
 4. Create `fixtures/<bgg_id>.json` with 2 to 4 players. Prefer an example from the rulebook (`provenance: "rulebook-example"`); otherwise calculate by hand and mark it `hand-calculated`. Work the expected totals out yourself, not by running the engine.
 5. Run the two commands above. Include a tie in the fixture when the game has tie-breakers.
 6. Express the game with the existing fields. If it cannot be expressed, raise a schema change rather than adding a game-specific special case.

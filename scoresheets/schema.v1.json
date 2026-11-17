@@ -44,6 +44,7 @@
       "properties": {
         "rulebook_title": { "type": "string", "minLength": 1 },
         "edition_or_year": { "type": "string", "minLength": 1 },
+        "url": { "type": "string", "minLength": 1 },
         "checked_against_rulebook": { "type": "boolean" }
       }
     },

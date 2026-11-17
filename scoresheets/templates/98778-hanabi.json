@@ -83,9 +83,10 @@
     }
   ],
   "source": {
-    "rulebook_title": "Hanabi rulebook",
-    "edition_or_year": "Original edition, 2010",
-    "checked_against_rulebook": false
+    "rulebook_title": "Hanabi rules (R&R Games English edition)",
+    "edition_or_year": "2013, licensed from Cocktailgames",
+    "url": "https://rnrgames.com/Content/RRGames/images/ProductRules/hanabiRules.pdf",
+    "checked_against_rulebook": true
   },
-  "notes": "One shared team score. Record the team as a single entry; result_bands describe how the show went. Rainbow variants are out of scope. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+  "notes": "One shared team score; record the team as a single entry. The game also ends as a loss on the third fuse token (the printed score on that loss was not legible in the scan). The rainbow variant is out of scope."
 }

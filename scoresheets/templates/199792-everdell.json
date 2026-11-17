@@ -62,15 +62,35 @@
       "points_per": 1,
       "allow_negative": false,
       "scope": "once"
+    },
+    {
+      "id": "events_achieved",
+      "label": "Events achieved",
+      "help": "Basic plus special events you achieved; the most wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "resources_left",
+      "label": "Resources left",
+      "help": "Leftover resources; second tie-break.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
     }
   ],
   "tie_breakers": [
-    "shared"
+    "events_achieved",
+    "resources_left"
   ],
   "source": {
-    "rulebook_title": "Everdell rulebook",
-    "edition_or_year": "Base game, 2018",
-    "checked_against_rulebook": false
+    "rulebook_title": "Everdell Core Game Rulebook",
+    "edition_or_year": "Second edition, 2018-2021",
+    "url": "https://cdn.shopify.com/s/files/1/0559/8245/6947/files/Everdell_Core_Game_Rulebook-web_res.pdf?v=1647463603",
+    "checked_against_rulebook": true
   },
-  "notes": "Ties are shared. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+  "notes": "Tie-break: most events, then most leftover resources. The rulebook is image-only and was read by OCR."
 }

@@ -102,7 +102,7 @@
     {
       "id": "habitat_bonus",
       "label": "Habitat bonuses",
-      "help": "Bonus points for having the biggest area of each habitat type.",
+      "help": "Corridor majority bonuses. 2 players: 2 for the largest of each habitat (1 each if tied). 3-4 players: 3 for largest, 1 for second.",
       "type": "number",
       "points_per": 1,
       "allow_negative": false,
@@ -124,7 +124,8 @@
   "source": {
     "rulebook_title": "Cascadia rulebook",
     "edition_or_year": "Base game, 2021",
-    "checked_against_rulebook": false
+    "url": "https://www.alderac.com/wp-content/uploads/2025/04/Cascadia_BaseGame_Rulebook_Optimized.pdf",
+    "checked_against_rulebook": true
   },
-  "notes": "Wildlife scoring cards vary per game, so each animal is a single entry. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+  "notes": "Wildlife scoring cards vary per game, so each animal is a single entry. Solo habitat bonus (2 per habitat with a group of 7+) is entered in the same field."
 }

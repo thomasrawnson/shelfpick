@@ -3,7 +3,7 @@
   "bgg_id": 84876,
   "name": "The Castles of Burgundy",
   "supported_players": [
-    1,
+    2,
     4
   ],
   "win_condition": "highest",
@@ -37,22 +37,42 @@
       "scope": "once"
     },
     {
-      "id": "workers",
-      "label": "Worker tiles",
-      "help": "One point for each worker tile left at the end.",
+      "id": "worker_pairs",
+      "label": "Worker tile pairs",
+      "help": "One point for every two worker tiles left at the end.",
       "type": "count",
       "points_per": 1,
       "allow_negative": false,
       "scope": "once"
+    },
+    {
+      "id": "knowledge_points",
+      "label": "Knowledge tiles",
+      "help": "Points shown on your yellow knowledge tiles.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "empty_spaces",
+      "label": "Empty estate spaces",
+      "help": "Empty spaces on your estate; fewer wins a tie per the printed rule.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once",
+      "tie_break_direction": "lower"
     }
   ],
   "tie_breakers": [
-    "shared"
+    "empty_spaces"
   ],
   "source": {
     "rulebook_title": "The Castles of Burgundy rulebook",
     "edition_or_year": "Original edition, 2011",
-    "checked_against_rulebook": false
+    "url": "https://www.world-of-board-games.com.sg/docs/Castles-of-Burgundy.pdf",
+    "checked_against_rulebook": true
   },
-  "notes": "Points during play are read off the score track. Ties are shared. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+  "notes": "Printed tie-break: fewest empty estate spaces, then whoever went later in turn order (not modelled). A BGG snippet suggests the English printing was later corrected to most empty spaces; this is unconfirmed, so confirm before shipping. Rules read from a third-party host of the publisher PDF."
 }

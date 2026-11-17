@@ -21,7 +21,7 @@
     {
       "id": "floor_penalty",
       "label": "Floor penalty",
-      "help": "Penalty size each round for tiles on your floor line (enter it as a positive number).",
+      "help": "Penalty actually applied each round for floor-line tiles, as a positive number (the starting-player marker counts as a floor tile and your score never drops below 0).",
       "type": "number",
       "points_per": -1,
       "allow_negative": false,
@@ -60,8 +60,9 @@
   ],
   "source": {
     "rulebook_title": "Azul rulebook",
-    "edition_or_year": "Base game, 2017",
-    "checked_against_rulebook": false
+    "edition_or_year": "Next Move / Plan B, 2018",
+    "url": "https://cdn.svc.asmodee.net/production-nextmove/uploads/sites/4/2024/06/EN-Azul-Rules-Next-Move-web.pdf",
+    "checked_against_rulebook": true
   },
   "notes": "Rounds are open ended: the game ends when someone completes a row. Enter one entry per round played. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
 }

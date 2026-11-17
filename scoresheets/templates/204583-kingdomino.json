@@ -60,9 +60,10 @@
     "total_crowns"
   ],
   "source": {
-    "rulebook_title": "Kingdomino rulebook",
-    "edition_or_year": "Base game, 2016",
-    "checked_against_rulebook": false
+    "rulebook_title": "Kingdomino rules",
+    "edition_or_year": "Blue Orange multilingual rules, 2016",
+    "url": "https://blueorangegames.eu/wp-content/uploads/2017/04/KINGDOMINO_rules_ML.pdf",
+    "checked_against_rulebook": true
   },
-  "notes": "Empty-kingdom checks are manual. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+  "notes": "Middle Kingdom and Harmony are optional rules in the rulebook; a loader may want them off by default. Tie-break: largest property, then crowns, then shared."
 }

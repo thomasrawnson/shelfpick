@@ -4,7 +4,7 @@
   "name": "Agricola",
   "supported_players": [
     1,
-    5
+    4
   ],
   "win_condition": "highest",
   "rounds": null,
@@ -132,13 +132,13 @@
       "help": "Extra points granted by cards and other bonuses.",
       "type": "number",
       "points_per": 1,
-      "allow_negative": false,
+      "allow_negative": true,
       "scope": "once"
     },
     {
       "id": "begging_cards",
-      "label": "Begging cards",
-      "help": "Begging cards taken, each costing three points.",
+      "label": "Begging markers",
+      "help": "Begging markers taken, each costing three points.",
       "type": "count",
       "points_per": -3,
       "allow_negative": false,
@@ -160,7 +160,8 @@
   "source": {
     "rulebook_title": "Agricola rulebook",
     "edition_or_year": "Revised edition, 2016",
-    "checked_against_rulebook": false
+    "url": "https://lookout-spiele.de/upload/en_agricolare.html_Rules_Agricola-RE_EN.pdf",
+    "checked_against_rulebook": true
   },
-  "notes": "Seven animal and crop categories score from tables on the board, so they are entered as the table result. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+  "notes": "Seven animal and crop categories score from tables, so they are entered as the table result (-1 to 4). The bgg_id 31260 is the original Agricola listing; the Revised Edition may have its own id. Scoring is the same."
 }

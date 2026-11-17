@@ -30,7 +30,7 @@
     {
       "id": "awards",
       "label": "Awards",
-      "help": "Points for awards: first place and second place pay different amounts.",
+      "help": "Awards: 5 points for first, 2 for second (no second place in a 2-player game; a tie for first has no second place).",
       "type": "number",
       "points_per": 1,
       "allow_negative": false,
@@ -78,8 +78,9 @@
   ],
   "source": {
     "rulebook_title": "Terraforming Mars rulebook",
-    "edition_or_year": "Base game, 2016",
-    "checked_against_rulebook": false
+    "edition_or_year": "2016 (FryxGames)",
+    "url": "https://fryxgames.se/wp-content/uploads/2023/04/TMRULESFINAL.pdf",
+    "checked_against_rulebook": true
   },
-  "notes": "Base game; Prelude and other expansions are out of scope. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+  "notes": "Base game; Prelude and other expansions are out of scope. Solo play has a different goal (complete terraforming within 14 generations) and is not modelled as a score contest."
 }

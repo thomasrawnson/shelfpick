@@ -7,7 +7,7 @@
     10
   ],
   "win_condition": "lowest",
-  "target_score": 66,
+  "target_score": 67,
   "rounds": null,
   "categories": [
     {
@@ -24,9 +24,10 @@
     "shared"
   ],
   "source": {
-    "rulebook_title": "6 nimmt! rulebook",
-    "edition_or_year": "Original edition, 1994 (current printing)",
-    "checked_against_rulebook": false
+    "rulebook_title": "6 nimmt! Spielregel (German)",
+    "edition_or_year": "AMIGO, 1998 print",
+    "url": "https://kramer-spiele.hier-im-netz.de/spielregeln/6nimmt_Regel.pdf",
+    "checked_against_rulebook": true
   },
-  "notes": "Fewest penalty heads wins. The game ends when a player reaches 66, recorded as target_score. Ties are shared. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+  "notes": "Fewest penalty heads wins. The game ends when a player has more than 66, so target_score is 67; the group may agree another target. Only the German rulebook was read. Ties are shared."
 }

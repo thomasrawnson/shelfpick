@@ -12,7 +12,7 @@
     {
       "id": "buttons",
       "label": "Buttons",
-      "help": "One point for each button you hold.",
+      "help": "One point for each button you have left.",
       "type": "count",
       "points_per": 1,
       "allow_negative": false,
@@ -21,7 +21,7 @@
     {
       "id": "special_tile",
       "label": "Special tile",
-      "help": "Tick if you took the 7x7 bonus tile (7 points).",
+      "help": "Tick if you were first to fill a 7x7 square and took the bonus tile (7 points).",
       "type": "boolean",
       "points_per": 7,
       "allow_negative": false,
@@ -50,9 +50,10 @@
     "reached_end_first"
   ],
   "source": {
-    "rulebook_title": "Patchwork rulebook",
-    "edition_or_year": "Base game, 2014",
-    "checked_against_rulebook": false
+    "rulebook_title": "Patchwork rules",
+    "edition_or_year": "10-year Anniversary Edition, 2024",
+    "url": "https://www.lookout-spiele.de/upload/en_patchworkanniversary.html_PW10_Rules_EN_web.pdf",
+    "checked_against_rulebook": true
   },
-  "notes": "Two players only. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+  "notes": "Two players only. The 2014 English rulebook was not found; the anniversary edition reproduces the base rules."
 }

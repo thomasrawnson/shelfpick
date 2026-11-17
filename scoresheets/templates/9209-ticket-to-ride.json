@@ -56,12 +56,14 @@
     }
   ],
   "tie_breakers": [
-    "tickets_completed_count"
+    "tickets_completed_count",
+    "longest_path"
   ],
   "source": {
-    "rulebook_title": "Ticket to Ride rulebook",
-    "edition_or_year": "USA map, 2004 (current printing)",
-    "checked_against_rulebook": false
+    "rulebook_title": "Ticket to Ride rules",
+    "edition_or_year": "USA map, rulebook 2004-2015",
+    "url": "https://ncdn0.daysofwonder.com/tickettoride/en/img/tt_rules_2015_en.pdf",
+    "checked_against_rulebook": true
   },
-  "notes": "Base USA map. Map-specific bonuses (such as stations) are out of scope. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+  "notes": "Base USA map. Tie-break: most completed tickets, then whoever holds the longest path card (a tied path means both tick the box). The game ends when a player has 0 to 2 trains left, after one more turn each."
 }

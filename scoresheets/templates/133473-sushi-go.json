@@ -57,7 +57,7 @@
     {
       "id": "pudding_points",
       "label": "Pudding",
-      "help": "Points after round three: most puddings gains, fewest loses.",
+      "help": "Points after round three: most puddings gains 6, fewest loses 6 (no loss in a 2-player game).",
       "type": "number",
       "points_per": 1,
       "allow_negative": true,
@@ -77,9 +77,10 @@
     "pudding_cards"
   ],
   "source": {
-    "rulebook_title": "Sushi Go! rulebook",
-    "edition_or_year": "Original edition, 2013",
-    "checked_against_rulebook": false
+    "rulebook_title": "Sushi Go! rules of play",
+    "edition_or_year": "Original edition, 2014",
+    "url": "https://www.world-of-board-games.com.sg/docs/Sushi-Go.pdf",
+    "checked_against_rulebook": true
   },
   "notes": "Three rounds; pudding is the only end-of-game category. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
 }

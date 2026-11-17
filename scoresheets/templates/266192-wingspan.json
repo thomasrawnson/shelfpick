@@ -7,7 +7,7 @@
     5
   ],
   "win_condition": "highest",
-  "rounds": null,
+  "rounds": 4,
   "categories": [
     {
       "id": "birds",
@@ -79,7 +79,8 @@
   "source": {
     "rulebook_title": "Wingspan rulebook",
     "edition_or_year": "Base game, 2019",
-    "checked_against_rulebook": false
+    "url": "https://cs.uwaterloo.ca/~dtompkin/archive/dtlib/base/Wingspan.pdf",
+    "checked_against_rulebook": true
   },
-  "notes": "Base game only; expansion scoring (such as nectar) is out of scope for v1. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+  "notes": "Base game only; expansion scoring such as nectar is out of scope. Read from a university mirror of the publisher PDF; Stonemaier's Rulepop agrees on scoring and the tie-break."
 }

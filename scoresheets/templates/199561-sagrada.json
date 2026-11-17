@@ -3,7 +3,7 @@
   "bgg_id": 199561,
   "name": "Sagrada",
   "supported_players": [
-    1,
+    2,
     4
   ],
   "win_condition": "highest",
@@ -51,9 +51,10 @@
     "favour_tokens"
   ],
   "source": {
-    "rulebook_title": "Sagrada rulebook",
-    "edition_or_year": "Base game, 2017",
-    "checked_against_rulebook": false
+    "rulebook_title": "Sagrada rule book",
+    "edition_or_year": "Version 1.2, 2017",
+    "url": "https://media.floodgate.games/rule-books/Sagrada-Rule-Book.pdf",
+    "checked_against_rulebook": true
   },
-  "notes": "Remaining ties after the listed tie-breakers are shared. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+  "notes": "The final tie-break (reverse player order in the last round) is not modelled; anything left is shared. Solo play scores differently (no favour tokens, -3 per empty space, target score) and is not supported."
 }

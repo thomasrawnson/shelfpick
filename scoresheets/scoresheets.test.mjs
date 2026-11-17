@@ -31,6 +31,14 @@ test('every template records its rulebook source and edition', () => {
   }
 });
 
+test('every template was checked against a named rulebook text', () => {
+  for (const r of validateAll()) {
+    const t = load('templates', r.file);
+    assert.equal(t.source.checked_against_rulebook, true, r.file);
+    assert.match(t.source.url, /^https:\/\//, r.file);
+  }
+});
+
 test('a wrong expected total is caught', () => {
   const t = load('templates', '266192-wingspan.json');
   const f = clone(load('fixtures', '266192.json'));

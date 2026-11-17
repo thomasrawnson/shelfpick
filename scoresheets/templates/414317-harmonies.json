@@ -48,7 +48,7 @@
     {
       "id": "water",
       "label": "Water",
-      "help": "Points from the rivers on your board.",
+      "help": "Points from your rivers by length, or 5 per island on the reverse board.",
       "type": "number",
       "points_per": 1,
       "allow_negative": false,
@@ -57,7 +57,7 @@
     {
       "id": "animal_cards",
       "label": "Animal cards",
-      "help": "Points from your animal cards, counting partly filled ones at their highest filled slot.",
+      "help": "Points shown on the topmost uncovered space of each animal card; a card with no cube placed scores 0.",
       "type": "number",
       "points_per": 1,
       "allow_negative": false,
@@ -71,15 +71,26 @@
       "points_per": 1,
       "allow_negative": false,
       "scope": "once"
+    },
+    {
+      "id": "animal_cubes",
+      "label": "Animal cubes placed",
+      "help": "Animal cubes you placed; the most wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
     }
   ],
   "tie_breakers": [
+    "animal_cubes",
     "shared"
   ],
   "source": {
-    "rulebook_title": "Harmonies rulebook",
-    "edition_or_year": "Base game, 2024",
-    "checked_against_rulebook": false
+    "rulebook_title": "Harmonies rules",
+    "edition_or_year": "Libellud, 2024",
+    "url": "https://cdn.svc.asmodee.net/production-libellud/uploads/2024/12/HARMONIES_Rules_EN.pdf",
+    "checked_against_rulebook": true
   },
-  "notes": "Island scoring on the reverse board is not modelled. Ties are shared. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+  "notes": "Tie-break: most animal cubes, then shared. Whether a Nature's Spirit cube counts as an animal cube is not specified."
 }

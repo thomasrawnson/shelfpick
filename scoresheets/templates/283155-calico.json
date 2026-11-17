@@ -21,7 +21,7 @@
     {
       "id": "buttons",
       "label": "Buttons",
-      "help": "Buttons you earned (3 points each).",
+      "help": "Buttons you earned, including the rainbow button (3 points each).",
       "type": "count",
       "points_per": 3,
       "allow_negative": false,
@@ -35,15 +35,27 @@
       "points_per": 1,
       "allow_negative": false,
       "scope": "once"
+    },
+    {
+      "id": "cat_tokens",
+      "label": "Cat tokens",
+      "help": "How many cat tokens you earned; the most wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
     }
   ],
   "tie_breakers": [
+    "cat_tokens",
+    "buttons",
     "shared"
   ],
   "source": {
     "rulebook_title": "Calico rulebook",
-    "edition_or_year": "Base game, 2020",
-    "checked_against_rulebook": false
+    "edition_or_year": "Base game (no year printed)",
+    "url": "https://lot.ahml.info/Calico.pdf",
+    "checked_against_rulebook": true
   },
-  "notes": "Ties are shared. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+  "notes": "Tie-break: most cat tokens, then most buttons, then shared. Read from a library mirror of the publisher text."
 }

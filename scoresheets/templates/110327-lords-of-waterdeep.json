@@ -53,15 +53,25 @@
       "points_per": 1,
       "allow_negative": false,
       "scope": "once"
+    },
+    {
+      "id": "gold",
+      "label": "Gold",
+      "help": "Gold coins you hold; the most wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
     }
   ],
   "tie_breakers": [
-    "shared"
+    "gold"
   ],
   "source": {
     "rulebook_title": "Lords of Waterdeep rulebook",
     "edition_or_year": "Base game, 2012",
-    "checked_against_rulebook": false
+    "url": "https://cdn.shopify.com/s/files/1/2546/6116/files/rules-lords-of-waterdeep.pdf",
+    "checked_against_rulebook": true
   },
-  "notes": "Ties are shared. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+  "notes": "Tie-break: most gold. Coins score one point per full pair, so enter pairs for scoring and total gold for the tie-break."
 }
