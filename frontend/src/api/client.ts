@@ -275,6 +275,34 @@ export interface MonthlyRecap {
   collage_games: MonthlyRecapGame[]
 }
 
+export interface YearRecapGame {
+  bgg_id: number
+  name: string
+  play_count: number
+}
+
+export interface YearRecap {
+  year: number
+  total_plays: number
+  unique_games: number
+  total_duration_minutes: number | null
+  duration_plays: number
+  top_games: YearRecapGame[]
+  new_games_count: number
+  new_games: YearRecapGame[]
+  plays_by_month: number[]
+  busiest_month: number | null
+  plays_by_weekday: number[]
+  busiest_weekday: number | null
+  longest_play: {
+    bgg_id: number
+    name: string
+    duration_minutes: number
+    played_on: string
+  } | null
+  co_players: Array<{ name: string; play_count: number }>
+}
+
 export interface ExportConfiguration {
   cover_artwork_enabled: boolean
 }
@@ -1059,6 +1087,18 @@ export async function getMonthlyRecap(
   const response = await apiFetch(`/insights/monthly-recap?${parameters}`)
   if (!response.ok) {
     throw new Error(`Monthly recap request failed: ${response.status}`)
+  }
+  return response.json()
+}
+
+export async function getYearRecap(
+  year: number,
+  timezone: string,
+): Promise<YearRecap> {
+  const parameters = new URLSearchParams({ year: String(year), timezone })
+  const response = await apiFetch(`/insights/year-recap?${parameters}`)
+  if (!response.ok) {
+    throw new Error(`Year recap request failed: ${response.status}`)
   }
   return response.json()
 }

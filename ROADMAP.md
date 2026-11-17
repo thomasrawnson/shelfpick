@@ -30,6 +30,17 @@ and validate the work before asking Tom to resume beta. Internal testing
 continues. This instruction supersedes older immediate-beta and post-launch
 timing below; existing completed slices remain historical implementation facts.
 
+### SP-YIR-01 Year in Review 2026 — IMPLEMENTED; DRAFT PR OPEN (17 November 2026)
+
+Free swipeable Year in Review story (8 slides, short version under 3 plays,
+empty state), `GET /insights/year-recap?year=&timezone=` built on a shared
+period query with the monthly recap, Insights → Recaps entry replacing the
+placeholder, a Pick banner from 1 December to 31 January, and a 1080×1920
+share PNG (initials artwork, Powered by BGG, names off by default). Build
+number bumped to 7. Automated, browser and Simulator evidence only; physical
+phone check, merge, backend deploy (before the app) and submission remain
+owner gates. Report: `docs/SP-YIR-01-REPORT.md`.
+
 ### SP-BETA-01 private-beta readiness — AUDIT COMPLETE (12 October 2026)
 
 ShelfPick is not ready for tester invitations yet, but a small controlled beta
