@@ -53,8 +53,8 @@ Guest data is new compared with the version-1.0 answers. Compare against what is
 
 Apple counts the host's own data under the existing account answers. If you judge a nickname to be a "Name", declare Name as well. The privacy manifest in `frontend/ios/App/App/PrivacyInfo.xcprivacy` (PR SP-PRIVACY-02) and the App Store Connect answers should be changed together so they match.
 
-## 10. Questions for the owner
+## 10. Owner decisions (2026-11-17)
 
-1. Is "legitimate interests" the basis you want for guest data (section 4)?
-2. Publish "no automatic deletion yet" (section 5), or enable `RETENTION_CLEANUP_ENABLED` first and publish the 30-day wording? Enabling it is a production change and is out of scope without your approval.
-3. The "contact us" route for guests (section 6) adds a manual task. Keep it, or drop the sentence?
+1. Legal basis for guest data: legitimate interests, as drafted. Keep a short internal note of the balancing test (purpose, minimal data, no account, guest can remove their own data, host guidance on nicknames). Not independently reviewed.
+2. Retention: publish "no automatic deletion yet" (section 5, first version). Do not enable `RETENTION_CLEANUP_ENABLED` as part of this change.
+3. Keep the guest "email us" route (section 6). Handle requests without disclosing other people's nicknames or ballots, and ask only for the host's name, the approximate date and the nickname used. `hello@plutonightlabs.com` must be monitored before publication.
