@@ -95,3 +95,22 @@ test('a target game has no winner until someone reaches the target', () => {
   f.expected.winner = [];
   assert.deepEqual(fixtureProblems(t, f), []);
 });
+
+test('real play samples: the recorded winner matches the template rule whenever the top total is unique', () => {
+  let checked = 0;
+  for (const r of validateAll()) {
+    const tpl = load('templates', r.file);
+    let sample;
+    try { sample = load('play-samples', `${tpl.bgg_id}.json`); } catch { continue; }
+    for (const play of sample.plays) {
+      const totals = play.players.map((p) => p.total);
+      const best = tpl.win_condition === 'lowest' ? Math.min(...totals) : Math.max(...totals);
+      const top = play.players.filter((p) => p.total === best);
+      if (top.length !== 1) continue; // ties need category data to apply tie-breakers
+      assert.equal(top[0].winner, true, `${tpl.name}: ${JSON.stringify(totals)}`);
+      assert.equal(play.players.filter((p) => p.winner).length, 1, tpl.name);
+      checked++;
+    }
+  }
+  assert.ok(checked >= 80);
+});

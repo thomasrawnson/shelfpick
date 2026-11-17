@@ -1,0 +1,676 @@
+{
+  "bgg_id": 68448,
+  "provenance": "real plays, totals only, anonymised (no names, dates or places)",
+  "plays": [
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 49,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 35,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 45,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 73,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 56,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 45,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 51,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 54,
+          "winner": true
+        },
+        {
+          "name": "P3",
+          "total": 30,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 60,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 41,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 43,
+          "winner": false
+        },
+        {
+          "name": "P4",
+          "total": 36,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 43,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 47,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 47,
+          "winner": true
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 56,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 44,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 52,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 61,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 52,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 44,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 45,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 46,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 57,
+          "winner": true
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 46,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 45,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 63,
+          "winner": true
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 46,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 46,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 53,
+          "winner": true
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 52,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 56,
+          "winner": true
+        },
+        {
+          "name": "P3",
+          "total": 45,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 66,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 46,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 53,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 68,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 47,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 57,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 74,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 61,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 57,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 71,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 67,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 59,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 63,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 51,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 58,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 57,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 67,
+          "winner": true
+        },
+        {
+          "name": "P3",
+          "total": 64,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 61,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 39,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 60,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 69,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 62,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 63,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 60,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 56,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 70,
+          "winner": true
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 75,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 71,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 66,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 77,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 65,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 57,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 59,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 59,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 62,
+          "winner": true
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 70,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 66,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 48,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 65,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 52,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 53,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 60,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 67,
+          "winner": true
+        },
+        {
+          "name": "P3",
+          "total": 56,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 76,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 49,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 62,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 68,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 63,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 61,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 67,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 52,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 67,
+          "winner": true
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 68,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 51,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 53,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 48,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 49,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 66,
+          "winner": true
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 50,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 46,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 42,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 69,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 50,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 53,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 58,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 55,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 59,
+          "winner": true
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 77,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 48,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 64,
+          "winner": false
+        }
+      ]
+    }
+  ]
+}
