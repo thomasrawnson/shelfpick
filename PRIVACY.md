@@ -54,8 +54,8 @@ The owner enters these; this repository cannot read them.
 
 ## Privacy manifest (PrivacyInfo.xcprivacy)
 
-- Source: **No app-level `PrivacyInfo.xcprivacy` exists in this repository** (`frontend/ios`). Only the manifests shipped inside `@capacitor/ios` are present; earlier release reports record that they declare no tracking, collected data or required-reason APIs.
-- Required-reason API declarations: TODO (owner to decide whether the app target needs its own manifest, for example for the Keychain and local-storage use above)
+- Source: `frontend/ios/App/App/PrivacyInfo.xcprivacy`, part of the App target (draft, owner to review). It declares no tracking and no tracking domains, collected data of Email Address, Name and Other User Content (linked, not for tracking, App Functionality). The manifests inside `@capacitor/ios` declare nothing.
+- Required-reason API declarations: none. No required-reason API use was found in the app or plugin Swift sources (checked 2026-11-17). Owner to confirm the three collected data types match the App Store Connect answers.
 
 ## Google Play Data safety (when shipping to Android)
 
@@ -66,11 +66,12 @@ The owner enters these; this repository cannot read them.
 1. **Published policy is out of date for phone voting.** The public policy states there is no phone or QR voting. It must be updated and approved before `GAME_NIGHT_PHONE_VOTING_ENABLED` is turned on in production.
 2. **Guest-data wording.** `docs/privacy-notice-draft.md` and the in-app draft describe nicknames, ballots, the 12-hour window and the provisional 30-day retention. The owner approved the wording on 2026-11-17; no lawyer has reviewed it, and the retention is not implemented.
 3. **App Store Connect answers** need checking against the guest data above before the build that enables phone voting ships.
-4. **App-level privacy manifest** is absent (see above).
+4. **App-level privacy manifest** was added on 2026-11-17 and is not yet in a released build; confirm it matches the App Store Connect answers.
 5. This repository's `privacy-check.sh` reads only a root `package.json`; ShelfPick's dependencies are in `frontend/package.json`, so the dependency table above is maintained by hand.
 
 ## Change log
 
 | Date | Change | By |
 |------|--------|----|
+| 2026-11-17 | App privacy manifest added; manifest section updated | Claude Code, for owner review |
 | 2026-11-17 | Initial privacy inventory (SP-POLISH-02), including SP-UNLOCK-01 additions: guest nicknames and ballots, haptics and in-app review plugins | Claude Code, for owner review |
