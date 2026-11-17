@@ -162,7 +162,6 @@ export interface PickerCriteria {
   playerIds?: number[]
   maxPlayTime?: number
   complexityBand?: PickerComplexityBand
-  maxComplexity?: number
   youngestPlayerAge?: number
   playStyle?: PickerPlayStyle
   preferredCategories?: string[]
@@ -669,17 +668,6 @@ export async function getPickerMatches(
     params.set(
       "complexity_band",
       criteria.complexityBand,
-    )
-  }
-
-  if (
-    criteria.maxComplexity !==
-    undefined
-  ) {
-    params.set(
-      "max_complexity",
-      criteria.maxComplexity
-        .toString(),
     )
   }
 

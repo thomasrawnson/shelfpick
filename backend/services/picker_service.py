@@ -33,7 +33,6 @@ class PickerCriteria:
     players: int
     max_play_time: int | None = None
     complexity_band: str | None = None
-    max_complexity: float | None = None
     youngest_player_age: int | None = None
     play_style: str = "any"
     preferred_categories: list[str] = field(
@@ -101,17 +100,13 @@ class PickerService:
         )
 
         can_relax_complexity = (
-            (
-                criteria.complexity_band is not None
-                or criteria.max_complexity is not None
-            )
+            criteria.complexity_band is not None
             and bool(
                 self.find_matches(
                     games,
                     replace(
                         criteria,
                         complexity_band=None,
-                        max_complexity=None,
                     ),
                 )
             )
@@ -119,10 +114,7 @@ class PickerService:
 
         can_relax_both = (
             criteria.max_play_time is not None
-            and (
-                criteria.complexity_band is not None
-                or criteria.max_complexity is not None
-            )
+            and criteria.complexity_band is not None
             and bool(
                 self.find_matches(
                     games,
@@ -130,7 +122,6 @@ class PickerService:
                         criteria,
                         max_play_time=None,
                         complexity_band=None,
-                        max_complexity=None,
                     ),
                 )
             )
@@ -187,7 +178,6 @@ class PickerService:
             if not self._fits_complexity(
                 game,
                 criteria.complexity_band,
-                criteria.max_complexity,
             ):
                 continue
 
@@ -324,7 +314,6 @@ class PickerService:
         ) = self._score_complexity(
             game,
             criteria.complexity_band,
-            criteria.max_complexity,
         )
 
         score += complexity_score
@@ -607,7 +596,6 @@ class PickerService:
     def _score_complexity(
         game: Game,
         complexity_band: str | None,
-        max_complexity: float | None,
     ) -> tuple[
         int,
         str | None,
@@ -627,37 +615,7 @@ class PickerService:
                 ),
             )
 
-        if max_complexity is None:
-            return 15, None
-
-        if game.complexity is None:
-            return (
-                7,
-                "Complexity not yet available",
-            )
-
-        utilisation = min(
-            game.complexity
-            / max_complexity,
-            1.0,
-        )
-
-        score = round(
-            7
-            + (
-                8
-                * utilisation
-            )
-        )
-
-        return (
-            score,
-            (
-                f"Complexity "
-                f"{game.complexity:.1f} "
-                "fits preference"
-            ),
-        )
+        return 15, None
 
     @staticmethod
     def _score_play_history(
@@ -1000,7 +958,6 @@ class PickerService:
     def _fits_complexity(
         game: Game,
         complexity_band: str | None,
-        max_complexity: float | None,
     ) -> bool:
         if complexity_band is not None:
             if game.complexity is None:
@@ -1019,17 +976,7 @@ class PickerService:
 
             return False
 
-        # Legacy max-complexity support for older clients and tests.
-        if max_complexity is None:
-            return True
-
-        if game.complexity is None:
-            return True
-
-        return (
-            game.complexity
-            <= max_complexity
-        )
+        return True
 
     @staticmethod
     def _score_player_count_quality(

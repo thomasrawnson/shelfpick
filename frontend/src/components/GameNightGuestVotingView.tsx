@@ -15,6 +15,7 @@ import { clearCredential, getCredential, isNativeIos, saveCredential } from "../
 import { PHONE_VOTING_V1_AVAILABLE } from "../game-night-availability"
 import { APP_STORE_URL } from "../app-store"
 import { lightImpact } from "../haptics"
+import { useVisibleInterval } from "../use-visible-interval"
 
 
 type Props = {
@@ -94,6 +95,7 @@ function GameNightGuestVotingView({ joinToken }: Props) {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState("")
   const [refreshKey, setRefreshKey] = useState(0)
+  const pollRef = useRef<(() => Promise<void>) | null>(null)
 
   useEffect(() => {
     let active = true
@@ -111,7 +113,6 @@ function GameNightGuestVotingView({ joinToken }: Props) {
   useEffect(() => {
     if (!PHONE_VOTING_V1_AVAILABLE || !credentialReady || guestRemoved) return
     let active = true
-    const interval = setInterval(() => { void load() }, 4000)
 
     async function load() {
       try {
@@ -127,7 +128,6 @@ function GameNightGuestVotingView({ joinToken }: Props) {
         if (next.guest?.has_submitted) {
           setSelection(next.guest.current_vote ?? "abstain")
         }
-        if (next.status !== "open") clearInterval(interval)
       } catch (err) {
         if (active) {
           setError(err instanceof Error ? err.message : "Couldn't load this voting session.")
@@ -137,12 +137,20 @@ function GameNightGuestVotingView({ joinToken }: Props) {
       }
     }
 
+    pollRef.current = load
     void load()
     return () => {
       active = false
-      clearInterval(interval)
+      pollRef.current = null
     }
   }, [credential, credentialReady, guestRemoved, joinToken, refreshKey, storageKey])
+
+  useVisibleInterval(
+    () => { void pollRef.current?.() },
+    4000,
+    PHONE_VOTING_V1_AVAILABLE && credentialReady && !guestRemoved
+      && (state === null || state.status === "open"),
+  )
 
   async function join() {
     setSubmitting(true)
