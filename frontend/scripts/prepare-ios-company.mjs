@@ -42,7 +42,10 @@ replaceExpected("PRODUCT_BUNDLE_IDENTIFIER = com.shelfpick.prototype;", "PRODUCT
 replaceExpected('TARGETED_DEVICE_FAMILY = "1,2";', "TARGETED_DEVICE_FAMILY = 1;", 2)
 replaceExpected("INFOPLIST_FILE = App/Info.plist;", "INFOPLIST_FILE = App/Info-Company.plist;", 2)
 replaceExpected('DEVELOPMENT_TEAM = "";', "DEVELOPMENT_TEAM = 9CDNVY8UKQ;", 1)
-replaceExpected("CODE_SIGN_STYLE = Automatic;\n\t\t\t\tCURRENT_PROJECT_VERSION = 1;\n\t\t\t\tINFOPLIST_FILE = App/Info-Company.plist;", "CODE_SIGN_STYLE = Automatic;\n\t\t\t\tCURRENT_PROJECT_VERSION = 1;\n\t\t\t\tDEVELOPMENT_TEAM = 9CDNVY8UKQ;\n\t\t\t\tINFOPLIST_FILE = App/Info-Company.plist;", 1)
+const buildNumber = /CODE_SIGN_STYLE = Automatic;\n\t\t\t\tCURRENT_PROJECT_VERSION = (\d+);\n\t\t\t\tINFOPLIST_FILE = App\/Info-Company.plist;/g
+const matches = project.match(buildNumber) ?? []
+if (matches.length !== 1) throw new Error(`Unexpected Xcode project layout for the Release build number: ${matches.length}`)
+project = project.replace(buildNumber, (_, n) => `CODE_SIGN_STYLE = Automatic;\n\t\t\t\tCURRENT_PROJECT_VERSION = ${n};\n\t\t\t\tDEVELOPMENT_TEAM = 9CDNVY8UKQ;\n\t\t\t\tINFOPLIST_FILE = App/Info-Company.plist;`)
 writeFileSync(projectPath, project)
 
 // Only the staged company candidate receives the approved ShelfPick artwork.
