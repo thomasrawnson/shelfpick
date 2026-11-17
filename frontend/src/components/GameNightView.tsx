@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import { QRCodeSVG } from "qrcode.react"
 
 import {
@@ -15,6 +15,7 @@ import TimeStep from "./picker/TimeStep"
 import { timeBand, trackEvent } from "../telemetry"
 import { PHONE_VOTING_V1_AVAILABLE } from "../game-night-availability"
 import { requestReviewAfter } from "../review-prompt"
+import { useVisibleInterval } from "../use-visible-interval"
 
 
 type Props = {
@@ -69,9 +70,9 @@ function GameNightView({ enabled, votingEnabled, defaultTime = null, onBack, onV
   const votingSessionId = votingSession?.session_id
   const votingStatus = votingSession?.status
 
-  useEffect(() => {
-    if (step !== "voting" || !votingSessionId || votingStatus !== "open") return
-    const interval = window.setInterval(() => {
+  useVisibleInterval(
+    () => {
+      if (!votingSessionId) return
       void getGameNightVotingHostState(votingSessionId)
         .then((next) => {
           setVotingSession((current) => ({
@@ -82,9 +83,10 @@ function GameNightView({ enabled, votingEnabled, defaultTime = null, onBack, onV
         .catch((err) => {
           setError(err instanceof Error ? err.message : "Couldn't refresh voting.")
         })
-    }, 4000)
-    return () => window.clearInterval(interval)
-  }, [step, votingSessionId, votingStatus])
+    },
+    4000,
+    step === "voting" && !!votingSessionId && votingStatus === "open",
+  )
 
   async function findGames() {
     setLoading(true)

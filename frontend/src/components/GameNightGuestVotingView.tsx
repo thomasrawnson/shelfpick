@@ -1,3 +1,4 @@
+import { candidateFacts } from "../game-night-candidate"
 import { useEffect, useRef, useState } from "react"
 
 import {
@@ -14,6 +15,7 @@ import { clearCredential, getCredential, isNativeIos, saveCredential } from "../
 import { PHONE_VOTING_V1_AVAILABLE } from "../game-night-availability"
 import { APP_STORE_URL } from "../app-store"
 import { lightImpact } from "../haptics"
+import { useVisibleInterval } from "../use-visible-interval"
 
 
 type Props = {
@@ -93,6 +95,7 @@ function GameNightGuestVotingView({ joinToken }: Props) {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState("")
   const [refreshKey, setRefreshKey] = useState(0)
+  const pollRef = useRef<(() => Promise<void>) | null>(null)
 
   useEffect(() => {
     let active = true
@@ -110,7 +113,6 @@ function GameNightGuestVotingView({ joinToken }: Props) {
   useEffect(() => {
     if (!PHONE_VOTING_V1_AVAILABLE || !credentialReady || guestRemoved) return
     let active = true
-    const interval = setInterval(() => { void load() }, 4000)
 
     async function load() {
       try {
@@ -126,7 +128,6 @@ function GameNightGuestVotingView({ joinToken }: Props) {
         if (next.guest?.has_submitted) {
           setSelection(next.guest.current_vote ?? "abstain")
         }
-        if (next.status !== "open") clearInterval(interval)
       } catch (err) {
         if (active) {
           setError(err instanceof Error ? err.message : "Couldn't load this voting session.")
@@ -136,12 +137,20 @@ function GameNightGuestVotingView({ joinToken }: Props) {
       }
     }
 
+    pollRef.current = load
     void load()
     return () => {
       active = false
-      clearInterval(interval)
+      pollRef.current = null
     }
   }, [credential, credentialReady, guestRemoved, joinToken, refreshKey, storageKey])
+
+  useVisibleInterval(
+    () => { void pollRef.current?.() },
+    4000,
+    PHONE_VOTING_V1_AVAILABLE && credentialReady && !guestRemoved
+      && (state === null || state.status === "open"),
+  )
 
   async function join() {
     setSubmitting(true)
@@ -283,9 +292,9 @@ function GameNightGuestVotingView({ joinToken }: Props) {
       {state?.status === "open" && state.guest && (
         <form onSubmit={(event) => { event.preventDefault(); void submitVote() }} className="game-night-ballot">
           <fieldset>
-            <legend>Choose one game</legend>
+            <legend className="sr-only">Choose one game</legend>
             {state.candidates.map((candidate) => (
-              <label key={candidate.bgg_id} className="game-night-ballot-option">
+              <label key={candidate.bgg_id} className={candidate.thumbnail_url ? "game-night-ballot-option" : "game-night-ballot-option game-night-ballot-option-no-art"}>
                 <input
                   type="radio"
                   name="game-night-vote"
@@ -293,7 +302,12 @@ function GameNightGuestVotingView({ joinToken }: Props) {
                   onChange={() => setSelection(candidate.bgg_id)}
                 />
                 {candidate.thumbnail_url && <img src={candidate.thumbnail_url} alt="" />}
-                <span>{candidate.name}</span>
+                <span className="game-night-ballot-text">
+                  <span className="game-night-ballot-name">{candidate.name}</span>
+                  {candidateFacts(candidate) && (
+                    <span className="game-night-ballot-facts">{candidateFacts(candidate)}</span>
+                  )}
+                </span>
               </label>
             ))}
             <label className="game-night-ballot-option game-night-abstain-option">

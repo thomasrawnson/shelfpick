@@ -1,3 +1,5 @@
+import zlib
+
 from sqlalchemy.exc import (
     IntegrityError,
 )
@@ -17,6 +19,16 @@ from database.models import (
 from models.play import (
     Play as DomainPlay,
 )
+
+
+# Colours a new player can start with. Chosen from the name so it is stable.
+PLAYER_AVATAR_KEYS = ("forest", "gold", "clay", "dice", "meeple", "cards")
+
+
+def default_avatar_key(normalized_name: str) -> str:
+    return PLAYER_AVATAR_KEYS[
+        zlib.crc32(normalized_name.encode("utf-8")) % len(PLAYER_AVATAR_KEYS)
+    ]
 
 
 class PlayWriteRepository:
@@ -217,12 +229,34 @@ class PlayWriteRepository:
             normalized_name=(
                 normalized_name
             ),
+            avatar_key=default_avatar_key(
+                normalized_name
+            ),
         )
 
         self.db.add(player)
         self.db.flush()
 
         return player
+
+    def create_player(
+        self,
+        name: str,
+    ) -> dict:
+        """Create a player for this user, or return the existing one.
+
+        Matching uses the same normalised name as play participants, so
+        "alex" and "Alex " resolve to one player.
+        """
+        player = self._get_or_create_player(name)
+        self.db.commit()
+        self.db.refresh(player)
+
+        return {
+            "id": player.id,
+            "name": player.name,
+            "avatar_key": player.avatar_key,
+        }
 
     def exists_by_source_play_id(
         self,
