@@ -5,7 +5,7 @@ import type { AuthUser } from "../auth"
 import BrandLogo from "./ui/BrandLogo"
 import AvatarPicker from "./ui/AvatarPicker"
 import type { AvatarId } from "../avatar-catalog"
-import { timeBand, trackEvent } from "../telemetry"
+import { Analytics, timeBand } from "../analytics"
 import { APP_PATHS } from "../routes"
 
 type Props = {
@@ -54,7 +54,7 @@ function OnboardingView({ displayName, onComplete, hidden = false, restoreAccoun
     setSyncing(true); setError("")
     try {
       const result = await syncBGGCollection(username.trim())
-      trackEvent("collection_import_completed", { source: "onboarding_bgg", result_count: result.games_synced })
+      Analytics.track("collection_import_completed", { source: "onboarding_bgg", result_count: result.games_synced })
       setStep(2)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not import your shelf.")
@@ -69,7 +69,11 @@ function OnboardingView({ displayName, onComplete, hidden = false, restoreAccoun
   }
   async function addGame(id: number) {
     setAddingId(id); setError("")
-    try { await addGameToCollection(id); setAdded((current) => [...current, id]) }
+    try {
+      await addGameToCollection(id)
+      Analytics.track("game_added", { source: "onboarding_search" })
+      setAdded((current) => [...current, id])
+    }
     catch (err) { setError(err instanceof Error ? err.message : "Could not add this game.") }
     finally { setAddingId(null) }
   }
@@ -83,8 +87,8 @@ function OnboardingView({ displayName, onComplete, hidden = false, restoreAccoun
         player_name: name.trim(), avatar_key: avatar,
         preferred_player_count: playerCount, preferred_play_time: playTime,
       })
-      trackEvent("onboarding_completed", {
-        source: "onboarding", player_count: playerCount ?? undefined, time_band: timeBand(playTime),
+      Analytics.track("onboarding_completed", {
+        player_count: playerCount ?? undefined, time_band: timeBand(playTime),
       })
       onComplete(completedUser)
     } catch (err) {

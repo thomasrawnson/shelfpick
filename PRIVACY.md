@@ -6,7 +6,7 @@
 - **Policy URL:** https://plutonightlabs.com/shelfpick/privacy/ (published before phone voting; see "Open items")
 - **Last reviewed:** 2026-11-17
 - **Collects any personal data?** Yes (account email, display name, collection and play data; Game Night guest nicknames and ballots)
-- **Tracking (ATT prompt needed)?** No. No analytics, advertising or crash-reporting SDK is connected; no cross-app or cross-site tracking.
+- **Tracking (ATT prompt needed)?** No. Anonymous product analytics (PostHog EU, SP-ANL-001) are collected but not used for tracking; no advertising or crash-reporting SDK is connected; no cross-app or cross-site tracking.
 - **Children's audience?** No. Accounts require a 13+ self-declaration; App Store age rating 4+ (owner decisions of 2026-11-15). Children's Code applicability has not been independently reviewed.
 
 ## SDKs and plugins
@@ -20,6 +20,7 @@ Runtime packages from `frontend/package.json` that ship in the web and iOS build
 | @aparajita/capacitor-secure-storage | 8.0.1 | Keeps the sign-in token in the iOS Keychain | None sent off-device | n/a | No | None expected (Keychain); confirm |
 | @capacitor/haptics | 8.0.2 | Light haptic feedback | None | No | No | None |
 | @capacitor-community/in-app-review | 8.0.0 | Asks iOS to show the system review prompt (throttled locally) | None; Apple controls the prompt and any rating | No | No | None |
+| posthog-js | 1.450.0 | Anonymous product analytics (EU Cloud); user can switch off in Settings > About | Event name and enumerated properties, random device ID, app version, OS/device context; no account data, free text or IDFA | No (not linked to an account; device ID is device-level, see `docs/analytics/privacy-disclosure.md`) | No | Local storage only; no required-reason API declared by the package: confirm |
 | qrcode.react | ^4.2.0 | Draws the Game Night join QR code on-device | None | No | No | None |
 | react | ^19.2.8 | UI | None | No | No | None |
 | react-dom | ^19.2.8 | UI | None | No | No | None |
@@ -34,6 +35,7 @@ Runtime packages from `frontend/package.json` that ship in the web and iOS build
 | Game Night host sessions and candidate lists | Our server | Hosted votes | Access expires after 12 hours; rows are not yet deleted automatically |
 | Game Night guest nickname, hashed guest credential, ballot | Our server | Phone voting without an account | Access 12 hours; provisional 30-day deletion after expiry is **not implemented or approved** |
 | Guest credential and bearer access token | Device (browser local storage on web; Keychain on iOS for the sign-in token) | Keep a guest or user signed in | Until sign-out, expiry or app deletion |
+| Analytics events and random anonymous ID | PostHog EU Cloud (processor); ID and opt-out choice in device local storage | Count feature use, drop-off and retention | PostHog project retention (owner to confirm); stops when the user opts out |
 | Review-prompt state (last request date, saved-play count) | Device only (local storage) | Limit the review prompt to once per 90 days | Until app data is cleared |
 | Year in Review banner dismissal (one flag per year) | Device only (local storage) | Stop showing the Pick banner after it is dismissed | Until app data is cleared |
 | One-time verification/reset token hashes, keyed-hash abuse counters, request IDs, server logs | Our server | Security and operations | Render logs 7 days; abuse rows removed on a later write after 24 hours; expired tokens have no scheduled cleanup (per SP-IOS-21B) |
@@ -41,7 +43,7 @@ Runtime packages from `frontend/package.json` that ship in the web and iOS build
 | BGG username (public collection requests) | Sent to BoardGameGeek | Import a public collection | Per BGG |
 | Game cover images | Loaded by the user's browser or app directly from BGG | Show cover art | None held by ShelfPick; BGG may see IP address and request headers |
 
-Processors and integrations: Render (hosting, database, logs), Resend (email), BoardGameGeek (collection data and images). Contracting roles and UK transfer mechanisms have not been independently verified (see `docs/SP-IOS-21B-LEGAL-PAGES-AND-BUILD-3-PREPARATION.md`).
+Processors and integrations: Render (hosting, database, logs), Resend (email), PostHog (anonymous analytics, EU), BoardGameGeek (collection data and images). Contracting roles and UK transfer mechanisms have not been independently verified (see `docs/SP-IOS-21B-LEGAL-PAGES-AND-BUILD-3-PREPARATION.md`).
 
 The Get ShelfPick link shown to guests is a plain App Store link. It carries no tracking parameters.
 
