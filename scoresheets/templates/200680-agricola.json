@@ -1,0 +1,167 @@
+{
+  "format_version": 1,
+  "bgg_id": 200680,
+  "name": "Agricola",
+  "supported_players": [
+    1,
+    4
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "fields",
+      "label": "Fields",
+      "help": "Score from the fields table, from -1 up to 4.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": true,
+      "scope": "once"
+    },
+    {
+      "id": "pastures",
+      "label": "Pastures",
+      "help": "Score from the pastures table, from -1 up to 4.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": true,
+      "scope": "once"
+    },
+    {
+      "id": "grain",
+      "label": "Grain",
+      "help": "Score from the grain table, from -1 up to 4.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": true,
+      "scope": "once"
+    },
+    {
+      "id": "vegetables",
+      "label": "Vegetables",
+      "help": "Score from the vegetables table, from -1 up to 4.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": true,
+      "scope": "once"
+    },
+    {
+      "id": "sheep",
+      "label": "Sheep",
+      "help": "Score from the sheep table, from -1 up to 4.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": true,
+      "scope": "once"
+    },
+    {
+      "id": "wild_boar",
+      "label": "Wild boar",
+      "help": "Score from the wild boar table, from -1 up to 4.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": true,
+      "scope": "once"
+    },
+    {
+      "id": "cattle",
+      "label": "Cattle",
+      "help": "Score from the cattle table, from -1 up to 4.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": true,
+      "scope": "once"
+    },
+    {
+      "id": "fenced_stables",
+      "label": "Fenced stables",
+      "help": "One point per stable inside a pasture.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "clay_rooms",
+      "label": "Clay rooms",
+      "help": "One point per room in a clay house.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "stone_rooms",
+      "label": "Stone rooms",
+      "help": "Two points per room in a stone house.",
+      "type": "count",
+      "points_per": 2,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "family_members",
+      "label": "Family members",
+      "help": "Three points per family member.",
+      "type": "count",
+      "points_per": 3,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "unused_spaces",
+      "label": "Unused farm spaces",
+      "help": "Farm spaces left empty, each costing one point.",
+      "type": "count",
+      "points_per": -1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "card_points",
+      "label": "Card points",
+      "help": "Points printed on your played improvements and occupations.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": true,
+      "scope": "once"
+    },
+    {
+      "id": "bonus_points",
+      "label": "Bonus points",
+      "help": "Extra points granted by cards and other bonuses.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": true,
+      "scope": "once"
+    },
+    {
+      "id": "begging_cards",
+      "label": "Begging markers",
+      "help": "Begging markers taken, each costing three points.",
+      "type": "count",
+      "points_per": -3,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "building_resources_left",
+      "label": "Building resources left",
+      "help": "Leftover wood, clay, reed and stone; the most wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "building_resources_left"
+  ],
+  "source": {
+    "rulebook_title": "Agricola rulebook",
+    "edition_or_year": "Revised edition, 2016",
+    "url": "https://lookout-spiele.de/upload/en_agricolare.html_Rules_Agricola-RE_EN.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Seven animal and crop categories score from tables, so they are entered as the table result (-1 to 4)."
+}

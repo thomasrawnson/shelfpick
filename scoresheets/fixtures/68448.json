@@ -1,0 +1,55 @@
+{
+  "bgg_id": 68448,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "military": 9,
+        "coin_sets": 5,
+        "wonder": 7,
+        "civilian": 14,
+        "commercial": 4,
+        "guilds": 6,
+        "science": 24,
+        "coins_left": 16
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "military": 2,
+        "coin_sets": 3,
+        "wonder": 10,
+        "civilian": 18,
+        "commercial": 3,
+        "guilds": 8,
+        "science": 20,
+        "coins_left": 9
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "military": 3,
+        "coin_sets": 6,
+        "wonder": 3,
+        "civilian": 21,
+        "commercial": 5,
+        "guilds": 3,
+        "science": 28,
+        "coins_left": 20
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 69,
+      "Ben": 64,
+      "Cleo": 69
+    },
+    "winner": [
+      "Cleo"
+    ]
+  }
+}

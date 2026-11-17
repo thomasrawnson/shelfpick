@@ -1,0 +1,23 @@
+{
+  "bgg_id": 98778,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Team",
+      "scores": {
+        "red": 5,
+        "yellow": 4,
+        "green": 5,
+        "blue": 3,
+        "white": 5
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Team": 22
+    },
+    "winner": [],
+    "result_band": "Amazing"
+  }
+}

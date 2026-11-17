@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://shelfpick.example/scoresheets/fixture.schema.v1.json",
+  "title": "ShelfPick scoresheet worked-example fixture, format version 1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["bgg_id", "provenance", "players", "expected"],
+  "properties": {
+    "bgg_id": { "type": "integer", "minimum": 1 },
+    "provenance": { "enum": ["rulebook-example", "hand-calculated"] },
+    "players": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "scores"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "scores": {
+            "type": "object",
+            "additionalProperties": {
+              "type": ["number", "boolean", "array"],
+              "items": { "type": "number" }
+            }
+          }
+        }
+      }
+    },
+    "expected": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["totals", "winner"],
+      "properties": {
+        "totals": { "type": "object", "additionalProperties": { "type": "number" } },
+        "winner": { "type": "array", "items": { "type": "string" } },
+        "result_band": { "type": "string" }
+      }
+    }
+  }
+}

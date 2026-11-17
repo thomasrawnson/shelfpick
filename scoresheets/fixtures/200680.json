@@ -1,0 +1,79 @@
+{
+  "bgg_id": 200680,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "fields": 3,
+        "pastures": 2,
+        "grain": 3,
+        "vegetables": 2,
+        "sheep": 3,
+        "wild_boar": 2,
+        "cattle": 1,
+        "fenced_stables": 2,
+        "clay_rooms": 3,
+        "stone_rooms": 0,
+        "family_members": 4,
+        "unused_spaces": 3,
+        "card_points": 4,
+        "bonus_points": 2,
+        "begging_cards": 0,
+        "building_resources_left": 4
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "fields": 2,
+        "pastures": 3,
+        "grain": 2,
+        "vegetables": 3,
+        "sheep": 4,
+        "wild_boar": 3,
+        "cattle": 2,
+        "fenced_stables": 3,
+        "clay_rooms": 0,
+        "stone_rooms": 2,
+        "family_members": 5,
+        "unused_spaces": 5,
+        "card_points": 0,
+        "bonus_points": 3,
+        "begging_cards": 1,
+        "building_resources_left": 6
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "fields": -1,
+        "pastures": 1,
+        "grain": 2,
+        "vegetables": -1,
+        "sheep": 2,
+        "wild_boar": 1,
+        "cattle": -1,
+        "fenced_stables": 0,
+        "clay_rooms": 0,
+        "stone_rooms": 0,
+        "family_members": 3,
+        "unused_spaces": 8,
+        "card_points": 1,
+        "bonus_points": 0,
+        "begging_cards": 2,
+        "building_resources_left": 0
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 36,
+      "Ben": 36,
+      "Cleo": -1
+    },
+    "winner": [
+      "Ben"
+    ]
+  }
+}

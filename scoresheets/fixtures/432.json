@@ -1,0 +1,49 @@
+{
+  "bgg_id": 432,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "penalty_heads": [
+          10,
+          9,
+          12,
+          20
+        ]
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "penalty_heads": [
+          20,
+          18,
+          16,
+          14
+        ]
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "penalty_heads": [
+          5,
+          22,
+          13,
+          15
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 51,
+      "Ben": 68,
+      "Cleo": 55
+    },
+    "winner": [
+      "Ana"
+    ]
+  }
+}

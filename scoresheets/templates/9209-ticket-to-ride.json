@@ -1,0 +1,69 @@
+{
+  "format_version": 1,
+  "bgg_id": 9209,
+  "name": "Ticket to Ride",
+  "supported_players": [
+    2,
+    5
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "routes",
+      "label": "Claimed routes",
+      "help": "Points for the routes you claimed, by route length.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "tickets_completed",
+      "label": "Completed tickets",
+      "help": "Total value of destination tickets you connected.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "tickets_failed",
+      "label": "Failed tickets",
+      "help": "Total value of destination tickets you did not connect (enter as a positive number).",
+      "type": "number",
+      "points_per": -1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "longest_path",
+      "label": "Longest path bonus",
+      "help": "Tick if you own the longest continuous path (10 points; tied players all score it).",
+      "type": "boolean",
+      "points_per": 10,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "tickets_completed_count",
+      "label": "Tickets completed (count)",
+      "help": "How many tickets you completed; the most wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "tickets_completed_count",
+    "longest_path"
+  ],
+  "source": {
+    "rulebook_title": "Ticket to Ride rules",
+    "edition_or_year": "USA map, rulebook 2004-2015",
+    "url": "https://ncdn0.daysofwonder.com/tickettoride/en/img/tt_rules_2015_en.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Base USA map. Tie-break: most completed tickets, then whoever holds the longest path card (a tied path means both tick the box). The game ends when a player has 0 to 2 trains left, after one more turn each."
+}

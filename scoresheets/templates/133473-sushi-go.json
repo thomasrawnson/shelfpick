@@ -1,0 +1,86 @@
+{
+  "format_version": 1,
+  "bgg_id": 133473,
+  "name": "Sushi Go!",
+  "supported_players": [
+    2,
+    5
+  ],
+  "win_condition": "highest",
+  "rounds": 3,
+  "categories": [
+    {
+      "id": "maki",
+      "label": "Maki rolls",
+      "help": "Points for having the most or second-most maki icons this round.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "per_round"
+    },
+    {
+      "id": "tempura",
+      "label": "Tempura pairs",
+      "help": "Pairs of tempura this round (5 points each).",
+      "type": "count",
+      "points_per": 5,
+      "allow_negative": false,
+      "scope": "per_round"
+    },
+    {
+      "id": "sashimi",
+      "label": "Sashimi sets",
+      "help": "Complete sets of three sashimi this round (10 points each).",
+      "type": "count",
+      "points_per": 10,
+      "allow_negative": false,
+      "scope": "per_round"
+    },
+    {
+      "id": "dumplings",
+      "label": "Dumplings",
+      "help": "Points from your dumpling count this round, using the rising scale.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "per_round"
+    },
+    {
+      "id": "nigiri",
+      "label": "Nigiri",
+      "help": "Points from nigiri this round, including wasabi-tripled ones.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "per_round"
+    },
+    {
+      "id": "pudding_points",
+      "label": "Pudding",
+      "help": "Points after round three: most puddings gains 6, fewest loses 6 (no loss in a 2-player game).",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": true,
+      "scope": "once"
+    },
+    {
+      "id": "pudding_cards",
+      "label": "Pudding cards",
+      "help": "Pudding cards you collected across all rounds; the most wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "pudding_cards"
+  ],
+  "source": {
+    "rulebook_title": "Sushi Go! rules of play",
+    "edition_or_year": "Original edition, 2014",
+    "url": "https://www.world-of-board-games.com.sg/docs/Sushi-Go.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Three rounds; pudding is the only end-of-game category. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+}

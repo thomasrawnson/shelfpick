@@ -1,0 +1,46 @@
+{
+  "bgg_id": 13,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "settlements": 3,
+        "cities": 2,
+        "vp_cards": 1,
+        "longest_road": true,
+        "largest_army": false
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "settlements": 2,
+        "cities": 2,
+        "vp_cards": 0,
+        "longest_road": false,
+        "largest_army": true
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "settlements": 4,
+        "cities": 1,
+        "vp_cards": 2,
+        "longest_road": false,
+        "largest_army": false
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 10,
+      "Ben": 8,
+      "Cleo": 8
+    },
+    "winner": [
+      "Ana"
+    ]
+  }
+}

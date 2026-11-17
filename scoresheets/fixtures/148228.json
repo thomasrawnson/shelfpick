@@ -1,0 +1,40 @@
+{
+  "bgg_id": 148228,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "card_points": 12,
+        "nobles": 1,
+        "cards_owned": 9
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "card_points": 15,
+        "nobles": 0,
+        "cards_owned": 11
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "card_points": 9,
+        "nobles": 1,
+        "cards_owned": 7
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 15,
+      "Ben": 15,
+      "Cleo": 12
+    },
+    "winner": [
+      "Ana"
+    ]
+  }
+}

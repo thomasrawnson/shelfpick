@@ -1,0 +1,128 @@
+{
+  "format_version": 1,
+  "bgg_id": 169786,
+  "name": "Scythe",
+  "supported_players": [
+    2,
+    5
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "star_coins",
+      "label": "Stars",
+      "help": "Coins from stars you placed, at the rate set by your popularity.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "territory_coins",
+      "label": "Territories",
+      "help": "Coins from territories you control, at your popularity rate.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "resource_coins",
+      "label": "Resources",
+      "help": "Coins from resource pairs you control, at your popularity rate.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "structure_bonus",
+      "label": "Structure bonus",
+      "help": "Bonus coins from your structure bonus tile.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "coins",
+      "label": "Coins",
+      "help": "Coins you hold.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "units_total",
+      "label": "Workers, mechs and structures",
+      "help": "Total units you have on the board; first tie-break.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "power",
+      "label": "Power",
+      "help": "Your power; second tie-break.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "popularity",
+      "label": "Popularity",
+      "help": "Your popularity; third tie-break.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "resources_controlled",
+      "label": "Resources controlled",
+      "help": "Resource tokens you control; fourth tie-break.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "territories_controlled",
+      "label": "Territories controlled",
+      "help": "Territories you control; fifth tie-break.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "stars_placed",
+      "label": "Stars placed",
+      "help": "Star tokens you placed; sixth tie-break.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "units_total",
+    "power",
+    "popularity",
+    "resources_controlled",
+    "territories_controlled",
+    "stars_placed",
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "Scythe rulebook",
+    "edition_or_year": "Base game, 2015",
+    "url": "https://cs.uwaterloo.ca/~dtompkin/archive/dtlib/base/Scythe.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "The three rate categories are entered as coins already multiplied by your popularity rate. The game ends when a player places a sixth star. Solo play uses separate Automa rules and is not covered. Read from a university mirror of the publisher PDF."
+}

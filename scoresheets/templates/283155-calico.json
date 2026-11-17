@@ -1,0 +1,61 @@
+{
+  "format_version": 1,
+  "bgg_id": 283155,
+  "name": "Calico",
+  "supported_players": [
+    1,
+    4
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "cat_points",
+      "label": "Cats",
+      "help": "Points from the cat patterns you completed.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "buttons",
+      "label": "Buttons",
+      "help": "Buttons you earned, including the rainbow button (3 points each).",
+      "type": "count",
+      "points_per": 3,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "design_goals",
+      "label": "Design goals",
+      "help": "Points from the design goal tiles you met.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "cat_tokens",
+      "label": "Cat tokens",
+      "help": "How many cat tokens you earned; the most wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "cat_tokens",
+    "buttons",
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "Calico rulebook",
+    "edition_or_year": "Base game (no year printed)",
+    "url": "https://lot.ahml.info/Calico.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Tie-break: most cat tokens, then most buttons, then shared. Read from a library mirror of the publisher text."
+}

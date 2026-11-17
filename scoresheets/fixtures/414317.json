@@ -1,0 +1,52 @@
+{
+  "bgg_id": 414317,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "trees": 20,
+        "mountains": 12,
+        "fields": 9,
+        "buildings": 11,
+        "water": 14,
+        "animal_cards": 28,
+        "spirit_cards": 0
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "trees": 17,
+        "mountains": 15,
+        "fields": 12,
+        "buildings": 8,
+        "water": 18,
+        "animal_cards": 31,
+        "spirit_cards": 5
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "trees": 22,
+        "mountains": 9,
+        "fields": 15,
+        "buildings": 13,
+        "water": 10,
+        "animal_cards": 20,
+        "spirit_cards": 0
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 94,
+      "Ben": 106,
+      "Cleo": 89
+    },
+    "winner": [
+      "Ben"
+    ]
+  }
+}

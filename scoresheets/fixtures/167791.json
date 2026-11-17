@@ -1,0 +1,52 @@
+{
+  "bgg_id": 167791,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "terraform_rating": 38,
+        "milestones": 2,
+        "awards": 5,
+        "greeneries": 8,
+        "cities": 7,
+        "card_points": 12,
+        "megacredits": 30
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "terraform_rating": 41,
+        "milestones": 1,
+        "awards": 7,
+        "greeneries": 10,
+        "cities": 4,
+        "card_points": 13,
+        "megacredits": 22
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "terraform_rating": 33,
+        "milestones": 0,
+        "awards": 0,
+        "greeneries": 5,
+        "cities": 3,
+        "card_points": 20,
+        "megacredits": 11
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 80,
+      "Ben": 80,
+      "Cleo": 61
+    },
+    "winner": [
+      "Ana"
+    ]
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "format_version": 1,
+  "bgg_id": 163412,
+  "name": "Patchwork",
+  "supported_players": [
+    2,
+    2
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "buttons",
+      "label": "Buttons",
+      "help": "One point for each button you have left.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "special_tile",
+      "label": "Special tile",
+      "help": "Tick if you were first to fill a 7x7 square and took the bonus tile (7 points).",
+      "type": "boolean",
+      "points_per": 7,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "empty_spaces",
+      "label": "Empty spaces",
+      "help": "Uncovered squares on your quilt board, each costing two points.",
+      "type": "count",
+      "points_per": -2,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "reached_end_first",
+      "label": "Reached the end first",
+      "help": "Tick if you reached the final space of the time track first; this wins a tie.",
+      "type": "boolean",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "reached_end_first"
+  ],
+  "source": {
+    "rulebook_title": "Patchwork rules",
+    "edition_or_year": "10-year Anniversary Edition, 2024",
+    "url": "https://www.lookout-spiele.de/upload/en_patchworkanniversary.html_PW10_Rules_EN_web.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Two players only. The 2014 English rulebook was not found; the anniversary edition reproduces the base rules."
+}

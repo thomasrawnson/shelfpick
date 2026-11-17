@@ -1,0 +1,60 @@
+{
+  "format_version": 1,
+  "bgg_id": 199561,
+  "name": "Sagrada",
+  "supported_players": [
+    2,
+    4
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "private_objective",
+      "label": "Private objective",
+      "help": "Sum of the values of your secret colour on your window.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "public_objectives",
+      "label": "Public objectives",
+      "help": "Points from the shared objective cards you met.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "favour_tokens",
+      "label": "Favour tokens",
+      "help": "One point for each unused favour token.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "empty_spaces",
+      "label": "Empty spaces",
+      "help": "Window spaces left empty, each costing one point.",
+      "type": "count",
+      "points_per": -1,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "private_objective",
+    "favour_tokens"
+  ],
+  "source": {
+    "rulebook_title": "Sagrada rule book",
+    "edition_or_year": "Version 1.2, 2017",
+    "url": "https://media.floodgate.games/rule-books/Sagrada-Rule-Book.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "The final tie-break (reverse player order in the last round) is not modelled; anything left is shared. Solo play scores differently (no favour tokens, -3 per empty space, target score) and is not supported."
+}
