@@ -82,7 +82,7 @@ test("avatar catalogue keeps legacy IDs and offers labelled board-game choices",
   assert.match(markup, /role="radiogroup"|type="radio"/)
   assert.match(markup, /checked="" value="cards"/)
   assert.match(markup, /Cards/)
-  assert.match(markup, /Blue token with a card motif/)
+  assert.match(markup, /Plum circle/)
 })
 
 test("avatar uses initials without an uploaded image", () => {
@@ -93,11 +93,11 @@ test("avatar uses initials without an uploaded image", () => {
   assert.match(markup, /player-avatar-initials">MR<\/span>/)
 })
 
-test("new avatar motifs retain legible initials", () => {
+test("avatars are initials on a coloured circle with no icon overlay", () => {
   const markup = renderToStaticMarkup(React.createElement(PlayerAvatar, {
     name: "A Very Long Player Name", variant: "meeple",
   }))
   assert.match(markup, /player-avatar-meeple/)
-  assert.match(markup, /player-avatar-motif-meeple/)
+  assert.doesNotMatch(markup, /motif|<svg/)
   assert.match(markup, /player-avatar-initials">AV<\/span>/)
 })

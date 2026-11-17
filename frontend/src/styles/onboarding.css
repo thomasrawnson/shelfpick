@@ -282,19 +282,12 @@
 .avatar-picker-fieldset:disabled .avatar-choice { cursor: wait; opacity: .7; }
 .player-avatar { position: relative; display: inline-grid; place-items: center; width: 34px; height: 34px; flex: none; overflow: hidden; border-radius: 50%; font-size: 13px; font-weight: 800; line-height: 1; }
 .player-avatar-initials { position: relative; z-index: 1; }
-.player-avatar-motif { position: absolute; right: 1px; bottom: 1px; width: 15px; height: 15px; opacity: .58; }
-.player-avatar-motif svg { display: block; width: 100%; height: 100%; fill: currentColor; }
-.player-avatar-motif-dice rect, .player-avatar-motif-cards rect { fill: none; stroke: currentColor; stroke-width: 1.5; }
-.player-avatar-motif-forest path, .player-avatar-motif-clay rect, .player-avatar-motif-clay path { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-.player-avatar-motif-gold path { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linejoin: round; }
-.player-avatar-forest .player-avatar-initials, .player-avatar-gold .player-avatar-initials, .player-avatar-clay .player-avatar-initials { transform: translate(-2px, -2px); }
-.player-avatar-dice .player-avatar-initials, .player-avatar-meeple .player-avatar-initials, .player-avatar-cards .player-avatar-initials { transform: translate(-2px, -2px); }
-.player-avatar-forest { color: var(--color-brand-primary); background: var(--color-brand-primary-soft); }
-.player-avatar-gold { color: var(--color-accent-text); background: var(--color-brand-accent-soft); }
-.player-avatar-clay { color: var(--text-primary); background: var(--color-surface-raised); box-shadow: inset 0 0 0 1px var(--line); }
-.player-avatar-dice { color: var(--color-text-inverse); background: var(--color-success); }
-.player-avatar-meeple { color: var(--color-text-inverse); background: var(--color-accent-text); }
-.player-avatar-cards { color: var(--color-text-inverse); background: var(--color-info); }
+.player-avatar-forest { color: var(--color-text-inverse); background: var(--color-brand-primary); }
+.player-avatar-gold { color: var(--color-text-inverse); background: var(--color-accent-text); }
+.player-avatar-clay { color: var(--color-text-inverse); background: var(--color-text-support); }
+.player-avatar-dice { color: var(--color-text-inverse); background: var(--color-info); }
+.player-avatar-meeple { color: var(--color-text-inverse); background: var(--color-danger); }
+.player-avatar-cards { color: var(--color-text-inverse); background: color-mix(in srgb, var(--color-info) 50%, var(--color-danger)); }
 .dice-menu-button .player-avatar { width: 34px; height: 34px; }
 .picker-selection-person { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
 .profile-settings { margin-bottom: 20px; }
