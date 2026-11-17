@@ -306,3 +306,47 @@ test("closing the native share sheet is treated as cancellation", () => {
   assert.equal(isShareCancellation(new DOMException("cancelled", "AbortError")), true)
   assert.equal(isShareCancellation(new Error("share failed")), false)
 })
+
+test("exported play card carries the unmodified Powered by BGG logo and no cover text", async () => {
+  const originalDocument = globalThis.document
+  const originalImage = globalThis.Image
+  const originalWindow = globalThis.window
+  const images = []
+  const drawn = []
+  const texts = []
+  const context = {
+    beginPath() {}, fill() {}, fillRect() {}, roundRect() {},
+    drawImage(image, x, y, w, h) { drawn.push({ src: image.src, x, y, w, h }) },
+    fillText(value, x, y) { texts.push({ value, x, y }) },
+    measureText(value) { return { width: value.length * 18 } },
+    set fillStyle(_value) {}, set font(_value) {}, set textAlign(_value) {},
+  }
+  const canvas = {
+    getContext() { return context },
+    toBlob(callback) { callback(new Blob(["png"], { type: "image/png" })) },
+  }
+  class MockImage {
+    width = 342
+    height = 76
+    set src(value) { this._src = value; images.push(value); queueMicrotask(() => this.onload?.()) }
+    get src() { return this._src }
+  }
+  globalThis.document = { createElement: () => canvas }
+  globalThis.Image = MockImage
+  globalThis.window = { setTimeout, clearTimeout }
+  try {
+    await renderPlayShareCard(game, play, defaults)
+    const logo = drawn.find(item => item.src === "/branding/powered-by-bgg-rgb.svg")
+    assert.ok(logo, "official logo is drawn")
+    assert.ok(Math.abs(logo.w / logo.h - 342 / 76) < 0.01, "logo is scaled uniformly, never cropped or stretched")
+    assert.ok(logo.x + logo.w <= 1128 && logo.y + logo.h < 1500)
+    assert.ok(texts.some(item => item.value === "boardgamegeek.com" && item.y > logo.y + logo.h))
+    assert.equal(texts.some(item => item.value === "Game data from BoardGameGeek"), false)
+    assert.ok(drawn.some(item => item.src === "/branding/shelfpick-logo-light.svg"))
+    assert.equal(images.some(src => /^https?:/.test(src)), false)
+  } finally {
+    globalThis.document = originalDocument
+    globalThis.Image = originalImage
+    globalThis.window = originalWindow
+  }
+})

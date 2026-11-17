@@ -24,12 +24,12 @@ def test_pro_tier_resolves_and_uses_central_feature_map():
     assert Feature.ADVANCED_STATS in entitlements_for(user)
 
 
-def test_game_night_capabilities_are_independent():
+def test_game_night_capabilities_are_free_for_every_tier():
     free_user = SimpleNamespace(tier="FREE")
     pro_user = SimpleNamespace(tier="PRO")
 
     assert can_use(free_user, Feature.GAME_NIGHT_BASIC)
-    assert not can_use(free_user, Feature.GAME_NIGHT_ENHANCED)
+    assert can_use(free_user, Feature.GAME_NIGHT_ENHANCED)
     assert can_use(pro_user, Feature.GAME_NIGHT_BASIC)
     assert can_use(pro_user, Feature.GAME_NIGHT_ENHANCED)
 
@@ -53,7 +53,10 @@ def test_frontend_user_response_uses_the_same_entitlement_rules():
     response = user_response(user)
 
     assert response.tier == "FREE"
-    assert response.entitlements == [Feature.GAME_NIGHT_BASIC.value]
+    assert response.entitlements == [
+        Feature.GAME_NIGHT_BASIC.value,
+        Feature.GAME_NIGHT_ENHANCED.value,
+    ]
 
 
 def test_picker_personal_rankings_are_loaded_for_pro_only():

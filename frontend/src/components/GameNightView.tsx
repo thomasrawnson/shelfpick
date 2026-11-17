@@ -14,6 +14,7 @@ import PlayerSelectionStep from "./picker/PlayerSelectionStep"
 import TimeStep from "./picker/TimeStep"
 import { timeBand, trackEvent } from "../telemetry"
 import { PHONE_VOTING_V1_AVAILABLE } from "../game-night-availability"
+import { requestReviewAfter } from "../review-prompt"
 
 
 type Props = {
@@ -149,7 +150,9 @@ function GameNightView({ enabled, votingEnabled, defaultTime = null, onBack, onV
     setLoading(true)
     setError("")
     try {
-      setVotingSession(await closeGameNightVoting(votingSession.session_id))
+      const closed = await closeGameNightVoting(votingSession.session_id)
+      setVotingSession(closed)
+      if (closed.results?.outcome === "winner") void requestReviewAfter("vote_winner")
     } catch (err) {
       setError(err instanceof Error ? err.message : "Couldn't close voting.")
     } finally {

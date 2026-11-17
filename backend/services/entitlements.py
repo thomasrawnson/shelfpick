@@ -16,7 +16,10 @@ class Feature(str, Enum):
 
 
 FEATURES_BY_TIER: dict[PlanTier, frozenset[Feature]] = {
-    PlanTier.FREE: frozenset({Feature.GAME_NIGHT_BASIC}),
+    # Phone voting hosting (game_night_enhanced) is free for every account.
+    PlanTier.FREE: frozenset(
+        {Feature.GAME_NIGHT_BASIC, Feature.GAME_NIGHT_ENHANCED}
+    ),
     PlanTier.PRO: frozenset(Feature),
 }
 

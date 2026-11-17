@@ -43,7 +43,7 @@ export function backendEnv(): NodeJS.ProcessEnv {
     PUBLIC_REGISTRATION_ENABLED: "true",
     BETA_INVITE_EMAILS: "",
     AI_PICKER_ENABLED: "false",
-    GAME_NIGHT_PHONE_VOTING_ENABLED: "false",
+    GAME_NIGHT_PHONE_VOTING_ENABLED: process.env.E2E_PHONE_VOTING_ENABLED === "true" ? "true" : "false",
     RETENTION_CLEANUP_ENABLED: "false",
     RESEND_API_KEY: "",
     BGG_API_TOKEN: "",

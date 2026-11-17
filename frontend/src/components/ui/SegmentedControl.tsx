@@ -1,3 +1,5 @@
+import { lightImpact } from "../../haptics"
+
 type Option<T extends string> = {
   value: T
   label: string
@@ -43,9 +45,10 @@ function SegmentedControl<T extends string>({
           aria-pressed={
             value === option.value
           }
-          onClick={() =>
+          onClick={() => {
+            if (value !== option.value) void lightImpact()
             onChange(option.value)
-          }
+          }}
         >
           {option.label}
         </button>

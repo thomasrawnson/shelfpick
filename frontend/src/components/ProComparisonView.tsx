@@ -16,7 +16,7 @@ type FeatureGroup = { activity: string; features: ComparisonFeature[] }
 
 const included = { label: "Included", tone: "included" } as const
 const proOnly = { label: "Not included", tone: "pro" } as const
-const unavailable = { label: "Unavailable", tone: "unavailable" } as const
+const guestAccess = { label: "No account needed", tone: "guest" } as const
 
 const freeBenefits = [
   "Manage your Owned and Want to Play shelves",
@@ -67,12 +67,12 @@ const featureGroups: FeatureGroup[] = [
     activity: "Plan together",
     features: [
       { name: "Basic Game Night", detail: "Group shortlist and host selection", free: included, pro: included },
-      { name: "Phone voting", detail: "Not offered in this release", free: unavailable, pro: unavailable },
+      { name: "Phone voting", detail: "Host a vote from guests’ phones", free: included, pro: included },
       {
         name: "Join a hosted vote",
-        detail: "Not offered in this release",
-        free: unavailable,
-        pro: unavailable,
+        detail: "Guests join from a link, no account needed",
+        free: guestAccess,
+        pro: guestAccess,
       },
     ],
   },

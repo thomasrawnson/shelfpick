@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 
+import { lightImpact } from "../haptics"
 import {
   addToWishlist,
   getDiscoverRecommendations,
@@ -266,7 +267,10 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
             role="tab"
             aria-selected={mode === tab.mode}
             className={mode === tab.mode ? "discover-tab active" : "discover-tab"}
-            onClick={() => selectMode(tab.mode)}
+            onClick={() => {
+              if (mode !== tab.mode) void lightImpact()
+              selectMode(tab.mode)
+            }}
           >
             {tab.label}
             {tab.mode === "for_you" && !personalized && (

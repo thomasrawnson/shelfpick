@@ -7,6 +7,7 @@ import {
   renderMonthlyRecapCard,
 } from "../../monthly-recap-card"
 import { isShareCancellation } from "../../share-card"
+import { requestReviewAfter } from "../../review-prompt"
 
 type Props = { recap: MonthlyRecap; onClose: () => void }
 
@@ -82,6 +83,7 @@ function MonthlyRecapShareDialog({ recap, onClose }: Props) {
     try {
       await navigator.share({ files: [file], title: `${recap.month_label} ShelfPick recap` })
       setStatus("Share sheet closed. ShelfPick did not post the image itself.")
+      void requestReviewAfter("recap_shared")
     } catch (shareError) {
       if (isShareCancellation(shareError)) {
         setStatus("Sharing cancelled.")

@@ -14,7 +14,7 @@ The proposed launch is UK-first and Free-only. The proposed minimum age is 13+, 
 
 - Account: email address, password hash, display name, verification state, account tier, optional BoardGameGeek username and preferences.
 - Shelf and activity: owned/wishlisted games, plays, dates, duration, optional location, participant names and scores, rankings/comparisons, Picker criteria/events and recommendations, live-timer drafts and hosted Game Night candidate lists/sessions.
-- Guest voting: guest display name, hashed guest credential and ballot within the host's expiring session.
+- Guest voting (awaiting owner/legal approval): a guest-chosen nickname, a hashed guest credential and the guest's ballot within the host's session. Guests need no account or email. The host sees nicknames and group totals, not each guest's individual choice. Guest access lasts 12 hours; the provisional drafting position is to delete nickname and ballot records 30 days after that window expires (not yet an active deletion commitment). Guests can change or remove their nickname and ballot from the device they joined on.
 - Operations: one-time verification/reset token hashes, authentication-abuse counters stored as keyed hashes, request identifiers and server logs. Production application logs record the Resend message ID but no longer record the recipient address; Resend still receives the address and message to deliver transactional email.
 
 Passwords, raw one-time links and guest credentials are not stored in the database in readable form. The bearer access token and each Game Night guest credential are stored in that browser's local storage. ShelfPick does not currently set cookies or connect its telemetry hooks to an analytics provider. Production traffic must use HTTPS.
@@ -31,7 +31,7 @@ Expected processors/integrations are Render (hosting/database/logs), Resend (tra
 
 Active-account data remains until account deletion or the approved retention schedule requires earlier removal. In-app deletion removes the account and its ShelfPick-owned personal data from the live database; shared catalogue records remain. Provider backups may retain deleted data until they age out under the approved backup schedule and are not restored except for disaster recovery.
 
-Game Night access expires after 12 hours, but this does not delete the host, guest or ballot rows. Stale auth-abuse rows are removed only during later authentication writes. Used/expired one-time-token rows otherwise remain until replacement or account deletion.
+Game Night access expires after 12 hours, but this does not delete the host, guest nickname or ballot rows; the provisional 30-day post-expiry retention is not yet implemented or approved (SP-UNLOCK-01 draft addition, awaiting owner/legal approval). Stale auth-abuse rows are removed only during later authentication writes. Used/expired one-time-token rows otherwise remain until replacement or account deletion.
 
 The owner has approved these provisional drafting periods for legal review: inactive accounts 24 months; expired Game Night records 30 days; expired verification/reset tokens 7 days; operational logs 30 days; independent backups 30 days; temporary exported personal-data files 7 days; and resolved privacy requests 12 months. They are not active automatic-deletion commitments until technical implementation, qualified review and publication approval are complete.
 
