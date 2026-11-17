@@ -21,14 +21,31 @@ export function monthlyRecapFileName(month: string): string {
   return `shelfpick-${month}-recap.png`
 }
 
+export type MonthlyHighlight = { label: string; value: string }
+
+// "Most played" only means something when a game was played more than once.
+export function monthlyHighlight(recap: MonthlyRecap): MonthlyHighlight | null {
+  const top = recap.most_played
+  if (!top) return null
+  if (recap.total_plays === recap.unique_games) {
+    return recap.unique_games === 1
+      ? { label: "Played", value: top.name }
+      : { label: "Variety", value: `${recap.unique_games} different games` }
+  }
+  return { label: "Most played", value: `${top.name} · ${top.play_count} ${top.play_count === 1 ? "play" : "plays"}` }
+}
+
 export function monthlyRecapAltText(recap: MonthlyRecap): string {
   const duration = recap.total_duration_minutes === null
     ? "recorded play time unavailable"
     : `${formatDuration(recap.total_duration_minutes)}`
-  const mostPlayed = recap.most_played
-    ? ` Most played: ${recap.most_played.name}, ${recap.most_played.play_count} ${recap.most_played.play_count === 1 ? "play" : "plays"}.`
-    : ""
-  return `${recap.month_label} ShelfPick recap: ${recap.total_plays} plays, ${recap.unique_games} games, ${duration}.${mostPlayed}`
+  const highlight = monthlyHighlight(recap)
+  const highlightText = !highlight
+    ? ""
+    : highlight.label === "Variety"
+      ? ` ${highlight.value}, one play each.`
+      : ` ${highlight.label}: ${highlight.value.replace(" · ", ", ")}.`
+  return `${recap.month_label} ShelfPick recap: ${recap.total_plays} plays, ${recap.unique_games} games, ${duration}.${highlightText}`
 }
 
 function collageRects(count: number): ImageRect[] {
@@ -188,16 +205,16 @@ export async function renderMonthlyRecapCard(
     context.fillText(label, x, metricY + 42)
   })
 
-  if (recap.most_played) {
+  const highlight = monthlyHighlight(recap)
+  if (highlight) {
     context.fillStyle = SHARE_CARD.goldSoft
     fillRoundedRect(context, 72, 1120, 1056, 122, 18)
     context.fillStyle = SHARE_CARD.goldText
     context.font = "800 21px 'Nunito Sans', system-ui, sans-serif"
-    context.fillText("MOST PLAYED", 98, 1161)
+    context.fillText(highlight.label.toUpperCase(), 98, 1161)
     context.fillStyle = SHARE_CARD.ink
     context.font = "600 37px Lora, Georgia, serif"
-    const suffix = `${recap.most_played.play_count} ${recap.most_played.play_count === 1 ? "play" : "plays"}`
-    context.fillText(fitShareText(context, `${recap.most_played.name} · ${suffix}`, 1004), 98, 1210)
+    context.fillText(fitShareText(context, highlight.value, 1004), 98, 1210)
   }
 
   context.fillStyle = SHARE_CARD.line

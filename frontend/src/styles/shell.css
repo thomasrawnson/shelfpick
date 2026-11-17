@@ -14,8 +14,11 @@
   overflow: visible;
 }
 .app-phone { position: relative; }
-.app-content > .screen > header,
-.app-content > .screen > .collection-heading-row > header { padding-right: 56px; }
+/* One fixed avatar spot: every screen's title row keeps 56px clear on the right. */
+.page-transition > .screen > header,
+.page-transition > .screen > .collection-heading-row > header { padding-right: 56px; }
+/* Centred step titles keep the same clearance on both sides so they stay centred. */
+.app-content .picker-step-screen:not(.player-step-screen) > header { padding-inline: 56px; }
 .app-content { padding-top: calc(4px + env(safe-area-inset-top)); }
 
 /* Keep titles and primary controls clear of the avatar in the title row. */
@@ -52,17 +55,16 @@
 .collection-heading-row .collection-add-button { min-height: 36px; padding: 0 14px; font-size: 0.875rem; border-radius: 999px; }
 .collection-section-tabs button { min-height: 40px; font-size: 0.9375rem; }
 .collection-section-tabs { margin-bottom: 8px; }
-.collection-tools { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; margin-bottom: 12px; padding: 4px 0 8px; background: var(--color-bg); }
-.collection-search-sort-row { display: grid; grid-template-columns: minmax(0, 1fr) 76px auto; align-items: center; gap: 8px; }
+.collection-tools { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; margin-bottom: 8px; padding: 2px 0 4px; background: var(--color-bg); }
+.collection-search-sort-row { display: grid; grid-template-columns: minmax(0, 1fr) 72px var(--target-min); align-items: center; gap: 6px; }
+/* One button switches layout; it shows the layout it will switch to. */
+.shelf-view-toggle { display: grid; place-items: center; width: var(--target-min); height: var(--target-min); padding: 0; color: var(--color-brand-primary); background: transparent; border: 1px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; }
+.shelf-view-toggle svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .collection-search-wrap { flex: 1 1 0; min-width: 0; }
-.collection-sort-wrap { width: 76px; min-width: 0; display: block; }
+.collection-sort-wrap { width: 72px; min-width: 0; display: block; }
 .collection-sort { width: 100%; max-width: none; padding-inline: 10px 4px; background-color: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: var(--radius-md); }
 .collection-search-sort-row .collection-search { min-height: 40px; }
 .collection-sort { min-height: 40px; }
-.shelf-view-toggle { flex: none; display: inline-flex; gap: 2px; padding: 3px; background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: var(--radius-md); }
-.shelf-view-toggle button { display: grid; place-items: center; width: 36px; height: 34px; padding: 0; color: var(--color-text-support); background: transparent; border: 0; border-radius: 9px; cursor: pointer; }
-.shelf-view-toggle button.active { color: var(--color-text-inverse); background: var(--color-brand-primary); }
-.shelf-view-toggle svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .collection-tools .filter-tabs { display: flex; gap: 6px; padding: 0; background: transparent; border: 0; }
 .collection-tools .filter-tabs button {
   flex: none; min-height: 32px; padding: 0 14px; border: 1px solid var(--color-border);
@@ -96,7 +98,7 @@
 .tonight-recent-cover { display: block; width: 96px; aspect-ratio: 1; overflow: hidden; background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: 14px; }
 .tonight-recent-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .tonight-recent-cover .game-artwork-placeholder { width: 100%; height: 100%; }
-.tonight-recent-name { font-size: 0.8125rem; font-weight: 700; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.tonight-recent-name { font-size: 0.8125rem; font-weight: 700; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; overflow-wrap: normal; word-break: normal; hyphens: none; }
 
 .tonight-choose-players {
   display: flex; align-items: center; justify-content: space-between;
@@ -109,11 +111,10 @@
 .tonight-vote-button {
   width: 100%; min-height: 48px; margin: 0; padding: 0;
   color: var(--color-brand-primary); background: transparent; border: 0;
-  font: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; cursor: pointer;
+  font: inherit; font-weight: 700; text-decoration: none; cursor: pointer;
 }
 /* Lighter floating tab bar, and room so content clears it. */
 .app-nav { box-shadow: 0 2px 8px var(--color-shadow); }
-.app-content { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
 
 /* Skeleton loaders (static under reduced motion). */
 .skeleton { display: grid; gap: 12px; margin-top: 12px; }
@@ -126,7 +127,7 @@
 @keyframes skeleton-shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
 
 /* Plays tab. */
-.plays-log-button { width: 100%; min-height: 52px; margin: 4px 0 14px; }
+.plays-log-button { width: 100%; min-height: 48px; margin: 2px 0 10px; }
 .plays-filters { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
 .plays-filters select, .plays-search { min-height: 44px; width: 100%; padding: 0 12px; color: var(--color-text-primary); background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: var(--radius-md); font: inherit; }
 .plays-range { display: flex; gap: 6px; margin-bottom: 8px; }
@@ -134,17 +135,17 @@
 .plays-range button.active { color: var(--color-text-inverse); background: var(--color-brand-primary); border-color: var(--color-brand-primary); }
 .plays-month h2 { margin: 18px 0 8px; color: var(--color-text-support); font-family: inherit; font-size: 0.8125rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
 .plays-month ul, .plays-game-picker { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
-.plays-card { display: grid; gap: 10px; padding: 12px; background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: 16px; }
-.plays-card-main { display: flex; gap: 12px; align-items: center; width: 100%; padding: 0; text-align: left; color: var(--color-text-primary); background: transparent; border: 0; cursor: pointer; }
-.plays-cover { flex: none; width: 56px; height: 56px; overflow: hidden; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; display: block; }
+/* Compact play rows (SP-UI-02): cover opens the game, the row edits the play, Rematch is a small action. */
+.plays-month ul { gap: 0; border-block: 1px solid var(--color-border); }
+.plays-card { display: flex; align-items: center; gap: 10px; min-height: 60px; padding: 6px 0; }
+.plays-card + .plays-card { border-top: 1px solid var(--color-border); }
+.plays-cover { flex: none; width: 44px; height: 44px; overflow: hidden; padding: 0; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 6px; display: block; cursor: pointer; }
 .plays-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .plays-cover .game-artwork-placeholder { width: 100%; height: 100%; }
-.plays-card-copy { display: grid; gap: 2px; min-width: 0; }
-.plays-card-copy span { color: var(--color-text-support); font-size: 0.8125rem; }
-.plays-card-copy .plays-result { color: var(--color-accent-text); font-weight: 700; }
-.plays-card-actions { display: flex; gap: 8px; }
-.plays-card-actions { align-items: stretch; }
-.plays-card-actions button { min-height: 44px; flex: 1; margin: 0; }
+.plays-card-main { flex: 1 1 auto; display: grid; gap: 1px; min-width: 0; min-height: var(--target-min); padding: 0; text-align: left; color: var(--color-text-primary); background: transparent; border: 0; font: inherit; cursor: pointer; }
+.plays-card-main strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.plays-card-main span { overflow: hidden; color: var(--color-text-support); font-size: 0.8125rem; text-overflow: ellipsis; white-space: nowrap; }
+.plays-rematch { flex: none; min-height: var(--target-min); padding: 0 4px; color: var(--color-brand-primary); background: transparent; border: 0; font: inherit; font-size: 0.875rem; font-weight: 800; cursor: pointer; }
 .plays-state { display: grid; gap: 8px; justify-items: start; padding: 20px 4px; color: var(--color-text-support); }
 .plays-empty-note { margin: 16px 0 0; color: var(--color-text-support); font-size: 0.8125rem; }
 .plays-game-picker button { display: flex; gap: 12px; align-items: center; width: 100%; padding: 8px 12px 8px 8px; text-align: left; color: var(--color-text-primary); background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: 14px; font: inherit; cursor: pointer; }
@@ -196,7 +197,7 @@
   :root[data-native-ios] .player-step-screen .player-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 3.5em), 1fr)); }
   :root[data-native-ios] .plays-range { flex-wrap: wrap; }
   :root[data-native-ios] .plays-filters { grid-template-columns: 1fr; }
-  :root[data-native-ios] .plays-card-actions { flex-wrap: wrap; }
+  :root[data-native-ios] .plays-card-main strong, :root[data-native-ios] .plays-card-main span { white-space: normal; }
 }
 
 /* Shelf grid refinement: whole cover visible, two-line titles that line up, readable plays badge. */
@@ -207,3 +208,9 @@
   color: #fff; background: rgb(20 24 22 / 90%); border: 1px solid rgb(255 255 255 / 40%);
   backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
 }
+.plays-off-shelf { flex: none; color: var(--color-text-support); font-size: 0.75rem; font-weight: 700; }
+.plays-card.off-shelf .plays-card-main { cursor: default; }
+/* Missing artwork in a 44px play cover: the mark only, no caption. */
+.plays-cover .game-artwork-placeholder { display: grid; place-items: center; padding: 0; }
+.plays-cover .game-artwork-placeholder-copy { display: none; }
+.plays-cover .game-artwork-placeholder-mark { transform: scale(0.6); }

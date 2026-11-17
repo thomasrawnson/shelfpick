@@ -2,11 +2,11 @@ import { expect, test, type Page } from "@playwright/test"
 
 import { LOCAL_PASSWORD, logIn } from "./support"
 
-// SP-PLAY-01. Real local backend. Logs co-op and team plays, edits a saved
+// SP-PLAY-01, updated for the SP-UI-02 Log play sheet. Real local backend. Logs co-op and team plays, edits a saved
 // play and starts rematches from the confirmation and from history.
 const FREE_EMAIL = "local-free@shelfpick.app"
 const GAME = "Lantern Grove"
-const SHOTS = "../docs/screenshots/sp-play-01"
+const SHOTS = "../docs/screenshots/sp-ui-02/after"
 
 test.use({ viewport: { width: 390, height: 844 } })
 
@@ -16,13 +16,12 @@ async function openGame(page: Page) {
   await expect(page.getByRole("button", { name: "Log a play" })).toBeVisible()
 }
 
-async function fillPlayers(page: Page, names: string[]) {
-  const form = page.locator("form.play-form")
-  while ((await form.locator(".player-form-card").count()) < names.length) {
-    await form.getByRole("button", { name: "+ Add player" }).click()
-  }
-  for (const [index, name] of names.entries()) {
-    await form.locator(".player-form-card").nth(index).getByPlaceholder("Player name").fill(name)
+const sheet = (page: Page) => page.getByRole("dialog")
+
+async function addPlayers(page: Page, names: string[]) {
+  for (const name of names) {
+    await sheet(page).getByLabel("Add player").fill(name)
+    await sheet(page).getByLabel("Add player").press("Enter")
   }
 }
 
@@ -42,35 +41,36 @@ for (const scheme of ["light", "dark"] as const) {
 
     // Co-op game, Won.
     await page.getByRole("button", { name: "Log a play" }).click()
-    const form = page.locator("form.play-form")
-    await form.getByLabel("Co-op").check({ force: true })
-    await fillPlayers(page, [alex, sam])
+    const form = sheet(page)
+    await form.getByLabel("Result type").selectOption("cooperative")
+    await addPlayers(page, [alex, sam])
     await expect(form.getByText("Did the group win?")).toBeVisible()
     await form.getByRole("button", { name: "Save play" }).click()
     await expect(form.getByRole("alert")).toContainText("Won or Lost")
     await form.getByLabel("Won", { exact: true }).check({ force: true })
     await page.screenshot({ path: `${SHOTS}/coop-form-${scheme}.png` })
     await form.getByRole("button", { name: "Save play" }).click()
-    await expect(page.getByText("Play saved.")).toBeVisible()
+    await expect(form.getByText("Play saved")).toBeVisible()
 
     // Rematch from the confirmation keeps players and type, clears the result.
-    await page.getByRole("button", { name: "Rematch" }).first().click()
-    await expect(form.getByLabel("Co-op")).toBeChecked()
+    await form.getByRole("button", { name: "Rematch" }).click()
+    await expect(form.getByLabel("Result type")).toHaveValue("cooperative")
     await expect(form.getByPlaceholder("Player name").first()).toHaveValue(alex)
     await expect(form.getByPlaceholder("Player name").nth(1)).toHaveValue(sam)
     await expect(form.getByLabel("Won", { exact: true })).not.toBeChecked()
 
     // Team game: two teams, one winner.
-    await form.getByLabel("Teams").check({ force: true })
-    await fillPlayers(page, [alex, sam, jo])
-    const cards = form.locator(".player-form-card")
-    await cards.nth(0).getByPlaceholder("e.g. Red").fill("Red")
-    await cards.nth(1).getByPlaceholder("e.g. Red").fill("Blue")
-    await cards.nth(2).getByPlaceholder("e.g. Red").fill("Red")
+    await form.getByLabel("Result type").selectOption("team")
+    await addPlayers(page, [jo])
+    await form.getByLabel(`Team for ${alex}`).fill("Red")
+    await form.getByLabel(`Team for ${sam}`).fill("Blue")
+    await form.getByLabel(`Team for ${jo}`).fill("Red")
     await form.getByLabel("Winning team").selectOption("Red")
     await page.screenshot({ path: `${SHOTS}/team-form-${scheme}.png` })
     await form.getByRole("button", { name: "Save play" }).click()
-    await expect(page.getByText("Play saved.")).toBeVisible()
+    await expect(form.getByText("Play saved")).toBeVisible()
+    await form.getByRole("button", { name: "Done" }).click()
+    await expect(form).toBeHidden()
 
     // The history shows the team result per player.
     const teamPlay = page.locator(".recent-play-detail").first()
@@ -81,13 +81,15 @@ for (const scheme of ["light", "dark"] as const) {
 
     // Edit the team play: change the location and make Blue the winner.
     await teamPlay.getByRole("button", { name: "Edit" }).click()
-    const editForm = page.locator(".recent-play-detail form.play-form")
+    const editForm = sheet(page)
     await expect(editForm.getByText("Edit play")).toBeVisible()
-    await expect(editForm.getByLabel("Teams")).toBeChecked()
+    await expect(editForm.getByLabel("Result type")).toHaveValue("team")
+    await editForm.locator(".play-summary-button").click()
     await editForm.getByPlaceholder("e.g. The Dice Cup").fill(`Edited ${stamp}`)
     await editForm.getByLabel("Winning team").selectOption("Blue")
     await page.screenshot({ path: `${SHOTS}/edit-form-${scheme}.png` })
     await editForm.getByRole("button", { name: "Save changes" }).click()
+    await expect(editForm).toBeHidden()
     const edited = page.locator(".recent-play-detail").first()
     await expect(edited).toContainText(`Edited ${stamp}`)
     await expect(edited.locator(".history-player", { hasText: sam })).toContainText("Won")
@@ -95,12 +97,13 @@ for (const scheme of ["light", "dark"] as const) {
 
     // Rematch from a saved play prefills players, teams and location.
     await edited.getByRole("button", { name: "Rematch" }).click()
-    const rematchForm = page.locator("form.play-form")
-    await expect(rematchForm.getByLabel("Teams")).toBeChecked()
+    const rematchForm = sheet(page)
+    await expect(rematchForm.getByLabel("Result type")).toHaveValue("team")
     await expect(rematchForm.getByPlaceholder("Player name").first()).toHaveValue(alex)
-    await expect(rematchForm.getByPlaceholder("e.g. Red").first()).toHaveValue("Red")
-    await expect(rematchForm.getByPlaceholder("e.g. The Dice Cup")).toHaveValue(`Edited ${stamp}`)
+    await expect(rematchForm.getByPlaceholder("Team").first()).toHaveValue("Red")
+    await expect(rematchForm.locator(".play-summary-text")).toContainText(`Edited ${stamp}`)
     await page.screenshot({ path: `${SHOTS}/rematch-${scheme}.png` })
+    await rematchForm.getByRole("button", { name: "Cancel" }).click()
 
     // Tidy: delete the two plays this run created.
     for (let index = 0; index < 2; index += 1) {

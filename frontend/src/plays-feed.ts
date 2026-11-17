@@ -1,6 +1,8 @@
-import type { Game, GamePlay } from "./api/client"
+import type { Game, GamePlay, ListedPlay } from "./api/client"
 
-export type FeedEntry = { game: Game; play: GamePlay }
+// onShelf is false for plays on games no longer on the shelf (or expansions):
+// they still count and show, but cannot be edited or rematched.
+export type FeedEntry = { game: Game; play: GamePlay; onShelf: boolean }
 export type DateRange = "all" | "30d" | "year"
 export type FeedFilters = {
   bggId: number | null
@@ -78,4 +80,27 @@ export function playSummary(play: GamePlay): string {
   const players = `${play.player_count} ${play.player_count === 1 ? "player" : "players"}`
   const time = play.duration_minutes ? `${play.duration_minutes} min` : null
   return [players, time].filter(Boolean).join(" · ")
+}
+
+// Every play on the account, newest first (SP-UI-02 counting rule: one play
+// counts once, whatever its game's current ownership). Shelf games supply
+// full details; other games use the summary that came with the play.
+export function feedEntries(shelf: Game[], plays: ListedPlay[]): FeedEntry[] {
+  const byId = new Map(shelf.map(game => [game.bgg_id, game]))
+  return sortFeed(plays.map(play => {
+    const owned = byId.get(play.bgg_id)
+    if (owned) return { game: owned, play, onShelf: true }
+    const summary = play.game
+    return {
+      game: {
+        bgg_id: play.bgg_id, name: summary?.name ?? "Unknown game", year_published: null,
+        min_players: null, max_players: null, min_play_time: null, max_play_time: null,
+        min_age: null, complexity: null, rating: null, owned: false,
+        image_url: summary?.image_url ?? null, thumbnail_url: summary?.thumbnail_url ?? null,
+        categories: [], mechanics: [],
+      },
+      play,
+      onShelf: false,
+    }
+  }))
 }

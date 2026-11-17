@@ -12,7 +12,7 @@ import {
   groupFeedByMonth,
   NO_FILTERS,
   playSummary,
-  sortFeed,
+  feedEntries,
   winnersLabel,
   type DateRange,
   type FeedEntry,
@@ -41,18 +41,11 @@ const RANGES: Array<{ value: DateRange; label: string }> = [
   { value: "year", label: "This year" },
 ]
 
-// Every play on the shelf, newest first, paired with its game.
+// Every play on the account, newest first, paired with its game.
 async function loadFeed(): Promise<{ games: Game[]; entries: FeedEntry[] }> {
   const [games, plays] = await Promise.all([getGames(), getPlays()])
   const owned = games.filter(game => game.owned)
-  const byId = new Map(owned.map(game => [game.bgg_id, game]))
-  return {
-    games: owned,
-    entries: sortFeed(plays.flatMap(play => {
-      const game = byId.get(play.bgg_id)
-      return game ? [{ game, play }] : []
-    })),
-  }
+  return { games: owned, entries: feedEntries(owned, plays) }
 }
 
 function PlaysView({ onOpenGame }: Props) {
@@ -127,50 +120,30 @@ function PlaysView({ onOpenGame }: Props) {
     )
   }
 
-  if (screen.kind === "log") {
-    const { game, prefill } = screen
-    return (
-      <section className="screen plays-screen picker-play-entry">
-        <button type="button" className="collection-back" onClick={() => setScreen({ kind: "list" })}>← Back to Plays</button>
-        <header><h1>{prefill ? "Rematch" : "Log a play"}</h1><p className="subtitle">{game.name}</p></header>
-        <PlayLogForm
-          key={screen.key}
-          game={game}
-          presentation="dedicated"
-          initialOpen
-          initialPlayerCount={prefill?.names.length}
-          initialPlayerNames={prefill?.names}
-          initialTeams={prefill?.teams}
-          initialOutcomeType={prefill?.outcomeType}
-          initialLocation={prefill?.location}
-          onCancel={() => setScreen({ kind: "list" })}
-          onSaved={async () => { /* Stay on the saved confirmation until Done. */ }}
-          onDone={() => void afterSave()}
-        />
-      </section>
-    )
-  }
-
-  if (screen.kind === "edit") {
-    const { entry } = screen
-    return (
-      <section className="screen plays-screen picker-play-entry">
-        <button type="button" className="collection-back" onClick={() => setScreen({ kind: "list" })}>← Back to Plays</button>
-        <header><h1>Edit play</h1><p className="subtitle">{entry.game.name}</p></header>
-        <PlayLogForm
-          game={entry.game}
-          editingPlay={entry.play}
-          presentation="dedicated"
-          onCancel={() => setScreen({ kind: "list" })}
-          onSaved={afterSave}
-        />
-      </section>
-    )
-  }
-
   return (
     <section className="screen plays-screen">
       <PullIndicator {...pull} />
+      {screen.kind === "log" && (
+        <PlayLogForm
+          key={screen.key}
+          game={screen.game}
+          initialPlayerNames={screen.prefill?.names}
+          initialTeams={screen.prefill?.teams}
+          initialOutcomeType={screen.prefill?.outcomeType}
+          initialLocation={screen.prefill?.location}
+          onClose={() => setScreen({ kind: "list" })}
+          onSaved={async () => { setReloadKey(current => current + 1) }}
+          onDone={() => setScreen({ kind: "list" })}
+        />
+      )}
+      {screen.kind === "edit" && (
+        <PlayLogForm
+          game={screen.entry.game}
+          editingPlay={screen.entry.play}
+          onClose={() => setScreen({ kind: "list" })}
+          onSaved={afterSave}
+        />
+      )}
       <header>
         <h1>Plays</h1>
         {!loading && entries.length > 0 && <p className="subtitle">{entries.length} {entries.length === 1 ? "play" : "plays"}</p>}
@@ -244,19 +217,30 @@ function PlaysView({ onOpenGame }: Props) {
                   const date = new Date(play.played_at).toLocaleDateString(undefined, { day: "numeric", month: "short" })
                   const result = winnersLabel(play)
                   return (
-                    <li key={play.id} className="plays-card">
-                      <button type="button" className="plays-card-main" onClick={() => onOpenGame(game.bgg_id)} aria-label={`${game.name}, ${date}. Open game`}>
-                        <span className="plays-cover"><ResilientGameArtwork src={game.thumbnail_url ?? game.image_url} alt="" gameName={game.name} /></span>
-                        <span className="plays-card-copy">
-                          <strong>{game.name}</strong>
-                          <span>{date} · {playSummary(play)}</span>
-                          {result && <span className="plays-result">{result}</span>}
-                        </span>
-                      </button>
-                      <div className="plays-card-actions">
-                        <button type="button" className="secondary-button" onClick={() => setScreen({ kind: "log", game, prefill: rematchPrefill(play), key: Date.now() })}>Rematch</button>
-                        <button type="button" className="ghost-button" onClick={() => setScreen({ kind: "edit", entry })}>Edit</button>
-                      </div>
+                    <li key={play.id} className={entry.onShelf ? "plays-card" : "plays-card off-shelf"}>
+                      {entry.onShelf ? (
+                        <>
+                          <button type="button" className="plays-cover" onClick={() => onOpenGame(game.bgg_id)} aria-label={`Open ${game.name}`}>
+                            <ResilientGameArtwork src={game.thumbnail_url ?? game.image_url} alt="" gameName={game.name} />
+                          </button>
+                          <button type="button" className="plays-card-main" onClick={() => setScreen({ kind: "edit", entry })} aria-label={`${game.name}, ${date}. Edit play`}>
+                            <strong>{game.name}</strong>
+                            <span>{date} · {playSummary(play)}{result ? ` · ${result}` : ""}</span>
+                          </button>
+                          <button type="button" className="plays-rematch" onClick={() => setScreen({ kind: "log", game, prefill: rematchPrefill(play), key: Date.now() })} aria-label={`Rematch ${game.name}`}>
+                            Rematch
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <span className="plays-cover"><ResilientGameArtwork src={game.thumbnail_url ?? game.image_url} alt="" gameName={game.name} /></span>
+                          <span className="plays-card-main">
+                            <strong>{game.name}</strong>
+                            <span>{date} · {playSummary(play)}{result ? ` · ${result}` : ""}</span>
+                          </span>
+                          <span className="plays-off-shelf">Not on shelf</span>
+                        </>
+                      )}
                     </li>
                   )
                 })}

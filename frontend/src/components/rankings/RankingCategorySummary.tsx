@@ -7,6 +7,8 @@ import {
   getRankings,
   type RankingSummary,
 } from "../../api/client"
+import { Link } from "react-router-dom"
+import { APP_PATHS } from "../../routes"
 
 
 function RankingCategorySummary() {
@@ -64,6 +66,29 @@ function RankingCategorySummary() {
   }
 
 
+  const leaders = ([
+    ["Publishers", summary.publishers],
+    ["Designers", summary.designers],
+    ["Mechanics", summary.mechanics],
+    ["Categories", summary.categories],
+  ] as const).filter(([, items]) => items.length > 0)
+
+  // Publisher, designer, mechanic and category data arrives with a BGG sync.
+  if (leaders.length === 0) {
+    return (
+      <section className="stats-sync-note" aria-labelledby="stats-sync-note-title">
+        <h2 id="stats-sync-note-title">Shelf details</h2>
+        <p>
+          Sync your BoardGameGeek collection to see your top publishers, designers, mechanics and categories.
+        </p>
+        <Link className="stats-action-link" to={APP_PATHS.settingsCollectionData}>
+          Sync collection
+        </Link>
+      </section>
+    )
+  }
+
+
   return (
     <section>
       <div className="stats-section-heading">
@@ -73,24 +98,7 @@ function RankingCategorySummary() {
       </div>
 
       <div className="rank-summary-grid">
-        {([
-          [
-            "Publishers",
-            summary.publishers,
-          ],
-          [
-            "Designers",
-            summary.designers,
-          ],
-          [
-            "Mechanics",
-            summary.mechanics,
-          ],
-          [
-            "Categories",
-            summary.categories,
-          ],
-        ] as const).map(
+        {leaders.map(
           ([label, items]) => (
             <article
               className="rank-summary-card"
@@ -100,26 +108,20 @@ function RankingCategorySummary() {
                 Top {label}
               </p>
 
-              {items.length > 0 ? (
-                <ol>
-                  {items.map(
-                    (item) => (
-                      <li key={item.name}>
-                        <span>
-                          {item.name}
-                        </span>
-                        <strong>
-                          {item.count}
-                        </strong>
-                      </li>
-                    ),
-                  )}
-                </ol>
-              ) : (
-                <p className="insight-empty">
-                  Sync your collection to add this metadata.
-                </p>
-              )}
+              <ol>
+                {items.map(
+                  (item) => (
+                    <li key={item.name}>
+                      <span>
+                        {item.name}
+                      </span>
+                      <strong>
+                        {item.count}
+                      </strong>
+                    </li>
+                  ),
+                )}
+              </ol>
             </article>
           ),
         )}

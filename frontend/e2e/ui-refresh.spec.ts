@@ -75,17 +75,19 @@ test("Plays: filters, Rematch, Edit and Log play", async ({ page }) => {
   expect(await cards.count()).toBeGreaterThan(0)
   await page.getByLabel("Player", { exact: true }).selectOption({ label: "All players" })
 
+  // Rematch and Edit open the Log play sheet over the list.
+  const sheet = page.getByRole("dialog")
   await cards.first().getByRole("button", { name: "Rematch" }).click()
-  await expect(page.getByRole("heading", { name: "Rematch" })).toBeVisible()
-  await page.getByRole("button", { name: "← Back to Plays" }).click()
-  await cards.first().getByRole("button", { name: "Edit" }).click()
-  await expect(page.getByRole("heading", { name: "Edit play" })).toBeVisible()
-  await page.getByRole("button", { name: "← Back to Plays" }).click()
+  await expect(sheet.getByText("Log play")).toBeVisible()
+  await sheet.getByRole("button", { name: "Cancel" }).click()
+  await cards.first().locator(".plays-card-main").click()
+  await expect(sheet.getByText("Edit play")).toBeVisible()
+  await sheet.getByRole("button", { name: "Cancel" }).click()
 
   await page.getByRole("button", { name: "Log play" }).click()
   await expect(page.getByRole("heading", { name: "Log a play" })).toBeVisible()
   await page.getByRole("button", { name: /Lantern Grove/ }).click()
-  await expect(page.getByRole("heading", { name: "Log a play" })).toBeVisible()
+  await expect(page.getByRole("dialog", { name: "Lantern Grove" })).toBeVisible()
 })
 
 test("Plays shows an empty state before the first play", async ({ page }) => {
@@ -178,6 +180,6 @@ test("Shelf: last row scrolls clear of the tab bar and long titles keep two line
   })
   expect(lines).toBeLessThanOrEqual(2)
   await page.screenshot({ path: `${SHOTS}/after/shelf-end-390-light.png` })
-  await page.getByRole("button", { name: "List view" }).click()
-  await expect(page.getByRole("button", { name: "List view" })).toHaveAttribute("aria-pressed", "true")
+  await page.getByRole("button", { name: "Show as list" }).click()
+  await expect(page.getByRole("button", { name: "Show as grid" })).toBeVisible()
 })

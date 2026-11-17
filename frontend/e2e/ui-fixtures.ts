@@ -47,3 +47,34 @@ export async function mockShelf(page: Page) {
     return route.fulfill({ json: { total: plays.length, plays } })
   })
 }
+
+// Discover feed with enough cards to scroll, for layout checks.
+export async function mockDiscover(page: Page) {
+  const recommendations = GAMES.map((game, index) => ({
+    game: { ...game, owned: false }, score: 90 - index * 4, reasons: ["Popular this week", "Plays well at 3"],
+    wishlisted: index === 1, source_rank: index + 1, section: null,
+  }))
+  await page.route(/\/discover\?/, route => route.fulfill({ json: recommendations }))
+}
+
+// Controls and headings whose box meets the avatar's box.
+export function avatarCollisions(page: Page) {
+  return page.evaluate(() => {
+    const avatar = document.querySelector(".app-top-bar .dice-menu-button")
+    if (!avatar) return ["no avatar"]
+    const a = avatar.getBoundingClientRect()
+    const meets = (b: DOMRect) => b.width > 0 && b.height > 0 && b.left < a.right && b.right > a.left && b.top < a.bottom && b.bottom > a.top
+    return Array.from(document.querySelectorAll<HTMLElement>(".app-content :is(button, a[href], input, select, h1, h2, [role=tab])"))
+      .filter((element) => {
+        if (getComputedStyle(element).visibility === "hidden") return false
+        // Headings are measured by their text, not their full-width block.
+        if (/^H[12]$/.test(element.tagName)) {
+          const range = document.createRange()
+          range.selectNodeContents(element)
+          return Array.from(range.getClientRects()).some(meets)
+        }
+        return meets(element.getBoundingClientRect())
+      })
+      .map((element) => `${element.tagName.toLowerCase()}.${element.className} "${(element.textContent ?? "").trim().slice(0, 30)}"`)
+  })
+}

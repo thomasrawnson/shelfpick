@@ -44,7 +44,7 @@ function renderPlayLog(selectedPlayerIds, selectedPlayerNames) {
     game,
     selectedPlayerIds,
     selectedPlayerNames,
-    presentation: "dedicated",
+    defaultOpen: true,
   }))
 }
 
@@ -62,12 +62,12 @@ test("Game Night play logging prepopulates exact named participants in selection
   assert.equal((markup.match(/placeholder="Player name"/g) ?? []).length, 2)
 })
 
-test("count-only Game Night play logging creates the correct number of editable blank rows", () => {
+test("count-only Game Night play logging asks for that many players without blank rows", () => {
   const markup = renderPlayLog([10, 11, 12], [])
 
-  assert.equal((markup.match(/placeholder="Player name"/g) ?? []).length, 3)
-  assert.equal((markup.match(/value=""/g) ?? []).length >= 3, true)
-  assert.match(markup, /\+ Add player/)
+  assert.equal((markup.match(/placeholder="Player name"/g) ?? []).length, 0)
+  assert.match(markup, /add 3 more players/)
+  assert.match(markup, /aria-label="Add player"/)
 })
 
 test("changed and repeated Game Night entry does not retain stale participants", () => {
@@ -81,9 +81,9 @@ test("changed and repeated Game Night entry does not retain stale participants",
   assert.equal((changedEntry.match(/placeholder="Player name"/g) ?? []).length, 1)
 })
 
-test("incomplete Game Night selections remain editable without duplicating names", () => {
+test("incomplete Game Night selections keep named players and ask for the rest", () => {
   const markup = renderPlayLog([1, 2], ["Alex"])
 
   assert.equal((markup.match(/value="Alex"/g) ?? []).length, 1)
-  assert.equal((markup.match(/placeholder="Player name"/g) ?? []).length, 2)
+  assert.equal((markup.match(/placeholder="Player name"/g) ?? []).length, 1)
 })

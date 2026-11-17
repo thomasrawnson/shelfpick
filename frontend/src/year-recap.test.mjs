@@ -44,6 +44,33 @@ test("every slide has a spoken summary and missing play time is not zero", () =>
   assert.doesNotMatch(lib.slideSummary("totals", untimed), /0h|0m/)
 })
 
+test("story progress segments always match the slide counter", () => {
+  const recaps = [
+    base,
+    { ...base, new_games_count: 0, longest_play: null, co_players: [] },
+    { ...base, total_plays: 2 },
+  ]
+  for (const recap of recaps) {
+    const kinds = lib.yearSlideKinds(recap)
+    for (let index = 0; index < kinds.length; index += 1) {
+      const { segments, counter } = lib.storyProgress(kinds, index)
+      const total = Number(counter.match(/of (\d+)$/)[1])
+      assert.equal(segments.length, total)
+      assert.equal(segments.length, kinds.length)
+      assert.equal(counter, `Slide ${index + 1} of ${kinds.length}`)
+      assert.equal(segments.filter(segment => segment === "current").length, 1)
+      assert.equal(segments.indexOf("current"), index)
+    }
+  }
+})
+
+test("timed coverage is shown only when some plays were not timed", () => {
+  assert.equal(lib.hoursCoverage(base), "Timed on 30 of 40 plays")
+  const fullyTimed = { ...base, duration_plays: base.total_plays }
+  assert.equal(lib.hoursCoverage(fullyTimed), null)
+  assert.doesNotMatch(lib.slideSummary("totals", fullyTimed), /Timed on/)
+})
+
 test("alt text leaves player names out unless asked", () => {
   assert.doesNotMatch(lib.yearRecapAltText(base, false), /Ann/)
   assert.match(lib.yearRecapAltText(base, true), /Ann/)

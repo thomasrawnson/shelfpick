@@ -10,6 +10,7 @@ import {
   plural,
   slideSummary,
   slideTitle,
+  storyProgress,
   weekdayName,
   yearSlideKinds,
   type YearSlideKind,
@@ -40,7 +41,8 @@ function usePrefersReducedMotion(): boolean {
 
 function SlideBody({ kind, recap }: { kind: YearSlideKind; recap: YearRecap }) {
   switch (kind) {
-    case "totals":
+    case "totals": {
+      const coverage = hoursCoverage(recap)
       return (
         <div className="year-story-stats">
           <p><strong>{recap.total_plays}</strong><span>{recap.total_plays === 1 ? "Play" : "Plays"}</span></p>
@@ -49,9 +51,10 @@ function SlideBody({ kind, recap }: { kind: YearSlideKind; recap: YearRecap }) {
             <strong>{recap.total_duration_minutes === null ? "Not recorded" : formatHours(recap.total_duration_minutes)}</strong>
             <span>{recap.total_duration_minutes === null ? "Play time" : "Played"}</span>
           </p>
-          <p className="year-story-note">{hoursCoverage(recap)}.</p>
+          {coverage && <p className="year-story-note">{coverage}.</p>}
         </div>
       )
+    }
     case "top-games":
       return (
         <ol className="year-story-list">
@@ -166,6 +169,7 @@ function YearRecapStory({ recap, onClose, onShare }: Props) {
 
   const kind = kinds[index]
   const title = slideTitle(kind, recap)
+  const progress = storyProgress(kinds, index)
 
   // Portalled so it sits above the app header and tab bar, which have their own stacking contexts.
   return createPortal(
@@ -179,19 +183,19 @@ function YearRecapStory({ recap, onClose, onShare }: Props) {
       onKeyDown={onKeyDown}
     >
       <div className="year-story-progress" role="presentation">
-        {kinds.map((slide, position) => (
+        {progress.segments.map((segment, position) => (
           <span
-            key={slide}
-            className={position < index ? "is-done" : position === index ? "is-current" : undefined}
+            key={kinds[position]}
+            className={segment === "upcoming" ? undefined : `is-${segment}`}
           >
-            {position === index && !reducedMotion && !paused && index < last && (
+            {segment === "current" && !reducedMotion && !paused && index < last && (
               <i key={index} style={{ animationDuration: `${AUTO_ADVANCE_MS}ms` }} />
             )}
           </span>
         ))}
       </div>
       <div className="year-story-bar">
-        <p aria-hidden="true">Slide {index + 1} of {kinds.length}</p>
+        <p aria-hidden="true">{progress.counter}</p>
         <div>
           {!reducedMotion && index < last && (
             <button type="button" className="ghost-button" aria-pressed={paused} onClick={() => setPaused(value => !value)}>
@@ -213,7 +217,7 @@ function YearRecapStory({ recap, onClose, onShare }: Props) {
           className="year-story-slide"
           role="group"
           aria-roledescription="slide"
-          aria-label={`Slide ${index + 1} of ${kinds.length}: ${title}. ${slideSummary(kind, recap)}`}
+          aria-label={`${progress.counter}: ${title}. ${slideSummary(kind, recap)}`}
         >
           <h2>{title}</h2>
           <SlideBody kind={kind} recap={recap} />
@@ -221,10 +225,12 @@ function YearRecapStory({ recap, onClose, onShare }: Props) {
       </div>
 
       <div className="year-story-controls">
-        <button type="button" className="secondary-button" disabled={index === 0} onClick={() => goTo(index - 1)}>Previous</button>
+        <button type="button" className="secondary-button" disabled={index === 0} onClick={() => goTo(index - 1)}>
+          <span aria-hidden="true">‹ </span>Previous
+        </button>
         {index === last
           ? <button type="button" className="primary-button" onClick={onShare}>Share my year</button>
-          : <button type="button" className="primary-button" onClick={() => goTo(index + 1)}>Next</button>}
+          : <button type="button" className="primary-button" onClick={() => goTo(index + 1)}>Next<span aria-hidden="true"> ›</span></button>}
       </div>
     </div>,
     document.body,

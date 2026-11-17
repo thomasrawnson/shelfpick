@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import type { Game } from "../api/client"
 import { useLiveTimer } from "../live-timer"
 import { elapsedSeconds, formatElapsed } from "../live-timer-utils"
-import PlayLogForm from "./collection/PlayLogForm"
+import { LogPlayButton } from "./collection/PlayLogForm"
 
 function timerGame(timer: NonNullable<ReturnType<typeof useLiveTimer>["timer"]>): Game {
   return {
@@ -51,9 +51,9 @@ export function LiveTimerRecovery({ timer, onBack, playSaved, onPlaySaved }: Rec
         ? "Manual play logging remains available. Saving here will not finish or discard the retained timer."
         : "Review the retained duration and details before saving."}</p>
     </div>
-    <PlayLogForm
+    <LogPlayButton
+      label={wasActive ? "Log this play" : "Save play"}
       game={timerGame(timer)}
-      presentation="dedicated"
       initialPlayerCount={Math.max(1, timer.draft.participant_names?.length ?? 1)}
       initialPlayerNames={timer.draft.participant_names ?? []}
       initialDurationMinutes={Math.max(0, Math.round(elapsed / 60))}
@@ -98,9 +98,10 @@ function LiveTimerView({ onBack }: { onBack: () => void }) {
         : <button className="secondary-button" type="button" disabled={pending} onClick={() => void resume()}>Resume</button>}
       <button className="primary-button" type="button" disabled={pending} onClick={() => void finish()}>Finish</button>
     </div>}
-    {timer.status === "finished" && <PlayLogForm
+    {timer.status === "finished" && <LogPlayButton
+      label="Save play"
+      defaultOpen
       game={game}
-      presentation="dedicated"
       initialPlayerCount={Math.max(1, timer.draft.participant_names?.length ?? 1)}
       initialPlayerNames={timer.draft.participant_names ?? []}
       initialDurationMinutes={Math.max(0, Math.round(elapsed / 60))}

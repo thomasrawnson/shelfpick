@@ -336,10 +336,14 @@ function PlayerStep({
             type="button"
             className="primary-button"
             disabled={players === null}
+            aria-describedby={players === null ? "player-step-hint" : undefined}
             onClick={onContinue}
           >
             Find a game
           </button>
+          {players === null && (
+            <p id="player-step-hint" className="picker-action-hint">Choose your player count</p>
+          )}
           {onGroupVote && (
             <button
               type="button"

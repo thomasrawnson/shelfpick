@@ -344,6 +344,23 @@ select,
 textarea,
 a {
   -webkit-tap-highlight-color: transparent;
+  color: var(--color-brand-primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* Links are told apart by colour, never by underline (SP-UI-02). */
+a:hover {
+  color: var(--color-brand-primary-hover);
+}
+
+/* Standalone text actions end in a chevron instead of an underline. */
+.picker-view-game::after,
+.tonight-vote-button::after,
+.add-game-import a::after,
+.game-night-get-app a::after {
+  content: "\00a0›";
+  font-weight: 800;
 }
 
 button,
@@ -408,7 +425,10 @@ textarea:focus-visible {
 
 :root {
 
-  --shelfpick-nav-height: 72px;
+  /* Floating tab bar (SP-UI-02): compact, sitting just above the home indicator. */
+  --shelfpick-nav-height: 62px;
+  --shelfpick-nav-bottom: max(8px, calc(env(safe-area-inset-bottom) - 12px));
+  --shelfpick-nav-clearance: calc(var(--shelfpick-nav-height) + var(--shelfpick-nav-bottom) + 24px);
 }
 
 /* Overall signed-in application */
@@ -418,9 +438,7 @@ textarea:focus-visible {
 
   min-height: 100dvh;
 
-  padding-bottom: calc(
-    var(--shelfpick-nav-height) + env(safe-area-inset-bottom)
-  );
+  padding-bottom: var(--shelfpick-nav-clearance);
 
   background: radial-gradient(
       circle at 50% -5%,

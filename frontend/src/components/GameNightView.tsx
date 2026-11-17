@@ -9,7 +9,7 @@ import {
   type GameNightVotingHostState,
   type PickerMatch,
 } from "../api/client"
-import PlayLogForm from "./collection/PlayLogForm"
+import { LogPlayButton } from "./collection/PlayLogForm"
 import PlayerSelectionStep from "./picker/PlayerSelectionStep"
 import TimeStep from "./picker/TimeStep"
 import { Analytics, timeBand } from "../analytics"
@@ -34,7 +34,7 @@ type GameNightPlayLogProps = {
   game: PickerMatch["game"]
   selectedPlayerIds: number[]
   selectedPlayerNames: string[]
-  presentation?: "inline" | "dedicated"
+  defaultOpen?: boolean
 }
 
 
@@ -42,14 +42,14 @@ export function GameNightPlayLog({
   game,
   selectedPlayerIds,
   selectedPlayerNames,
-  presentation = "inline",
+  defaultOpen = false,
 }: GameNightPlayLogProps) {
   return (
-    <PlayLogForm
+    <LogPlayButton
       game={game}
+      defaultOpen={defaultOpen}
       initialPlayerCount={selectedPlayerIds.length}
       initialPlayerNames={selectedPlayerNames.slice(0, selectedPlayerIds.length)}
-      presentation={presentation}
       onSaved={() => Promise.resolve()}
     />
   )

@@ -39,3 +39,20 @@ test("winner labels cover competitive, co-op and unscored plays", () => {
   assert.equal(winnersLabel(play(2, "2026-01-01", [], { outcome_type: "cooperative", coop_result: "won" })), "Won together")
   assert.equal(winnersLabel(play(3, "2026-01-01", ["Ann"])), null)
 })
+
+test("SP-UI-02 counting rule: every play counts, off-shelf plays keep their game summary", async () => {
+  const { feedEntries } = await import("./plays-feed.ts")
+  const shelf = [{ bgg_id: 1, name: "Alpha" }]
+  const plays = [
+    { ...play(1, "2026-11-01T12:00:00Z", ["Ann"]), bgg_id: 1, game: { bgg_id: 1, name: "Alpha", thumbnail_url: null, image_url: null, is_expansion: false, on_shelf: true } },
+    { ...play(2, "2026-11-02T12:00:00Z", ["Ann"]), bgg_id: 9, game: { bgg_id: 9, name: "Sold Game", thumbnail_url: "t.png", image_url: null, is_expansion: false, on_shelf: false } },
+    { ...play(3, "2026-11-03T12:00:00Z", ["Bob"]), bgg_id: 7, game: { bgg_id: 7, name: "An Expansion", thumbnail_url: null, image_url: null, is_expansion: true, on_shelf: true } },
+  ]
+  const feed = feedEntries(shelf, plays)
+  // The Plays count equals the /plays total (and Stats' total plays).
+  assert.equal(feed.length, plays.length)
+  assert.deepEqual(feed.map(entry => [entry.game.name, entry.onShelf]), [
+    ["An Expansion", false], ["Sold Game", false], ["Alpha", true],
+  ])
+  assert.equal(feed[1].game.thumbnail_url, "t.png")
+})

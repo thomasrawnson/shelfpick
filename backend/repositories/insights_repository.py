@@ -2,7 +2,7 @@ from sqlalchemy import case, func
 from sqlalchemy.dialects.postgresql import (
     aggregate_order_by,
 )
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from database.models import (
     Game,
@@ -11,6 +11,7 @@ from database.models import (
     Player,
     UserGame,
 )
+from repositories.play_read_repository import _participant_outcome
 from models.collection_insights import (
     GamePlaySummary,
     LastPlayedGame,
@@ -322,6 +323,10 @@ class InsightsRepository:
         self,
         limit: int = 5,
     ) -> list[PlayerSummary]:
+        """Players by plays they took part in. Wins and decided plays use the
+        same outcome rules as the player profile, so the two win rates agree:
+        win rate = wins / decided plays (wins + losses + draws); plays with
+        no recorded result are left out of the rate."""
         if self.user_id is None:
             return []
 
@@ -329,63 +334,49 @@ class InsightsRepository:
             self.db.query(
                 Player.id,
                 Player.name,
-                func.count(
-                    PlayParticipant.id
-                ).label(
-                    "play_count"
-                ),
-                func.sum(
-                    case(
-                        (
-                            PlayParticipant
-                            .is_winner
-                            .is_(True),
-                            1,
-                        ),
-                        else_=0,
-                    )
-                ).label(
-                    "win_count"
-                ),
+                func.count(PlayParticipant.id).label("play_count"),
             )
-            .join(
-                PlayParticipant,
-                PlayParticipant.player_id
-                == Player.id,
-            )
-            .join(
-                Play,
-                Play.id
-                == PlayParticipant.play_id,
-            )
+            .join(PlayParticipant, PlayParticipant.player_id == Player.id)
+            .join(Play, Play.id == PlayParticipant.play_id)
             .filter(
-                Player.user_id
-                == self.user_id,
-                Play.user_id
-                == self.user_id,
+                Player.user_id == self.user_id,
+                Play.user_id == self.user_id,
             )
-            .group_by(
-                Player.id,
-                Player.name,
-            )
-            .order_by(
-                func.count(
-                    PlayParticipant.id
-                ).desc(),
-                Player.name,
-            )
+            .group_by(Player.id, Player.name)
+            .order_by(func.count(PlayParticipant.id).desc(), Player.name)
             .limit(limit)
             .all()
         )
+        if not rows:
+            return []
+
+        wins = {row.id: 0 for row in rows}
+        decided = {row.id: 0 for row in rows}
+        participants = (
+            self.db.query(PlayParticipant, Play, Game)
+            .join(Play, Play.id == PlayParticipant.play_id)
+            .join(Game, Game.id == Play.game_id)
+            .options(selectinload(Game.mechanics))
+            .filter(
+                PlayParticipant.player_id.in_(list(wins)),
+                Play.user_id == self.user_id,
+            )
+            .all()
+        )
+        for participant, play, game in participants:
+            outcome = _participant_outcome(participant, play, game)
+            if outcome == "win":
+                wins[participant.player_id] += 1
+            if outcome in ("win", "loss", "draw"):
+                decided[participant.player_id] += 1
 
         return [
             PlayerSummary(
                 id=row.id,
                 name=row.name,
                 play_count=row.play_count,
-                win_count=(
-                    row.win_count or 0
-                ),
+                win_count=wins[row.id],
+                decided_count=decided[row.id],
             )
             for row in rows
         ]

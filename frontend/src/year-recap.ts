@@ -39,8 +39,10 @@ export function formatHours(minutes: number): string {
   return remainder ? `${hours}h ${remainder}m` : `${hours}h`
 }
 
-export function hoursCoverage(recap: YearRecap): string {
+// Null when every play was timed: full coverage needs no caveat.
+export function hoursCoverage(recap: YearRecap): string | null {
   if (recap.total_duration_minutes === null) return "Play time wasn't recorded"
+  if (recap.duration_plays >= recap.total_plays) return null
   return `Timed on ${recap.duration_plays} of ${plural(recap.total_plays, "play")}`
 }
 
@@ -55,6 +57,16 @@ export function yearSlideKinds(recap: YearRecap): YearSlideKind[] {
   if (recap.co_players.length > 0) kinds.push("co-players")
   kinds.push("closing")
   return kinds
+}
+
+export type StorySegment = "done" | "current" | "upcoming"
+
+// The progress bar and the "Slide n of m" counter both come from the same slide list.
+export function storyProgress(kinds: YearSlideKind[], index: number): { segments: StorySegment[]; counter: string } {
+  return {
+    segments: kinds.map((_, position) => position < index ? "done" : position === index ? "current" : "upcoming"),
+    counter: `Slide ${index + 1} of ${kinds.length}`,
+  }
 }
 
 export function slideTitle(kind: YearSlideKind, recap: YearRecap): string {
@@ -76,7 +88,7 @@ export function slideSummary(kind: YearSlideKind, recap: YearRecap): string {
     case "totals": {
       const time = recap.total_duration_minutes === null
         ? "Play time wasn't recorded."
-        : `${formatHours(recap.total_duration_minutes)} played. ${hoursCoverage(recap)}.`
+        : `${formatHours(recap.total_duration_minutes)} played.${coverageSentence(recap)}`
       return `${plural(recap.total_plays, "play")} of ${plural(recap.unique_games, "different game")}. ${time}`
     }
     case "top-games":
@@ -104,6 +116,11 @@ export function slideSummary(kind: YearSlideKind, recap: YearRecap): string {
     case "closing":
       return `${plural(recap.total_plays, "play")} in ${recap.year}. Share your year or close the story.`
   }
+}
+
+function coverageSentence(recap: YearRecap): string {
+  const coverage = hoursCoverage(recap)
+  return coverage ? ` ${coverage}.` : ""
 }
 
 export function monthsChartLabel(recap: YearRecap): string {

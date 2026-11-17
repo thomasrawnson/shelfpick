@@ -1,3 +1,4 @@
+import { formatPlayerCount } from "../../player-count"
 import type {
   CollectionGameStats,
   Game,
@@ -96,10 +97,7 @@ function CollectionGameList({
           stats?.play_count ?? 0
         const gameMeta = [
           game.year_published,
-          game.min_players !== null
-          && game.max_players !== null
-            ? `${game.min_players}–${game.max_players} players`
-            : null,
+          formatPlayerCount(game.min_players, game.max_players),
           game.max_play_time !== null
             ? `${game.max_play_time} min`
             : null,

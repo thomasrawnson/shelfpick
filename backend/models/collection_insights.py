@@ -22,6 +22,8 @@ class PlayerSummary:
     name: str
     play_count: int
     win_count: int
+    # Plays with a known result (win, loss or draw); the win-rate denominator.
+    decided_count: int
 
 
 @dataclass

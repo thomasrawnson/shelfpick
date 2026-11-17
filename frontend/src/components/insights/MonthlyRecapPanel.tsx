@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { getMonthlyRecap, type MonthlyRecap } from "../../api/client"
 import { monthInTimezone, shiftMonth } from "../../monthly-recap-month"
+import { monthlyHighlight } from "../../monthly-recap-card"
 import MonthlyRecapShareDialog from "./MonthlyRecapShareDialog"
 
 function durationCopy(recap: MonthlyRecap): string {
@@ -8,6 +9,7 @@ function durationCopy(recap: MonthlyRecap): string {
   const hours = Math.floor(recap.total_duration_minutes / 60)
   const minutes = recap.total_duration_minutes % 60
   const value = [hours ? `${hours}h` : "", minutes ? `${minutes}m` : ""].filter(Boolean).join(" ")
+  if (recap.duration_plays >= recap.total_plays) return `${value} recorded.`
   return `${value} recorded across ${recap.duration_plays} of ${recap.total_plays} ${recap.total_plays === 1 ? "play" : "plays"}.`
 }
 
@@ -20,6 +22,7 @@ function MonthlyRecapPanel() {
   const [error, setError] = useState("")
   const [retryKey, setRetryKey] = useState(0)
   const [sharing, setSharing] = useState(false)
+  const highlight = recap ? monthlyHighlight(recap) : null
 
   useEffect(() => {
     let active = true
@@ -57,10 +60,10 @@ function MonthlyRecapPanel() {
           <h2>This month in games</h2>
           <p>Turn your recorded plays into a private, shareable recap.</p>
         </div>
-        <div className="recap-month-controls" aria-label="Select recap month">
-          <button type="button" className="ghost-button" aria-label="Previous month" onClick={() => selectMonth(shiftMonth(month, -1))}>Previous</button>
+        <div className="recap-month-controls" role="group" aria-label="Select recap month">
+          <button type="button" className="recap-month-step" aria-label="Previous month" onClick={() => selectMonth(shiftMonth(month, -1))}><span aria-hidden="true">‹</span></button>
           <time dateTime={month} aria-live="polite">{recap?.month_label ?? month}</time>
-          <button type="button" className="ghost-button" aria-label="Next month" disabled={month >= currentMonth} onClick={() => selectMonth(shiftMonth(month, 1))}>Next</button>
+          <button type="button" className="recap-month-step" aria-label="Next month" disabled={month >= currentMonth} onClick={() => selectMonth(shiftMonth(month, 1))}><span aria-hidden="true">›</span></button>
         </div>
       </div>
 
@@ -85,7 +88,9 @@ function MonthlyRecapPanel() {
           </div>
           <div className="monthly-recap-copy">
             <p>{durationCopy(recap)}</p>
-            {recap.most_played && <p><strong>Most played:</strong> {recap.most_played.name} · {recap.most_played.play_count} {recap.most_played.play_count === 1 ? "play" : "plays"}</p>}
+            {highlight && (highlight.label === "Variety"
+              ? <p>{highlight.value}, one play each.</p>
+              : <p><strong>{highlight.label}:</strong> {highlight.value}</p>)}
           </div>
           <button type="button" className="primary-button monthly-recap-share" onClick={() => setSharing(true)}>Share this month</button>
         </article>
