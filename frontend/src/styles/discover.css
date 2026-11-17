@@ -199,7 +199,7 @@
   display: grid;
   grid-template-columns: 76px minmax(0, 1fr);
   gap: var(--space-3);
-  padding: var(--space-3) 0;
+  padding: var(--space-2) 0;
 }
 
 .discover-card + .discover-card {
@@ -229,7 +229,7 @@
 .discover-copy {
   display: grid;
   align-content: start;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
 }
 
@@ -266,10 +266,11 @@
 }
 
 .discover-save-button {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  min-height: var(--target-min);
+  min-height: 34px;
   padding: 0 12px;
   border: 1px solid var(--color-brand-primary);
   border-radius: 999px;
@@ -281,6 +282,13 @@
   cursor: pointer;
 }
 
+/* 34px pill, 44px tap target. */
+.discover-save-button::before {
+  position: absolute;
+  inset: -5px 0;
+  content: "";
+}
+
 .discover-save-button.saved {
   background: var(--color-brand-primary);
   color: var(--color-text-inverse);
@@ -288,16 +296,6 @@
 
 .discover-save-button:disabled {
   opacity: 0.6;
-}
-
-.discover-reason-details summary {
-  min-height: var(--target-min);
-  display: flex;
-  align-items: center;
-  color: var(--color-brand-primary);
-  font-size: var(--text-support);
-  font-weight: 700;
-  cursor: pointer;
 }
 
 .discover-reasons {
@@ -309,12 +307,19 @@
 
 .discover-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-4);
+  column-gap: var(--space-3);
+  margin-top: -4px;
 }
 
+/* One quiet line of secondary actions. Each keeps a 44px tap height through
+   padding, but the line itself stays compact. */
 .discover-actions a[href],
-.discover-dismiss-button {
+.discover-dismiss-button,
+.discover-reasons-toggle {
+  display: inline-flex;
+  align-items: center;
   min-height: var(--target-min);
   min-width: 0;
   padding: 0;
@@ -325,4 +330,17 @@
   font-size: var(--text-support);
   font-weight: 700;
   cursor: pointer;
+}
+
+.discover-reasons-toggle {
+  color: var(--color-brand-primary);
+}
+
+.discover-reasons-toggle::after {
+  content: "\00a0▾";
+  font-size: 0.75em;
+}
+
+.discover-reasons-toggle[aria-expanded="true"]::after {
+  content: "\00a0▴";
 }

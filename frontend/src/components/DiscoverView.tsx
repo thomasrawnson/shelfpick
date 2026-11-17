@@ -77,6 +77,7 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
   const [actionError, setActionError] = useState("")
   const [reloadKey, setReloadKey] = useState(0)
   const [dismissedCount, setDismissedCount] = useState(0)
+  const [openReasons, setOpenReasons] = useState<Set<number>>(new Set())
   const [personalisationStatus, setPersonalisationStatus] =
     useState<DiscoverPersonalisationStatus>("unknown")
   const [personalisationSignals, setPersonalisationSignals] =
@@ -240,15 +241,23 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
               <span>{wishlisted ? "Saved" : "Want to Play"}</span>
             </button>
           </div>
-          {reasons.length > 0 && (
-            <details className="discover-reason-details">
-              <summary>{mode === "hot" ? "Why it’s trending" : "Why this match?"}</summary>
-              <ul className="discover-reasons">
-                {reasons.map((reason) => <li key={reason}>{reason}</li>)}
-              </ul>
-            </details>
-          )}
           <div className="discover-actions">
+            {reasons.length > 0 && (
+              <button
+                type="button"
+                className="discover-reasons-toggle"
+                aria-expanded={openReasons.has(game.bgg_id)}
+                aria-controls={`discover-reasons-${game.bgg_id}`}
+                onClick={() => setOpenReasons((current) => {
+                  const next = new Set(current)
+                  if (next.has(game.bgg_id)) next.delete(game.bgg_id)
+                  else next.add(game.bgg_id)
+                  return next
+                })}
+              >
+                {mode === "hot" ? "Why it’s trending" : "Why this match?"}
+              </button>
+            )}
             <a
               className="discover-bgg-link"
               href={`https://boardgamegeek.com/boardgame/${game.bgg_id}`}
@@ -261,11 +270,17 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
               type="button"
               className="discover-dismiss-button"
               aria-label={`Not interested in ${game.name}`}
+              title="Not interested"
               onClick={() => dismissRecommendation(game.bgg_id)}
             >
-              Not interested
+              Hide
             </button>
           </div>
+          {reasons.length > 0 && openReasons.has(game.bgg_id) && (
+            <ul className="discover-reasons" id={`discover-reasons-${game.bgg_id}`}>
+              {reasons.map((reason) => <li key={reason}>{reason}</li>)}
+            </ul>
+          )}
         </div>
       </article>
     )

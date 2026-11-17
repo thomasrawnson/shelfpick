@@ -85,6 +85,8 @@
 .player-step-screen .complexity-option strong { font-size: 1rem; }
 .player-step-screen .complexity-option.selected { color: var(--color-brand-primary); }
 .player-step-screen .advanced-filters summary { padding-inline: 16px; min-height: 52px; }
+/* The open Fine-tune body keeps the same 16px inset as its header. */
+.player-step-screen .advanced-filters .ui-disclosure-body { padding-inline: 16px; }
 .player-step-screen .advanced-filters summary strong { font-size: 1rem; }
 .player-step-screen .ui-disclosure-chevron { font-size: 1.5rem; line-height: 1; }
 .player-step-screen .picker-step-actions { margin: 0 !important; display: grid; gap: 4px; }

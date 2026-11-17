@@ -136,6 +136,35 @@ for (const scheme of ["light", "dark"] as const) {
   })
 }
 
+test("Log play: score boxes line up with and without a record; date and minutes align", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.emulateMedia({ colorScheme: "dark", reducedMotion: "reduce" })
+  await mockLogging(page)
+  const sheet = await openLogPlay(page)
+  // Tom has a record for this game; Ann has none.
+  for (const name of ["Tom", "Ann", "Wales"]) await sheet.getByRole("button", { name: `Add ${name}` }).click()
+  const lefts = await sheet.locator(".play-row-score").evaluateAll((inputs) => inputs.map((input) => Math.round(input.getBoundingClientRect().left)))
+  expect(new Set(lefts).size, `score boxes start at ${lefts.join(", ")}`).toBe(1)
+  await sheet.locator(".play-summary-button").click()
+  const date = await sheet.getByRole("textbox", { name: "Date" }).boundingBox()
+  const minutes = await sheet.getByRole("spinbutton", { name: "Minutes" }).boundingBox()
+  expect(Math.abs(date!.y - minutes!.y)).toBeLessThanOrEqual(1)
+  expect(Math.abs(date!.height - minutes!.height)).toBeLessThanOrEqual(1)
+  await page.screenshot({ path: `${SHOTS}/after/log-play-aligned-390-dark.png` })
+})
+
+test("Tonight Fine-tune content is inset like its header", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await mockPicker(page)
+  await page.goto("/tonight")
+  await page.getByText("Fine-tune").click()
+  const panel = await page.locator(".advanced-filters").boundingBox()
+  const label = await page.getByText("Pick style").boundingBox()
+  expect(label!.x - panel!.x).toBeGreaterThanOrEqual(12)
+  await page.getByText("Pick style").scrollIntoViewIfNeeded()
+  await page.screenshot({ path: `${SHOTS}/after/tonight-fine-tune-390-light.png` })
+})
+
 test("Log play: saving sends places from the scores", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await mockLogging(page)

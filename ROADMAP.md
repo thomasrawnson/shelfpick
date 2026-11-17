@@ -50,6 +50,13 @@ one play-counting rule (every play on the account counts; player counts are play
 taken part in). Build 9. Owner gates: phone check, merge, backend deploy before
 build 9, App Store screenshots. Report: `docs/SP-UI-02-REPORT.md`.
 
+**SP-UI-02b (17 Nov 2026, after the owner's phone check of build 9):** compact
+Discover rows (one line of secondary actions, 34px save pill), aligned Log play
+score boxes and date/minutes fields, Fine-tune body inset. Build 10.
+
+**Recorded follow-up (owner 17 Nov 2026): better Ranking share card.** The Top
+10/20/50/100 share image needs a stronger card design. Not part of SP-UI-02.
+
 **Recorded follow-up (separate scope, owner 17 Nov 2026): richer play stats.**
 On the Log play sheet and play detail, add BG Stats-style group statistics: for
 this game and these players, plays together, and per player wins, win %, average
