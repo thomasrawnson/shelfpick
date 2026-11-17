@@ -3,7 +3,9 @@ import { useState } from "react"
 import type {
   Game,
   GameHistory as GameHistoryData,
+  GamePlay,
 } from "../../api/client"
+import { rematchPrefill, type PlayPrefill } from "../../play-results"
 
 import ResilientGameArtwork from "../ResilientGameArtwork"
 import GameHistory from "./GameHistory"
@@ -30,6 +32,11 @@ function GameDetail({
     confirmingRemove,
     setConfirmingRemove,
   ] = useState(false)
+
+  const [rematch, setRematch] = useState<{
+    key: number
+    prefill: PlayPrefill
+  } | null>(null)
 
   const [
     removing,
@@ -119,8 +126,15 @@ function GameDetail({
         </div>
 
         <PlayLogForm
+          key={rematch?.key ?? 0}
           game={game}
           onSaved={onPlaySaved}
+          initialOpen={rematch !== null}
+          initialPlayerCount={rematch?.prefill.names.length}
+          initialPlayerNames={rematch?.prefill.names}
+          initialTeams={rematch?.prefill.teams}
+          initialOutcomeType={rematch?.prefill.outcomeType}
+          initialLocation={rematch?.prefill.location}
         />
 
         <div className="detail-section">
@@ -186,6 +200,16 @@ function GameDetail({
           onPlayDeleted={
             onPlaySaved
           }
+          onPlayEdited={
+            onPlaySaved
+          }
+          onRematch={(play: GamePlay) => {
+            setRematch({
+              key: (rematch?.key ?? 0) + 1,
+              prefill: rematchPrefill(play),
+            })
+            window.scrollTo({ top: 0, behavior: "smooth" })
+          }}
         />
 
         <div className="detail-section collection-danger-zone">

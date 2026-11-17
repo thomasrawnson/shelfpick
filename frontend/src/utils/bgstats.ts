@@ -3,6 +3,7 @@ import type {
   GamePlay,
   Play,
   PlayParticipant,
+  PlayResult,
 } from "../api/client"
 
 
@@ -12,6 +13,9 @@ type BGStatsPlayer = {
   startPlayer: boolean
   winner: boolean
   score?: number
+  rank?: number
+  team?: string
+  role?: string
 }
 
 
@@ -26,6 +30,7 @@ type BGStatsPlayData = {
     bggId: number
     highestWins: boolean
     noPoints: boolean
+    cooperative?: boolean
   }
   players: BGStatsPlayer[]
 }
@@ -88,7 +93,17 @@ function playerSourceId(
 
 function buildPlayers(
   participants: PlayParticipant[],
+  result?: PlayResult,
 ): BGStatsPlayer[] {
+  const sharedWin =
+    result !== undefined
+    && (
+      result.outcome_type === "cooperative"
+      || result.outcome_type === "solo"
+    )
+      ? result.coop_result === "won"
+      : null
+
   return participants.map(
     (participant) => {
       const player: BGStatsPlayer = {
@@ -98,8 +113,21 @@ function buildPlayers(
             participant.name,
           ),
         startPlayer: false,
+        // BG Stats has no shared result: a won co-op marks everyone a winner.
         winner:
-          participant.is_winner,
+          sharedWin ?? participant.is_winner,
+      }
+
+      if (participant.rank != null) {
+        player.rank = participant.rank
+      }
+
+      if (participant.team) {
+        player.team = participant.team
+      }
+
+      if (participant.role) {
+        player.role = participant.role
       }
 
       if (
@@ -121,6 +149,7 @@ export function createBGStatsPlayUrl(
   participants: PlayParticipant[],
   durationMinutes:
     number | null,
+  result?: PlayResult,
 ): string {
   const payload:
     BGStatsPlayData = {
@@ -147,11 +176,17 @@ export function createBGStatsPlayUrl(
             participant.score ===
             null,
         ),
+      ...(
+        result?.outcome_type === "cooperative"
+          ? { cooperative: true }
+          : {}
+      ),
     },
 
     players:
       buildPlayers(
         participants,
+        result,
       ),
   }
 
@@ -188,5 +223,6 @@ export function createBGStatsHistoryUrl(
     },
     play.participants,
     play.duration_minutes,
+    play,
   )
 }

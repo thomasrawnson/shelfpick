@@ -16,6 +16,7 @@ from database.models import (
     UserGame,
     LivePlayTimer,
 )
+from repositories.play_read_repository import serialize_play
 from models.play import (
     Play as DomainPlay,
 )
@@ -40,6 +41,8 @@ class PlayWriteRepository:
         participants: list[dict],
         location: str | None = None,
         timer_session_id: str | None = None,
+        outcome_type: str = "competitive",
+        coop_result: str | None = None,
     ) -> DomainPlay | None:
         if self.user_id is None:
             raise ValueError(
@@ -108,6 +111,8 @@ class PlayWriteRepository:
             duration_minutes=duration_minutes,
             location=location,
             timer_session_id=timer_session_id,
+            outcome_type=outcome_type,
+            coop_result=coop_result,
         )
 
         if played_at is not None:
@@ -149,17 +154,7 @@ class PlayWriteRepository:
                 )
             )
             database_play.participants.append(
-                PlayParticipant(
-                    player_id=player.id,
-                    name=player.name,
-                    score=participant.get(
-                        "score"
-                    ),
-                    is_winner=participant.get(
-                        "is_winner",
-                        False,
-                    ),
-                )
+                self._build_participant(player, participant)
             )
 
         if timer is not None:
@@ -180,6 +175,101 @@ class PlayWriteRepository:
             duration_minutes=database_play.duration_minutes,
             location=database_play.location,
         )
+    @staticmethod
+    def _build_participant(
+        player: Player,
+        data: dict,
+    ) -> PlayParticipant:
+        return PlayParticipant(
+            player_id=player.id,
+            name=player.name,
+            score=data.get("score"),
+            is_winner=data.get("is_winner", False),
+            team=data.get("team"),
+            rank=data.get("rank"),
+            role=data.get("role"),
+        )
+
+    def get_play_for_edit(self, play_id: int) -> dict | None:
+        """Return the caller's own play as plain data, or None."""
+        play = self._owned_play(play_id)
+        if play is None:
+            return None
+        game = self.db.get(DatabaseGame, play.game_id)
+        return {
+            "bgg_id": game.bgg_id,
+            "played_at": play.played_at,
+            "duration_minutes": play.duration_minutes,
+            "location": play.location,
+            "outcome_type": play.outcome_type,
+            "coop_result": play.coop_result,
+            "participants": [
+                {
+                    "name": p.name,
+                    "score": p.score,
+                    "is_winner": p.is_winner,
+                    "team": p.team,
+                    "rank": p.rank,
+                    "role": p.role,
+                }
+                for p in play.participants
+            ],
+        }
+
+    def _owned_play(self, play_id: int) -> DatabasePlay | None:
+        if self.user_id is None:
+            return None
+        return (
+            self.db.query(DatabasePlay)
+            .filter(
+                DatabasePlay.id == play_id,
+                DatabasePlay.user_id == self.user_id,
+            )
+            .first()
+        )
+
+    def update(self, play_id: int, state: dict) -> dict | None:
+        """Replace an owned play's editable fields with ``state``.
+
+        ``source``, ``source_play_id`` and ``timer_session_id`` are never
+        touched, so an edited import still matches its BG Stats id.
+        Returns the serialised play, or None when it is not found or the
+        new game is not in the caller's collection.
+        """
+        play = self._owned_play(play_id)
+        if play is None:
+            return None
+
+        game = (
+            self.db.query(DatabaseGame)
+            .join(UserGame, UserGame.game_id == DatabaseGame.id)
+            .filter(
+                DatabaseGame.bgg_id == state["bgg_id"],
+                UserGame.user_id == self.user_id,
+            )
+            .first()
+        )
+        if game is None:
+            return None
+
+        play.game_id = game.id
+        play.played_at = state["played_at"]
+        play.duration_minutes = state["duration_minutes"]
+        play.location = state["location"]
+        play.outcome_type = state["outcome_type"]
+        play.coop_result = state["coop_result"]
+        play.player_count = len(state["participants"])
+
+        play.participants.clear()
+        self.db.flush()
+        for data in state["participants"]:
+            player = self._get_or_create_player(data["name"])
+            play.participants.append(self._build_participant(player, data))
+
+        self.db.commit()
+        self.db.refresh(play)
+        return serialize_play(play, game)
+
     @staticmethod
     def _normalize_player_name(
         name: str,
@@ -286,6 +376,8 @@ class PlayWriteRepository:
         source_play_id: str,
         participants: list[dict],
         commit: bool = True,
+        outcome_type: str = "competitive",
+        coop_result: str | None = None,
     ) -> bool:
         if self.user_id is None:
             return False
@@ -317,22 +409,14 @@ class PlayWriteRepository:
             )
 
             database_play.participants.append(
-                PlayParticipant(
-                    player_id=player.id,
-                    name=player.name,
-                    score=participant.get(
-                        "score"
-                    ),
-                    is_winner=participant.get(
-                        "is_winner",
-                        False,
-                    ),
-                )
+                self._build_participant(player, participant)
             )
 
         database_play.player_count = len(
             participants
         )
+        database_play.outcome_type = outcome_type
+        database_play.coop_result = coop_result
 
         if commit:
             self.db.commit()
@@ -351,6 +435,8 @@ class PlayWriteRepository:
         source_play_id: str,
         participants: list[dict],
         commit: bool = True,
+        outcome_type: str = "competitive",
+        coop_result: str | None = None,
     ) -> bool:
         if self.user_id is None:
             raise ValueError(
@@ -408,6 +494,8 @@ class PlayWriteRepository:
             duration_minutes=duration_minutes,
             source=source,
             source_play_id=source_play_id,
+            outcome_type=outcome_type,
+            coop_result=coop_result,
         )
 
         try:
@@ -444,17 +532,7 @@ class PlayWriteRepository:
             )
 
             database_play.participants.append(
-                PlayParticipant(
-                    player_id=player.id,
-                    name=player.name,
-                    score=participant.get(
-                        "score"
-                    ),
-                    is_winner=participant.get(
-                        "is_winner",
-                        False,
-                    ),
-                )
+                self._build_participant(player, participant)
             )
 
         if commit:

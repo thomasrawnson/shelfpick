@@ -1,0 +1,126 @@
+import assert from "node:assert/strict"
+import { readdirSync, readFileSync, statSync } from "node:fs"
+import { join } from "node:path"
+import { after, before, test } from "node:test"
+import { createServer } from "vite"
+
+let server
+let core
+
+before(async () => {
+  server = await createServer({ server: { middlewareMode: true, hmr: false }, appType: "custom" })
+  core = await server.ssrLoadModule("/src/analytics/core.ts")
+})
+after(async () => { await server?.close() })
+
+function harness(initial = {}) {
+  const store = new Map(Object.entries(initial))
+  const calls = []
+  const sdk = {
+    init: opts => calls.push(["init", opts.startOptedOut]),
+    capture: (name, properties) => calls.push(["capture", name, properties]),
+    optIn: () => calls.push(["optIn"]),
+    optOut: () => calls.push(["optOut"]),
+  }
+  const analytics = core.createAnalytics({
+    sdk,
+    storage: { getItem: k => store.get(k) ?? null, setItem: (k, v) => store.set(k, v) },
+    appVersion: "abc1234",
+    common: { environment: "dev", platform: "web" },
+  })
+  return { analytics, calls, store }
+}
+const captured = calls => calls.filter(c => c[0] === "capture")
+
+test("with analytics switched off the wrapper sends nothing and the SDK starts opted out", () => {
+  const { analytics, calls } = harness({ [core.ANALYTICS_PREF_KEY]: "off" })
+  analytics.start()
+  analytics.track("picker_completed", { source: "pick", player_count: 3, time_band: "any", result_count: 2 })
+  assert.deepEqual(calls, [["init", true]])
+})
+
+test("turning the toggle off opts the SDK out, persists, and silences every later event", () => {
+  const { analytics, calls, store } = harness()
+  analytics.start()
+  const before = captured(calls).length
+  analytics.setEnabled(false)
+  analytics.track("discover_opened", { tab: "hot" })
+  assert.equal(captured(calls).length, before)
+  assert.ok(calls.some(c => c[0] === "optOut"))
+  assert.equal(store.get(core.ANALYTICS_PREF_KEY), "off")
+  analytics.setEnabled(true)
+  analytics.track("discover_opened", { tab: "hot" })
+  assert.ok(calls.some(c => c[0] === "optIn"))
+  assert.deepEqual(captured(calls).at(-1), ["capture", "discover_opened", { tab: "hot" }])
+})
+
+test("lifecycle: install on first launch, update when the build changes, opened every launch", () => {
+  const first = harness()
+  first.analytics.start()
+  assert.deepEqual(captured(first.calls).map(c => c[1]), ["app_installed", "app_opened"])
+  const updated = harness({ "shelfpick.analytics.installed-version": "old" })
+  updated.analytics.start()
+  assert.deepEqual(captured(updated.calls).map(c => c[1]), ["app_updated", "app_opened"])
+  const same = harness({ "shelfpick.analytics.installed-version": "abc1234" })
+  same.analytics.start()
+  assert.deepEqual(captured(same.calls).map(c => c[1]), ["app_opened"])
+})
+
+test("the guard drops unknown events and properties that are emails, free text or IDs", () => {
+  const { analytics, calls } = harness()
+  analytics.start()
+  const n = captured(calls).length
+  analytics.track("not_in_the_plan", {})
+  analytics.track("discover_opened", { tab: "tom@example.com" })
+  analytics.track("discover_opened", { tab: "my favourite game" })
+  analytics.track("discover_opened", { tab: "hot", search: "catan" })
+  analytics.track("pick_started", { source: "pick", player_count: 4.5, time_band: "any" })
+  analytics.track("pick_started", { source: "pick", player_count: 123456, time_band: "any" })
+  analytics.track("play_logged", { source: "play_log_form", player_count: 2, has_scores: "yes" })
+  assert.equal(captured(calls).length, n)
+  analytics.track("play_logged", { source: "play_log_form", player_count: 2, has_scores: true })
+  assert.equal(captured(calls).length, n + 1)
+})
+
+test("time bands avoid exact duration payloads", () => {
+  assert.equal(core.timeBand(null), "any")
+  assert.equal(core.timeBand(0), "any")
+  assert.equal(core.timeBand(60), "up_to_60")
+  assert.equal(core.timeBand(121), "over_120")
+})
+
+function sourceFiles(dir) {
+  return readdirSync(dir).flatMap(entry => {
+    const path = join(dir, entry)
+    if (statSync(path).isDirectory()) return sourceFiles(path)
+    return /\.(ts|tsx)$/.test(entry) && !/\.test\./.test(entry) ? [path] : []
+  })
+}
+
+test("every event the code sends is in the catalogue, and no code bypasses the wrapper", () => {
+  const catalogue = Object.keys(core.EVENT_SPECS)
+  const used = new Set()
+  for (const file of sourceFiles("src")) {
+    const text = readFileSync(file, "utf8")
+    for (const match of text.matchAll(/Analytics\.track\(\s*"([a-z_]+)"/g)) used.add(match[1])
+    if (!file.includes("src/analytics/")) assert.doesNotMatch(text, /posthog/i, `${file} must use the Analytics wrapper only`)
+    assert.doesNotMatch(text, /Analytics\.track\(\s*[^"\s]/, `${file} must pass a literal event name`)
+  }
+  for (const name of used) assert.ok(catalogue.includes(name), `${name} is sent but not in EVENT_SPECS`)
+  // Lifecycle events are emitted inside the wrapper/bootstrap rather than by feature code.
+  for (const name of catalogue) {
+    assert.ok(used.has(name) || /^app_/.test(name), `${name} is in EVENT_SPECS but never sent`)
+  }
+})
+
+test("the tracking plan documents exactly the catalogue, with its property names", () => {
+  const full = readFileSync("../docs/analytics/tracking-plan.md", "utf8")
+  const plan = full.slice(full.indexOf("## Events"), full.indexOf("## Property values"))
+  const rows = [...plan.matchAll(/^\| `([a-z_]+)` \|(.*)$/gm)]
+  assert.deepEqual(rows.map(r => r[1]).sort(), Object.keys(core.EVENT_SPECS).sort())
+  for (const [, name, rest] of rows) {
+    for (const prop of Object.keys(core.EVENT_SPECS[name])) {
+      assert.ok(rest.includes(`\`${prop}\``), `${name}: property ${prop} missing from the tracking plan`)
+    }
+  }
+})

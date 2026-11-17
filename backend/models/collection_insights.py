@@ -82,6 +82,45 @@ class MonthlyRecap:
     most_played: MonthlyRecapGame | None
     collage_games: list[MonthlyRecapGame]
 @dataclass
+class YearRecapGame:
+    bgg_id: int
+    name: str
+    play_count: int
+
+
+@dataclass
+class YearRecapLongestPlay:
+    bgg_id: int
+    name: str
+    duration_minutes: int
+    played_on: str
+
+
+@dataclass
+class YearRecapPlayer:
+    name: str
+    play_count: int
+
+
+@dataclass
+class YearRecap:
+    year: int
+    total_plays: int
+    unique_games: int
+    total_duration_minutes: int | None
+    duration_plays: int
+    top_games: list[YearRecapGame]
+    new_games_count: int
+    new_games: list[YearRecapGame]
+    plays_by_month: list[int]
+    busiest_month: int | None
+    plays_by_weekday: list[int]
+    busiest_weekday: int | None
+    longest_play: YearRecapLongestPlay | None
+    co_players: list[YearRecapPlayer]
+
+
+@dataclass
 class CollectionInsights:
     total_games: int
     total_plays: int
