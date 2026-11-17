@@ -7,7 +7,10 @@ import { collectionEmptyKind } from "../../ui-empty-state"
 import { Link } from "react-router-dom"
 import { APP_PATHS } from "../../routes"
 
+export type ShelfLayout = "grid" | "list"
+
 type Props = {
+  layout?: ShelfLayout
   games: Game[]
   totalGames: number
   statsByGame: Map<
@@ -20,6 +23,7 @@ type Props = {
 }
 
 function CollectionGameList({
+  layout = "list",
   games,
   totalGames,
   statsByGame,
@@ -49,6 +53,37 @@ function CollectionGameList({
           </> : <button type="button" className="secondary-button" onClick={onClearFilters}>Clear filters</button>}
         </div>
       </div>
+    )
+  }
+
+  if (layout === "grid") {
+    return (
+      <ul className="collection-grid" aria-label="Games on your shelf">
+        {games.map((game) => {
+          const playCount = statsByGame.get(game.bgg_id)?.play_count ?? 0
+          const playLabel = playCount > 0 ? `${playCount} ${playCount === 1 ? "play" : "plays"}` : null
+          return (
+            <li key={game.bgg_id}>
+              <button
+                type="button"
+                className="collection-tile"
+                aria-label={playLabel ? `${game.name}, ${playLabel}` : game.name}
+                onClick={() => onOpenGame(game)}
+              >
+                <span className="collection-tile-cover">
+                  <ResilientGameArtwork
+                    src={game.image_url ?? game.thumbnail_url}
+                    alt=""
+                    gameName={game.name}
+                  />
+                  {playLabel && <span className="collection-tile-plays" aria-hidden="true">{playLabel}</span>}
+                </span>
+                <strong>{game.name}</strong>
+              </button>
+            </li>
+          )
+        })}
+      </ul>
     )
   }
 

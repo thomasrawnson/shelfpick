@@ -16,20 +16,20 @@ export const APP_PATHS = {
   termsDraft: "/legal/terms-draft",
   onboarding: "/onboarding",
   onboardingAccount: "/onboarding/account",
-  picker: "/picker",
-  pickerPlay: "/picker/log-play",
-  collection: "/collection",
-  collectionOwned: "/collection/owned",
-  collectionWishlist:
-    "/collection/want-to-play",
-  collectionRanking:
-    "/collection/ranking",
-  gameNight: "/game-night",
+  tonight: "/tonight",
+  tonightPlay: "/tonight/log-play",
+  shelf: "/shelf",
+  shelfOwned: "/shelf/owned",
+  shelfWishlist:
+    "/shelf/want-to-play",
+  shelfRanking:
+    "/shelf/ranking",
+  plays: "/plays",
+  discover: "/discover",
+  stats: "/stats",
+  // Guest voting links keep their original public path.
   gameNightJoin: "/game-night/join",
   liveTimer: "/live-timer",
-  rankings: "/rankings",
-  discover: "/discover",
-  insights: "/insights",
   setup: "/setup",
   settings: "/settings",
   settingsProfile: "/settings/profile",
@@ -41,6 +41,31 @@ export const APP_PATHS = {
   settingsAbout: "/settings/about",
   settingsPro: "/settings/pro",
 } as const
+
+export type TonightMode = "pick" | "vote"
+
+export function tonightModePath(mode: TonightMode): string {
+  return `${APP_PATHS.tonight}?mode=${mode}`
+}
+
+// Paths from before the five-tab navigation. Each resolves to its new home,
+// keeping sub-paths and query strings. Guest voting links are not legacy.
+export function legacyRedirect(
+  pathname: string,
+  search = "",
+): string | null {
+  const tail = (prefix: string) =>
+    pathname === prefix ? "" : pathname.startsWith(`${prefix}/`) ? pathname.slice(prefix.length) : null
+
+  const picker = tail("/picker")
+  if (picker !== null) return `${APP_PATHS.tonight}${picker}${search}`
+  const collection = tail("/collection")
+  if (collection !== null) return `${APP_PATHS.shelf}${collection}${search}`
+  if (pathname === "/game-night") return tonightModePath("vote")
+  if (pathname === "/insights") return `${APP_PATHS.stats}${search}`
+  if (pathname === "/rankings") return APP_PATHS.shelfRanking
+  return null
+}
 
 export function isIncompleteOnboardingPath(pathname: string): boolean {
   return pathname === APP_PATHS.onboarding || pathname === APP_PATHS.onboardingAccount
@@ -60,95 +85,66 @@ export function gameNightJoinToken(pathname: string): string | null {
 }
 
 
-export function collectionPath(
+export function shelfPath(
   section: CollectionSection,
 ): string {
   if (section === "wishlist") {
-    return APP_PATHS.collectionWishlist
+    return APP_PATHS.shelfWishlist
   }
 
   if (section === "ranking") {
-    return APP_PATHS.collectionRanking
+    return APP_PATHS.shelfRanking
   }
 
-  return APP_PATHS.collectionOwned
+  return APP_PATHS.shelfOwned
 }
 
 
-export function collectionGamePath(
+export function shelfGamePath(
   bggId: number,
 ): string {
-  return `${APP_PATHS.collectionOwned}/${bggId}`
+  return `${APP_PATHS.shelfOwned}/${bggId}`
 }
 
 
 export function wishlistGamePath(
   bggId: number,
 ): string {
-  return `${APP_PATHS.collectionWishlist}/${bggId}`
+  return `${APP_PATHS.shelfWishlist}/${bggId}`
 }
 
 
 export function appViewForPath(
   pathname: string,
 ): AppView {
-  if (
-    pathname === APP_PATHS.collection
-    || pathname.startsWith(
-      `${APP_PATHS.collection}/`,
-    )
-  ) {
-    return "collection"
-  }
+  const onPath = (base: string) =>
+    pathname === base || pathname.startsWith(`${base}/`)
 
-  if (pathname === APP_PATHS.discover) {
-    return "discover"
-  }
-
-  if (pathname === APP_PATHS.gameNight) {
-    return "gameNight"
-  }
-
-  if (pathname === APP_PATHS.insights) {
-    return "insights"
-  }
-
-  if (pathname === APP_PATHS.rankings) {
-    return "collection"
-  }
-
-  if (pathname === APP_PATHS.setup) {
-    return "setup"
-  }
-
-  if (pathname === APP_PATHS.settings || pathname.startsWith(`${APP_PATHS.settings}/`)) {
-    return "setup"
-  }
-
-  return "picker"
+  if (onPath(APP_PATHS.shelf)) return "shelf"
+  if (onPath(APP_PATHS.plays)) return "plays"
+  if (onPath(APP_PATHS.discover)) return "discover"
+  if (onPath(APP_PATHS.stats)) return "stats"
+  if (pathname === APP_PATHS.setup || onPath(APP_PATHS.settings)) return "setup"
+  return "tonight"
 }
 
 
 export function isProtectedAppPath(
   pathname: string,
 ): boolean {
+  const onPath = (base: string) =>
+    pathname === base || pathname.startsWith(`${base}/`)
+
   return (
-    pathname === APP_PATHS.picker
-    || pathname.startsWith(
-      `${APP_PATHS.picker}/`,
-    )
-    || pathname === APP_PATHS.collection
-    || pathname.startsWith(
-      `${APP_PATHS.collection}/`,
-    )
+    legacyRedirect(pathname) !== null
+    || onPath(APP_PATHS.tonight)
+    || onPath(APP_PATHS.shelf)
+    || onPath(APP_PATHS.plays)
     || pathname === APP_PATHS.discover
-    || pathname === APP_PATHS.gameNight
     || pathname === APP_PATHS.liveTimer
-    || pathname === APP_PATHS.rankings
-    || pathname === APP_PATHS.insights
+    || pathname === APP_PATHS.stats
     || pathname === APP_PATHS.setup
-    || pathname === APP_PATHS.settings
-    || pathname.startsWith(`${APP_PATHS.settings}/`)
+    || onPath(APP_PATHS.settings)
   )
 }
 
@@ -168,6 +164,9 @@ export function safeReturnPath(
     value,
     "https://boardgamepicker.local",
   )
+
+  const redirected = legacyRedirect(url.pathname, url.search)
+  if (redirected) return `${redirected}${url.hash}`
 
   return isProtectedAppPath(url.pathname)
     ? `${url.pathname}${url.search}${url.hash}`

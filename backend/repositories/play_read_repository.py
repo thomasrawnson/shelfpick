@@ -2,6 +2,7 @@ from collections import Counter
 from statistics import median
 
 from sqlalchemy import and_, func
+from sqlalchemy.orm import selectinload
 
 from database.models import (
     Game as DatabaseGame,
@@ -234,6 +235,43 @@ class PlayReadRepository:
             }
             for play, game_bgg_id in rows
         ]
+
+    def list_plays(
+        self,
+        limit: int,
+        offset: int,
+    ) -> dict:
+        """Newest-first plays across the shelf, with the full match count."""
+        if self.user_id is None:
+            return {"total": 0, "plays": []}
+
+        base = (
+            self.db.query(DatabasePlay, DatabaseGame)
+            .join(DatabaseGame, DatabaseGame.id == DatabasePlay.game_id)
+            .join(
+                UserGame,
+                and_(
+                    UserGame.game_id == DatabaseGame.id,
+                    UserGame.user_id == self.user_id,
+                ),
+            )
+            .filter(DatabasePlay.user_id == self.user_id)
+        )
+        total = base.count()
+        rows = (
+            base.order_by(
+                DatabasePlay.played_at.desc(),
+                DatabasePlay.id.desc(),
+            )
+            .options(selectinload(DatabaseGame.mechanics))
+            .offset(offset)
+            .limit(limit)
+            .all()
+        )
+        return {
+            "total": total,
+            "plays": [serialize_play(play, game) for play, game in rows],
+        }
 
     def get_game_history(
         self,

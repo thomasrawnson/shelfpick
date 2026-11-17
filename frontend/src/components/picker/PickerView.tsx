@@ -1,5 +1,6 @@
 import RetryNotice from "../ui/RetryNotice";
 import {
+  type ReactNode,
   useEffect,
   useRef,
   useState,
@@ -44,6 +45,8 @@ type Step =
 type Props = {
   onViewGame: (bggId: number) => void;
   onViewCollection: () => void;
+  onGroupVote?: () => void;
+  playerStepFooter?: ReactNode;
   defaultPlayers?: number | null;
   defaultTime?: number | null;
   defaultPlayStyle?: PickerPlayStyle | null;
@@ -56,6 +59,8 @@ function savedPlayStyleOrFallback(value: PickerPlayStyle | null | undefined): Pi
 function PickerView({
   onViewGame,
   onViewCollection,
+  onGroupVote,
+  playerStepFooter,
   defaultPlayers = null,
   defaultTime = null,
   defaultPlayStyle = null,
@@ -293,7 +298,7 @@ function PickerView({
     onViewGame(match.game.bgg_id);
   }
 
-  const isPlayEntry = location.pathname === APP_PATHS.pickerPlay;
+  const isPlayEntry = location.pathname === APP_PATHS.tonightPlay;
 
   if (isPlayEntry) {
     if (!match || step !== "reveal" || players === null) {
@@ -307,7 +312,7 @@ function PickerView({
           <button
             type="button"
             className="primary-button"
-            onClick={() => navigate(APP_PATHS.picker, { replace: true })}
+            onClick={() => navigate(APP_PATHS.tonight, { replace: true })}
           >
             Go to Picker
           </button>
@@ -332,7 +337,7 @@ function PickerView({
 
   return (
     <>
-      {step === "players" && <YearRecapBanner onOpen={() => navigate(APP_PATHS.insights, { state: { openYearRecap: true } })} />}
+      {step === "players" && <YearRecapBanner onOpen={() => navigate(APP_PATHS.stats, { state: { openYearRecap: true } })} />}
       {optionsError && <RetryNotice message={optionsError} busy={optionsLoading} onRetry={() => { setOptionsLoading(true); setOptionsAttempt(current => current + 1); }} />}
       {error && <RetryNotice message={error} busy={loading} onRetry={revealGame} />}
       <fieldset className="picker-request-fields" disabled={loading} aria-busy={loading}>
@@ -357,6 +362,8 @@ function PickerView({
           onOpenMechanics={() => setStep("play_style")}
           onClearFineTune={clearFineTune}
           onContinue={() => setStep("time")}
+          onGroupVote={onGroupVote}
+          footer={playerStepFooter}
         />
       )}
 
@@ -449,7 +456,7 @@ function PickerView({
             onStartOver={startOver}
             onLogPlay={() => {
               setPlaySavedMessage("");
-              navigate(APP_PATHS.pickerPlay);
+              navigate(APP_PATHS.tonightPlay);
             }}
             playSavedMessage={playSavedMessage}
           />

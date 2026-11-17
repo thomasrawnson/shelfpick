@@ -4,6 +4,7 @@ from fastapi import (
     APIRouter,
     Depends,
     HTTPException,
+    Query,
 )
 
 from api.dependencies import (
@@ -32,6 +33,15 @@ router = APIRouter()
 logger = logging.getLogger(
     "boardgamepicker.picker_analytics"
 )
+
+
+@router.get("/plays")
+def list_plays(
+    limit: int = Query(100, ge=1, le=200),
+    offset: int = Query(0, ge=0),
+    repository: PlayRepository = Depends(get_play_repository),
+):
+    return repository.list_plays(limit, offset)
 
 
 @router.post(

@@ -10,8 +10,11 @@ const here = path.dirname(fileURLToPath(import.meta.url))
 export const FRONTEND_DIR = path.resolve(here, "..")
 export const BACKEND_DIR = path.resolve(FRONTEND_DIR, "../backend")
 
-export const API_ORIGIN = "http://127.0.0.1:8000"
-export const WEB_ORIGIN = "http://127.0.0.1:5173"
+// Ports can move (E2E_API_PORT / E2E_WEB_PORT) when another local server holds the defaults.
+export const API_PORT = process.env.E2E_API_PORT ?? "8000"
+export const WEB_PORT = process.env.E2E_WEB_PORT ?? "5173"
+export const API_ORIGIN = `http://127.0.0.1:${API_PORT}`
+export const WEB_ORIGIN = `http://127.0.0.1:${WEB_PORT}`
 
 // Local-only fixture credentials, documented in docs/local-free-pro-testing.md.
 export const ONBOARDING_EMAIL = "local-onboarding@shelfpick.app"
@@ -38,7 +41,7 @@ export function backendEnv(): NodeJS.ProcessEnv {
       ?? "postgresql+psycopg://boardgamepicker:boardgamepicker_dev@localhost:5433/shelfpick_dev",
     JWT_SECRET: process.env.E2E_JWT_SECRET ?? "local-e2e-only-jwt-secret-not-for-any-real-host",
     ACCESS_TOKEN_MINUTES: "60",
-    CORS_ORIGINS: `${WEB_ORIGIN},http://localhost:5173`,
+    CORS_ORIGINS: `${WEB_ORIGIN},http://localhost:${WEB_PORT}`,
     FRONTEND_URL: WEB_ORIGIN,
     PUBLIC_REGISTRATION_ENABLED: "true",
     BETA_INVITE_EMAILS: "",

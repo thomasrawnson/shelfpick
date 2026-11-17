@@ -230,6 +230,11 @@ export interface GamePlay extends PlayResult {
 }
 
 
+export interface ListedPlay extends GamePlay {
+  bgg_id: number
+}
+
+
 export interface GameHistory {
   bgg_id: number
   play_count: number
@@ -974,6 +979,21 @@ export async function restoreRankingGame(
     throw new Error(
       `Ranking restore failed: ${response.status}`,
     )
+  }
+}
+
+
+const PLAYS_PAGE_SIZE = 200
+
+// Every play on the shelf, newest first, fetched a page at a time.
+export async function getPlays(): Promise<ListedPlay[]> {
+  const plays: ListedPlay[] = []
+  for (;;) {
+    const response = await apiFetch(`/plays?limit=${PLAYS_PAGE_SIZE}&offset=${plays.length}`)
+    if (!response.ok) throw new Error(`Plays request failed: ${response.status}`)
+    const page = await response.json() as { total: number; plays: ListedPlay[] }
+    plays.push(...page.plays)
+    if (page.plays.length === 0 || plays.length >= page.total) return plays
   }
 }
 

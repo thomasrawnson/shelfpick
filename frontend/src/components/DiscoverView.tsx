@@ -11,6 +11,9 @@ import {
   type DiscoverRecommendation,
 } from "../api/client"
 import RetryNotice from "./ui/RetryNotice"
+import PullIndicator from "./ui/PullIndicator"
+import Skeleton from "./ui/Skeleton"
+import { usePullToRefresh } from "../use-pull-to-refresh"
 import { Analytics } from "../analytics"
 import { discoverEmptyCopy, discoverPersonalisationCopy } from "../discover-state"
 
@@ -119,6 +122,8 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
     setLoading(true)
     setReloadKey((current) => current + 1)
   }
+
+  const pull = usePullToRefresh(() => { retry() })
 
   async function toggleWishlist(recommendation: DiscoverRecommendation) {
     const bggId = recommendation.game.bgg_id
@@ -250,6 +255,7 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
 
   return (
     <section className="screen discover-screen">
+      <PullIndicator {...pull} />
       <header className="discover-header">
         <div>
           <h1>Discover</h1>
@@ -299,7 +305,7 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
         </div>
       ) : (
         <>
-          {loading && <p className="subtitle">Finding games...</p>}
+          {loading && <Skeleton rows={4} label="Finding games" />}
           {error && <RetryNotice message={error} busy={loading} onRetry={retry} />}
           {actionError && <p className="error-message" role="alert">{actionError}</p>}
           {mode === "for_you" && recommendations.length > 0 && personalisationStatus === "personalised" && (
