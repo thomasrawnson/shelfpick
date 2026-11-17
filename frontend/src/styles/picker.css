@@ -3165,3 +3165,33 @@
     height: auto;
   }
 }
+
+
+.picker-add-player,
+.picker-add-player-button {
+  margin-bottom: 10px;
+}
+
+.picker-add-player-button {
+  width: 100%;
+}
+
+.picker-add-player-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.picker-add-player-actions .primary-button {
+  flex: 1;
+}
+
+.picker-add-player-actions .secondary-button {
+  width: auto;
+  margin: 0;
+}
+
+.picker-add-player-error {
+  margin: 0 0 8px;
+  color: var(--color-danger);
+  font-size: var(--text-support);
+}
