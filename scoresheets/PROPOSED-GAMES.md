@@ -16,7 +16,7 @@ Categories will come from each publisher's rulebook, with labels and help in our
 | 8 | Carcassonne | 822 | 2-5 | highest | Roads, cities, monasteries, fields, scored during and at end |
 | 9 | Splendor | 148228 | 2-4 | highest | Prestige points with a tie-break on fewest development cards |
 | 10 | Scythe | 169786 | 1-5 | highest | Popularity-tiered stars, territories, resources, structure bonus, coins |
-| 11 | Agricola (revised) | 31260 | 1-5 | highest | Per-category 1-4 point bands, negative for empty categories, bonus points |
+| 11 | Agricola (revised) | 200680 | 1-5 | highest | Per-category 1-4 point bands, negative for empty categories, bonus points |
 | 12 | The Castles of Burgundy | 84876 | 1-4 | highest | Per-phase scoring, colour areas, leftover goods and silverlings |
 | 13 | Lords of Waterdeep | 110327 | 2-5 | highest | Quest points, buildings, leftover resources, lord bonus |
 | 14 | Sushi Go! | 133473 | 2-5 | highest | **Per-round** (3 rounds), set collection plus pudding at game end |
@@ -44,6 +44,8 @@ Categories will come from each publisher's rulebook, with labels and help in our
 ## Post-approval corrections
 
 - Skyjo's BGG id changed from 155987 to 204135 during rulebook checking (found by search only; BGG blocks automated fetches).
+
+- Agricola's BGG id changed from 31260 (original 2007 listing) to 200680 (Revised Edition), per the owner. All other ids were confirmed by the owner.
 
 ## Risks
 

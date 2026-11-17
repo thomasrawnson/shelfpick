@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "bgg_id": 31260,
+  "bgg_id": 200680,
   "name": "Agricola",
   "supported_players": [
     1,
@@ -163,5 +163,5 @@
     "url": "https://lookout-spiele.de/upload/en_agricolare.html_Rules_Agricola-RE_EN.pdf",
     "checked_against_rulebook": true
   },
-  "notes": "Seven animal and crop categories score from tables, so they are entered as the table result (-1 to 4). The bgg_id 31260 is the original Agricola listing; the Revised Edition may have its own id. Scoring is the same."
+  "notes": "Seven animal and crop categories score from tables, so they are entered as the table result (-1 to 4)."
 }
