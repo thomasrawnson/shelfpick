@@ -23,7 +23,7 @@
 | Frontend `npm test` | 148 passed |
 | ESLint, `tsc -b`, build, `check:pwa`, `build:ios` | pass (`check:colors` reports 10 raw colours that exist on `origin/main`; none are new) |
 | Playwright 390×844 light + dark, real local backend: log co-op, log team, edit, Rematch (confirmation and history) | 2 passed; screenshots `docs/screenshots/sp-play-01/` |
-| iOS Simulator smoke test | **Not run** |
+| iOS Simulator smoke test (iPhone 18 Pro, **Simulator evidence, not a device**; Debug build pointed at a local backend on the local dev DB): log in, open game, new result-type selector, log a co-op Won play, confirmation shows Rematch and Send to BG Stats, Rematch opens a fresh form, row stored as `cooperative`/`won`. Team, edit and picker flows were not repeated on the Simulator (covered by Playwright). The Simulator was very laggy; one cosmetic fix (chip label spacing) followed. | pass |
 | Physical device | **Not run** |
 
 ## Rollback

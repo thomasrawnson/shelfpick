@@ -2095,6 +2095,13 @@
   background: var(--color-brand-primary-soft);
 }
 
+.outcome-type-option span {
+  letter-spacing: 0;
+  text-transform: none;
+  font-size: var(--text-support);
+  white-space: nowrap;
+}
+
 .outcome-type-option input {
   position: absolute;
   inset: 0;
