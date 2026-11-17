@@ -209,49 +209,6 @@
 
 /* Play form */
 
-.play-form {
-  padding: 13px;
-
-  margin-top: 12px;
-}
-
-.play-form-grid {
-  grid-template-columns:
-    1fr;
-
-  gap: 10px;
-
-  margin-bottom: 14px;
-}
-
-.player-form-card {
-  padding: 11px;
-}
-
-.player-input-row {
-  display: grid;
-
-  grid-template-columns:
-    minmax(0, 1fr)
-    82px;
-
-  gap: 8px;
-}
-
-.player-input-row label {
-  min-width: 0;
-}
-
-.score-field {
-  min-width: 0;
-}
-
-.winner-toggle {
-  min-height: 44px;
-
-  justify-content: center;
-}
-
 
 /* History */
 

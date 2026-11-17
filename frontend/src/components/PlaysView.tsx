@@ -127,50 +127,30 @@ function PlaysView({ onOpenGame }: Props) {
     )
   }
 
-  if (screen.kind === "log") {
-    const { game, prefill } = screen
-    return (
-      <section className="screen plays-screen picker-play-entry">
-        <button type="button" className="collection-back" onClick={() => setScreen({ kind: "list" })}>← Back to Plays</button>
-        <header><h1>{prefill ? "Rematch" : "Log a play"}</h1><p className="subtitle">{game.name}</p></header>
-        <PlayLogForm
-          key={screen.key}
-          game={game}
-          presentation="dedicated"
-          initialOpen
-          initialPlayerCount={prefill?.names.length}
-          initialPlayerNames={prefill?.names}
-          initialTeams={prefill?.teams}
-          initialOutcomeType={prefill?.outcomeType}
-          initialLocation={prefill?.location}
-          onCancel={() => setScreen({ kind: "list" })}
-          onSaved={async () => { /* Stay on the saved confirmation until Done. */ }}
-          onDone={() => void afterSave()}
-        />
-      </section>
-    )
-  }
-
-  if (screen.kind === "edit") {
-    const { entry } = screen
-    return (
-      <section className="screen plays-screen picker-play-entry">
-        <button type="button" className="collection-back" onClick={() => setScreen({ kind: "list" })}>← Back to Plays</button>
-        <header><h1>Edit play</h1><p className="subtitle">{entry.game.name}</p></header>
-        <PlayLogForm
-          game={entry.game}
-          editingPlay={entry.play}
-          presentation="dedicated"
-          onCancel={() => setScreen({ kind: "list" })}
-          onSaved={afterSave}
-        />
-      </section>
-    )
-  }
-
   return (
     <section className="screen plays-screen">
       <PullIndicator {...pull} />
+      {screen.kind === "log" && (
+        <PlayLogForm
+          key={screen.key}
+          game={screen.game}
+          initialPlayerNames={screen.prefill?.names}
+          initialTeams={screen.prefill?.teams}
+          initialOutcomeType={screen.prefill?.outcomeType}
+          initialLocation={screen.prefill?.location}
+          onClose={() => setScreen({ kind: "list" })}
+          onSaved={async () => { setReloadKey(current => current + 1) }}
+          onDone={() => setScreen({ kind: "list" })}
+        />
+      )}
+      {screen.kind === "edit" && (
+        <PlayLogForm
+          game={screen.entry.game}
+          editingPlay={screen.entry.play}
+          onClose={() => setScreen({ kind: "list" })}
+          onSaved={afterSave}
+        />
+      )}
       <header>
         <h1>Plays</h1>
         {!loading && entries.length > 0 && <p className="subtitle">{entries.length} {entries.length === 1 ? "play" : "plays"}</p>}

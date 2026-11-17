@@ -1,13 +1,19 @@
 import {
   useEffect,
+  useId,
+  useMemo,
   useRef,
   useState,
+  type ReactNode,
 } from "react"
+import { createPortal } from "react-dom"
 
 import { lightImpact } from "../../haptics"
 import { Analytics } from "../../analytics"
 import { requestReviewAfterPlaySaved } from "../../review-prompt"
 import {
+  getGameHistory,
+  getLatestPlay,
   getPlayers,
   recordPlay,
   updatePlay,
@@ -19,188 +25,191 @@ import {
 } from "../../api/client"
 import {
   OUTCOME_TYPES,
+  autoWinners,
   buildResult,
   draftsFromPlay,
   emptyDraft,
+  finishingOrder,
+  inferScoreDirection,
+  playerBestFor,
+  recordContext,
+  resolveCompetitive,
   type PlayPrefill,
   type PlayerDraft,
+  type ScoreDirection,
 } from "../../play-results"
-
-import {
-  createBGStatsPlayUrl,
-} from "../../utils/bgstats"
-import {
-  useLiveTimer,
-} from "../../live-timer"
+import { createBGStatsPlayUrl } from "../../utils/bgstats"
+import { useLiveTimer } from "../../live-timer"
 import { elapsedSeconds, formatElapsed } from "../../live-timer-utils"
-
-
-type PlayerForm = PlayerDraft
-
-
-type Props = {
-  game: Game
-  onSaved: (result: SavedPlayResult) => Promise<void>
-  initialPlayerCount?: number
-  initialPlayerNames?: string[]
-  pickerSessionId?: string | null
-  presentation?: "inline" | "dedicated"
-  onCancel?: () => void
-  initialDurationMinutes?: number | null
-  initialLocation?: string
-  timerSessionId?: string | null
-  // A rematch opens with the same type and teams as an earlier play.
-  initialOutcomeType?: OutcomeType
-  initialTeams?: string[]
-  initialOpen?: boolean
-  // Edit an already saved play instead of recording a new one.
-  editingPlay?: GamePlay | null
-  // Dedicated screens show Rematch and Done after saving.
-  onDone?: () => void
-}
+import PlayerAvatar from "../ui/PlayerAvatar"
 
 export type SavedPlayResult = {
   bgStatsUrl: string | null
 }
 
-function todayValue() {
-  const now = new Date()
-
-  const year = now.getFullYear()
-
-  const month = String(
-    now.getMonth() + 1,
-  ).padStart(
-    2,
-    "0",
-  )
-
-  const day = String(
-    now.getDate(),
-  ).padStart(
-    2,
-    "0",
-  )
-
-  return `${year}-${month}-${day}`
+type Prefill = {
+  initialPlayerCount?: number
+  initialPlayerNames?: string[]
+  initialTeams?: string[]
+  initialOutcomeType?: OutcomeType
+  initialLocation?: string
+  initialDurationMinutes?: number | null
+  pickerSessionId?: string | null
+  timerSessionId?: string | null
 }
 
-function localDateValue(iso: string) {
-  const date = new Date(iso)
+type Props = Prefill & {
+  game: Game
+  onSaved: (result: SavedPlayResult) => Promise<void>
+  // Cancel, and Done after saving unless onDone is given.
+  onClose: () => void
+  onDone?: () => void
+  // Edit an already saved play instead of recording a new one.
+  editingPlay?: GamePlay | null
+}
+
+const HISTORY_LIMIT = 500
+const CHIP_LIMIT = 6
+
+function dateValue(date: Date) {
   const month = String(date.getMonth() + 1).padStart(2, "0")
   const day = String(date.getDate()).padStart(2, "0")
   return `${date.getFullYear()}-${month}-${day}`
 }
 
-function createPlayerForms(
-  count: number,
-  names: string[] = [],
-  teams: string[] = [],
-): PlayerForm[] {
-  return Array.from(
-    {
-      length: Math.max(
-        1,
-        count,
-      ),
-    },
-    (_, index) => emptyDraft(names[index] ?? "", teams[index] ?? ""),
+function summaryDate(value: string) {
+  if (value === dateValue(new Date())) return "Today"
+  const date = new Date(`${value}T12:00:00`)
+  if (Number.isNaN(date.getTime())) return value
+  const sameYear = date.getFullYear() === new Date().getFullYear()
+  return date.toLocaleDateString(undefined, sameYear
+    ? { day: "numeric", month: "short" }
+    : { day: "numeric", month: "short", year: "numeric" })
+}
+
+function normalName(name: string) {
+  return name.trim().toLowerCase().replace(/\s+/g, " ")
+}
+
+function draftsFor(names: string[], teams: string[]) {
+  return names.filter((name) => name.trim() !== "").map((name, index) => emptyDraft(name, teams[index] ?? ""))
+}
+
+// Edits keep what was recorded: places that differ from the scores stay
+// manual, and hand-picked winners stay overridden.
+function editModes(drafts: PlayerDraft[]) {
+  const scores = drafts.map((draft) => draft.score)
+  const ranks = drafts.map((draft) => draft.rank)
+  const order = finishingOrder(scores, "highest")
+  const placesMatch = order !== null && ranks.every((rank, index) => rank === String(order[index]))
+  const manualPlaces = ranks.some((rank) => rank !== "") && !placesMatch
+  const winners = autoWinners(scores, "highest")
+  const winnersMatch = drafts.every((draft, index) => draft.isWinner === winners[index])
+  return { manualPlaces, winnersOverridden: !manualPlaces && !winnersMatch }
+}
+
+function TrophyIcon() {
+  return <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+    <path fill="currentColor" d="M7 3h10v2h3v3a4 4 0 0 1-4 4h-.3A5 5 0 0 1 13 14.9V18h3v2H8v-2h3v-3.1A5 5 0 0 1 8.3 12H8a4 4 0 0 1-4-4V5h3V3Zm0 4H6v1a2 2 0 0 0 1 1.7V7Zm10 0v2.7A2 2 0 0 0 18 8V7h-1Z" />
+  </svg>
+}
+
+// A full-screen sheet over the app. The tab bar and page behind it are inert.
+function Sheet({ labelledBy, onEscape, children }: { labelledBy: string; onEscape: () => void; children: ReactNode }) {
+  const sheet = useRef<HTMLDivElement>(null)
+  const escape = useRef(onEscape)
+  useEffect(() => { escape.current = onEscape })
+
+  useEffect(() => {
+    const root = document.getElementById("root")
+    const previous = document.activeElement as HTMLElement | null
+    document.documentElement.classList.add("play-sheet-open")
+    if (root) root.inert = true
+    sheet.current?.focus()
+    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") escape.current() }
+    document.addEventListener("keydown", onKey)
+    return () => {
+      document.removeEventListener("keydown", onKey)
+      document.documentElement.classList.remove("play-sheet-open")
+      if (root) root.inert = false
+      previous?.focus?.()
+    }
+  }, [])
+
+  const content = (
+    <div className="play-sheet-layer">
+      <div ref={sheet} className="play-sheet" role="dialog" aria-modal="true" aria-labelledby={labelledBy} tabIndex={-1}>
+        {children}
+      </div>
+    </div>
   )
+  return typeof document === "undefined" ? content : createPortal(content, document.body)
 }
 
 function PlayLogForm({
   game,
   onSaved,
-  initialPlayerCount = 1,
-  initialPlayerNames = [],
-  pickerSessionId = null,
-  presentation = "inline",
-  onCancel,
-  initialDurationMinutes = null,
-  initialLocation = "",
-  timerSessionId = null,
-  initialOutcomeType = "competitive",
-  initialTeams = [],
-  initialOpen = false,
-  editingPlay = null,
+  onClose,
   onDone,
+  editingPlay = null,
+  initialPlayerCount = 0,
+  initialPlayerNames = [],
+  initialTeams = [],
+  initialOutcomeType = "competitive",
+  initialLocation = "",
+  initialDurationMinutes = null,
+  pickerSessionId = null,
+  timerSessionId = null,
 }: Props) {
+  const ids = useId()
+  const formId = `${ids}-form`
+  const titleId = `${ids}-title`
+  const detailsId = `${ids}-details`
   const liveTimer = useLiveTimer()
-  const isDedicated = presentation === "dedicated"
   const isEditing = editingPlay !== null
-  const editDraft = editingPlay ? draftsFromPlay(editingPlay) : null
-  const [open, setOpen] =
-    useState(isDedicated || initialOpen)
+  const [initial] = useState(() => {
+    if (editingPlay) {
+      const edit = draftsFromPlay(editingPlay)
+      return { ...edit, ...editModes(edit.drafts) }
+    }
+    return {
+      drafts: draftsFor(initialPlayerNames, initialTeams),
+      coopResult: "" as CoopResult | "",
+      winningTeam: "",
+      manualPlaces: false,
+      winnersOverridden: false,
+    }
+  })
 
-  const [
-    playDate,
-    setPlayDate,
-  ] = useState(
-    editingPlay ? localDateValue(editingPlay.played_at) : todayValue(),
-  )
-
-  const [
-    duration,
-    setDuration,
-  ] = useState(
+  const [playDate, setPlayDate] = useState(editingPlay ? dateValue(new Date(editingPlay.played_at)) : dateValue(new Date()))
+  const [duration, setDuration] = useState(
     editingPlay
       ? editingPlay.duration_minutes === null ? "" : String(editingPlay.duration_minutes)
       : initialDurationMinutes === null ? "" : String(initialDurationMinutes),
   )
-
   const [location, setLocation] = useState(editingPlay ? editingPlay.location ?? "" : initialLocation)
-  const [outcomeType, setOutcomeType] = useState<OutcomeType>(
-    editingPlay ? editingPlay.outcome_type : initialOutcomeType,
-  )
-  const [coopResult, setCoopResult] = useState<CoopResult | "">(editDraft?.coopResult ?? "")
-  const [winningTeam, setWinningTeam] = useState(editDraft?.winningTeam ?? "")
+  const locationTouched = useRef(editingPlay !== null || initialLocation !== "")
+  const [outcomeType, setOutcomeType] = useState<OutcomeType>(editingPlay ? editingPlay.outcome_type : initialOutcomeType)
+  const [coopResult, setCoopResult] = useState<CoopResult | "">(initial.coopResult)
+  const [winningTeam, setWinningTeam] = useState(initial.winningTeam)
+  const [players, setPlayers] = useState<PlayerDraft[]>(initial.drafts)
+  const [manualPlaces, setManualPlaces] = useState(initial.manualPlaces)
+  const [winnersOverridden, setWinnersOverridden] = useState(initial.winnersOverridden)
+  const [direction, setDirection] = useState<ScoreDirection>("highest")
+  const directionTouched = useRef(false)
+  const [history, setHistory] = useState<GamePlay[]>([])
+  const [knownPlayers, setKnownPlayers] = useState<Player[]>([])
+  const [newName, setNewName] = useState("")
+  const [detailsOpen, setDetailsOpen] = useState(false)
+  const [removing, setRemoving] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState("")
+  const [saved, setSaved] = useState(false)
+  const [bgStatsUrl, setBGStatsUrl] = useState<string | null>(null)
+  const savePending = useRef(false)
   const lastSaved = useRef<PlayPrefill | null>(null)
   const [, redrawTimer] = useState(0)
-
-  const [
-    players,
-    setPlayers,
-  ] = useState<PlayerForm[]>(
-    editDraft
-      ? editDraft.drafts
-      : createPlayerForms(
-          initialPlayerCount,
-          initialPlayerNames,
-          initialTeams,
-        ),
-  )
-
-  const [
-    knownPlayers,
-    setKnownPlayers,
-  ] = useState<Player[]>([])
-
-  const [
-    saving,
-    setSaving,
-  ] = useState(false)
-
-  const [
-    error,
-    setError,
-  ] = useState("")
-
-  const [
-    saved,
-    setSaved,
-  ] = useState(false)
-
-  const [
-    bgStatsUrl,
-    setBGStatsUrl,
-  ] = useState<string | null>(
-    null,
-  )
-
-  const savePending = useRef(false)
-  const matchingTimer = liveTimer.timer?.game.bgg_id === game.bgg_id
-    ? liveTimer.timer
-    : null
+  const matchingTimer = liveTimer.timer?.game.bgg_id === game.bgg_id ? liveTimer.timer : null
 
   useEffect(() => {
     if (matchingTimer?.status !== "finished") return
@@ -212,230 +221,126 @@ function PlayLogForm({
 
   useEffect(() => {
     if (matchingTimer?.status !== "running") return
-    const id = window.setInterval(() => redrawTimer(value => value + 1), 1000)
+    const id = window.setInterval(() => redrawTimer((value) => value + 1), 1000)
     return () => window.clearInterval(id)
   }, [matchingTimer?.public_id, matchingTimer?.status])
 
-
   useEffect(() => {
-    async function loadPlayers() {
-      try {
-        const result =
-          await getPlayers()
-
-        setKnownPlayers(
-          result,
-        )
-      } catch (err) {
-        console.error(err)
-      }
+    getPlayers().then(setKnownPlayers).catch((err) => console.error(err))
+    getGameHistory(game.bgg_id, HISTORY_LIMIT)
+      .then((result) => {
+        // Records are a nice-to-have: an odd response leaves them hidden.
+        const plays = Array.isArray(result?.recent_plays) ? result.recent_plays : []
+        setHistory(plays)
+        if (!directionTouched.current) setDirection(inferScoreDirection(plays))
+      })
+      .catch((err) => console.error(err))
+    if (!locationTouched.current) {
+      getLatestPlay()
+        .then((latest) => { if (!locationTouched.current && latest?.location) setLocation(latest.location) })
+        .catch((err) => console.error(err))
     }
+  }, [game.bgg_id])
 
-    loadPlayers()
-  }, [])
+  const competitive = outcomeType === "competitive"
+  const mode = { direction, winnersOverridden, manualPlaces }
+  const shown = competitive ? resolveCompetitive(players, mode) : players
+  const records = useMemo(() => recordContext(history, players.length, direction), [history, players.length, direction])
+  const avatarFor = (name: string) => knownPlayers.find((player) => normalName(player.name) === normalName(name))?.avatar_key
+  const inPlay = new Set(players.map((player) => normalName(player.name)))
+  const chips = knownPlayers.filter((player) => !inPlay.has(normalName(player.name))).slice(0, CHIP_LIMIT)
+  const canAdd = outcomeType !== "solo" || players.length === 0
+  const missing = !isEditing && initialPlayerNames.length === 0 && initialPlayerCount > players.length
+    ? initialPlayerCount - players.length
+    : 0
 
-
-  function resetForm() {
-    setPlayDate(
-      todayValue(),
-    )
-
-    setDuration("")
-    setLocation("")
-    setOutcomeType("competitive")
-    setCoopResult("")
-    setWinningTeam("")
-
-    setPlayers([emptyDraft()])
-
+  function updatePlayer(index: number, changes: Partial<PlayerDraft>) {
+    setPlayers((current) => current.map((player, at) => (at === index ? { ...player, ...changes } : player)))
     setError("")
   }
 
+  function addPlayer(name: string) {
+    const trimmed = name.trim()
+    if (trimmed === "") return
+    if (inPlay.has(normalName(trimmed))) {
+      setError(`${trimmed} is already in this play.`)
+      return
+    }
+    setPlayers((current) => [...current, emptyDraft(trimmed)])
+    setNewName("")
+    setError("")
+  }
+
+  function removePlayer(index: number) {
+    setPlayers((current) => current.filter((_, at) => at !== index))
+    if (players.length <= 1) setRemoving(false)
+  }
+
+  function toggleWinner(index: number) {
+    const base = winnersOverridden ? players : shown
+    setPlayers(base.map((player, at) => ({ ...player, rank: "", isWinner: at === index ? !player.isWinner : player.isWinner })))
+    setWinnersOverridden(true)
+  }
 
   function startRematch() {
     const previous = lastSaved.current
     if (previous === null) return
-    setPlayDate(todayValue())
+    setPlayDate(dateValue(new Date()))
     setDuration("")
     setLocation(previous.location)
     setOutcomeType(previous.outcomeType)
     setCoopResult("")
     setWinningTeam("")
-    setPlayers(
-      createPlayerForms(
-        previous.names.length,
-        previous.names,
-        previous.teams,
-      ),
-    )
+    setPlayers(draftsFor(previous.names, previous.teams))
+    setManualPlaces(false)
+    setWinnersOverridden(false)
     setError("")
     setSaved(false)
     setBGStatsUrl(null)
-    setOpen(true)
   }
-
-
-  function updatePlayer(
-    index: number,
-    changes: Partial<PlayerForm>,
-  ) {
-    setPlayers(
-      players.map(
-        (
-          player,
-          playerIndex,
-        ) =>
-          playerIndex === index
-            ? {
-                ...player,
-                ...changes,
-              }
-            : player,
-      ),
-    )
-  }
-
-
-  function addPlayer() {
-    setPlayers([...players, emptyDraft()])
-  }
-
-
-  function removePlayer(
-    index: number,
-  ) {
-    if (
-      players.length === 1
-    ) {
-      return
-    }
-
-    setPlayers(
-      players.filter(
-        (
-          _,
-          playerIndex,
-        ) =>
-          playerIndex !== index,
-      ),
-    )
-  }
-
-
-  async function refreshPlayers() {
-    try {
-      const result =
-        await getPlayers()
-
-      setKnownPlayers(
-        result,
-      )
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
 
   async function savePlay() {
-    if (savePending.current) {
+    if (savePending.current) return
+    const drafts = competitive ? shown : players
+    const names = drafts.map((player) => player.name.trim())
+    if (drafts.length === 0) {
+      setError("Add at least one player.")
       return
     }
-
-    const names = players.map((player) => player.name.trim())
-
     if (names.some((name) => name.length === 0)) {
-      setError(
-        "Please enter a name for every player.",
-      )
-
+      setError("Please enter a name for every player.")
       return
     }
-    const normalizedNames = names.map(
-      (name) => name.toLowerCase().replace(/\s+/g, " "),
-    )
-
-    const hasDuplicatePlayers =
-      new Set(
-        normalizedNames,
-      ).size !==
-      normalizedNames.length
-
-    if (hasDuplicatePlayers) {
-      setError(
-        "The same player can't be added twice.",
-      )
-
+    if (new Set(names.map(normalName)).size !== names.length) {
+      setError("The same player can't be added twice.")
       return
     }
-    if (
-      players.some(
-        (player) =>
-          player.score.trim() !== "" &&
-          Number.isNaN(Number(player.score)),
-      )
-    ) {
-      setError(
-        "Scores must be numbers.",
-      )
-
+    if (drafts.some((player) => player.score.trim() !== "" && Number.isNaN(Number(player.score)))) {
+      setError("Scores must be numbers.")
       return
     }
-
-    const built = buildResult(
-      outcomeType,
-      players,
-      coopResult,
-      winningTeam,
-    )
-
+    const built = buildResult(outcomeType, drafts, coopResult, winningTeam)
     if (!built.ok) {
       setError(built.error)
-
       return
     }
-
     const { participants, result } = built
-
-    const durationMinutes =
-      duration.trim() === ""
-        ? null
-        : Number(
-            duration,
-          )
-
-    if (
-      durationMinutes !==
-        null &&
-      (
-        Number.isNaN(
-          durationMinutes,
-        ) ||
-        durationMinutes < 0
-      )
-    ) {
-      setError(
-        "Duration must be a valid number.",
-      )
-
+    const durationMinutes = duration.trim() === "" ? null : Number(duration)
+    if (durationMinutes !== null && (Number.isNaN(durationMinutes) || durationMinutes < 0)) {
+      setError("Duration must be a valid number.")
+      setDetailsOpen(true)
       return
     }
 
     savePending.current = true
     setSaving(true)
     setError("")
-    setSaved(false)
-
     let url: string | null = null
     let succeeded = false
-
     try {
-      const playedAt =
-        editingPlay && playDate === localDateValue(editingPlay.played_at)
-          ? editingPlay.played_at
-          : new Date(
-              `${playDate}T12:00:00`,
-            ).toISOString()
-
+      const playedAt = editingPlay && playDate === dateValue(new Date(editingPlay.played_at))
+        ? editingPlay.played_at
+        : new Date(`${playDate}T12:00:00`).toISOString()
       if (editingPlay) {
         await updatePlay(editingPlay.id, {
           played_at: playedAt,
@@ -445,51 +350,36 @@ function PlayLogForm({
           ...result,
         })
       } else {
-        const savedPlay =
-          await recordPlay(
-            game.bgg_id,
-            playedAt,
-            durationMinutes,
-            participants,
-            pickerSessionId,
-            location,
-            timerSessionId ?? (matchingTimer?.status === "finished" ? matchingTimer.public_id : null),
-            result,
-          )
-
-        url =
-          createBGStatsPlayUrl(
-            game,
-            savedPlay,
-            participants,
-            durationMinutes,
-            result,
-          )
+        const savedPlay = await recordPlay(
+          game.bgg_id,
+          playedAt,
+          durationMinutes,
+          participants,
+          pickerSessionId,
+          location,
+          timerSessionId ?? (matchingTimer?.status === "finished" ? matchingTimer.public_id : null),
+          result,
+        )
+        url = createBGStatsPlayUrl(game, savedPlay, participants, durationMinutes, result)
       }
       succeeded = true
     } catch (err) {
       console.error(err)
-
-      setError(
-        isEditing ? "Couldn't save your changes." : "Couldn't save this play.",
-      )
+      setError(isEditing ? "Couldn't save your changes." : "Couldn't save this play.")
     } finally {
       savePending.current = false
       setSaving(false)
     }
-
-    if (!succeeded) {
-      return
-    }
+    if (!succeeded) return
 
     void lightImpact()
-
     if (isEditing) {
       try {
         await onSaved({ bgStatsUrl: null })
       } catch (err) {
         console.error(err)
       }
+      onClose()
       return
     }
 
@@ -497,532 +387,351 @@ function PlayLogForm({
       outcomeType,
       location: location.trim(),
       names,
-      teams: players.map((player) => player.team.trim()),
+      teams: drafts.map((player) => player.team.trim()),
     }
     setBGStatsUrl(url)
     setSaved(true)
-
-    if (!isDedicated) {
-      resetForm()
-      setOpen(false)
-    }
-
     Analytics.track("play_logged", {
       source: "play_log_form",
       player_count: Math.min(participants.length, 999),
       has_scores: participants.some((participant) => participant.score !== null),
     })
     void requestReviewAfterPlaySaved()
-
     try {
-      await onSaved({
-        bgStatsUrl: url,
-      })
+      await onSaved({ bgStatsUrl: url })
     } catch (err) {
       console.error(err)
     }
-
-    void refreshPlayers()
     void liveTimer.refresh()
   }
 
+  const timerText = matchingTimer && matchingTimer.status !== "finished"
+    ? `${matchingTimer.status === "paused" ? "Paused" : "Timer"} ${formatElapsed(elapsedSeconds(matchingTimer))}`
+    : null
+  const summary = [
+    summaryDate(playDate),
+    location.trim() || null,
+    timerText ?? (duration.trim() !== "" ? `${duration.trim()} min` : null),
+  ].filter(Boolean) as string[]
+  const needsDetails = location.trim() === "" && duration.trim() === "" && timerText === null
+  const footer = competitive
+    ? [
+        records.bestAtCount !== null ? `Best ${players.length}p: ${records.bestAtCount}` : null,
+        records.average !== null ? `Avg: ${records.average}` : null,
+        records.worstWin !== null ? `Worst win: ${records.worstWin}` : null,
+      ].filter(Boolean)
+    : []
+  const teams = Array.from(new Map(players.map((player) => player.team.trim()).filter(Boolean)
+    .map((team) => [team.toLowerCase(), team] as const)).values())
+  const done = onDone ?? onClose
 
   return (
-    <>
-      <datalist id="known-players">
-        {knownPlayers.map(
-          (player) => (
-            <option
-              key={player.id}
-              value={player.name}
-            />
-          ),
-        )}
-      </datalist>
+    <Sheet labelledBy={titleId} onEscape={() => { if (!saving) (saved ? done : onClose)() }}>
+      <header className="play-sheet-header">
+        {saved
+          ? <span />
+          : <button type="button" className="sheet-text-button" onClick={onClose} disabled={saving}>Cancel</button>}
+        <div className="play-sheet-title">
+          <h2 id={titleId}>{game.name}</h2>
+          <span>{isEditing ? "Edit play" : saved ? "Saved" : "Log play"}</span>
+        </div>
+        {saved
+          ? <button type="button" className="sheet-text-button sheet-strong" onClick={done}>Done</button>
+          : <button
+              type="submit"
+              form={formId}
+              className="sheet-save-button"
+              disabled={saving}
+              aria-busy={saving}
+              aria-label={isEditing ? "Save changes" : "Save play"}
+            >
+              {saving ? "Saving…" : "Save"}
+            </button>}
+      </header>
 
-      {!isDedicated && (
-        <button
-          type="button"
-          className={
-            saved && !open
-              ? "secondary-button log-play-button"
-              : "primary-button log-play-button"
-          }
-          onClick={() => {
-            setOpen(
-              !open,
-            )
-
-            setError("")
-            setSaved(false)
-            setBGStatsUrl(null)
-          }}
-        >
-          {open
-            ? "Cancel"
-            : saved
-              ? "Log another play"
-              : "Log a play"}
-        </button>
-      )}
-
-      {open && !(saved && isDedicated && onDone) && (
+      {saved ? (
+        <div className="play-saved" role="status">
+          <strong>Play saved</strong>
+          <div className="play-saved-actions">
+            <button type="button" className="secondary-button" onClick={() => { void lightImpact(); startRematch() }}>Rematch</button>
+            {bgStatsUrl && <a className="bgstats-button" href={bgStatsUrl} target="_blank" rel="noopener noreferrer">Send to BG Stats</a>}
+          </div>
+        </div>
+      ) : (
         <form
-          className={
-            isDedicated
-              ? "play-form play-form-dedicated"
-              : "play-form"
-          }
-          onSubmit={(event) => {
-            event.preventDefault()
-            void savePlay()
-          }}
+          id={formId}
+          className="play-sheet-form"
+          noValidate
+          onSubmit={(event) => { event.preventDefault(); void savePlay() }}
         >
-          <div className="play-form-heading">
-            <div>
-              <p className="preference-label">
-                {isEditing ? "Edit play" : "New play"}
-              </p>
+          <datalist id={`${ids}-known`}>
+            {knownPlayers.map((player) => <option key={player.id} value={player.name} />)}
+          </datalist>
 
-              <strong>
-                {game.name}
-              </strong>
-            </div>
+          <div className="play-summary-row">
+            <button
+              type="button"
+              className="play-summary-button"
+              aria-expanded={detailsOpen}
+              aria-controls={detailsId}
+              aria-label={`Date, place and time: ${summary.join(", ")}. ${detailsOpen ? "Hide" : "Edit"}`}
+              onClick={() => setDetailsOpen((open) => !open)}
+            >
+              <span className="play-summary-text">
+                {summary.join(" · ")}
+                {needsDetails && <span className="play-summary-hint"> · Add place & time</span>}
+              </span>
+              <span className="play-summary-chevron" aria-hidden="true">{detailsOpen ? "▴" : "▾"}</span>
+            </button>
+            <label className="play-type-menu">
+              <span className="sr-only">Result type</span>
+              <select
+                value={outcomeType}
+                onChange={(event) => { setOutcomeType(event.target.value as OutcomeType); setError("") }}
+              >
+                {OUTCOME_TYPES.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+              </select>
+            </label>
           </div>
 
-          <div className="play-form-grid">
-            <label>
-              <span>
-                Date
-              </span>
-
-              <input
-                type="date"
-                value={
-                  playDate
-                }
-                onChange={(
-                  event,
-                ) =>
-                  setPlayDate(
-                    event
-                      .target
-                      .value,
-                  )
-                }
-              />
-            </label>
-
-            <label>
-              <span>
-                Duration
-              </span>
-
-              <div className="duration-input">
+          {detailsOpen && (
+            <div id={detailsId} className="play-details">
+              <label>
+                <span>Date</span>
+                <input type="date" value={playDate} onChange={(event) => setPlayDate(event.target.value)} />
+              </label>
+              <label>
+                <span>Minutes</span>
                 <input
                   type="number"
                   min="0"
                   inputMode="numeric"
                   placeholder="60"
-                  value={
-                    duration
-                  }
-                  onChange={(
-                    event,
-                  ) =>
-                    setDuration(
-                      event
-                        .target
-                        .value,
-                    )
-                  }
+                  value={duration}
+                  onChange={(event) => setDuration(event.target.value)}
                 />
-
-                <small>
-                  min
-                </small>
-              </div>
-            </label>
-          </div>
-
-          <label className="play-location-field">
-            <span>Location <small>Optional</small></span>
-            <input
-              type="text"
-              maxLength={200}
-              autoComplete="off"
-              placeholder="e.g. The Dice Cup"
-              value={location}
-              onChange={(event) => setLocation(event.target.value)}
-            />
-          </label>
-
-          <fieldset className="outcome-type-field">
-            <legend className="preference-label">Result type</legend>
-            <div className="outcome-type-options">
-              {OUTCOME_TYPES.map((option) => (
-                <label
-                  key={option.value}
-                  className={
-                    outcomeType === option.value
-                      ? "outcome-type-option selected"
-                      : "outcome-type-option"
-                  }
-                >
-                  <input
-                    type="radio"
-                    name="outcome-type"
-                    value={option.value}
-                    checked={outcomeType === option.value}
-                    onChange={() => {
-                      setOutcomeType(option.value)
-                      setError("")
-                    }}
-                  />
-                  <span>{option.label}</span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
-
-          {liveTimer.enabled && !isEditing && (
-            <section className="play-timer-panel" aria-labelledby="play-timer-heading">
-              <div>
-                <p className="preference-label" id="play-timer-heading">Live duration · Pro</p>
-                <p>Keep an accurate duration while you use ShelfPick.</p>
-              </div>
-              {matchingTimer ? (
-                <>
-                  <strong className="play-timer-value">{formatElapsed(elapsedSeconds(matchingTimer))}</strong>
-                  <div className="play-timer-actions">
-                    {matchingTimer.status === "running" && <button type="button" className="secondary-button" disabled={liveTimer.pending} onClick={() => void liveTimer.pause()}>Pause</button>}
-                    {matchingTimer.status === "paused" && <button type="button" className="secondary-button" disabled={liveTimer.pending} onClick={() => void liveTimer.resume()}>Resume</button>}
-                    {matchingTimer.status !== "finished" && <button type="button" className="primary-button" disabled={liveTimer.pending} onClick={() => void liveTimer.finish()}>Finish</button>}
-                    {matchingTimer.status === "finished" && <span role="status">Duration ready to review</span>}
-                  </div>
-                </>
-              ) : liveTimer.timer ? (
-                <p className="supporting-copy">A timer is already active for {liveTimer.timer.game.name}.</p>
-              ) : (
-                <button
-                  type="button"
-                  className="secondary-button"
-                  disabled={liveTimer.pending}
-                  onClick={() => void liveTimer.start(game.bgg_id, players.map(player => player.name.trim()).filter(Boolean), location.trim())}
-                >
-                  Start timer
-                </button>
+              </label>
+              <label className="play-details-wide">
+                <span>Location</span>
+                <input
+                  type="text"
+                  maxLength={200}
+                  autoComplete="off"
+                  placeholder="e.g. The Dice Cup"
+                  value={location}
+                  onChange={(event) => { locationTouched.current = true; setLocation(event.target.value) }}
+                />
+              </label>
+              {liveTimer.enabled && !isEditing && (
+                <div className="play-details-wide play-timer">
+                  {matchingTimer ? (
+                    <>
+                      <strong className="play-timer-clock">{formatElapsed(elapsedSeconds(matchingTimer))}</strong>
+                      {matchingTimer.status === "running" && <button type="button" className="secondary-button" disabled={liveTimer.pending} onClick={() => void liveTimer.pause()}>Pause</button>}
+                      {matchingTimer.status === "paused" && <button type="button" className="secondary-button" disabled={liveTimer.pending} onClick={() => void liveTimer.resume()}>Resume</button>}
+                      {matchingTimer.status !== "finished" && <button type="button" className="primary-button" disabled={liveTimer.pending} onClick={() => void liveTimer.finish()}>Finish</button>}
+                      {matchingTimer.status === "finished" && <span role="status">Duration ready</span>}
+                    </>
+                  ) : liveTimer.timer ? (
+                    <p className="supporting-copy">A timer is already running for {liveTimer.timer.game.name}.</p>
+                  ) : (
+                    <button
+                      type="button"
+                      className="secondary-button"
+                      disabled={liveTimer.pending}
+                      onClick={() => void liveTimer.start(game.bgg_id, players.map((player) => player.name.trim()).filter(Boolean), location.trim())}
+                    >
+                      Start timer · Pro
+                    </button>
+                  )}
+                  {liveTimer.error && <p className="error-message" role="alert">{liveTimer.error}</p>}
+                </div>
               )}
-              {liveTimer.error && <p className="error-message" role="alert">{liveTimer.error}</p>}
-            </section>
+            </div>
           )}
 
-          <div className="player-form-heading">
-            <p className="preference-label">
-              Players
-            </p>
-
-            <span>
-              {players.length}
-            </span>
+          <div className="play-players-head">
+            <span className="preference-label">Players · {players.length}</span>
+            {competitive && !manualPlaces && (
+              <label className="play-direction-menu">
+                <span className="sr-only">Scoring</span>
+                <select
+                  value={direction}
+                  onChange={(event) => { directionTouched.current = true; setDirection(event.target.value as ScoreDirection) }}
+                >
+                  <option value="highest">Highest wins</option>
+                  <option value="lowest">Lowest wins</option>
+                </select>
+              </label>
+            )}
+            {players.length > 0 && (
+              <button type="button" className="sheet-text-button" aria-pressed={removing} onClick={() => setRemoving((value) => !value)}>
+                {removing ? "Done" : "Edit"}
+              </button>
+            )}
           </div>
 
-          <div className="player-forms">
-            {players.map(
-              (
-                player,
-                index,
-              ) => (
-                <div
-                  className="player-form-card"
-                  key={index}
-                >
-                  <div className="player-form-number">
-                    <strong>
-                      Player{" "}
-                      {index + 1}
-                    </strong>
-
-                    {players.length >
-                      1 && (
+          {players.length > 0 && (
+            <ul className="play-rows">
+              {shown.map((player, index) => {
+                const label = player.name.trim() || `Player ${index + 1}`
+                const best = competitive ? playerBestFor(records, player.name) : null
+                return (
+                  <li className={player.isWinner && competitive ? "play-row winner" : "play-row"} key={index}>
+                    {removing && (
+                      <button type="button" className="play-row-remove" aria-label={`Remove ${label}`} onClick={() => removePlayer(index)}>−</button>
+                    )}
+                    {competitive && !manualPlaces && (
                       <button
                         type="button"
-                        onClick={() =>
-                          removePlayer(
-                            index,
-                          )
-                        }
+                        className="play-winner-toggle"
+                        aria-pressed={player.isWinner}
+                        aria-label={`${label} won`}
+                        onClick={() => toggleWinner(index)}
                       >
-                        Remove
+                        <TrophyIcon />
                       </button>
                     )}
-                  </div>
-
-                  <div className="player-input-row">
-                    <label>
-                      <span>
-                        Name
-                      </span>
-
+                    {competitive && manualPlaces && (
                       <input
-                        type="text"
-                        list="known-players"
-                        autoComplete="off"
-                        value={
-                          player.name
-                        }
-                        placeholder="Player name"
-                        onChange={(
-                          event,
-                        ) =>
-                          updatePlayer(
-                            index,
-                            {
-                              name:
-                                event
-                                  .target
-                                  .value,
-                            },
-                          )
-                        }
-                      />
-                    </label>
-
-                    <label className="score-field">
-                      <span>
-                        Score
-                      </span>
-
-                      <input
-                        type="number"
-                        inputMode="decimal"
-                        value={
-                          player.score
-                        }
-                        placeholder="—"
-                        onChange={(
-                          event,
-                        ) =>
-                          updatePlayer(
-                            index,
-                            {
-                              score:
-                                event
-                                  .target
-                                  .value,
-                            },
-                          )
-                        }
-                      />
-                    </label>
-                  </div>
-
-                  {outcomeType === "team" && (
-                    <label className="team-field">
-                      <span>Team</span>
-
-                      <input
-                        type="text"
-                        maxLength={50}
-                        autoComplete="off"
-                        placeholder="e.g. Red"
-                        value={player.team}
-                        onChange={(event) =>
-                          updatePlayer(index, { team: event.target.value })
-                        }
-                      />
-                    </label>
-                  )}
-
-                  {outcomeType === "competitive" && (
-                    <label className="rank-field">
-                      <span>Place <small>Optional</small></span>
-
-                      <input
+                        className="play-row-place"
                         type="number"
                         min="1"
                         max="99"
                         inputMode="numeric"
-                        placeholder="1"
+                        placeholder="#"
+                        aria-label={`Place for ${label}`}
                         value={player.rank}
-                        onChange={(event) =>
-                          updatePlayer(index, { rank: event.target.value })
-                        }
+                        onChange={(event) => updatePlayer(index, { rank: event.target.value })}
                       />
-                    </label>
-                  )}
-
-                  {outcomeType === "competitive" && player.rank.trim() === "" && (
-                  <label className="winner-toggle">
+                    )}
+                    <PlayerAvatar name={player.name} variant={avatarFor(player.name)} className="play-row-avatar" />
                     <input
-                      type="checkbox"
-                      checked={
-                        player.isWinner
-                      }
-                      onChange={(
-                        event,
-                      ) =>
-                        updatePlayer(
-                          index,
-                          {
-                            isWinner:
-                              event
-                                .target
-                                .checked,
-                          },
-                        )
-                      }
+                      className="play-row-name"
+                      type="text"
+                      list={`${ids}-known`}
+                      autoComplete="off"
+                      placeholder="Player name"
+                      aria-label={`Player ${index + 1} name`}
+                      value={player.name}
+                      onChange={(event) => updatePlayer(index, { name: event.target.value })}
                     />
+                    {outcomeType === "team" && (
+                      <input
+                        className="play-row-team"
+                        type="text"
+                        maxLength={50}
+                        autoComplete="off"
+                        placeholder="Team"
+                        aria-label={`Team for ${label}`}
+                        value={player.team}
+                        onChange={(event) => updatePlayer(index, { team: event.target.value })}
+                      />
+                    )}
+                    <input
+                      className="play-row-score"
+                      type="number"
+                      inputMode="decimal"
+                      placeholder="Score"
+                      aria-label={`Score for ${label}`}
+                      value={player.score}
+                      onChange={(event) => updatePlayer(index, { score: event.target.value })}
+                    />
+                    {best !== null && <span className="play-row-best" aria-label={`${label}'s best: ${best}`}>best {best}</span>}
+                  </li>
+                )
+              })}
+            </ul>
+          )}
 
-                    <span>
-                      Winner
-                    </span>
-                  </label>
-                  )}
+          {canAdd && (
+            <div className="play-add">
+              {missing > 0 && <p className="play-add-hint">Tonight: add {missing} more {missing === 1 ? "player" : "players"}.</p>}
+              {chips.length > 0 && (
+                <div className="play-chips" role="group" aria-label="Recent players">
+                  {chips.map((player) => (
+                    <button type="button" key={player.id} className="play-chip" aria-label={`Add ${player.name}`} onClick={() => addPlayer(player.name)}>
+                      <PlayerAvatar name={player.name} variant={player.avatar_key} />
+                      <span>{player.name}</span>
+                    </button>
+                  ))}
                 </div>
-              ),
-            )}
-          </div>
+              )}
+              <div className="play-add-field">
+                <input
+                  type="text"
+                  list={`${ids}-known`}
+                  autoComplete="off"
+                  enterKeyHint="done"
+                  placeholder="Add player"
+                  aria-label="Add player"
+                  value={newName}
+                  onChange={(event) => setNewName(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") { event.preventDefault(); addPlayer(newName) }
+                  }}
+                />
+                <button type="button" className="sheet-text-button" disabled={newName.trim() === ""} onClick={() => addPlayer(newName)}>Add</button>
+              </div>
+            </div>
+          )}
 
-          {outcomeType !== "solo" && (
-            <button
-              type="button"
-              className="add-player-button"
-              onClick={
-                addPlayer
-              }
-            >
-              + Add player
-            </button>
+          {competitive && players.length > 1 && (
+            <div className="play-winner-note">
+              {manualPlaces
+                ? <button type="button" className="sheet-text-button" onClick={() => { setManualPlaces(false); setWinnersOverridden(false) }}>Use scores for places</button>
+                : winnersOverridden
+                  ? <><span>Winner chosen by hand.</span> <button type="button" className="sheet-text-button" onClick={() => setWinnersOverridden(false)}>Use scores</button></>
+                  : <button type="button" className="sheet-text-button" onClick={() => { setManualPlaces(true); setWinnersOverridden(false); setPlayers(shown) }}>Set places manually</button>}
+            </div>
           )}
 
           {(outcomeType === "cooperative" || outcomeType === "solo") && (
-            <fieldset className="coop-result-field">
-              <legend className="preference-label">
-                {outcomeType === "solo" ? "Result" : "Did the group win?"}
-              </legend>
-              <div className="outcome-type-options">
-                {(["won", "lost"] as const).map((value) => (
-                  <label
-                    key={value}
-                    className={
-                      coopResult === value
-                        ? "outcome-type-option selected"
-                        : "outcome-type-option"
-                    }
-                  >
-                    <input
-                      type="radio"
-                      name="coop-result"
-                      value={value}
-                      checked={coopResult === value}
-                      onChange={() => setCoopResult(value)}
-                    />
-                    <span>{value === "won" ? "Won" : "Lost"}</span>
-                  </label>
-                ))}
-              </div>
+            <fieldset className="play-choice">
+              <legend>{outcomeType === "solo" ? "Result" : "Did the group win?"}</legend>
+              {(["won", "lost"] as const).map((value) => (
+                <label key={value} className={coopResult === value ? "play-choice-option selected" : "play-choice-option"}>
+                  <input type="radio" name={`${ids}-coop`} value={value} checked={coopResult === value} onChange={() => setCoopResult(value)} />
+                  <span>{value === "won" ? "Won" : "Lost"}</span>
+                </label>
+              ))}
             </fieldset>
           )}
 
           {outcomeType === "team" && (
-            <label className="winning-team-field">
+            <label className="play-inline-select">
               <span>Winning team</span>
-              <select
-                value={winningTeam}
-                onChange={(event) => setWinningTeam(event.target.value)}
-              >
+              <select value={winningTeam} onChange={(event) => setWinningTeam(event.target.value)}>
                 <option value="">No winner recorded</option>
-                {Array.from(
-                  new Map(
-                    players
-                      .map((player) => player.team.trim())
-                      .filter(Boolean)
-                      .map((team) => [team.toLowerCase(), team] as const),
-                  ).values(),
-                ).map((team) => (
-                  <option key={team} value={team}>{team}</option>
-                ))}
+                {teams.map((team) => <option key={team} value={team}>{team}</option>)}
               </select>
             </label>
           )}
 
-          {error && (
-            <p className="error-message" role="alert">
-              {error}
-            </p>
-          )}
+          {footer.length > 0 && <p className="play-records">{footer.join(" · ")}</p>}
 
-          <div className="play-form-actions">
-            <button
-              type="submit"
-              className="primary-button save-play-button"
-              disabled={saving}
-              aria-busy={saving}
-            >
-              {saving
-                ? "Saving..."
-                : isEditing ? "Save changes" : "Save play"}
-            </button>
-
-            {isDedicated && onCancel && (
-              <button
-                type="button"
-                className="ghost-button cancel-play-button"
-                onClick={onCancel}
-                disabled={saving}
-              >
-                Cancel
-              </button>
-            )}
-          </div>
+          {error && <p className="error-message" role="alert">{error}</p>}
         </form>
       )}
-
-      {saved && !isEditing && (
-        <div className="play-confirmation-panel">
-          <p className="play-confirmation">
-            Play saved.
-          </p>
-
-          <button
-            type="button"
-            className="secondary-button rematch-button"
-            onClick={() => {
-              void lightImpact()
-              startRematch()
-            }}
-          >
-            Rematch
-          </button>
-
-          {onDone && (
-            <button
-              type="button"
-              className="primary-button"
-              onClick={onDone}
-            >
-              Done
-            </button>
-          )}
-
-          {bgStatsUrl && (
-            <a
-              className="bgstats-button"
-              href={
-                bgStatsUrl
-              }
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Send to BG Stats
-            </a>
-          )}
-        </div>
-      )}
-    </>
+    </Sheet>
   )
 }
 
+type LogPlayButtonProps = Omit<Props, "onClose"> & {
+  label?: string
+  defaultOpen?: boolean
+  className?: string
+}
+
+// An inline "Log a play" button that opens the sheet.
+export function LogPlayButton({ label = "Log a play", defaultOpen = false, className = "primary-button log-play-button", ...props }: LogPlayButtonProps) {
+  const [open, setOpen] = useState(defaultOpen)
+  return (
+    <>
+      <button type="button" className={className} onClick={() => setOpen(true)}>{label}</button>
+      {open && <PlayLogForm {...props} onClose={() => setOpen(false)} onDone={props.onDone ? () => { setOpen(false); props.onDone?.() } : undefined} />}
+    </>
+  )
+}
 
 export default PlayLogForm

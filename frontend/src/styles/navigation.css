@@ -191,8 +191,9 @@
   font-weight: 800;
 }
 
-/* The full controls are already authoritative here; avoid covering form actions. */
-.app-phone:has(.play-timer-value) .live-timer-indicator {
+/* The Log play sheet covers the app; hide the floating chrome under it. */
+.play-sheet-open .app-nav,
+.play-sheet-open .live-timer-indicator {
   display: none;
 }
 

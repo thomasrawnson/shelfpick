@@ -10,7 +10,7 @@ import { rematchPrefill, type PlayPrefill } from "../../play-results"
 
 import ResilientGameArtwork from "../ResilientGameArtwork"
 import GameHistory from "./GameHistory"
-import PlayLogForm from "./PlayLogForm"
+import { LogPlayButton } from "./PlayLogForm"
 
 type Props = {
   game: Game
@@ -128,11 +128,11 @@ function GameDetail({
           </div>
         </div>
 
-        <PlayLogForm
+        <LogPlayButton
           key={rematch?.key ?? 0}
           game={game}
           onSaved={onPlaySaved}
-          initialOpen={rematch !== null}
+          defaultOpen={rematch !== null}
           initialPlayerCount={rematch?.prefill.names.length}
           initialPlayerNames={rematch?.prefill.names}
           initialTeams={rematch?.prefill.teams}

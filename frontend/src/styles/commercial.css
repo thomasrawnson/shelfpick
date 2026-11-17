@@ -157,9 +157,10 @@ h1 {
   cursor: pointer;
 }
 
+/* A smaller cover keeps the title, details and Log a play on one screen. */
 .picker-cover-wrap {
   position: relative;
-  width: min(100%, 255px);
+  width: min(100%, 168px, 22dvh);
   margin: 0 auto;
 }
 

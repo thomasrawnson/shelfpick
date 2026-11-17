@@ -12,6 +12,8 @@ import type {
 
 import { lightImpact } from "../../haptics"
 import { useCoverAccent } from "../../use-cover-accent"
+import { formatPlayerCount } from "../../player-count"
+import { FIT_SCALE_NOTE, fitLabel } from "../../picker-fit"
 import Disclosure
   from "../ui/Disclosure"
 
@@ -107,13 +109,7 @@ function PickerResult({
 
   const accentStyle = useCoverAccent(coverUrl, game.name)
 
-  const playerText =
-    game.min_players !== null
-    && game.max_players !== null
-      ? game.min_players === game.max_players
-        ? `${game.min_players} players`
-        : `${game.min_players}–${game.max_players} players`
-      : null
+  const playerText = formatPlayerCount(game.min_players, game.max_players)
 
   const timeText =
     game.max_play_time !== null
@@ -133,6 +129,7 @@ function PickerResult({
       : null
 
   const score = Math.round(match.score)
+  const fit = fitLabel(match.score)
   const primaryReason =
     match.reasons.find(
       (reason) => !/^Supports?\s+\d+\s+player/i.test(reason)
@@ -294,12 +291,8 @@ function PickerResult({
         </div>
 
         <div className="picker-result-status">
-          <span
-            className="picker-result-score"
-            aria-label={`Match score ${score}`}
-          >
-            <strong>{score}</strong>
-            <span>match</span>
+          <span className="picker-result-score">
+            {fit}
           </span>
 
           <span className="picker-result-counter">
@@ -347,8 +340,7 @@ function PickerResult({
         {weightText && <span>{weightText}</span>}
       </div>
 
-      {(additionalReasons.length > 0 || additionalAiReason) && (
-        <Disclosure
+      <Disclosure
           label="More reasons"
           className="picker-reason-details"
         >
@@ -368,9 +360,12 @@ function PickerResult({
                 ))}
               </ul>
             )}
+
+            <p className="picker-fit-scale">
+              {fit}: {score} of 100. {FIT_SCALE_NOTE}
+            </p>
           </div>
         </Disclosure>
-      )}
 
       <div className="picker-primary-action">
         <button
