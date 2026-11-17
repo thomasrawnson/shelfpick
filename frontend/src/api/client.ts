@@ -179,20 +179,47 @@ export interface Play {
 }
 
 
+export type OutcomeType =
+  | "competitive"
+  | "cooperative"
+  | "team"
+  | "solo"
+
+
+export type CoopResult = "won" | "lost"
+
+
+export type ParticipantOutcome =
+  | "win"
+  | "loss"
+  | "draw"
+  | "unknown"
+
+
 export interface PlayParticipant {
   name: string
   score: number | null
   is_winner: boolean
+  team?: string | null
+  rank?: number | null
+  role?: string | null
 }
 
 
 export interface GamePlayParticipant
   extends PlayParticipant {
   id: number
+  outcome: ParticipantOutcome
 }
 
 
-export interface GamePlay {
+export interface PlayResult {
+  outcome_type: OutcomeType
+  coop_result: CoopResult | null
+}
+
+
+export interface GamePlay extends PlayResult {
   id: number
   played_at: string
   player_count: number
@@ -979,6 +1006,10 @@ export async function recordPlay(
   pickerSessionId?: string | null,
   location?: string | null,
   timerSessionId?: string | null,
+  result: PlayResult = {
+    outcome_type: "competitive",
+    coop_result: null,
+  },
 ): Promise<Play> {
   const response =
     await apiFetch(
@@ -1000,6 +1031,7 @@ export async function recordPlay(
           timer_session_id: timerSessionId,
           picker_session_id:
             pickerSessionId,
+          ...result,
         }),
       },
     )
@@ -1007,6 +1039,39 @@ export async function recordPlay(
   if (!response.ok) {
     throw new Error(
       `Play request failed: ${response.status}`,
+    )
+  }
+
+  return response.json()
+}
+
+
+export interface PlayEdit extends PlayResult {
+  played_at: string
+  duration_minutes: number | null
+  location: string | null
+  participants: PlayParticipant[]
+}
+
+
+export async function updatePlay(
+  playId: number,
+  edit: PlayEdit,
+): Promise<GamePlay> {
+  const response = await apiFetch(
+    `/plays/${playId}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(edit),
+    },
+  )
+
+  if (!response.ok) {
+    throw new Error(
+      `Play update failed: ${response.status}`,
     )
   }
 

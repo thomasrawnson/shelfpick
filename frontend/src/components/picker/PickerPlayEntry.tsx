@@ -17,6 +17,7 @@ type Props = {
   pickerSessionId: string | null
   onCancel: () => void
   onSaved: (result: SavedPlayResult) => Promise<void>
+  onDone?: () => void
 }
 
 
@@ -27,6 +28,7 @@ function PickerPlayEntry({
   pickerSessionId,
   onCancel,
   onSaved,
+  onDone,
 }: Props) {
   const game = match.game
   const participantSummary =
@@ -80,6 +82,7 @@ function PickerPlayEntry({
         presentation="dedicated"
         onCancel={onCancel}
         onSaved={onSaved}
+        onDone={onDone}
       />
     </section>
   )
