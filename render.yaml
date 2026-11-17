@@ -30,7 +30,7 @@ services:
       - key: RETENTION_CLEANUP_ENABLED
         value: "false"
       - key: GAME_NIGHT_PHONE_VOTING_ENABLED
-        value: "false"
+        value: "true"
       - key: CORS_ORIGINS
         sync: false
       - key: FRONTEND_URL

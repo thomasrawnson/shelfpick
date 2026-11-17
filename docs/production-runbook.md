@@ -387,3 +387,13 @@ a separate database, validate it, then update the API's database connection.
 | Date | Commit | Deploy | Migration | Email | Backup/restore | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
 | YYYY-MM-DD | SHA | Pass/Fail | Pass/Fail | Pass/Fail | Pass/Fail | |
+
+### Phone voting switch
+
+`GAME_NIGHT_PHONE_VOTING_ENABLED` was set to `true` in production on
+2026-11-17 (Render environment, manual deploy of `ffff122`; the web service was
+deployed at the same commit). `render.yaml` carries `"true"` so a Blueprint sync
+does not turn it off. To roll back, set it to `false` in the Render API
+environment and redeploy: hosts and guests then see the "unavailable" state and
+existing data is kept. The matching privacy policy and terms were published on
+the website the same day.
