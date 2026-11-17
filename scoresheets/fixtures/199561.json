@@ -1,0 +1,33 @@
+{
+  "bgg_id": 199561,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "private_objective": 14,
+        "public_objectives": 18,
+        "favour_tokens": 2,
+        "empty_spaces": 1
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "private_objective": 14,
+        "public_objectives": 16,
+        "favour_tokens": 4,
+        "empty_spaces": 1
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 33,
+      "Ben": 33
+    },
+    "winner": [
+      "Ben"
+    ]
+  }
+}

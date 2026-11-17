@@ -1,6 +1,6 @@
 # SP-SCORE-00: proposed games (awaiting owner approval)
 
-Status: PROPOSAL ONLY. No templates are written until the owner approves this list.
+Status: APPROVED by the owner on 2026-11-17 (list approved as proposed). Templates written in Step 2.
 BGG IDs are from memory and must be confirmed against BoardGameGeek before Step 2 (see Risks).
 Categories will come from each publisher's rulebook, with labels and help in our own words.
 
@@ -48,6 +48,6 @@ Categories will come from each publisher's rulebook, with labels and help in our
 - Rulebooks are not yet fetched; each template will record the exact edition used.
 - Sushi Go! and Dominion tie-breaks and Hanabi result bands will need a schema field or just `notes`; Step 2 will settle this without game-specific special cases.
 
-## Decision needed
+## Decision
 
-Approve the list as is, or name swaps.
+Approved as is.

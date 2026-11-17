@@ -1,0 +1,40 @@
+{
+  "bgg_id": 266524,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "park_points": 26,
+        "photos": 6,
+        "bonus_points": 3
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "park_points": 22,
+        "photos": 9,
+        "bonus_points": 2
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "park_points": 30,
+        "photos": 3,
+        "bonus_points": 4
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 35,
+      "Ben": 33,
+      "Cleo": 37
+    },
+    "winner": [
+      "Cleo"
+    ]
+  }
+}

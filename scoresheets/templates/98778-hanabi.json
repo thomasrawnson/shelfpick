@@ -1,0 +1,91 @@
+{
+  "format_version": 1,
+  "bgg_id": 98778,
+  "name": "Hanabi",
+  "supported_players": [
+    2,
+    5
+  ],
+  "win_condition": "cooperative",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "red",
+      "label": "Red fireworks",
+      "help": "Highest red card played in order (0 to 5).",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "yellow",
+      "label": "Yellow fireworks",
+      "help": "Highest yellow card played in order (0 to 5).",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "green",
+      "label": "Green fireworks",
+      "help": "Highest green card played in order (0 to 5).",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "blue",
+      "label": "Blue fireworks",
+      "help": "Highest blue card played in order (0 to 5).",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "white",
+      "label": "White fireworks",
+      "help": "Highest white card played in order (0 to 5).",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [],
+  "result_bands": [
+    {
+      "min_total": 0,
+      "label": "Crowd unimpressed"
+    },
+    {
+      "min_total": 6,
+      "label": "Mediocre"
+    },
+    {
+      "min_total": 11,
+      "label": "Respectable"
+    },
+    {
+      "min_total": 16,
+      "label": "Excellent"
+    },
+    {
+      "min_total": 21,
+      "label": "Amazing"
+    },
+    {
+      "min_total": 25,
+      "label": "Perfect"
+    }
+  ],
+  "source": {
+    "rulebook_title": "Hanabi rulebook",
+    "edition_or_year": "Original edition, 2010",
+    "checked_against_rulebook": false
+  },
+  "notes": "One shared team score. Record the team as a single entry; result_bands describe how the show went. Rainbow variants are out of scope. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+}

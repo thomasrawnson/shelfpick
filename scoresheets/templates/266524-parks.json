@@ -1,0 +1,49 @@
+{
+  "format_version": 1,
+  "bgg_id": 266524,
+  "name": "Parks",
+  "supported_players": [
+    1,
+    5
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "park_points",
+      "label": "Park cards",
+      "help": "Points printed on the parks you visited.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "photos",
+      "label": "Photos",
+      "help": "One point for each photo you took.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "bonus_points",
+      "label": "Bonus points",
+      "help": "Points from your year-end goal and any other bonuses.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "Parks rulebook",
+    "edition_or_year": "First edition, 2019",
+    "checked_against_rulebook": false
+  },
+  "notes": "Second-edition scoring may differ; confirm before shipping. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+}

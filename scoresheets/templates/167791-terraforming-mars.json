@@ -1,0 +1,85 @@
+{
+  "format_version": 1,
+  "bgg_id": 167791,
+  "name": "Terraforming Mars",
+  "supported_players": [
+    1,
+    5
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "terraform_rating",
+      "label": "Terraform rating",
+      "help": "Your rating on the track when the game ends.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "milestones",
+      "label": "Milestones",
+      "help": "Number of milestones you claimed (5 points each).",
+      "type": "count",
+      "points_per": 5,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "awards",
+      "label": "Awards",
+      "help": "Points for awards: first place and second place pay different amounts.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "greeneries",
+      "label": "Greenery tiles",
+      "help": "One point per greenery tile you own.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "cities",
+      "label": "Cities",
+      "help": "One point for each greenery next to each of your cities.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "card_points",
+      "label": "Card points",
+      "help": "Victory points on your played cards, including any that are negative.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": true,
+      "scope": "once"
+    },
+    {
+      "id": "megacredits",
+      "label": "Megacredits",
+      "help": "Megacredits in hand; the most wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "megacredits"
+  ],
+  "source": {
+    "rulebook_title": "Terraforming Mars rulebook",
+    "edition_or_year": "Base game, 2016",
+    "checked_against_rulebook": false
+  },
+  "notes": "Base game; Prelude and other expansions are out of scope. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+}

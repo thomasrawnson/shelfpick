@@ -1,0 +1,68 @@
+{
+  "format_version": 1,
+  "bgg_id": 204583,
+  "name": "Kingdomino",
+  "supported_players": [
+    2,
+    4
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "property_points",
+      "label": "Properties",
+      "help": "For each connected property: its tile count times its crowns, added together.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "middle_kingdom",
+      "label": "Middle Kingdom",
+      "help": "Tick if your castle is in the centre of your 5x5 grid (10 points).",
+      "type": "boolean",
+      "points_per": 10,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "harmony",
+      "label": "Harmony",
+      "help": "Tick if your kingdom is a full 5x5 with no discarded tiles (5 points).",
+      "type": "boolean",
+      "points_per": 5,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "largest_property",
+      "label": "Largest property",
+      "help": "Tile count of your biggest property; the larger wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "total_crowns",
+      "label": "Total crowns",
+      "help": "All crowns in your kingdom; second tie-break.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "largest_property",
+    "total_crowns"
+  ],
+  "source": {
+    "rulebook_title": "Kingdomino rulebook",
+    "edition_or_year": "Base game, 2016",
+    "checked_against_rulebook": false
+  },
+  "notes": "Empty-kingdom checks are manual. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+}

@@ -1,0 +1,46 @@
+{
+  "bgg_id": 204583,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "property_points": 41,
+        "middle_kingdom": true,
+        "harmony": false,
+        "largest_property": 6,
+        "total_crowns": 10
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "property_points": 46,
+        "middle_kingdom": false,
+        "harmony": true,
+        "largest_property": 7,
+        "total_crowns": 9
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "property_points": 30,
+        "middle_kingdom": false,
+        "harmony": false,
+        "largest_property": 4,
+        "total_crowns": 8
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 51,
+      "Ben": 51,
+      "Cleo": 30
+    },
+    "winner": [
+      "Ben"
+    ]
+  }
+}

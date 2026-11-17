@@ -1,0 +1,67 @@
+{
+  "format_version": 1,
+  "bgg_id": 230802,
+  "name": "Azul",
+  "supported_players": [
+    2,
+    4
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "wall_placement",
+      "label": "Wall placement",
+      "help": "Points earned each round for tiles you place on your wall.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "per_round"
+    },
+    {
+      "id": "floor_penalty",
+      "label": "Floor penalty",
+      "help": "Penalty size each round for tiles on your floor line (enter it as a positive number).",
+      "type": "number",
+      "points_per": -1,
+      "allow_negative": false,
+      "scope": "per_round"
+    },
+    {
+      "id": "rows",
+      "label": "Complete rows",
+      "help": "Horizontal lines you filled (2 points each); the most wins a tie.",
+      "type": "count",
+      "points_per": 2,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "columns",
+      "label": "Complete columns",
+      "help": "Vertical lines you filled (7 points each).",
+      "type": "count",
+      "points_per": 7,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "colours",
+      "label": "Complete colours",
+      "help": "Colours with all five tiles on your wall (10 points each).",
+      "type": "count",
+      "points_per": 10,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "rows"
+  ],
+  "source": {
+    "rulebook_title": "Azul rulebook",
+    "edition_or_year": "Base game, 2017",
+    "checked_against_rulebook": false
+  },
+  "notes": "Rounds are open ended: the game ends when someone completes a row. Enter one entry per round played. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+}

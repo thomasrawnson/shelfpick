@@ -1,0 +1,130 @@
+{
+  "format_version": 1,
+  "bgg_id": 295947,
+  "name": "Cascadia",
+  "supported_players": [
+    1,
+    4
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "bear",
+      "label": "Bears",
+      "help": "Points from your bear scoring card.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "elk",
+      "label": "Elk",
+      "help": "Points from your elk scoring card.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "salmon",
+      "label": "Salmon",
+      "help": "Points from your salmon scoring card.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "hawk",
+      "label": "Hawks",
+      "help": "Points from your hawk scoring card.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "fox",
+      "label": "Foxes",
+      "help": "Points from your fox scoring card.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "mountain",
+      "label": "Mountain corridor",
+      "help": "Tiles in your largest connected mountain area.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "forest",
+      "label": "Forest corridor",
+      "help": "Tiles in your largest connected forest area.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "prairie",
+      "label": "Prairie corridor",
+      "help": "Tiles in your largest connected prairie area.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "wetland",
+      "label": "Wetland corridor",
+      "help": "Tiles in your largest connected wetland area.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "river",
+      "label": "River corridor",
+      "help": "Tiles in your largest connected river area.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "habitat_bonus",
+      "label": "Habitat bonuses",
+      "help": "Bonus points for having the biggest area of each habitat type.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "nature_tokens",
+      "label": "Nature tokens",
+      "help": "One point for each unused nature token; the most wins a tie.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "nature_tokens"
+  ],
+  "source": {
+    "rulebook_title": "Cascadia rulebook",
+    "edition_or_year": "Base game, 2021",
+    "checked_against_rulebook": false
+  },
+  "notes": "Wildlife scoring cards vary per game, so each animal is a single entry. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+}

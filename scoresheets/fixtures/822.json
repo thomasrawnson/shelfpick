@@ -1,0 +1,43 @@
+{
+  "bgg_id": 822,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "roads": 22,
+        "cities": 34,
+        "monasteries": 18,
+        "farms": 9
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "roads": 30,
+        "cities": 24,
+        "monasteries": 9,
+        "farms": 21
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "roads": 15,
+        "cities": 41,
+        "monasteries": 6,
+        "farms": 18
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 83,
+      "Ben": 84,
+      "Cleo": 80
+    },
+    "winner": [
+      "Ben"
+    ]
+  }
+}

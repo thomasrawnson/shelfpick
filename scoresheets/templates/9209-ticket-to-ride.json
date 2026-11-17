@@ -1,0 +1,67 @@
+{
+  "format_version": 1,
+  "bgg_id": 9209,
+  "name": "Ticket to Ride",
+  "supported_players": [
+    2,
+    5
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "routes",
+      "label": "Claimed routes",
+      "help": "Points for the routes you claimed, by route length.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "tickets_completed",
+      "label": "Completed tickets",
+      "help": "Total value of destination tickets you connected.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "tickets_failed",
+      "label": "Failed tickets",
+      "help": "Total value of destination tickets you did not connect (enter as a positive number).",
+      "type": "number",
+      "points_per": -1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "longest_path",
+      "label": "Longest path bonus",
+      "help": "Tick if you own the longest continuous path (10 points; tied players all score it).",
+      "type": "boolean",
+      "points_per": 10,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "tickets_completed_count",
+      "label": "Tickets completed (count)",
+      "help": "How many tickets you completed; the most wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "tickets_completed_count"
+  ],
+  "source": {
+    "rulebook_title": "Ticket to Ride rulebook",
+    "edition_or_year": "USA map, 2004 (current printing)",
+    "checked_against_rulebook": false
+  },
+  "notes": "Base USA map. Map-specific bonuses (such as stations) are out of scope. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+}

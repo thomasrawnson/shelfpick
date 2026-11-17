@@ -1,0 +1,68 @@
+{
+  "format_version": 1,
+  "bgg_id": 13,
+  "name": "Catan",
+  "supported_players": [
+    3,
+    4
+  ],
+  "win_condition": "target",
+  "target_score": 10,
+  "rounds": null,
+  "categories": [
+    {
+      "id": "settlements",
+      "label": "Settlements",
+      "help": "Settlements on the board (1 point each).",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "cities",
+      "label": "Cities",
+      "help": "Cities on the board (2 points each).",
+      "type": "count",
+      "points_per": 2,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "vp_cards",
+      "label": "Victory point cards",
+      "help": "Hidden victory point cards revealed (1 point each).",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "longest_road",
+      "label": "Longest road",
+      "help": "Tick if you hold the longest road card (2 points).",
+      "type": "boolean",
+      "points_per": 2,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "largest_army",
+      "label": "Largest army",
+      "help": "Tick if you hold the largest army card (2 points).",
+      "type": "boolean",
+      "points_per": 2,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "Catan rulebook",
+    "edition_or_year": "Fifth edition, 2015",
+    "checked_against_rulebook": false
+  },
+  "notes": "First to the target on their own turn wins; the winner is the player at or above target_score. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+}

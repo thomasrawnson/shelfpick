@@ -1,0 +1,85 @@
+{
+  "format_version": 1,
+  "bgg_id": 414317,
+  "name": "Harmonies",
+  "supported_players": [
+    1,
+    4
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "trees",
+      "label": "Trees",
+      "help": "Points from the trees on your board.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "mountains",
+      "label": "Mountains",
+      "help": "Points from the mountains on your board.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "fields",
+      "label": "Fields",
+      "help": "Points from the fields on your board.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "buildings",
+      "label": "Buildings",
+      "help": "Points from the buildings on your board.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "water",
+      "label": "Water",
+      "help": "Points from the rivers on your board.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "animal_cards",
+      "label": "Animal cards",
+      "help": "Points from your animal cards, counting partly filled ones at their highest filled slot.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "spirit_cards",
+      "label": "Nature's spirit cards",
+      "help": "Points from spirit cards, if you play with them.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "Harmonies rulebook",
+    "edition_or_year": "Base game, 2024",
+    "checked_against_rulebook": false
+  },
+  "notes": "Island scoring on the reverse board is not modelled. Ties are shared. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+}

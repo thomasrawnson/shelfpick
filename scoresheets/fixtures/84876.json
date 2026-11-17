@@ -1,0 +1,43 @@
+{
+  "bgg_id": 84876,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "board_points": 171,
+        "unsold_goods": 2,
+        "silverlings": 3,
+        "workers": 1
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "board_points": 160,
+        "unsold_goods": 4,
+        "silverlings": 1,
+        "workers": 3
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "board_points": 184,
+        "unsold_goods": 0,
+        "silverlings": 2,
+        "workers": 0
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 177,
+      "Ben": 168,
+      "Cleo": 186
+    },
+    "winner": [
+      "Cleo"
+    ]
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "bgg_id": 9209,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "routes": 78,
+        "tickets_completed": 40,
+        "tickets_failed": 0,
+        "longest_path": true,
+        "tickets_completed_count": 4
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "routes": 85,
+        "tickets_completed": 27,
+        "tickets_failed": 8,
+        "longest_path": false,
+        "tickets_completed_count": 3
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "routes": 70,
+        "tickets_completed": 52,
+        "tickets_failed": 0,
+        "longest_path": false,
+        "tickets_completed_count": 5
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 128,
+      "Ben": 104,
+      "Cleo": 122
+    },
+    "winner": [
+      "Ana"
+    ]
+  }
+}

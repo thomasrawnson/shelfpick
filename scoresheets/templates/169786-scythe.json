@@ -1,0 +1,67 @@
+{
+  "format_version": 1,
+  "bgg_id": 169786,
+  "name": "Scythe",
+  "supported_players": [
+    1,
+    5
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "star_coins",
+      "label": "Stars",
+      "help": "Coins from stars you placed, at the rate set by your popularity.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "territory_coins",
+      "label": "Territories",
+      "help": "Coins from territories you control, at your popularity rate.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "resource_coins",
+      "label": "Resources",
+      "help": "Coins from resource pairs you control, at your popularity rate.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "structure_bonus",
+      "label": "Structure bonus",
+      "help": "Bonus coins from your structure bonus tile.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "coins",
+      "label": "Coins",
+      "help": "Coins you hold.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "Scythe rulebook",
+    "edition_or_year": "Base game, 2016",
+    "checked_against_rulebook": false
+  },
+  "notes": "The three popularity-rate categories are entered as the coin total already multiplied by the rate. Tie-break order not captured; ties are shared. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+}

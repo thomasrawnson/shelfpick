@@ -1,0 +1,58 @@
+{
+  "format_version": 1,
+  "bgg_id": 84876,
+  "name": "The Castles of Burgundy",
+  "supported_players": [
+    1,
+    4
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "board_points",
+      "label": "Points earned in play",
+      "help": "Everything you scored during the game: tiles, regions, bonus tiles and goods.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "unsold_goods",
+      "label": "Unsold goods",
+      "help": "One point for each goods tile you never sold.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "silverlings",
+      "label": "Silverlings",
+      "help": "One point for each silverling left at the end.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "workers",
+      "label": "Worker tiles",
+      "help": "One point for each worker tile left at the end.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "The Castles of Burgundy rulebook",
+    "edition_or_year": "Original edition, 2011",
+    "checked_against_rulebook": false
+  },
+  "notes": "Points during play are read off the score track. Ties are shared. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+}

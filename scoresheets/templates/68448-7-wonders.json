@@ -1,0 +1,94 @@
+{
+  "format_version": 1,
+  "bgg_id": 68448,
+  "name": "7 Wonders",
+  "supported_players": [
+    2,
+    7
+  ],
+  "win_condition": "highest",
+  "rounds": 3,
+  "categories": [
+    {
+      "id": "military",
+      "label": "Military",
+      "help": "Conflict tokens won or lost at the end of each age (defeats are negative).",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": true,
+      "scope": "per_round"
+    },
+    {
+      "id": "coin_sets",
+      "label": "Coins",
+      "help": "One point for every full set of three coins in your treasury.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "wonder",
+      "label": "Wonder",
+      "help": "Points from the stages of your wonder you have built.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "civilian",
+      "label": "Civilian buildings",
+      "help": "Points printed on your blue cards.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "commercial",
+      "label": "Commercial buildings",
+      "help": "Points from your yellow cards that pay at the end.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "guilds",
+      "label": "Guilds",
+      "help": "Points from your purple guild cards.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "science",
+      "label": "Science",
+      "help": "For each symbol type, its count squared, plus 7 for every complete set of all three.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "coins_left",
+      "label": "Coins left over",
+      "help": "Total coins in your treasury; the most wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "coins_left"
+  ],
+  "source": {
+    "rulebook_title": "7 Wonders rulebook",
+    "edition_or_year": "Second edition, 2020",
+    "checked_against_rulebook": false
+  },
+  "notes": "Military scores once per age, so it is the only per-round category. Base game only. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+}

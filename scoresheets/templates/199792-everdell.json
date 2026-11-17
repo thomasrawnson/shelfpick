@@ -1,0 +1,76 @@
+{
+  "format_version": 1,
+  "bgg_id": 199792,
+  "name": "Everdell",
+  "supported_players": [
+    1,
+    4
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "card_points",
+      "label": "Cards in city",
+      "help": "Points printed on the constructions and critters in your city.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "point_tokens",
+      "label": "Point tokens",
+      "help": "Total value of the point tokens you gathered.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "basic_events",
+      "label": "Basic events",
+      "help": "Basic events you achieved (3 points each).",
+      "type": "count",
+      "points_per": 3,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "special_events",
+      "label": "Special events",
+      "help": "Points from the special events you completed.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "prosperity",
+      "label": "Prosperity cards",
+      "help": "Bonus points from your prosperity cards, using each card's own rule.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "journey",
+      "label": "Journey",
+      "help": "Points from journey spaces you used in autumn.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "Everdell rulebook",
+    "edition_or_year": "Base game, 2018",
+    "checked_against_rulebook": false
+  },
+  "notes": "Ties are shared. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+}

@@ -1,0 +1,58 @@
+{
+  "format_version": 1,
+  "bgg_id": 163412,
+  "name": "Patchwork",
+  "supported_players": [
+    2,
+    2
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "buttons",
+      "label": "Buttons",
+      "help": "One point for each button you hold.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "special_tile",
+      "label": "Special tile",
+      "help": "Tick if you took the 7x7 bonus tile (7 points).",
+      "type": "boolean",
+      "points_per": 7,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "empty_spaces",
+      "label": "Empty spaces",
+      "help": "Uncovered squares on your quilt board, each costing two points.",
+      "type": "count",
+      "points_per": -2,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "reached_end_first",
+      "label": "Reached the end first",
+      "help": "Tick if you reached the final space of the time track first; this wins a tie.",
+      "type": "boolean",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "reached_end_first"
+  ],
+  "source": {
+    "rulebook_title": "Patchwork rulebook",
+    "edition_or_year": "Base game, 2014",
+    "checked_against_rulebook": false
+  },
+  "notes": "Two players only. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+}

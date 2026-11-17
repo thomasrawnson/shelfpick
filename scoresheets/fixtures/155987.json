@@ -1,0 +1,52 @@
+{
+  "bgg_id": 155987,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "round_points": [
+          12,
+          28,
+          9,
+          21,
+          20
+        ]
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "round_points": [
+          18,
+          15,
+          31,
+          20,
+          14
+        ]
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "round_points": [
+          30,
+          25,
+          22,
+          31,
+          -2
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 90,
+      "Ben": 98,
+      "Cleo": 106
+    },
+    "winner": [
+      "Ana"
+    ]
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "format_version": 1,
+  "bgg_id": 148228,
+  "name": "Splendor",
+  "supported_players": [
+    2,
+    4
+  ],
+  "win_condition": "highest",
+  "target_score": 15,
+  "rounds": null,
+  "categories": [
+    {
+      "id": "card_points",
+      "label": "Development cards",
+      "help": "Prestige points printed on your development cards.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "nobles",
+      "label": "Nobles",
+      "help": "Nobles who visited you (3 points each).",
+      "type": "count",
+      "points_per": 3,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "cards_owned",
+      "label": "Cards owned",
+      "help": "How many development cards you own; fewer wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once",
+      "tie_break_direction": "lower"
+    }
+  ],
+  "tie_breakers": [
+    "cards_owned"
+  ],
+  "source": {
+    "rulebook_title": "Splendor rulebook",
+    "edition_or_year": "Base game, 2014",
+    "checked_against_rulebook": false
+  },
+  "notes": "The game ends after the round in which someone reaches 15, recorded as target_score. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+}

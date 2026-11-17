@@ -1,0 +1,67 @@
+{
+  "format_version": 1,
+  "bgg_id": 110327,
+  "name": "Lords of Waterdeep",
+  "supported_players": [
+    2,
+    5
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "quests",
+      "label": "Quests",
+      "help": "Victory points from the quests you completed.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "buildings",
+      "label": "Buildings",
+      "help": "Points collected from buildings you built or used.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "adventurers",
+      "label": "Adventurers",
+      "help": "One point for each adventurer cube left in your tavern.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "coin_pairs",
+      "label": "Coins",
+      "help": "One point for every full pair of coins you hold.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "lord_bonus",
+      "label": "Lord of Waterdeep bonus",
+      "help": "Bonus points from your secret lord card.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "Lords of Waterdeep rulebook",
+    "edition_or_year": "Base game, 2012",
+    "checked_against_rulebook": false
+  },
+  "notes": "Ties are shared. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+}

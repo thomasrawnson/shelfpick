@@ -1,0 +1,58 @@
+{
+  "format_version": 1,
+  "bgg_id": 822,
+  "name": "Carcassonne",
+  "supported_players": [
+    2,
+    5
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "roads",
+      "label": "Roads",
+      "help": "Points from completed and unfinished roads, one per tile.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "cities",
+      "label": "Cities",
+      "help": "Points from cities: tiles and pennants, with the finished or unfinished rate.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "monasteries",
+      "label": "Monasteries",
+      "help": "Points from monasteries: the tile plus its neighbours.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "farms",
+      "label": "Farms",
+      "help": "Points from fields: 3 per completed city they touch.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "Carcassonne rulebook",
+    "edition_or_year": "Base game, current edition",
+    "checked_against_rulebook": false
+  },
+  "notes": "Enter running totals from the board track plus end-of-game scoring. Ties are shared. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+}

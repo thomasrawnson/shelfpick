@@ -1,0 +1,37 @@
+{
+  "bgg_id": 36218,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "estates": 3,
+        "duchies": 4,
+        "provinces": 5,
+        "curses": 1,
+        "other_victory": 0,
+        "turns_taken": 17
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "estates": 5,
+        "duchies": 2,
+        "provinces": 4,
+        "curses": 0,
+        "other_victory": 9,
+        "turns_taken": 19
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 44,
+      "Ben": 44
+    },
+    "winner": [
+      "Ana"
+    ]
+  }
+}

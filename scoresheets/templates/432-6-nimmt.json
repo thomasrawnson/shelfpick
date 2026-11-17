@@ -1,0 +1,32 @@
+{
+  "format_version": 1,
+  "bgg_id": 432,
+  "name": "6 nimmt!",
+  "supported_players": [
+    2,
+    10
+  ],
+  "win_condition": "lowest",
+  "target_score": 66,
+  "rounds": null,
+  "categories": [
+    {
+      "id": "penalty_heads",
+      "label": "Penalty heads",
+      "help": "Bull heads on the cards you collected this round.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "per_round"
+    }
+  ],
+  "tie_breakers": [
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "6 nimmt! rulebook",
+    "edition_or_year": "Original edition, 1994 (current printing)",
+    "checked_against_rulebook": false
+  },
+  "notes": "Fewest penalty heads wins. The game ends when a player reaches 66, recorded as target_score. Ties are shared. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+}

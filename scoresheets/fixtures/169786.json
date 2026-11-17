@@ -1,0 +1,46 @@
+{
+  "bgg_id": 169786,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "star_coins": 18,
+        "territory_coins": 14,
+        "resource_coins": 6,
+        "structure_bonus": 4,
+        "coins": 21
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "star_coins": 12,
+        "territory_coins": 20,
+        "resource_coins": 10,
+        "structure_bonus": 3,
+        "coins": 25
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "star_coins": 18,
+        "territory_coins": 10,
+        "resource_coins": 4,
+        "structure_bonus": 5,
+        "coins": 18
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 63,
+      "Ben": 70,
+      "Cleo": 55
+    },
+    "winner": [
+      "Ben"
+    ]
+  }
+}

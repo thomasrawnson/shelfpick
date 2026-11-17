@@ -1,0 +1,77 @@
+{
+  "format_version": 1,
+  "bgg_id": 36218,
+  "name": "Dominion",
+  "supported_players": [
+    2,
+    4
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "estates",
+      "label": "Estates",
+      "help": "Estate cards you own (1 point each).",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "duchies",
+      "label": "Duchies",
+      "help": "Duchy cards you own (3 points each).",
+      "type": "count",
+      "points_per": 3,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "provinces",
+      "label": "Provinces",
+      "help": "Province cards you own (6 points each).",
+      "type": "count",
+      "points_per": 6,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "curses",
+      "label": "Curses",
+      "help": "Curse cards you hold, each costing one point.",
+      "type": "count",
+      "points_per": -1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "other_victory",
+      "label": "Other victory cards",
+      "help": "Points from other victory cards and effects in the kingdom.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": true,
+      "scope": "once"
+    },
+    {
+      "id": "turns_taken",
+      "label": "Turns taken",
+      "help": "How many turns you took; fewer wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once",
+      "tie_break_direction": "lower"
+    }
+  ],
+  "tie_breakers": [
+    "turns_taken"
+  ],
+  "source": {
+    "rulebook_title": "Dominion rulebook",
+    "edition_or_year": "Second edition, 2016",
+    "checked_against_rulebook": false
+  },
+  "notes": "Base cards plus a free-entry line for kingdom-specific victory cards. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+}

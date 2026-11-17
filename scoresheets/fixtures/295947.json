@@ -1,0 +1,67 @@
+{
+  "bgg_id": 295947,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "bear": 11,
+        "elk": 9,
+        "salmon": 12,
+        "hawk": 8,
+        "fox": 7,
+        "mountain": 6,
+        "forest": 5,
+        "prairie": 7,
+        "wetland": 4,
+        "river": 6,
+        "habitat_bonus": 3,
+        "nature_tokens": 2
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "bear": 10,
+        "elk": 13,
+        "salmon": 9,
+        "hawk": 5,
+        "fox": 9,
+        "mountain": 5,
+        "forest": 6,
+        "prairie": 4,
+        "wetland": 7,
+        "river": 5,
+        "habitat_bonus": 4,
+        "nature_tokens": 3
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "bear": 8,
+        "elk": 8,
+        "salmon": 10,
+        "hawk": 6,
+        "fox": 5,
+        "mountain": 4,
+        "forest": 4,
+        "prairie": 5,
+        "wetland": 3,
+        "river": 4,
+        "habitat_bonus": 0,
+        "nature_tokens": 1
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 80,
+      "Ben": 80,
+      "Cleo": 58
+    },
+    "winner": [
+      "Ben"
+    ]
+  }
+}

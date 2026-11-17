@@ -1,0 +1,59 @@
+{
+  "format_version": 1,
+  "bgg_id": 199561,
+  "name": "Sagrada",
+  "supported_players": [
+    1,
+    4
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "private_objective",
+      "label": "Private objective",
+      "help": "Sum of the values of your secret colour on your window.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "public_objectives",
+      "label": "Public objectives",
+      "help": "Points from the shared objective cards you met.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "favour_tokens",
+      "label": "Favour tokens",
+      "help": "One point for each unused favour token.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "empty_spaces",
+      "label": "Empty spaces",
+      "help": "Window spaces left empty, each costing one point.",
+      "type": "count",
+      "points_per": -1,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "private_objective",
+    "favour_tokens"
+  ],
+  "source": {
+    "rulebook_title": "Sagrada rulebook",
+    "edition_or_year": "Base game, 2017",
+    "checked_against_rulebook": false
+  },
+  "notes": "Remaining ties after the listed tie-breakers are shared. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+}

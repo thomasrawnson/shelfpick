@@ -1,0 +1,49 @@
+{
+  "format_version": 1,
+  "bgg_id": 283155,
+  "name": "Calico",
+  "supported_players": [
+    1,
+    4
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "cat_points",
+      "label": "Cats",
+      "help": "Points from the cat patterns you completed.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "buttons",
+      "label": "Buttons",
+      "help": "Buttons you earned (3 points each).",
+      "type": "count",
+      "points_per": 3,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "design_goals",
+      "label": "Design goals",
+      "help": "Points from the design goal tiles you met.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "Calico rulebook",
+    "edition_or_year": "Base game, 2020",
+    "checked_against_rulebook": false
+  },
+  "notes": "Ties are shared. Category list recalled from the publisher rulebook and not yet re-checked against the printed copy (see source.checked_against_rulebook)."
+}
