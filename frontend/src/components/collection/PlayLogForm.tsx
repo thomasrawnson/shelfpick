@@ -647,7 +647,12 @@ function PlayLogForm({
                       value={player.score}
                       onChange={(event) => updatePlayer(index, { score: event.target.value })}
                     />
-                    {best !== null && <span className="play-row-best" aria-label={`${label}'s best: ${best}`}>best {best}</span>}
+                    {competitive && (
+                      // Always present so every score box lines up, with or without a record.
+                      best !== null
+                        ? <span className="play-row-best" aria-label={`${label}'s best: ${best}`}>best {best}</span>
+                        : <span className="play-row-best" aria-hidden="true" />
+                    )}
                   </li>
                 )
               })}

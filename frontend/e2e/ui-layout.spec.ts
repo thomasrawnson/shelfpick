@@ -52,6 +52,15 @@ for (const scheme of ["light", "dark"] as const) {
       await expect(page).toHaveURL(new RegExp(tab.path))
       await settle(page)
       expect.soft(await avatarCollisions(page), `${tab.name}: avatar overlaps`).toEqual([])
+      if (tab.name === "Discover") {
+        // Compact rows: cover, title, facts, save and one line of actions.
+        const heights = await page.locator(".discover-card").evaluateAll((cards) => cards.slice(0, 3).map((card) => card.getBoundingClientRect().height))
+        for (const height of heights) expect.soft(height, "Discover row height").toBeLessThanOrEqual(150)
+        // Secondary actions stay on one line.
+        const lines = await page.locator(".discover-actions").first().evaluate((row) => new Set(Array.from(row.children).map((child) => Math.round(child.getBoundingClientRect().top))).size)
+        expect.soft(lines, "Discover actions on one line").toBe(1)
+        await page.screenshot({ path: `${SHOTS}/discover-top-390-${scheme}.png` })
+      }
 
       // Scroll to the end; the last item must sit fully above the bar.
       const last = page.locator(tab.last).last()

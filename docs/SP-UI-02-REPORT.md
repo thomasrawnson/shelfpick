@@ -84,6 +84,13 @@ Screenshots:
 - **Deploy the backend before the app build:** `GET /plays` changed shape (additive `game`) and scope (all plays).
 - The Simulator test left a few local-only "Alex …" test players in the loopback dev database.
 
+## SP-UI-02b: fixes from the owner's phone check (build 9 → 10)
+- Discover Hot rows are compact: "Why it's trending ▾", "BGG ›" and "Hide" share one line ("Hide" keeps the accessible name "Not interested in <game>"), reasons open below, and the save pill is 34px with a 44px tap area. About 4½ games per screen, down from 2.
+- Log play: score boxes line up whether or not a player has a "best" record, and the Date and Minutes fields are the same height and row (iOS date input normalised).
+- Tonight Fine-tune: the open body has the same 16px inset as its header.
+- Recorded for later: a better Ranking share card.
+- Tests added: score-box alignment, date/minutes alignment, Fine-tune inset, Discover row height and a single action line.
+
 ## Owner gates (NEXT)
 1. Physical-phone check: log a real 3-player game end to end and check counts against BG Stats.
 2. Review and merge the draft PR, then deploy the backend, then build 9.
