@@ -12,7 +12,7 @@ import {
 import PlayLogForm from "./collection/PlayLogForm"
 import PlayerSelectionStep from "./picker/PlayerSelectionStep"
 import TimeStep from "./picker/TimeStep"
-import { timeBand, trackEvent } from "../telemetry"
+import { Analytics, timeBand } from "../analytics"
 import { PHONE_VOTING_V1_AVAILABLE } from "../game-night-availability"
 import { requestReviewAfter } from "../review-prompt"
 import { useVisibleInterval } from "../use-visible-interval"
@@ -122,7 +122,7 @@ function GameNightView({ enabled, votingEnabled, defaultTime = null, onBack, onV
   function chooseMatch(match: PickerMatch) {
     if (!completionTracked.current) {
       completionTracked.current = true
-      trackEvent("game_night_completed", {
+      Analytics.track("game_night_completed", {
         source: "game_night", player_count: selectedPlayerIds.length,
         time_band: timeBand(maxPlayTime), result_count: matches.length,
       })

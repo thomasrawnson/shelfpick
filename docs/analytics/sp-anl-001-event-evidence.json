@@ -1,0 +1,68 @@
+[
+ {
+  "event": "app_installed",
+  "properties": {
+   "environment": "dev",
+   "platform": "web",
+   "app_version": "f906098"
+  }
+ },
+ {
+  "event": "app_opened",
+  "properties": {
+   "environment": "dev",
+   "platform": "web",
+   "app_version": "f906098"
+  }
+ },
+ {
+  "event": "pick_started",
+  "properties": {
+   "source": "pick",
+   "player_count": 4,
+   "time_band": "up_to_30",
+   "environment": "dev",
+   "platform": "web",
+   "app_version": "f906098"
+  }
+ },
+ {
+  "event": "picker_completed",
+  "properties": {
+   "source": "pick",
+   "player_count": 4,
+   "time_band": "up_to_30",
+   "result_count": 0,
+   "environment": "dev",
+   "platform": "web",
+   "app_version": "f906098"
+  }
+ },
+ {
+  "event": "discover_opened",
+  "properties": {
+   "tab": "hot",
+   "environment": "dev",
+   "platform": "web",
+   "app_version": "f906098"
+  }
+ },
+ {
+  "event": "app_opened",
+  "properties": {
+   "environment": "dev",
+   "platform": "web",
+   "app_version": "f906098"
+  }
+ },
+ {
+  "event": "settings_changed",
+  "properties": {
+   "setting": "theme",
+   "value": "dark",
+   "environment": "dev",
+   "platform": "web",
+   "app_version": "f906098"
+  }
+ }
+]

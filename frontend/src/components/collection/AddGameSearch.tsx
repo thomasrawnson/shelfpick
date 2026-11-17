@@ -11,6 +11,7 @@ import {
   type BGGSearchResult,
   type Game,
 } from "../../api/client"
+import { Analytics } from "../../analytics"
 import { APP_PATHS } from "../../routes"
 import {
   beginAddGameAction,
@@ -176,6 +177,9 @@ function AddGameSearch({
 
       if (destination === "owned") {
         onGameAdded(game)
+        Analytics.track("game_added", { source: "collection_search" })
+      } else {
+        Analytics.track("wishlist_added", { source: "collection_search" })
       }
 
       setStatus(

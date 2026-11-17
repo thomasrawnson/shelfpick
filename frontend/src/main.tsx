@@ -20,7 +20,11 @@ import App
   from "./App.tsx"
 import AppErrorBoundary from "./components/AppErrorBoundary.tsx"
 
+import { startAnalytics } from "./analytics"
+
 import "./index.css"
+
+startAnalytics()
 
 if (Capacitor.getPlatform() === "ios") {
   document.documentElement.dataset.nativeIos = "true"

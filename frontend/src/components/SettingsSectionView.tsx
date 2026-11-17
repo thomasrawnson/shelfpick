@@ -4,6 +4,7 @@ import { Link } from "react-router-dom"
 import type { AuthUser } from "../auth"
 import { APP_PATHS } from "../routes"
 import { rememberSettingsEntry } from "../settings-focus"
+import { Analytics } from "../analytics"
 import { getThemePreference, setThemePreference, type ThemePreference } from "../theme"
 import ProfileSettings from "./ProfileSettings"
 import SetupView from "./SetupView"
@@ -30,11 +31,23 @@ function SettingsBackLink({ section }: { section: Section }) {
     state={{ focusEntry: section }} onClick={() => rememberSettingsEntry(section)}>Back to Settings</Link>
 }
 
+function AnalyticsSetting() {
+  const [enabled, setEnabled] = useState(Analytics.isEnabled)
+  return <label className="settings-confirmation">
+    <input type="checkbox" checked={enabled} onChange={(event) => {
+      Analytics.setEnabled(event.target.checked)
+      setEnabled(event.target.checked)
+    }} />
+    <span>Share anonymous usage analytics</span>
+  </label>
+}
+
 function AppearanceSettings() {
   const [theme, setTheme] = useState<ThemePreference>(getThemePreference)
   function chooseTheme(value: ThemePreference) {
     setThemePreference(value)
     setTheme(value)
+    Analytics.track("settings_changed", { setting: "theme", value })
   }
   const options: Array<{ value: ThemePreference; label: string }> = [
     { value: "system", label: "Use device setting" },
@@ -120,6 +133,8 @@ function SettingsSectionView({ section, user, onUserChange, onAccountDeleted }: 
       <h2>ShelfPick</h2>
       <p>A calm way to choose from your collection and keep track of what reaches the table.</p>
       <p className="settings-row-detail">Made by Pluto Night Labs</p>
+      <AnalyticsSetting />
+      <p className="settings-row-detail">Anonymous counts of which features are used help improve ShelfPick. No account details, search text or notes are included.</p>
       <BggAttribution />
       {LEGAL_DRAFTS_ENABLED && <nav className="settings-legal-links" aria-label="Draft legal documents">
         <Link to={APP_PATHS.privacyDraft}>Privacy Policy draft</Link>

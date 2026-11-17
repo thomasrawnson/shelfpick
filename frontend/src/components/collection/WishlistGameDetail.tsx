@@ -4,6 +4,7 @@ import {
   moveWishlistGameToCollection,
   type Game,
 } from "../../api/client"
+import { Analytics } from "../../analytics"
 import ResilientGameArtwork from "../ResilientGameArtwork"
 
 
@@ -37,6 +38,7 @@ function WishlistGameDetail({
     try {
       const converted =
         await moveWishlistGameToCollection(game.bgg_id)
+      Analytics.track("game_added", { source: "wishlist_move" })
       onConverted(converted)
     } catch (err) {
       setError(

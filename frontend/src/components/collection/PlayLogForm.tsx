@@ -5,6 +5,7 @@ import {
 } from "react"
 
 import { lightImpact } from "../../haptics"
+import { Analytics } from "../../analytics"
 import { requestReviewAfterPlaySaved } from "../../review-prompt"
 import {
   getPlayers,
@@ -506,6 +507,11 @@ function PlayLogForm({
       setOpen(false)
     }
 
+    Analytics.track("play_logged", {
+      source: "play_log_form",
+      player_count: Math.min(participants.length, 999),
+      has_scores: participants.some((participant) => participant.score !== null),
+    })
     void requestReviewAfterPlaySaved()
 
     try {
