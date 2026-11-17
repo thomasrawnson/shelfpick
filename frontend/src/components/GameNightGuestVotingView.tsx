@@ -1,3 +1,4 @@
+import { candidateFacts } from "../game-night-candidate"
 import { useEffect, useRef, useState } from "react"
 
 import {
@@ -283,9 +284,9 @@ function GameNightGuestVotingView({ joinToken }: Props) {
       {state?.status === "open" && state.guest && (
         <form onSubmit={(event) => { event.preventDefault(); void submitVote() }} className="game-night-ballot">
           <fieldset>
-            <legend>Choose one game</legend>
+            <legend className="sr-only">Choose one game</legend>
             {state.candidates.map((candidate) => (
-              <label key={candidate.bgg_id} className="game-night-ballot-option">
+              <label key={candidate.bgg_id} className={candidate.thumbnail_url ? "game-night-ballot-option" : "game-night-ballot-option game-night-ballot-option-no-art"}>
                 <input
                   type="radio"
                   name="game-night-vote"
@@ -293,7 +294,12 @@ function GameNightGuestVotingView({ joinToken }: Props) {
                   onChange={() => setSelection(candidate.bgg_id)}
                 />
                 {candidate.thumbnail_url && <img src={candidate.thumbnail_url} alt="" />}
-                <span>{candidate.name}</span>
+                <span className="game-night-ballot-text">
+                  <span className="game-night-ballot-name">{candidate.name}</span>
+                  {candidateFacts(candidate) && (
+                    <span className="game-night-ballot-facts">{candidateFacts(candidate)}</span>
+                  )}
+                </span>
               </label>
             ))}
             <label className="game-night-ballot-option game-night-abstain-option">

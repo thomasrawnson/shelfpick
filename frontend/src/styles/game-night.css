@@ -178,11 +178,11 @@
 
 .game-night-ballot-option {
   display: grid;
-  grid-template-columns: auto 48px minmax(0, 1fr);
+  grid-template-columns: auto 40px minmax(0, 1fr);
   align-items: center;
   gap: var(--space-2);
-  min-height: 56px;
-  padding: var(--space-2);
+  min-height: 52px;
+  padding: 6px var(--space-2);
   background: var(--color-surface-raised);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -194,15 +194,43 @@
   border-color: var(--color-forest);
 }
 
+.game-night-ballot-option-no-art {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
 .game-night-ballot-option img {
-  width: 48px;
-  height: 56px;
+  width: 40px;
+  height: 48px;
   object-fit: contain;
   border-radius: var(--radius-sm);
 }
 
+.game-night-ballot-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.game-night-ballot-name {
+  overflow: hidden;
+  font-weight: 700;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.game-night-ballot-facts {
+  overflow: hidden;
+  color: var(--color-text-support);
+  font-size: var(--text-meta);
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .game-night-abstain-option {
   grid-template-columns: auto minmax(0, 1fr);
+  min-height: 44px;
 }
 
 .game-night-vote-results {
@@ -278,4 +306,40 @@
   align-items: center;
   min-height: 44px;
   font-weight: 700;
+}
+
+
+/* Guest vote screen: keep a typical 3-5 game ballot on one phone screen. */
+.game-night-guest-screen {
+  gap: var(--space-2);
+}
+
+.game-night-guest-screen > .brand-logo {
+  width: min(140px, 45vw);
+  margin-bottom: 0;
+}
+
+.game-night-guest-screen > header h1 {
+  margin: 0;
+  font-size: clamp(22px, 6.4vw, 26px);
+  line-height: 1.15;
+}
+
+.game-night-guest-screen > header .eyebrow {
+  margin-bottom: 2px;
+}
+
+.game-night-ballot {
+  gap: var(--space-2);
+}
+
+.game-night-ballot fieldset {
+  gap: 6px;
+}
+
+/* The submit button stays in view so no scrolling is needed to vote. */
+.game-night-ballot > .primary-button {
+  position: sticky;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+  z-index: 1;
 }

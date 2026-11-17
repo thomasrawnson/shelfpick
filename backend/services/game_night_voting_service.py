@@ -64,6 +64,11 @@ class GameNightVotingService:
                         "bgg_id": game.bgg_id,
                         "name": game.name,
                         "thumbnail_url": game.thumbnail_url,
+                        "min_players": game.min_players,
+                        "max_players": game.max_players,
+                        "min_play_time": game.min_play_time,
+                        "max_play_time": game.max_play_time,
+                        "complexity": game.complexity,
                     }
                     for game in (games_by_id[bgg_id] for bgg_id in candidate_bgg_ids)
                 ],

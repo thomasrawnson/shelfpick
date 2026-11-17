@@ -80,6 +80,12 @@ export interface GameNightVotingCandidate {
   bgg_id: number
   name: string
   thumbnail_url: string | null
+  // Added for new votes; sessions opened earlier do not have them.
+  min_players?: number | null
+  max_players?: number | null
+  min_play_time?: number | null
+  max_play_time?: number | null
+  complexity?: number | null
 }
 
 export interface GameNightVotingResults {
