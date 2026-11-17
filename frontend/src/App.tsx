@@ -537,6 +537,7 @@ function App() {
         />
 
         <div className="app-content">
+          <div className="page-transition" key={view}>
           <Routes>
             <Route
               path={`${APP_PATHS.tonight}/*`}
@@ -668,6 +669,7 @@ function App() {
               element={<Navigate to={APP_PATHS.tonight} replace />}
             />
           </Routes>
+          </div>
         </div>
 
         {location.pathname !== APP_PATHS.liveTimer && (

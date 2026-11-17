@@ -242,6 +242,25 @@ one ballot but cannot guarantee one real person across multiple browsers or
 devices. Invalid and expired links explain that the session is unavailable;
 closed links show final results.
 
+## Five-tab shell — SP-UI-01 (17 November 2026)
+
+Tabs are **Tonight · Shelf · Plays · Discover · Stats** (single words, one row).
+Tonight is the Picker with group size, complexity and Fine-tune, a text action
+"Start a group vote" (old Game Night, `?mode=vote`) and a quiet Recently played
+cover row. Shelf is the Collection (Owned, Want to Play, Ranking) with a grid
+(default) / list toggle, covers fitted without cropping and a two-line title.
+Plays lists recent plays across games with game, player and date filters, a
+prominent Log play, Rematch and Edit. Stats is the renamed Insights. Old URLs
+redirect (`legacyRedirect` in `routes.ts`); guest voting links never change.
+
+- Header: the avatar sits in the title row at the page padding; screen titles are 1.5rem.
+- Spacing: Tonight uses one 16px rhythm between control groups; rows are full-width and tappable.
+- Cover accent: game detail and the pick result tint from the cover (`cover-accent.ts`);
+  accent text is adjusted to WCAG AA on every light and dark surface, with a palette fallback
+  when the cover cannot be read (CORS).
+- Motion: tab transition, pick reveal and skeleton shimmer all switch off under reduced motion.
+  Pull-to-refresh on Shelf, Plays and Discover; light haptic on tab change.
+
 ## Colors
 
 **The Forest Means Action Rule.** Use Forest Green for primary actions, selected controls, active navigation, focus rings and interactive affordances that move the user forward.

@@ -6,7 +6,7 @@
 .app-top-bar {
   position: absolute;
   top: 0;
-  right: 17px;
+  right: 22px;
   min-height: 0;
   height: 0;
   align-items: flex-start;
@@ -53,16 +53,16 @@
 .collection-section-tabs button { min-height: 40px; font-size: 0.9375rem; }
 .collection-section-tabs { margin-bottom: 8px; }
 .collection-tools { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; margin-bottom: 12px; padding: 4px 0 8px; background: var(--color-bg); }
-.collection-search-sort-row { display: flex; align-items: center; gap: 8px; }
-.collection-search-wrap { flex: 1; min-width: 0; }
+.collection-search-sort-row { display: grid; grid-template-columns: minmax(0, 1fr) 76px auto; align-items: center; gap: 8px; }
+.collection-search-wrap { flex: 1 1 0; min-width: 0; }
+.collection-sort-wrap { width: 76px; min-width: 0; display: block; }
+.collection-sort { width: 100%; max-width: none; padding-inline: 10px 4px; background-color: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: var(--radius-md); }
 .collection-search-sort-row .collection-search { min-height: 40px; }
 .collection-sort { min-height: 40px; }
-.shelf-layout-button {
-  flex: none; display: grid; place-items: center; width: 40px; height: 40px; padding: 0;
-  color: var(--color-brand-primary); background: var(--color-surface-raised);
-  border: 1px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer;
-}
-.shelf-layout-button svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.shelf-view-toggle { flex: none; display: inline-flex; gap: 2px; padding: 3px; background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: var(--radius-md); }
+.shelf-view-toggle button { display: grid; place-items: center; width: 36px; height: 34px; padding: 0; color: var(--color-text-support); background: transparent; border: 0; border-radius: 9px; cursor: pointer; }
+.shelf-view-toggle button.active { color: var(--color-text-inverse); background: var(--color-brand-primary); }
+.shelf-view-toggle svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .collection-tools .filter-tabs { display: flex; gap: 6px; padding: 0; background: transparent; border: 0; }
 .collection-tools .filter-tabs button {
   flex: none; min-height: 32px; padding: 0 14px; border: 1px solid var(--color-border);
@@ -149,3 +149,61 @@
 .plays-note, .plays-empty-note { margin: 16px 0 0; color: var(--color-text-support); font-size: 0.8125rem; }
 .plays-game-picker button { display: flex; gap: 12px; align-items: center; width: 100%; padding: 8px 12px 8px 8px; text-align: left; color: var(--color-text-primary); background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: 14px; font: inherit; cursor: pointer; }
 .plays-search { margin-bottom: 12px; }
+
+/* Cover-derived accent (SP-UI-01). Text colours are contrast-checked in code (AA, both themes). */
+.has-cover-accent { --cover-accent-text: var(--cover-accent-text-light); }
+:root[data-theme="dark"] .has-cover-accent,
+:root[data-theme="black"] .has-cover-accent { --cover-accent-text: var(--cover-accent-text-dark); }
+.collection-detail.has-cover-accent .collection-detail-image {
+  width: 100%; height: auto; aspect-ratio: 4 / 3; margin: 0 0 18px; border-radius: 22px;
+  background: color-mix(in srgb, var(--cover-accent) 26%, var(--color-surface-raised));
+  box-shadow: 0 18px 38px color-mix(in srgb, var(--cover-accent) 28%, transparent);
+  display: grid; place-items: center;
+}
+.collection-detail.has-cover-accent .collection-detail-image img { width: auto; height: 100%; max-width: 100%; background: transparent; object-fit: contain; }
+.has-cover-accent .eyebrow, .has-cover-accent .picker-result-mode { color: var(--cover-accent-text); }
+.picker-result-card.has-cover-accent .picker-cover-wrap {
+  background: color-mix(in srgb, var(--cover-accent) 22%, var(--color-surface-raised));
+  border-radius: 22px; box-shadow: 0 18px 38px color-mix(in srgb, var(--cover-accent) 28%, transparent);
+}
+.picker-result-card.has-cover-accent .picker-result-score strong { color: var(--cover-accent-text); }
+
+/* Pick reveal. */
+@media (prefers-reduced-motion: no-preference) {
+  .picker-result-card .picker-cover-wrap { animation: pick-reveal 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  @keyframes pick-reveal { from { opacity: 0; transform: translateY(14px) scale(0.96); } to { opacity: 1; transform: none; } }
+}
+
+/* Pull to refresh and tab transitions. */
+.pull-indicator { display: grid; place-items: center; overflow: hidden; margin: 0 0 4px; }
+.pull-spinner { width: 20px; height: 20px; border: 2px solid var(--color-border); border-top-color: var(--color-brand-primary); border-radius: 50%; }
+@media (prefers-reduced-motion: no-preference) {
+  .pull-spinner.is-spinning { animation: pull-spin 700ms linear infinite; }
+  @keyframes pull-spin { to { transform: rotate(360deg); } }
+  .page-transition { animation: page-in 220ms ease-out both; }
+  @keyframes page-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+}
+
+/* Dynamic Type: keep my compact controls from splitting words at the AX sizes. */
+@supports (font: -apple-system-body) {
+  :root[data-native-ios] .collection-section-tabs { grid-template-columns: repeat(auto-fit, minmax(min(100%, 6em), 1fr)) !important; }
+  :root[data-native-ios] .collection-section-tabs button { font-size: var(--text-support); overflow-wrap: normal; word-break: keep-all; }
+  :root[data-native-ios] .player-step-screen .player-complexity-section .complexity-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 6em), 1fr)); }
+  :root[data-native-ios] .player-step-screen .complexity-option strong { font-size: var(--text-support); }
+  :root[data-native-ios] .player-step-screen .complexity-option { overflow-wrap: normal; word-break: keep-all; }
+  :root[data-native-ios] .player-step-screen .player-chip strong { font-size: 1.25rem; }
+  :root[data-native-ios] .player-step-screen .player-chip.solo strong { font-size: var(--text-support); }
+  :root[data-native-ios] .player-step-screen .player-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 3.5em), 1fr)); }
+  :root[data-native-ios] .plays-range { flex-wrap: wrap; }
+  :root[data-native-ios] .plays-filters { grid-template-columns: 1fr; }
+  :root[data-native-ios] .plays-card-actions { flex-wrap: wrap; }
+}
+
+/* Shelf grid refinement: whole cover visible, two-line titles that line up, readable plays badge. */
+.collection-tile-cover { background: color-mix(in srgb, var(--color-brand-primary) 8%, var(--color-surface-raised)); }
+.collection-tile-cover img { object-fit: contain; }
+.collection-tile strong { min-height: 2.5em; }
+.collection-tile-plays {
+  color: #fff; background: rgb(20 24 22 / 90%); border: 1px solid rgb(255 255 255 / 40%);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+}

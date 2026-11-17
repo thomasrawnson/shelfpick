@@ -119,7 +119,7 @@ for (const size of ACCESSIBILITY_BODY_SIZES) test.describe(`Year in Review story
     await emulateNativeDynamicType(page, size.px)
     await page.route("**/insights/year-recap**", route => route.fulfill({ json: STORY_RECAP }))
     await logIn(page, "local-free@shelfpick.app")
-    await expect(page).toHaveURL(/\/picker/)
+    await expect(page).toHaveURL(/\/tonight/)
     await page.goto("/insights")
     await page.getByRole("tab", { name: "Recaps" }).or(page.getByRole("button", { name: "Recaps" })).first().click()
     await page.getByRole("button", { name: "View my year" }).click()
@@ -134,5 +134,25 @@ for (const size of ACCESSIBILITY_BODY_SIZES) test.describe(`Year in Review story
       }
     }
     await expect(story.getByRole("button", { name: "Share my year" })).toBeInViewport()
+  })
+})
+
+// SP-UI-01: every tab keeps words whole and avoids sideways scrolling at the AX sizes.
+import { mockShelf } from "./ui-fixtures"
+
+for (const size of ACCESSIBILITY_BODY_SIZES) test.describe(`Five tabs at ${size.name}`, () => {
+  test(`${size.name}: Tonight, Shelf, Plays, Discover and Stats`, async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "iPhone 15")
+    await emulateNativeDynamicType(page, size.px)
+    await mockShelf(page)
+    await logIn(page, "local-free@shelfpick.app")
+    await expect(page).toHaveURL(/\/tonight/)
+    const nav = page.getByRole("navigation", { name: "Primary" })
+    for (const tab of ["Tonight", "Shelf", "Plays", "Discover", "Stats"]) {
+      await nav.getByRole("button", { name: tab, exact: true }).click()
+      await expect(nav.getByRole("button", { name: tab, exact: true })).toHaveAttribute("aria-current", "page")
+      await page.waitForLoadState("networkidle")
+      await expectWordsWhole(page, `${tab} at ${size.name}`, "main")
+    }
   })
 })

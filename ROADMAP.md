@@ -41,6 +41,15 @@ Rematch prefills game, players, teams and location. Migration `a7c1e9d3b5f2`
 is additive and must be applied before the new app build. iOS build number is 8.
 Evidence and rollback plan: `docs/SP-PLAY-01-REPORT.md`.
 
+### SP-UI-01 Navigation and visual refresh — IMPLEMENTED; DRAFT PR OPEN (17 November 2026)
+
+Five tabs (Tonight, Shelf, Plays, Discover, Stats) with legacy-URL redirects,
+Tonight and Shelf redesigns (owner-approved at the checkpoint), a cross-game Plays
+tab with filters, Log play, Rematch and Edit, cover-derived accents, skeleton
+loaders, pull-to-refresh and reduced-motion-aware transitions. No backend change.
+Build number 8. Automated, browser and Simulator evidence only; physical-phone
+check, merge and submission remain owner gates. Report: `docs/SP-UI-01-REPORT.md`.
+
 ### SP-YIR-01 Year in Review 2026 — IMPLEMENTED; DRAFT PR OPEN (17 November 2026)
 
 Free swipeable Year in Review story (8 slides, short version under 3 plays,

@@ -5,12 +5,14 @@ import type { Page } from "@playwright/test"
 const palette = ["#315C48", "#C28B37", "#356A7A", "#B7463C", "#6B4E9B", "#3F7655", "#A66D16", "#2F4858"]
 export function cover(index: number): string {
   const color = palette[index % palette.length]
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="400" height="400" fill="${color}"/><circle cx="300" cy="110" r="90" fill="#fff" opacity=".18"/></svg>`
+  // The last game has a tall box, to check awkward cover proportions.
+  const tall = index === 8
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${tall ? 260 : 400}" height="${tall ? 480 : 400}"><rect width="100%" height="100%" fill="${color}"/><circle cx="300" cy="110" r="90" fill="#fff" opacity=".18"/></svg>`
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`
 }
-export const NAMES = ["Clockwork Market", "Lantern Grove", "Harbour Council", "Tiny Orchard", "Night Courier", "Salt and Sail", "Ember Vale", "Quiet Archive"]
-const PLAY_COUNTS = [14, 0, 9, 3, 0, 7, 1, 0]
-const LAST_PLAYED = ["2026-11-16", null, "2026-11-10", "2026-10-30", null, "2026-11-12", "2026-09-01", null]
+export const NAMES = ["Clockwork Market", "Lantern Grove", "Harbour Council", "Tiny Orchard", "Night Courier", "Salt and Sail", "Ember Vale", "Quiet Archive", "The Very Long Titled Expedition of the Northern Lights Cartographers"]
+const PLAY_COUNTS = [14, 0, 9, 3, 0, 7, 1, 0, 2]
+const LAST_PLAYED = ["2026-11-16", null, "2026-11-10", "2026-10-30", null, "2026-11-12", "2026-09-01", null, "2026-08-20"]
 const PEOPLE = ["Ann", "Bob", "Cleo", "Dev"]
 
 export const GAMES = NAMES.map((name, index) => ({

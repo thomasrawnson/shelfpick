@@ -5,6 +5,7 @@ import type {
   GameHistory as GameHistoryData,
   GamePlay,
 } from "../../api/client"
+import { useCoverAccent } from "../../use-cover-accent"
 import { rematchPrefill, type PlayPrefill } from "../../play-results"
 
 import ResilientGameArtwork from "../ResilientGameArtwork"
@@ -28,6 +29,8 @@ function GameDetail({
   onPlaySaved,
   onRemove,
 }: Props) {
+  const accentStyle = useCoverAccent(game.image_url ?? game.thumbnail_url, game.name)
+
   const [
     confirmingRemove,
     setConfirmingRemove,
@@ -73,10 +76,10 @@ function GameDetail({
         className="collection-back"
         onClick={onBack}
       >
-        ← Back to collection
+        ← Back to shelf
       </button>
 
-      <article className="collection-detail">
+      <article className="collection-detail has-cover-accent" style={accentStyle}>
         <div className="collection-detail-image">
           <ResilientGameArtwork
             src={game.image_url ?? game.thumbnail_url}

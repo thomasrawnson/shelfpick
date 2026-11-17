@@ -45,6 +45,9 @@ import RankGamesView
 import SegmentedControl
   from "./ui/SegmentedControl"
 import { mergeGameIntoCollection } from "../collection-state"
+import PullIndicator from "./ui/PullIndicator"
+import Skeleton from "./ui/Skeleton"
+import { usePullToRefresh } from "../use-pull-to-refresh"
 import { readShelfLayout, saveShelfLayout } from "../shelf-layout"
 
 export type CollectionSection =
@@ -350,6 +353,7 @@ function CollectionView({
 
   const [reloadKey, setReloadKey] = useState(0)
   function retryCollection() { setLoading(true); setReloadKey(current => current + 1) }
+  const pull = usePullToRefresh(() => { setReloadKey(current => current + 1) }, section === "owned" && !selectedGame)
   useEffect(() => {
     let active = true
     async function loadGames() {
@@ -925,10 +929,11 @@ function CollectionView({
 
   if (loading && games.length === 0 && !error) {
     return (
-      <section className="screen collection-screen">
-        <h1>
-          Opening the cupboard...
-        </h1>
+      <section className="screen collection-screen" aria-busy="true">
+        <div className="collection-heading-row">
+          <header><h1>Shelf</h1></header>
+        </div>
+        <Skeleton variant="tile" rows={6} label="Opening your shelf" />
       </section>
     )
   }
@@ -980,6 +985,7 @@ function CollectionView({
 
   return (
     <section className="screen collection-screen">
+      <PullIndicator {...pull} />
       <div className="collection-heading-row">
         <header>
           <h1>
@@ -1019,18 +1025,26 @@ function CollectionView({
       )}
       <CollectionFilters
         trailing={
-          <button
-            type="button"
-            className="shelf-layout-button"
-            aria-label={layout === "grid" ? "Show as list" : "Show as grid"}
-            onClick={() => changeLayout(layout === "grid" ? "list" : "grid")}
-          >
-            {layout === "grid" ? (
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
-            ) : (
+          <div className="shelf-view-toggle" role="group" aria-label="Shelf view">
+            <button
+              type="button"
+              aria-label="Grid view"
+              aria-pressed={layout === "grid"}
+              className={layout === "grid" ? "active" : ""}
+              onClick={() => changeLayout("grid")}
+            >
               <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5" /><rect x="13" y="4" width="7" height="7" rx="1.5" /><rect x="4" y="13" width="7" height="7" rx="1.5" /><rect x="13" y="13" width="7" height="7" rx="1.5" /></svg>
-            )}
-          </button>
+            </button>
+            <button
+              type="button"
+              aria-label="List view"
+              aria-pressed={layout === "list"}
+              className={layout === "list" ? "active" : ""}
+              onClick={() => changeLayout("list")}
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+            </button>
+          </div>
         }
         search={
           search

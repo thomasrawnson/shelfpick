@@ -24,7 +24,9 @@ import {
 import { rematchPrefill, type PlayPrefill } from "../play-results"
 import PlayLogForm from "./collection/PlayLogForm"
 import ResilientGameArtwork from "./ResilientGameArtwork"
+import PullIndicator from "./ui/PullIndicator"
 import Skeleton from "./ui/Skeleton"
+import { usePullToRefresh } from "../use-pull-to-refresh"
 
 type Props = {
   onOpenGame: (bggId: number) => void
@@ -69,20 +71,30 @@ function PlaysView({ onOpenGame }: Props) {
   const [filters, setFilters] = useState<FeedFilters>(NO_FILTERS)
   const [search, setSearch] = useState("")
 
-  const refresh = useCallback(async () => {
-    try {
-      const feed = await loadFeed()
+  const [reloadKey, setReloadKey] = useState(0)
+
+  useEffect(() => {
+    let active = true
+    void loadFeed().then(feed => {
+      if (!active) return
       setGames(feed.games)
       setEntries(feed.entries)
       setError("")
-    } catch {
-      setError("Couldn't load your plays.")
-    } finally {
-      setLoading(false)
-    }
+    }).catch(() => {
+      if (active) setError("Couldn't load your plays.")
+    }).finally(() => {
+      if (active) setLoading(false)
+    })
+    return () => { active = false }
+  }, [reloadKey])
+
+  // Reloads in place; the pull indicator stays up briefly so the refresh is visible.
+  const refresh = useCallback(() => {
+    setReloadKey(current => current + 1)
+    return new Promise<void>(resolve => setTimeout(resolve, 600))
   }, [])
 
-  useEffect(() => { void refresh() }, [refresh])
+  const pull = usePullToRefresh(refresh, screen.kind === "list")
 
   const visible = useMemo(() => filterFeed(entries, filters), [entries, filters])
   const groups = useMemo(() => groupFeedByMonth(visible), [visible])
@@ -91,7 +103,7 @@ function PlaysView({ onOpenGame }: Props) {
   async function afterSave() {
     setScreen({ kind: "list" })
     setLoading(true)
-    await refresh()
+    setReloadKey(current => current + 1)
   }
 
   if (screen.kind === "choose") {
@@ -166,6 +178,7 @@ function PlaysView({ onOpenGame }: Props) {
 
   return (
     <section className="screen plays-screen">
+      <PullIndicator {...pull} />
       <header>
         <h1>Plays</h1>
         {!loading && entries.length > 0 && <p className="subtitle">{entries.length} recent {entries.length === 1 ? "play" : "plays"}</p>}
@@ -180,7 +193,7 @@ function PlaysView({ onOpenGame }: Props) {
       {!loading && error && (
         <div className="plays-state" role="alert">
           <p>{error}</p>
-          <button type="button" className="secondary-button" onClick={() => { setLoading(true); void refresh() }}>Retry</button>
+          <button type="button" className="secondary-button" onClick={() => { setLoading(true); setReloadKey(current => current + 1) }}>Retry</button>
         </div>
       )}
 

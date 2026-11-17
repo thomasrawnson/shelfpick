@@ -60,7 +60,7 @@ function CollectionFilters({
             className="collection-search"
             type="search"
             value={search}
-            placeholder="Search your games..."
+            placeholder="Search"
             onChange={(event) =>
               onSearchChange(
                 event.target.value

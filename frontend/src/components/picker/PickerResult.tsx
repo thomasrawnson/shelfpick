@@ -11,6 +11,7 @@ import type {
 } from "../../api/client"
 
 import { lightImpact } from "../../haptics"
+import { useCoverAccent } from "../../use-cover-accent"
 import Disclosure
   from "../ui/Disclosure"
 
@@ -103,6 +104,8 @@ function PickerResult({
 
   const coverUrl =
     game.image_url ?? game.thumbnail_url ?? null
+
+  const accentStyle = useCoverAccent(coverUrl, game.name)
 
   const playerText =
     game.min_players !== null
@@ -245,7 +248,8 @@ function PickerResult({
 
   return (
     <section
-      className="screen reveal-screen picker-result-card"
+      className="screen reveal-screen picker-result-card has-cover-accent"
+      style={accentStyle}
       aria-labelledby="picker-result-title"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
