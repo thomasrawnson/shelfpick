@@ -37,3 +37,15 @@ def get_monthly_recap(
         return service.get_monthly_recap(month, timezone)
     except ValueError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
+
+
+@router.get("/insights/year-recap")
+def get_year_recap(
+    year: int = Query(..., description="Calendar year, for example 2026"),
+    timezone: str = Query(..., description="IANA timezone name"),
+    service: InsightsService = Depends(get_insights_service),
+):
+    try:
+        return service.get_year_recap(year, timezone)
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error)) from error

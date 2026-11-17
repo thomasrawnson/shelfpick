@@ -28,6 +28,7 @@ import PlayStyleStep from "./PlayStyleStep";
 import PickerResult from "./PickerResult";
 import PickerNoMatch from "./PickerNoMatch";
 import PickerPlayEntry from "./PickerPlayEntry";
+import YearRecapBanner from "../insights/YearRecapBanner";
 import { timeBand, trackEvent } from "../../telemetry";
 import { APP_PATHS } from "../../routes";
 
@@ -327,6 +328,7 @@ function PickerView({
 
   return (
     <>
+      {step === "players" && <YearRecapBanner onOpen={() => navigate(APP_PATHS.insights, { state: { openYearRecap: true } })} />}
       {optionsError && <RetryNotice message={optionsError} busy={optionsLoading} onRetry={() => { setOptionsLoading(true); setOptionsAttempt(current => current + 1); }} />}
       {error && <RetryNotice message={error} busy={loading} onRetry={revealGame} />}
       <fieldset className="picker-request-fields" disabled={loading} aria-busy={loading}>
