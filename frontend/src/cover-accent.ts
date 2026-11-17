@@ -67,7 +67,7 @@ export function accessibleOn(hex: string, surfaces: string[], direction: "darker
     l += direction === "darker" ? -0.01 : 0.01
     if (l < 0 || l > 1) break
   }
-  return direction === "darker" ? "#1E2A24" : "#F4F1E8"
+  return direction === "darker" ? "#1E2A24" : "#FFFFFF"
 }
 
 export function accentTextColors(hex: string): { light: string; dark: string } {

@@ -26,14 +26,14 @@ colors:
   dark-canvas: "#151816"
   dark-surface: "#202521"
   dark-surface-raised: "#29302B"
-  dark-ink: "#F4F1E8"
-  dark-ink-secondary: "#AAB4AD"
+  dark-ink: "#FFFFFF"
+  dark-ink-secondary: "#B8C1BA"
   dark-line: "#39413B"
   black-canvas: "#000000"
   black-surface: "#0B0E0C"
   black-surface-raised: "#151A17"
-  black-ink: "#F7F4EB"
-  black-ink-secondary: "#BAC5BD"
+  black-ink: "#FFFFFF"
+  black-ink-secondary: "#C4CEC6"
   black-line: "#465149"
 typography:
   display:
@@ -120,6 +120,24 @@ components:
     typography: "{typography.label}"
     rounded: "{rounded.lg}"
 ---
+
+## SP-UI-02 compact logging and sharper type — 17 November 2026
+
+Log play is a full-screen sheet in every entry point: Cancel, a small game cover
+with the title, and Save in the header; the tab bar is hidden. One summary row
+(date · place · time, opening the editors) and the result-type menu sit on a flat
+hairline row with no boxes. Players are flat hairline rows: trophy toggle, avatar,
+name, boxed score, "best N". Recent players are chips above an Add player field.
+Scores set places and winners (highest or lowest wins, ties shared) with a manual
+override; places move behind "Set places manually". A footer shows best score at
+this player count, average and worst winning score. This replaces the 28 September
+dedicated play-entry screen.
+
+Inspired by BG Stats' scanning density (not its look): dark-mode text is pure
+white with a brighter secondary tone, links are never underlined (Forest colour,
+a trailing › for standalone actions), and Tonight's pick moves Share to the left
+so it never meets the account avatar. Tonight's pick labels fit as Great fit /
+Good fit / Worth a look with the 0–100 scale explained under More reasons.
 
 ## Pre-beta play-entry update — 28 September 2026
 

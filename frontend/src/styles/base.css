@@ -344,6 +344,23 @@ select,
 textarea,
 a {
   -webkit-tap-highlight-color: transparent;
+  color: var(--color-brand-primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* Links are told apart by colour, never by underline (SP-UI-02). */
+a:hover {
+  color: var(--color-brand-primary-hover);
+}
+
+/* Standalone text actions end in a chevron instead of an underline. */
+.picker-view-game::after,
+.tonight-vote-button::after,
+.add-game-import a::after,
+.game-night-get-app a::after {
+  content: "\00a0›";
+  font-weight: 800;
 }
 
 button,

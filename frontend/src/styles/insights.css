@@ -983,7 +983,7 @@
 }
 
 .stats-game-link:hover strong {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .stats-game-link, .player-name-link {
@@ -1004,7 +1004,7 @@
 }
 
 .stats-game-link:hover strong, .player-name-link:hover {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .player-name-link {
@@ -1138,7 +1138,7 @@
 }
 
 .favourite-player-link:hover, .favourite-game-link:hover, .monthly-play-game:hover {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 /*=========================================================
@@ -1399,7 +1399,7 @@
 }
 
 .rank-insight-game:hover strong {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .rank-insight-share-status {

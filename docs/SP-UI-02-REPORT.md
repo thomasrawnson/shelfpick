@@ -23,8 +23,12 @@ Branch `codex/sp-ui-02`, worktree `~/Developer/_worktrees/shelfpick/sp-ui-02`, b
 - "92 match" became **Great fit / Good fit / Worth a look**, shown in the forest-soft colour instead of on gold. "More reasons" explains the 0–100 scale and says it is a comparison, not a prediction.
 - Recently played titles clamp to two lines with an ellipsis, with no mid-word breaks.
 
-### Not done yet
-- The avatar still crowds the share button on Tonight's pick. That is item 1 and comes next.
+### Owner feedback round 1 (17 Nov), applied
+- Tonight's pick: Share moved to the left, so it no longer meets the avatar.
+- Links are no longer underlined anywhere. They use the Forest colour at bold weight, and standalone actions end in ›.
+- Sharper type, inspired by BG Stats: dark-mode text is pure white, secondary text is brighter, and text is antialiased. The light theme is unchanged.
+- Log play: the boxes around the summary line and Competitive are gone. Rows are flat and edge to edge with hairlines and tighter radii, and a small game cover sits beside the title.
+- More stats at the bottom (group wins, win %, averages, best ever) is recorded as a separate follow-up in `ROADMAP.md`. It is not built here.
 
 ## Count investigation (findings so far, from code; no real data checked)
 

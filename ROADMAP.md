@@ -41,6 +41,19 @@ Rematch prefills game, players, teams and location. Migration `a7c1e9d3b5f2`
 is additive and must be applied before the new app build. iOS build number is 8.
 Evidence and rollback plan: `docs/SP-PLAY-01-REPORT.md`.
 
+### SP-UI-02 Layout polish, compact play logging and data consistency — IN PROGRESS (17 November 2026)
+
+Branch `codex/sp-ui-02`. Checkpoint built: compact Log play sheet, Tonight hints
+and pick layout, owner design feedback applied (flat rows, game cover, no
+underlined links, sharper white dark-mode text, Share moved left). Next: shared
+layout, Shelf/Plays/Discover, Stats and the play-count rule. Report:
+`docs/SP-UI-02-REPORT.md`.
+
+**Recorded follow-up (separate scope, owner 17 Nov 2026): richer play stats.**
+On the Log play sheet and play detail, add BG Stats-style group statistics: for
+this game and these players, plays together, and per player wins, win %, average
+and best score, plus "best score ever". Not part of SP-UI-02.
+
 ### SP-UI-01 Navigation and visual refresh — IMPLEMENTED; DRAFT PR OPEN (17 November 2026)
 
 Five tabs (Tonight, Shelf, Plays, Discover, Stats) with legacy-URL redirects,

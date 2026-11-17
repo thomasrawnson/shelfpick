@@ -42,6 +42,7 @@ import { createBGStatsPlayUrl } from "../../utils/bgstats"
 import { useLiveTimer } from "../../live-timer"
 import { elapsedSeconds, formatElapsed } from "../../live-timer-utils"
 import PlayerAvatar from "../ui/PlayerAvatar"
+import ResilientGameArtwork from "../ResilientGameArtwork"
 
 export type SavedPlayResult = {
   bgStatsUrl: string | null
@@ -432,8 +433,13 @@ function PlayLogForm({
           ? <span />
           : <button type="button" className="sheet-text-button" onClick={onClose} disabled={saving}>Cancel</button>}
         <div className="play-sheet-title">
-          <h2 id={titleId}>{game.name}</h2>
-          <span>{isEditing ? "Edit play" : saved ? "Saved" : "Log play"}</span>
+          <span className="play-sheet-cover">
+            <ResilientGameArtwork src={game.thumbnail_url ?? game.image_url} alt="" gameName={game.name} />
+          </span>
+          <span className="play-sheet-title-text">
+            <h2 id={titleId}>{game.name}</h2>
+            <span>{isEditing ? "Edit play" : saved ? "Saved" : "Log play"}</span>
+          </span>
         </div>
         {saved
           ? <button type="button" className="sheet-text-button sheet-strong" onClick={done}>Done</button>
@@ -477,6 +483,10 @@ function PlayLogForm({
               aria-label={`Date, place and time: ${summary.join(", ")}. ${detailsOpen ? "Hide" : "Edit"}`}
               onClick={() => setDetailsOpen((open) => !open)}
             >
+              <svg className="play-summary-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <rect x="3.5" y="5" width="17" height="15" rx="2" />
+                <path d="M3.5 9.5h17M8 3v4M16 3v4" />
+              </svg>
               <span className="play-summary-text">
                 {summary.join(" · ")}
                 {needsDetails && <span className="play-summary-hint"> · Add place & time</span>}

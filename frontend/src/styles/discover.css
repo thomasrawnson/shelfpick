@@ -344,7 +344,7 @@
 
 .discover-bgg-link:hover {
   color: var(--sp-text);
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .discover-dismiss-button {
@@ -356,7 +356,7 @@
 
 .discover-dismiss-button:hover {
   color: var(--sp-secondary);
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .discover-empty {

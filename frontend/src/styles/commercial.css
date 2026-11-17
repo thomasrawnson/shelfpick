@@ -1326,7 +1326,7 @@ h3,
 
 .discover-bgg-link:hover {
   color: var(--sp-text);
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 /* Insight labels and recap links follow the same palette; no rust/red accents. */

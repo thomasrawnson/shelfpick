@@ -33,7 +33,6 @@
 .add-game-import a {
   color: var(--color-brand-primary);
   font-weight: 700;
-  text-underline-offset: 3px;
 }
 
 

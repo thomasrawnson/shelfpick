@@ -109,7 +109,7 @@
 .tonight-vote-button {
   width: 100%; min-height: 48px; margin: 0; padding: 0;
   color: var(--color-brand-primary); background: transparent; border: 0;
-  font: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; cursor: pointer;
+  font: inherit; font-weight: 700; text-decoration: none; cursor: pointer;
 }
 /* Lighter floating tab bar, and room so content clears it. */
 .app-nav { box-shadow: 0 2px 8px var(--color-shadow); }

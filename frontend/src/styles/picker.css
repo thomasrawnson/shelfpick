@@ -1795,7 +1795,7 @@
 }
 
 .picker-try-another:hover:not(:disabled) {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .picker-try-another:disabled {
@@ -2881,10 +2881,12 @@
   margin: 0;
 }
 
+/* Share sits on the left so it never meets the avatar in the top-right corner. */
 .picker-result-heading-row .picker-share-icon-button {
   position: static;
-  grid-column: 3;
-  justify-self: end;
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
   transform: none;
 }
 
@@ -2983,13 +2985,10 @@
   color: var(--color-brand-primary);
   font-size: var(--text-meta);
   font-weight: 750;
-  text-decoration: underline;
-  text-decoration-color: transparent;
-  text-underline-offset: 3px;
+  text-decoration: none;
 }
 
 .picker-hero-link:hover .picker-view-game {
-  text-decoration-color: currentColor;
 }
 
 .picker-fit-summary {

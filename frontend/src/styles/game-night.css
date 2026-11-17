@@ -300,8 +300,7 @@
 
 .game-night-get-app a {
   color: var(--color-accent-text);
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  text-decoration: none;
   display: inline-flex;
   align-items: center;
   min-height: 44px;

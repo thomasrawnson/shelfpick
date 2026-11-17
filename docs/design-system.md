@@ -72,8 +72,8 @@ tracking. Without JavaScript the root palette is light.
 | bg | #F6F3EB | #151816 |
 | surface | #FFFFFF | #202521 |
 | surface-raised | #EEEAE0 | #29302B |
-| text-primary | #1E2A24 | #F4F1E8 |
-| text-secondary | #667068 | #AAB4AD |
+| text-primary | #1E2A24 | #FFFFFF |
+| text-secondary | #667068 | #B8C1BA |
 | text-inverse | #FFFFFF | #151816 |
 | border | #D9D5CB | #39413B |
 | success | #3F7655 | #68A77C |
@@ -106,6 +106,11 @@ Spacing: `--space-1` through `--space-6` = 4, 8, 12, 16, 24, 32px.
 Radii: `--radius-sm/md/lg` = 8, 12, 16px. Existing bespoke geometry is retained
 where changing it would redesign the current layout. Typography and minimum
 target-size tokens retain their existing names.
+
+Links (SP-UI-02): links are never underlined. They use Forest text at bold weight;
+standalone text actions ("View game details", "Start a group vote") end in a
+chevron (›). Dark-mode text is pure white with a brighter secondary tone, rendered
+antialiased, for a sharper read.
 
 ## Shared UI and states
 
