@@ -8,7 +8,7 @@
 3. **Powered by BGG on exports.** Unmodified `powered-by-bgg-rgb.svg`, uniformly scaled, plus `boardgamegeek.com` beneath, in both cards; ShelfPick logo kept. Cover-art policy untouched (`EXPORT_COVER_ARTWORK_ENABLED` still off).
 4. **Haptics.** `@capacitor/haptics@8.0.2` (peer `@capacitor/core >=8`). Light impact on Pick reveal, vote cast, play saved, segmented/filter/Discover tab selection. One helper, no-op on web.
 5. **Review prompt.** `@capacitor-community/in-app-review@8.0.0` (peer `>=8`). At most once per 90 days, on recap shared, vote closed with a winner, or third saved play; iOS-native only; throttle in local storage.
-6. **Privacy draft.** Guest nicknames, ballots, 12-hour window and provisional 30-day retention added to `LegalDraftView` and `docs/privacy-notice-draft.md`, marked awaiting owner/legal approval. Published pages and draft routes untouched (build gate: drafts disabled).
+6. **Privacy draft.** Guest nicknames, ballots, 12-hour window and provisional 30-day retention added to `LegalDraftView` and `docs/privacy-notice-draft.md`; owner approved the wording 2026-11-17 (legal review not recorded). Published pages and draft routes untouched (build gate: drafts disabled).
 7. **iOS build number** 1 → 6 in `project.pbxproj` (build 5 is in review; the release process otherwise injects the number into a staged project). `npx cap sync ios` run.
 
 ## Evidence

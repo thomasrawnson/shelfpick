@@ -1,3 +1,5 @@
+import { lightImpact } from "../haptics"
+
 export type AppView =
   | "picker"
   | "collection"
@@ -105,7 +107,10 @@ function AppNavigation({
               ? "page"
               : undefined
           }
-          onClick={() => onChangeView(item.view)}
+          onClick={() => {
+            if (view !== item.view) void lightImpact()
+            onChangeView(item.view)
+          }}
         >
           <span className="nav-icon">
             <NavIcon name={item.icon} />

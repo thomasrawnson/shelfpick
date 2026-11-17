@@ -989,7 +989,7 @@ to FREE; `PHONE_VOTING_V1_AVAILABLE = true`; Pro copy removed). The server flag
 `GAME_NIGHT_PHONE_VOTING_ENABLED` stays false in `render.yaml`. Guests get a
 plain "Get ShelfPick" App Store link, exports carry the official Powered by BGG
 logo, light haptics and a 90-day-throttled review prompt are added, the privacy
-notice draft covers guest nicknames and ballots (awaiting owner/legal approval)
+notice draft covers guest nicknames and ballots (owner-approved 2026-11-17)
 and the iOS build number is 6. Evidence: `docs/SP-UNLOCK-01-REPORT.md`.
 
 ## Slice 5 — Private Beta readiness
