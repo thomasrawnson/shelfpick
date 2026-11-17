@@ -1,3 +1,5 @@
+import { execSync } from "node:child_process"
+
 import {
   defineConfig,
 } from "vite"
@@ -10,8 +12,18 @@ import {
 } from "vite-plugin-pwa"
 
 
+// Short commit SHA identifies the build; a change between launches is reported as an app update.
+function buildId(): string {
+  try {
+    return execSync("git rev-parse --short HEAD", { stdio: ["ignore", "pipe", "ignore"] }).toString().trim()
+  } catch {
+    return "unknown"
+  }
+}
+
 export default defineConfig({
   define: {
+    __SHELFPICK_BUILD_ID__: JSON.stringify(buildId()),
     __SHELFPICK_LEGAL_DRAFTS__:
       JSON.stringify(
         process.env.VITE_LEGAL_DRAFTS_ENABLED

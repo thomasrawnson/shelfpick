@@ -28,7 +28,7 @@ import PlayStyleStep from "./PlayStyleStep";
 import PickerResult from "./PickerResult";
 import PickerNoMatch from "./PickerNoMatch";
 import PickerPlayEntry from "./PickerPlayEntry";
-import { timeBand, trackEvent } from "../../telemetry";
+import { Analytics, timeBand } from "../../analytics";
 import { APP_PATHS } from "../../routes";
 
 type Step =
@@ -158,6 +158,10 @@ function PickerView({
     setLoading(true);
     setError("");
 
+    Analytics.track("pick_started", {
+      source: "pick", player_count: players, time_band: timeBand(nextMaxPlayTime),
+    });
+
     try {
       const response = await getPickerMatches({
         players,
@@ -176,7 +180,7 @@ function PickerView({
 
       setPickerSessionId(response.session_id);
 
-      trackEvent("picker_completed", {
+      Analytics.track("picker_completed", {
         source: "pick", player_count: players,
         time_band: timeBand(nextMaxPlayTime), result_count: response.matches.length,
       });
