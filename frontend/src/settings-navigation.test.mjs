@@ -143,7 +143,7 @@ test("primary navigation keeps all five named buttons in order", () => {
   assert.match(markup, /<nav class="app-nav" aria-label="Primary">/)
   assert.deepEqual(
     [...markup.matchAll(/<span class="nav-label">([^<]+)<\/span>/g)].map((match) => match[1]),
-    ["Pick", "Collection", "Game Night", "Discover", "Insights"],
+    ["Tonight", "Shelf", "Plays", "Discover", "Stats"],
   )
   assert.equal((markup.match(/<button /g) ?? []).length, 5)
   assert.equal((markup.match(/aria-current="page"/g) ?? []).length, 1)
