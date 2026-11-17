@@ -289,7 +289,7 @@ function PickerView({
     onViewGame(match.game.bgg_id);
   }
 
-  const isPlayEntry = location.pathname === APP_PATHS.pickerPlay;
+  const isPlayEntry = location.pathname === APP_PATHS.tonightPlay;
 
   if (isPlayEntry) {
     if (!match || step !== "reveal" || players === null) {
@@ -303,7 +303,7 @@ function PickerView({
           <button
             type="button"
             className="primary-button"
-            onClick={() => navigate(APP_PATHS.picker, { replace: true })}
+            onClick={() => navigate(APP_PATHS.tonight, { replace: true })}
           >
             Go to Picker
           </button>
@@ -328,7 +328,7 @@ function PickerView({
 
   return (
     <>
-      {step === "players" && <YearRecapBanner onOpen={() => navigate(APP_PATHS.insights, { state: { openYearRecap: true } })} />}
+      {step === "players" && <YearRecapBanner onOpen={() => navigate(APP_PATHS.stats, { state: { openYearRecap: true } })} />}
       {optionsError && <RetryNotice message={optionsError} busy={optionsLoading} onRetry={() => { setOptionsLoading(true); setOptionsAttempt(current => current + 1); }} />}
       {error && <RetryNotice message={error} busy={loading} onRetry={revealGame} />}
       <fieldset className="picker-request-fields" disabled={loading} aria-busy={loading}>
@@ -445,7 +445,7 @@ function PickerView({
             onStartOver={startOver}
             onLogPlay={() => {
               setPlaySavedMessage("");
-              navigate(APP_PATHS.pickerPlay);
+              navigate(APP_PATHS.tonightPlay);
             }}
             playSavedMessage={playSavedMessage}
           />

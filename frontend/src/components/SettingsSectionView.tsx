@@ -109,7 +109,7 @@ function SettingsSectionView({ section, user, onUserChange, onAccountDeleted }: 
     </>}
     {section === "plays" && <div className="settings-info-panel">
       <p>Review recorded plays, participants and game history in Insights.</p>
-      <Link className="secondary-button settings-section-action" to={APP_PATHS.insights}>Open Insights</Link>
+      <Link className="secondary-button settings-section-action" to={APP_PATHS.stats}>Open Insights</Link>
     </div>}
     {section === "help" && <div className="settings-info-panel">
       <h2>Using ShelfPick</h2>

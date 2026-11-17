@@ -35,7 +35,6 @@ import DiscoverView from "./components/DiscoverView";
 
 import InsightsView from "./components/InsightsView";
 
-import GameNightView from "./components/GameNightView";
 import GameNightGuestVotingView from "./components/GameNightGuestVotingView";
 
 import OnboardingView from "./components/OnboardingView";
@@ -53,7 +52,8 @@ import { LiveTimerProvider } from "./live-timer";
 
 import AppNavigation, { type AppView } from "./components/AppNavigation";
 
-import PickerView from "./components/picker/PickerView";
+import TonightView from "./components/TonightView";
+import PlaysView from "./components/PlaysView";
 
 import ForgotPasswordView from "./components/ForgotPasswordView";
 
@@ -69,10 +69,11 @@ import {
 import {
   APP_PATHS,
   appViewForPath,
-  collectionGamePath,
-  collectionPath,
+  shelfGamePath,
+  shelfPath,
   isIncompleteOnboardingPath,
   isProtectedAppPath,
+  legacyRedirect,
   gameNightJoinToken,
   safeReturnPath,
   wishlistGamePath,
@@ -186,7 +187,7 @@ function CollectionRoute({
   }, [onUiStateChange, section, uiState.section]);
 
   const handleGameUnavailable = useCallback(() => {
-    navigate(APP_PATHS.collectionOwned, { replace: true });
+    navigate(APP_PATHS.shelfOwned, { replace: true });
   }, [navigate]);
 
   const handleCloseGame = useCallback(() => {
@@ -197,7 +198,7 @@ function CollectionRoute({
       return;
     }
 
-    navigate(APP_PATHS.collectionOwned);
+    navigate(APP_PATHS.shelfOwned);
   }, [location.state, navigate]);
 
   const handleOpenWishlistGame = useCallback(
@@ -212,26 +213,26 @@ function CollectionRoute({
   );
 
   const handleCloseWishlistGame = useCallback(() => {
-    navigate(APP_PATHS.collectionWishlist);
+    navigate(APP_PATHS.shelfWishlist);
   }, [navigate]);
 
   const handleWishlistGameUnavailable = useCallback(() => {
-    navigate(APP_PATHS.collectionWishlist, { replace: true });
+    navigate(APP_PATHS.shelfWishlist, { replace: true });
   }, [navigate]);
 
   const handleWishlistGameConverted = useCallback(
     (bggId: number) => {
-      navigate(collectionGamePath(bggId), { replace: true });
+      navigate(shelfGamePath(bggId), { replace: true });
     },
     [navigate],
   );
 
   if (wildcard === "") {
-    return <Navigate to={collectionPath(uiState.section)} replace />;
+    return <Navigate to={shelfPath(uiState.section)} replace />;
   }
 
   if (!validRoute || section === null) {
-    return <Navigate to={APP_PATHS.collectionOwned} replace />;
+    return <Navigate to={APP_PATHS.shelfOwned} replace />;
   }
 
   return (
@@ -246,7 +247,7 @@ function CollectionRoute({
       gameBggId={gameBggId}
       wishlistGameBggId={wishlistGameBggId}
       onOpenGame={(bggId) => {
-        navigate(collectionGamePath(bggId), {
+        navigate(shelfGamePath(bggId), {
           state: {
             detailOrigin: "collection",
           } satisfies NavigationState,
@@ -259,7 +260,7 @@ function CollectionRoute({
       onWishlistGameUnavailable={handleWishlistGameUnavailable}
       onWishlistGameConverted={handleWishlistGameConverted}
       onSectionChange={(nextSection) => {
-        navigate(collectionPath(nextSection));
+        navigate(shelfPath(nextSection));
       }}
       onBrowseDiscover={() => {
         navigate(APP_PATHS.discover);
@@ -374,7 +375,7 @@ function App() {
       return;
     }
 
-    navigate(intendedRoute ?? APP_PATHS.picker, { replace: true });
+    navigate(intendedRoute ?? APP_PATHS.tonight, { replace: true });
   }
 
   function finishLogout() {
@@ -395,11 +396,6 @@ function App() {
   }
 
   function navigateToView(nextView: AppView) {
-    if (nextView === "collection") {
-      navigate(APP_PATHS.collection);
-      return;
-    }
-
     navigate(APP_PATHS[nextView]);
   }
 
@@ -408,7 +404,7 @@ function App() {
       ...current,
       section: "owned",
     }));
-    navigate(collectionGamePath(bggId));
+    navigate(shelfGamePath(bggId));
   }
 
   const guestVotingToken = gameNightJoinToken(location.pathname);
@@ -431,6 +427,11 @@ function App() {
 
   if (guestVotingToken) {
     return pageShell(<GameNightGuestVotingView joinToken={guestVotingToken} />);
+  }
+
+  const legacyTarget = legacyRedirect(location.pathname, location.search);
+  if (legacyTarget) {
+    return <Navigate to={legacyTarget} replace state={location.state} />;
   }
 
   if (location.pathname === APP_PATHS.forgotPassword) {
@@ -504,7 +505,7 @@ function App() {
           restoreAccountOptionsFocus={navigationState?.focusAccountOptions === true}
           onComplete={(updatedUser) => {
             setUser(updatedUser);
-            navigate(intendedRoute ?? APP_PATHS.picker, { replace: true });
+            navigate(intendedRoute ?? APP_PATHS.tonight, { replace: true });
           }}
         />
         {isAccountOptionsRoute && <OnboardingAccountOptions
@@ -519,7 +520,7 @@ function App() {
     location.pathname === APP_PATHS.login ||
     location.pathname === APP_PATHS.onboarding
   ) {
-    return <Navigate to={intendedRoute ?? APP_PATHS.picker} replace />;
+    return <Navigate to={intendedRoute ?? APP_PATHS.tonight} replace />;
   }
 
   const view = appViewForPath(location.pathname);
@@ -527,7 +528,7 @@ function App() {
   return (
     <main className="app-shell">
       <LiveTimerProvider enabled={user.entitlements.includes("live_play_enhancements")}>
-      <section className={`phone app-phone${["collection", "discover", "rankings", "insights"].includes(view) || location.pathname === APP_PATHS.settingsPro ? " app-phone-wide" : ""}`} ref={appScrollRef}>
+      <section className={`phone app-phone${["shelf", "plays", "discover", "stats"].includes(view) || location.pathname === APP_PATHS.settingsPro ? " app-phone-wide" : ""}`} ref={appScrollRef}>
         <AppHeader
           user={user}
           onOpenSettings={() => {
@@ -538,16 +539,23 @@ function App() {
         <div className="app-content">
           <Routes>
             <Route
-              path={`${APP_PATHS.picker}/*`}
-              element={<PickerView onViewGame={openOwnedCollectionGame}
-                onViewCollection={() => navigate(APP_PATHS.collectionOwned)}
-                defaultPlayers={user.preferred_player_count}
-                defaultTime={user.preferred_play_time}
-                defaultPlayStyle={user.preferred_play_style} />}
+              path={`${APP_PATHS.tonight}/*`}
+              element={
+                <TonightView
+                  defaultPlayers={user.preferred_player_count}
+                  defaultTime={user.preferred_play_time}
+                  defaultPlayStyle={user.preferred_play_style ?? null}
+                  gameNightEnabled={user.entitlements.includes("game_night_basic")}
+                  votingEnabled={user.entitlements.includes("game_night_enhanced")}
+                  onViewGame={openOwnedCollectionGame}
+                  onViewShelf={() => navigate(APP_PATHS.shelfOwned)}
+                  onUnlockPro={() => navigate(APP_PATHS.settingsPro)}
+                />
+              }
             />
 
             <Route
-              path={`${APP_PATHS.collection}/*`}
+              path={`${APP_PATHS.shelf}/*`}
               element={
                 <CollectionRoute
                   uiState={collectionUiState}
@@ -559,17 +567,8 @@ function App() {
             />
 
             <Route
-              path={APP_PATHS.gameNight}
-              element={
-                <GameNightView
-                  defaultTime={user.preferred_play_time}
-                  enabled={user.entitlements.includes("game_night_basic")}
-                  votingEnabled={user.entitlements.includes("game_night_enhanced")}
-                  onBack={() => navigate(APP_PATHS.picker)}
-                  onViewGame={openOwnedCollectionGame}
-                  onUnlockPro={() => navigate(APP_PATHS.settingsPro)}
-                />
-              }
+              path={APP_PATHS.plays}
+              element={<PlaysView onLogPlay={() => navigate(APP_PATHS.tonightPlay)} />}
             />
 
             <Route
@@ -578,22 +577,12 @@ function App() {
             />
 
             <Route
-              path={APP_PATHS.rankings}
-              element={
-                <Navigate
-                  to={APP_PATHS.collectionRanking}
-                  replace
-                />
-              }
-            />
-
-            <Route
               path={APP_PATHS.discover}
               element={
                 <DiscoverView
                   personalized={user.entitlements.includes("personalized_discover")}
                   onViewWishlist={() => {
-                    navigate(APP_PATHS.collectionWishlist);
+                    navigate(APP_PATHS.shelfWishlist);
                   }}
                   onUnlockPro={() => navigate(APP_PATHS.settingsPro)}
                   onPersonalize={() => navigate(APP_PATHS.settingsProfile)}
@@ -602,12 +591,12 @@ function App() {
             />
 
             <Route
-              path={APP_PATHS.insights}
+              path={APP_PATHS.stats}
               element={
                 <InsightsView
                   onOpenGame={openOwnedCollectionGame}
-                  onOpenCollection={() => navigate(APP_PATHS.collectionOwned)}
-                  onOpenPicker={() => navigate(APP_PATHS.picker)}
+                  onOpenCollection={() => navigate(APP_PATHS.shelfOwned)}
+                  onOpenPicker={() => navigate(APP_PATHS.tonight)}
                 />
               }
             />
@@ -671,12 +660,12 @@ function App() {
 
             <Route
               path="/"
-              element={<Navigate to={APP_PATHS.picker} replace />}
+              element={<Navigate to={APP_PATHS.tonight} replace />}
             />
 
             <Route
               path="*"
-              element={<Navigate to={APP_PATHS.picker} replace />}
+              element={<Navigate to={APP_PATHS.tonight} replace />}
             />
           </Routes>
         </div>

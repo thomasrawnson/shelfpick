@@ -29,8 +29,9 @@ import CollectionFilters, {
   type SortOption,
 } from "./collection/CollectionFilters"
 
-import CollectionGameList
-  from "./collection/CollectionGameList"
+import CollectionGameList, {
+  type ShelfLayout,
+} from "./collection/CollectionGameList"
 
 import GameDetail
   from "./collection/GameDetail"
@@ -44,6 +45,7 @@ import RankGamesView
 import SegmentedControl
   from "./ui/SegmentedControl"
 import { mergeGameIntoCollection } from "../collection-state"
+import { readShelfLayout, saveShelfLayout } from "../shelf-layout"
 
 export type CollectionSection =
   | "owned"
@@ -114,6 +116,8 @@ function CollectionView({
   onSectionChange,
   onBrowseDiscover,
 }: Props) {
+  const [layout, setLayout] = useState<ShelfLayout>(readShelfLayout)
+
   const {
     section,
     search,
@@ -806,6 +810,11 @@ function CollectionView({
     onCloseGame()
   }
 
+  function changeLayout(next: ShelfLayout) {
+    setLayout(next)
+    saveShelfLayout(next)
+  }
+
   function openAddGame() {
     setAddingGame(true)
   }
@@ -974,7 +983,7 @@ function CollectionView({
       <div className="collection-heading-row">
         <header>
           <h1>
-            Your games
+            Shelf
           </h1>
 
           <p className="subtitle">
@@ -1048,7 +1057,22 @@ function CollectionView({
       />
 
 
+      <div className="shelf-layout-toggle" role="group" aria-label="Shelf layout">
+        {(["grid", "list"] as const).map((option) => (
+          <button
+            type="button"
+            key={option}
+            className={layout === option ? "active" : ""}
+            aria-pressed={layout === option}
+            onClick={() => changeLayout(option)}
+          >
+            {option === "grid" ? "Grid" : "List"}
+          </button>
+        ))}
+      </div>
+
       <CollectionGameList
+        layout={layout}
         games={
           filteredGames
         }
