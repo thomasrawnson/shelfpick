@@ -11,7 +11,7 @@ import {
   type DiscoverRecommendation,
 } from "../api/client"
 import RetryNotice from "./ui/RetryNotice"
-import { trackEvent } from "../telemetry"
+import { Analytics } from "../analytics"
 import { discoverEmptyCopy, discoverPersonalisationCopy } from "../discover-state"
 
 
@@ -68,8 +68,8 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
   useEffect(() => {
     if (lastTrackedTab.current === mode) return
     lastTrackedTab.current = mode
-    trackEvent("discover_opened", {
-      source: "discover", tab: mode === "top100" ? "top500" : mode,
+    Analytics.track("discover_opened", {
+      tab: mode === "top100" ? "top500" : mode,
     })
   }, [mode])
 
@@ -138,7 +138,7 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
       if (wasWishlisted) await removeFromWishlist(bggId)
       else {
         await addToWishlist(bggId)
-        trackEvent("wishlist_added", { source: "discover" })
+        Analytics.track("wishlist_added", { source: "discover" })
       }
     } catch (err) {
       setRecommendations((current) => current.map((item) => (

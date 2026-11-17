@@ -28,7 +28,8 @@ import PlayStyleStep from "./PlayStyleStep";
 import PickerResult from "./PickerResult";
 import PickerNoMatch from "./PickerNoMatch";
 import PickerPlayEntry from "./PickerPlayEntry";
-import { timeBand, trackEvent } from "../../telemetry";
+import YearRecapBanner from "../insights/YearRecapBanner";
+import { Analytics, timeBand } from "../../analytics";
 import { APP_PATHS } from "../../routes";
 
 type Step =
@@ -158,6 +159,10 @@ function PickerView({
     setLoading(true);
     setError("");
 
+    Analytics.track("pick_started", {
+      source: "pick", player_count: players, time_band: timeBand(nextMaxPlayTime),
+    });
+
     try {
       const response = await getPickerMatches({
         players,
@@ -176,7 +181,7 @@ function PickerView({
 
       setPickerSessionId(response.session_id);
 
-      trackEvent("picker_completed", {
+      Analytics.track("picker_completed", {
         source: "pick", player_count: players,
         time_band: timeBand(nextMaxPlayTime), result_count: response.matches.length,
       });
@@ -319,14 +324,15 @@ function PickerView({
         onCancel={() => navigate(-1)}
         onSaved={async () => {
           setPlaySavedMessage(`Play saved for ${match.game.name}.`);
-          navigate(-1);
         }}
+        onDone={() => navigate(-1)}
       />
     );
   }
 
   return (
     <>
+      {step === "players" && <YearRecapBanner onOpen={() => navigate(APP_PATHS.insights, { state: { openYearRecap: true } })} />}
       {optionsError && <RetryNotice message={optionsError} busy={optionsLoading} onRetry={() => { setOptionsLoading(true); setOptionsAttempt(current => current + 1); }} />}
       {error && <RetryNotice message={error} busy={loading} onRetry={revealGame} />}
       <fieldset className="picker-request-fields" disabled={loading} aria-busy={loading}>

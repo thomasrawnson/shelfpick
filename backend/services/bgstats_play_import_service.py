@@ -7,6 +7,45 @@ from repositories.play_repository import (
     PlayRepository,
 )
 from database.models import User
+from services.play_results import normalize_results
+
+
+def _result_fields(play) -> dict:
+    """Structured result for an imported play.
+
+    A BG Stats export can hold a combination ShelfPick rejects, such as
+    ranks on only some players. The play still imports, as a plain
+    competitive play with its winner flags.
+    """
+    participants = [
+        {
+            "name": participant.name,
+            "score": participant.score,
+            "is_winner": (
+                participant.is_winner
+                and play.outcome_type not in ("cooperative", "solo")
+            ),
+            "team": participant.team,
+            "rank": participant.rank,
+            "role": participant.role,
+        }
+        for participant in play.participants
+    ]
+    try:
+        coop_result, participants = normalize_results(
+            play.outcome_type, play.coop_result, participants
+        )
+        outcome_type = play.outcome_type
+    except ValueError:
+        outcome_type, coop_result = "competitive", None
+        participants = [
+            {**row, "team": None, "rank": None} for row in participants
+        ]
+    return {
+        "participants": participants,
+        "outcome_type": outcome_type,
+        "coop_result": coop_result,
+    }
 
 
 @dataclass(frozen=True)
@@ -49,14 +88,7 @@ class BGStatsPlayImportService:
                     self.repository.enrich_imported_participants(
                         source="bgstats",
                         source_play_id=play.source_play_id,
-                        participants=[
-                            {
-                                "name": participant.name,
-                                "score": participant.score,
-                                "is_winner": participant.is_winner,
-                            }
-                            for participant in play.participants
-                        ],
+                        **_result_fields(play),
                         commit=False,
                     )
 
@@ -71,14 +103,7 @@ class BGStatsPlayImportService:
                         duration_minutes=play.duration_minutes,
                         source="bgstats",
                         source_play_id=play.source_play_id,
-                        participants=[
-                            {
-                                "name": participant.name,
-                                "score": participant.score,
-                                "is_winner": participant.is_winner,
-                            }
-                            for participant in play.participants
-                        ],
+                        **_result_fields(play),
                         commit=False,
                     )
                 )

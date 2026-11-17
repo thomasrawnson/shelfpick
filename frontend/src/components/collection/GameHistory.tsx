@@ -8,8 +8,10 @@ import {
 } from "../../api/client";
 
 import { createBGStatsHistoryUrl } from "../../utils/bgstats";
+import { outcomeLabel } from "../../play-results";
 
 import LoadingMessage from "../ui/LoadingMessage";
+import PlayLogForm from "./PlayLogForm";
 import PlayShareDialog from "./PlayShareDialog";
 
 type Props = {
@@ -17,9 +19,26 @@ type Props = {
   history: GameHistoryData | null;
   loading: boolean;
   onPlayDeleted: () => Promise<void>;
+  onPlayEdited: () => Promise<void>;
+  onRematch: (play: GamePlay) => void;
 };
 
-function GameHistory({ game, history, loading, onPlayDeleted }: Props) {
+const OUTCOME_TYPE_LABELS = {
+  competitive: null,
+  cooperative: "Co-op",
+  team: "Teams",
+  solo: "Solo",
+} as const;
+
+function GameHistory({
+  game,
+  history,
+  loading,
+  onPlayDeleted,
+  onPlayEdited,
+  onRematch,
+}: Props) {
+  const [editingPlayId, setEditingPlayId] = useState<number | null>(null);
   const [confirmingPlayId, setConfirmingPlayId] = useState<number | null>(null);
 
   const [deletingPlayId, setDeletingPlayId] = useState<number | null>(null);
@@ -129,7 +148,21 @@ function GameHistory({ game, history, loading, onPlayDeleted }: Props) {
             <div className="recent-plays">
               <p className="preference-label">Recent plays</p>
 
-              {history.recent_plays.map((play) => (
+              {history.recent_plays.map((play) =>
+                editingPlayId === play.id ? (
+                  <div className="recent-play-detail" key={play.id}>
+                    <PlayLogForm
+                      game={game}
+                      editingPlay={play}
+                      presentation="dedicated"
+                      onCancel={() => setEditingPlayId(null)}
+                      onSaved={async () => {
+                        setEditingPlayId(null);
+                        await onPlayEdited();
+                      }}
+                    />
+                  </div>
+                ) : (
                 <div className="recent-play-detail" key={play.id}>
                   <div className="recent-play-header">
                     <div>
@@ -161,12 +194,21 @@ function GameHistory({ game, history, loading, onPlayDeleted }: Props) {
                     <p className="recent-play-location">At {play.location}</p>
                   )}
 
+                  {OUTCOME_TYPE_LABELS[play.outcome_type] && (
+                    <p className="recent-play-type">
+                      {OUTCOME_TYPE_LABELS[play.outcome_type]}
+                      {play.coop_result &&
+                        ` · ${play.coop_result === "won" ? "Won" : "Lost"}`}
+                    </p>
+                  )}
+
                   {play.participants.length > 0 && (
                     <div className="play-participants">
                       {play.participants.map((participant) => (
                         <div
                           className={
-                            participant.is_winner
+                            participant.outcome === "win" ||
+                            participant.outcome === "draw"
                               ? "history-player winner"
                               : "history-player"
                           }
@@ -175,7 +217,12 @@ function GameHistory({ game, history, loading, onPlayDeleted }: Props) {
                           <span>
                             {participant.name}
 
-                            {participant.is_winner && " · Winner"}
+                            {participant.team && ` · ${participant.team}`}
+
+                            {participant.rank != null && ` · #${participant.rank}`}
+
+                            {outcomeLabel(participant.outcome) &&
+                              ` · ${outcomeLabel(participant.outcome)}`}
                           </span>
 
                           <strong>{participant.score ?? "—"}</strong>
@@ -195,6 +242,20 @@ function GameHistory({ game, history, loading, onPlayDeleted }: Props) {
                       onClick={() => openShare(play)}
                     >
                       Share play
+                    </button>
+                    <button
+                      type="button"
+                      className="secondary-button"
+                      onClick={() => setEditingPlayId(play.id)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      className="secondary-button"
+                      onClick={() => onRematch(play)}
+                    >
+                      Rematch
                     </button>
                     {play.source !== "bgstats" && (
                       <a
@@ -247,7 +308,8 @@ function GameHistory({ game, history, loading, onPlayDeleted }: Props) {
                     <p className="error-message">{deleteError}</p>
                   )}
                 </div>
-              ))}
+                ),
+              )}
             </div>
           ) : (
             <p className="history-empty">

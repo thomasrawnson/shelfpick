@@ -16,6 +16,7 @@ from database.models import (
     UserGame,
 )
 from models.game_play_stats import GamePlayStats
+from services.play_results import resolve_outcome
 
 
 def _participant_outcome(
@@ -23,48 +24,44 @@ def _participant_outcome(
     play: DatabasePlay,
     game: DatabaseGame,
 ) -> str:
-    winners = [
-        candidate
-        for candidate in play.participants
-        if candidate.is_winner
-    ]
-
-    if not winners:
-        return "unknown"
-
-    if not participant.is_winner:
-        return "loss"
-
-    is_cooperative = any(
-        mechanic.name.strip().casefold()
-        == "cooperative game"
-        for mechanic in game.mechanics
+    return resolve_outcome(
+        participant,
+        play,
+        is_cooperative_game=any(
+            mechanic.name.strip().casefold() == "cooperative game"
+            for mechanic in game.mechanics
+        ),
     )
 
-    if (
-        is_cooperative
-        and len(winners)
-        == len(play.participants)
-    ):
-        return "win"
 
-    is_scored_tie = (
-        len(winners) > 1
-        and all(
-            winner.score is not None
-            for winner in winners
-        )
-        and all(
-            winner.score
-            == winners[0].score
-            for winner in winners
-        )
-    )
-
-    if is_scored_tie:
-        return "draw"
-
-    return "win"
+def serialize_play(
+    play: DatabasePlay,
+    game: DatabaseGame,
+) -> dict:
+    return {
+        "id": play.id,
+        "bgg_id": game.bgg_id,
+        "played_at": play.played_at,
+        "player_count": play.player_count,
+        "duration_minutes": play.duration_minutes,
+        "location": play.location,
+        "source": play.source,
+        "outcome_type": play.outcome_type,
+        "coop_result": play.coop_result,
+        "participants": [
+            {
+                "id": participant.id,
+                "name": participant.name,
+                "score": participant.score,
+                "is_winner": participant.is_winner,
+                "team": participant.team,
+                "rank": participant.rank,
+                "role": participant.role,
+                "outcome": _participant_outcome(participant, play, game),
+            }
+            for participant in play.participants
+        ],
+    }
 
 
 class PlayReadRepository:
@@ -329,34 +326,7 @@ class PlayReadRepository:
                 else None
             ),
             "recent_plays": [
-                {
-                    "id": play.id,
-                    "played_at": play.played_at,
-                    "player_count": (
-                        play.player_count
-                    ),
-                    "duration_minutes": (
-                        play.duration_minutes
-                    ),
-                    "location": play.location,
-                    "source": play.source,
-                    "participants": [
-                        {
-                            "id": participant.id,
-                            "name": (
-                                participant.name
-                            ),
-                            "score": (
-                                participant.score
-                            ),
-                            "is_winner": (
-                                participant.is_winner
-                            ),
-                        }
-                        for participant
-                        in play.participants
-                    ],
-                }
+                serialize_play(play, database_game)
                 for play in plays
             ],
         }

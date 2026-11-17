@@ -68,3 +68,23 @@ def test_monthly_recap_endpoint_returns_structured_validation_error():
 
     assert response.status_code == 422
     assert response.json() == {"detail": "Month must use YYYY-MM format."}
+
+
+def test_year_recap_endpoint_requires_authentication():
+    response = client.get(
+        "/insights/year-recap",
+        params={"year": 2026, "timezone": "Europe/London"},
+    )
+    assert response.status_code == 401
+
+
+def test_year_recap_service_rejects_bad_year_and_timezone():
+    from services.insights_service import InsightsService
+
+    service = InsightsService(repository=None)
+    for year, zone in ((1999, "Europe/London"), (2026, "Not/AZone")):
+        try:
+            service.get_year_recap(year, zone)
+        except ValueError:
+            continue
+        raise AssertionError("expected ValueError")

@@ -18,7 +18,7 @@ from repositories.picker_analytics_repository import (
 from repositories.play_repository import (
     PlayRepository,
 )
-from api.schemas.play import PlayCreate, PlayerCreate
+from api.schemas.play import PlayCreate, PlayUpdate, PlayerCreate
 from api.schemas.play import LiveTimerStart
 from services.play_service import PlayService
 from api.current_user import get_current_user
@@ -61,6 +61,8 @@ def record_play(
             ],
             location=play_data.location,
             timer_session_id=play_data.timer_session_id,
+            outcome_type=play_data.outcome_type,
+            coop_result=play_data.coop_result,
         )
     except ValueError as exc:
         raise HTTPException(
@@ -88,6 +90,29 @@ def record_play(
                 "picker_play_analytics_failed"
             )
 
+    return play
+
+
+@router.patch("/plays/{play_id}")
+def edit_play(
+    play_id: int,
+    play_data: PlayUpdate,
+    service: PlayService = Depends(get_play_service),
+):
+    changes = play_data.model_dump(exclude_unset=True)
+    for required in ("bgg_id", "participants", "outcome_type"):
+        if required in changes and changes[required] is None:
+            raise HTTPException(
+                status_code=400,
+                detail=f"{required} cannot be cleared.",
+            )
+    try:
+        play = service.update_play(play_id, changes)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    if play is None:
+        raise HTTPException(status_code=404, detail="Play not found")
     return play
 
 
