@@ -34,12 +34,6 @@ from middleware.request_logging import (
     RequestLoggingMiddleware,
 )
 
-# Backwards-compatible name used by the
-# existing API tests.
-get_picker_play_repository = (
-    get_play_repository
-)
-
 configure_logging()
 
 app = FastAPI(

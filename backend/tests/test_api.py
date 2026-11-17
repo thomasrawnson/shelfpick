@@ -8,7 +8,6 @@ from api.main import (
     get_collection_service,
     get_game_service,
     get_picker_analytics_repository,
-    get_picker_play_repository,
     get_play_repository,
     get_play_service,
 )
@@ -293,7 +292,7 @@ def test_picker_returns_ranked_matches():
     ] = lambda: FakeGameService()
 
     app.dependency_overrides[
-        get_picker_play_repository
+        get_play_repository
     ] = lambda: FakePlayRepository()
 
     analytics = (
@@ -309,7 +308,6 @@ def test_picker_returns_ranked_matches():
             params={
                 "players": 2,
                 "max_play_time": 60,
-                "max_complexity": 3.0,
             },
         )
 
@@ -390,7 +388,7 @@ def test_picker_uses_personal_rankings_only_without_named_players():
         {"bgg_id": 1, "rating": 1400, "comparisons_count": 3},
     ]
     app.dependency_overrides[get_game_service] = lambda: FakeGameService()
-    app.dependency_overrides[get_picker_play_repository] = lambda: FakePlayRepository()
+    app.dependency_overrides[get_play_repository] = lambda: FakePlayRepository()
     app.dependency_overrides[
         get_picker_analytics_repository
     ] = lambda: FakePickerAnalyticsRepository()
@@ -483,7 +481,7 @@ def test_picker_guidance_explains_safe_no_match_options():
     ] = lambda: FakeGameService()
 
     app.dependency_overrides[
-        get_picker_play_repository
+        get_play_repository
     ] = lambda: FakePlayRepository()
 
     analytics = (
@@ -499,7 +497,7 @@ def test_picker_guidance_explains_safe_no_match_options():
             params={
                 "players": 2,
                 "max_play_time": 60,
-                "max_complexity": 3.0,
+                    "complexity_band": "light",
                 "include_guidance": True,
             },
         )
@@ -562,7 +560,7 @@ def test_picker_requires_valid_player_count():
     ] = lambda: FakeGameService()
 
     app.dependency_overrides[
-        get_picker_play_repository
+        get_play_repository
     ] = lambda: FakePlayRepository()
 
     app.dependency_overrides[
@@ -880,7 +878,7 @@ def test_picker_uses_preferred_mechanic():
     ] = lambda: FakeGameService()
 
     app.dependency_overrides[
-        get_picker_play_repository
+        get_play_repository
     ] = lambda: FakePlayRepository()
 
     app.dependency_overrides[
@@ -893,7 +891,6 @@ def test_picker_uses_preferred_mechanic():
             params={
                 "players": 2,
                 "max_play_time": 60,
-                "max_complexity": 3.0,
                 "preferred_mechanics":
                     "Deck Building",
             },
@@ -977,7 +974,7 @@ def test_picker_filters_by_game_type_and_age():
         get_game_service
     ] = lambda: FakeGameService()
     app.dependency_overrides[
-        get_picker_play_repository
+        get_play_repository
     ] = lambda: FakePlayRepository()
 
     app.dependency_overrides[

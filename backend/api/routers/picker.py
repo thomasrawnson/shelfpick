@@ -101,11 +101,6 @@ def pick_games(
         None,
         pattern="^(light|medium|heavy)$",
     ),
-    max_complexity: float | None = Query(
-        None,
-        ge=0,
-        le=5,
-    ),
     youngest_player_age: int | None = Query(
         None,
         ge=1,
@@ -220,7 +215,6 @@ def pick_games(
         players=players,
         max_play_time=max_play_time,
         complexity_band=complexity_band,
-        max_complexity=max_complexity,
         youngest_player_age=(
             youngest_player_age
         ),
@@ -301,7 +295,6 @@ def pick_games(
                         ),
                         "max_play_time": max_play_time,
                         "complexity_band": complexity_band,
-                        "max_complexity": max_complexity,
                         "youngest_player_age": (
                             youngest_player_age
                         ),

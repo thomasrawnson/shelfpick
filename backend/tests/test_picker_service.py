@@ -116,7 +116,7 @@ def test_filters_by_complexity_when_available():
         PickerCriteria(
             players=2,
             max_play_time=60,
-            max_complexity=3.0,
+            complexity_band="medium",
         ),
     )
 
@@ -143,7 +143,6 @@ def test_missing_complexity_does_not_exclude_game():
         PickerCriteria(
             players=2,
             max_play_time=60,
-            max_complexity=3.0,
         ),
     )
 
@@ -178,7 +177,6 @@ def test_rank_matches_returns_highest_score_first():
         PickerCriteria(
             players=2,
             max_play_time=60,
-            max_complexity=3.0,
         ),
     )
 
@@ -368,7 +366,7 @@ def test_rank_match_contains_explanation():
         PickerCriteria(
             players=2,
             max_play_time=90,
-            max_complexity=3.0,
+                complexity_band="medium",
         ),
     )
 
@@ -376,7 +374,7 @@ def test_rank_match_contains_explanation():
 
     assert "Supports 2 players" in match.reasons
     assert "Fits within 90 minutes" in match.reasons
-    assert "Complexity 2.5 fits preference" in match.reasons
+    assert "Medium complexity (2.5) fits preference" in match.reasons
 
 
 def test_score_never_exceeds_100():
@@ -397,7 +395,6 @@ def test_score_never_exceeds_100():
         PickerCriteria(
             players=2,
             max_play_time=60,
-            max_complexity=3.0,
         ),
     )
 
@@ -504,7 +501,6 @@ def test_never_played_game_beats_recently_played_game():
         PickerCriteria(
             players=2,
             max_play_time=60,
-            max_complexity=3.0,
         ),
         play_stats=play_stats,
     )
@@ -550,7 +546,6 @@ def test_preferred_mechanic_increases_score():
         PickerCriteria(
             players=2,
             max_play_time=60,
-            max_complexity=3.0,
             preferred_mechanics=[
                 "Deck Building"
             ],
@@ -602,7 +597,6 @@ def test_preferred_category_increases_score():
         PickerCriteria(
             players=2,
             max_play_time=60,
-            max_complexity=3.0,
             preferred_categories=[
                 "Economic"
             ],
@@ -719,7 +713,6 @@ def test_category_and_mechanic_bonus_is_capped_at_ten():
         PickerCriteria(
             players=2,
             max_play_time=60,
-            max_complexity=3.0,
             preferred_categories=[
                 "Economic",
                 "Strategy",
@@ -1089,7 +1082,6 @@ def test_expansions_are_never_picker_candidates():
         PickerCriteria(
             players=2,
             max_play_time=60,
-            max_complexity=3.0,
         ),
     )
 
@@ -1270,7 +1262,6 @@ def test_no_match_guidance_never_relaxes_player_count_fit():
         PickerCriteria(
             players=2,
             max_play_time=60,
-            max_complexity=3.0,
         ),
     )
 
@@ -1313,7 +1304,7 @@ def test_no_match_guidance_identifies_safe_relaxations():
         PickerCriteria(
             players=2,
             max_play_time=60,
-            max_complexity=3.0,
+            complexity_band="light",
         ),
     )
 
