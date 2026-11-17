@@ -114,3 +114,38 @@
 /* Lighter floating tab bar, and room so content clears it. */
 .app-nav { box-shadow: 0 2px 8px var(--color-shadow); }
 .app-content { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+
+/* Skeleton loaders (static under reduced motion). */
+.skeleton { display: grid; gap: 12px; margin-top: 12px; }
+.skeleton-tile { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.skeleton-block { display: block; height: 76px; border-radius: 16px; background: var(--color-surface-raised); }
+.skeleton-tile .skeleton-block { height: 168px; }
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton-block { background: linear-gradient(90deg, var(--color-surface-raised) 0%, var(--color-border) 50%, var(--color-surface-raised) 100%); background-size: 200% 100%; animation: skeleton-shimmer 1.4s ease-in-out infinite; }
+}
+@keyframes skeleton-shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+
+/* Plays tab. */
+.plays-log-button { width: 100%; min-height: 52px; margin: 4px 0 14px; }
+.plays-filters { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.plays-filters select, .plays-search { min-height: 44px; width: 100%; padding: 0 12px; color: var(--color-text-primary); background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: var(--radius-md); font: inherit; }
+.plays-range { display: flex; gap: 6px; margin-bottom: 8px; }
+.plays-range button { min-height: 32px; padding: 0 14px; color: var(--color-text-support); background: transparent; border: 1px solid var(--color-border); border-radius: 999px; font: inherit; font-size: 0.8125rem; font-weight: 700; }
+.plays-range button.active { color: var(--color-text-inverse); background: var(--color-brand-primary); border-color: var(--color-brand-primary); }
+.plays-month h2 { margin: 18px 0 8px; color: var(--color-text-support); font-family: inherit; font-size: 0.8125rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.plays-month ul, .plays-game-picker { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.plays-card { display: grid; gap: 10px; padding: 12px; background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: 16px; }
+.plays-card-main { display: flex; gap: 12px; align-items: center; width: 100%; padding: 0; text-align: left; color: var(--color-text-primary); background: transparent; border: 0; cursor: pointer; }
+.plays-cover { flex: none; width: 56px; height: 56px; overflow: hidden; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; display: block; }
+.plays-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.plays-cover .game-artwork-placeholder { width: 100%; height: 100%; }
+.plays-card-copy { display: grid; gap: 2px; min-width: 0; }
+.plays-card-copy span { color: var(--color-text-support); font-size: 0.8125rem; }
+.plays-card-copy .plays-result { color: var(--color-accent-text); font-weight: 700; }
+.plays-card-actions { display: flex; gap: 8px; }
+.plays-card-actions { align-items: stretch; }
+.plays-card-actions button { min-height: 44px; flex: 1; margin: 0; }
+.plays-state { display: grid; gap: 8px; justify-items: start; padding: 20px 4px; color: var(--color-text-support); }
+.plays-note, .plays-empty-note { margin: 16px 0 0; color: var(--color-text-support); font-size: 0.8125rem; }
+.plays-game-picker button { display: flex; gap: 12px; align-items: center; width: 100%; padding: 8px 12px 8px 8px; text-align: left; color: var(--color-text-primary); background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: 14px; font: inherit; cursor: pointer; }
+.plays-search { margin-bottom: 12px; }

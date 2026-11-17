@@ -568,7 +568,7 @@ function App() {
 
             <Route
               path={APP_PATHS.plays}
-              element={<PlaysView onLogPlay={() => navigate(APP_PATHS.tonightPlay)} />}
+              element={<PlaysView onOpenGame={openOwnedCollectionGame} />}
             />
 
             <Route
