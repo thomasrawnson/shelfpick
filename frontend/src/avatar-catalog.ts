@@ -2,37 +2,37 @@ export const AVATAR_CATALOG = [
   {
     id: "forest",
     label: "Forest",
-    description: "Deep green token with a tree motif",
+    description: "Deep green circle",
     motif: "forest",
   },
   {
     id: "gold",
     label: "Gold",
-    description: "Warm gold token with a star motif",
+    description: "Warm gold circle",
     motif: "gold",
   },
   {
     id: "clay",
     label: "Clay",
-    description: "Neutral clay token with a board motif",
+    description: "Slate circle",
     motif: "clay",
   },
   {
     id: "dice",
     label: "Dice",
-    description: "Teal token with a die motif",
+    description: "Teal circle",
     motif: "dice",
   },
   {
     id: "meeple",
     label: "Meeple",
-    description: "Warm rust token with a meeple motif",
+    description: "Warm rust circle",
     motif: "meeple",
   },
   {
     id: "cards",
     label: "Cards",
-    description: "Blue token with a card motif",
+    description: "Plum circle",
     motif: "cards",
   },
 ] as const

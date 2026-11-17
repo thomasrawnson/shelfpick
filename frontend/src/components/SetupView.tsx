@@ -176,7 +176,7 @@ function SetupView({
           className="setup-input"
           type="text"
           value={username}
-          placeholder="e.g. articsquirrel"
+          placeholder="Your BGG username"
           autoCapitalize="none"
           autoCorrect="off"
           onChange={(event) =>

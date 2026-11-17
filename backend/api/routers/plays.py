@@ -18,7 +18,7 @@ from repositories.picker_analytics_repository import (
 from repositories.play_repository import (
     PlayRepository,
 )
-from api.schemas.play import PlayCreate
+from api.schemas.play import PlayCreate, PlayerCreate
 from api.schemas.play import LiveTimerStart
 from services.play_service import PlayService
 from api.current_user import get_current_user
@@ -172,6 +172,22 @@ def get_players(
     ),
 ):
     return repository.get_players()
+
+@router.post(
+    "/players",
+    status_code=201,
+)
+def create_player(
+    player_data: PlayerCreate,
+    repository: PlayRepository = Depends(
+        get_play_repository
+    ),
+):
+    # Returns the existing player when the name already exists.
+    return repository.create_player(
+        player_data.name
+    )
+
 
 @router.get(
     "/players/{player_id}/stats",

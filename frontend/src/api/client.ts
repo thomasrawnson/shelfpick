@@ -1193,6 +1193,26 @@ Promise<Player[]> {
   return response.json()
 }
 
+export async function createPlayer(
+  name: string,
+): Promise<Player> {
+  const response = await apiFetch("/players", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name }),
+  })
+
+  if (!response.ok) {
+    throw new Error(
+      response.status === 422
+        ? "Enter a name up to 100 characters."
+        : `Couldn't add the player: ${response.status}`,
+    )
+  }
+
+  return response.json()
+}
+
 export async function getGameNightRecommendations(
   playerIds: number[],
   maxPlayTime: number | null,

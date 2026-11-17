@@ -6,6 +6,7 @@ import {
 } from "react"
 
 import {
+  createPlayer,
   getPlayers,
   type Player,
 } from "../../api/client"
@@ -51,6 +52,10 @@ function PlayerSelectionStep({
 
   const [error, setError] = useState("")
   const [attempt, setAttempt] = useState(0)
+  const [adding, setAdding] = useState(false)
+  const [newName, setNewName] = useState("")
+  const [saving, setSaving] = useState(false)
+  const [addError, setAddError] = useState("")
   useEffect(() => {
     let active = true
     async function loadPlayers() {
@@ -110,6 +115,32 @@ function PlayerSelectionStep({
   }
 
 
+  async function addPlayer(event: React.FormEvent) {
+    event.preventDefault()
+    const name = newName.trim()
+    if (!name || saving) return
+    setSaving(true)
+    setAddError("")
+    try {
+      const player = await createPlayer(name)
+      const nextPlayers = players.some((existing) => existing.id === player.id)
+        ? players
+        : [player, ...players]
+      const nextIds = selectedPlayerIds.includes(player.id)
+        ? selectedPlayerIds
+        : [...selectedPlayerIds, player.id]
+      setPlayers(nextPlayers)
+      onChange(nextIds, selectedPlayerNamesInOrder(nextPlayers, nextIds))
+      setNewName("")
+      setSearch("")
+      setAdding(false)
+    } catch (err) {
+      setAddError(err instanceof Error ? err.message : "Couldn't add the player.")
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return (
     <section className="screen picker-selection-screen">
       <button
@@ -147,6 +178,45 @@ function PlayerSelectionStep({
         />
       </label>
 
+
+      {adding ? (
+        <form className="picker-add-player" onSubmit={addPlayer}>
+          <label className="picker-search-label">
+            <span className="sr-only">New player name</span>
+            <input
+              type="text"
+              className="player-picker-search"
+              placeholder="Player's name"
+              value={newName}
+              maxLength={100}
+              autoFocus
+              onChange={(event) => setNewName(event.target.value)}
+            />
+          </label>
+          {addError && <p className="picker-add-player-error" role="alert">{addError}</p>}
+          <div className="picker-add-player-actions">
+            <button type="submit" className="primary-button" disabled={saving || !newName.trim()}>
+              {saving ? "Adding..." : "Add and select"}
+            </button>
+            <button
+              type="button"
+              className="secondary-button"
+              disabled={saving}
+              onClick={() => { setAdding(false); setNewName(""); setAddError("") }}
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      ) : (
+        <button
+          type="button"
+          className="secondary-button picker-add-player-button"
+          onClick={() => { setNewName(search.trim()); setAdding(true) }}
+        >
+          + Add player
+        </button>
+      )}
 
       {error && <RetryNotice message={error} busy={loading} onRetry={() => { setLoading(true); setAttempt(current => current + 1) }} />}
       <div className="picker-selection-list">
@@ -210,7 +280,7 @@ function PlayerSelectionStep({
           )
         ) : !error && (
           <p className="picker-selection-empty">
-            No players match that search — check the spelling, or add someone new.
+            No players match that search. Check the spelling, or use Add player.
           </p>
         )}
       </div>
