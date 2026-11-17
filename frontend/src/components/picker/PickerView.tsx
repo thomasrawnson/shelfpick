@@ -28,6 +28,7 @@ import PlayStyleStep from "./PlayStyleStep";
 import PickerResult from "./PickerResult";
 import PickerNoMatch from "./PickerNoMatch";
 import PickerPlayEntry from "./PickerPlayEntry";
+import YearRecapBanner from "../insights/YearRecapBanner";
 import { Analytics, timeBand } from "../../analytics";
 import { APP_PATHS } from "../../routes";
 
@@ -323,14 +324,15 @@ function PickerView({
         onCancel={() => navigate(-1)}
         onSaved={async () => {
           setPlaySavedMessage(`Play saved for ${match.game.name}.`);
-          navigate(-1);
         }}
+        onDone={() => navigate(-1)}
       />
     );
   }
 
   return (
     <>
+      {step === "players" && <YearRecapBanner onOpen={() => navigate(APP_PATHS.insights, { state: { openYearRecap: true } })} />}
       {optionsError && <RetryNotice message={optionsError} busy={optionsLoading} onRetry={() => { setOptionsLoading(true); setOptionsAttempt(current => current + 1); }} />}
       {error && <RetryNotice message={error} busy={loading} onRetry={revealGame} />}
       <fieldset className="picker-request-fields" disabled={loading} aria-busy={loading}>

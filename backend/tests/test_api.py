@@ -659,6 +659,8 @@ def test_record_play_returns_404_for_unknown_game():
                 list[dict],
             location=None,
             timer_session_id=None,
+            outcome_type="competitive",
+            coop_result=None,
         ):
             return None
 
@@ -714,6 +716,8 @@ def test_record_play_links_picker_conversion():
             participants: list[dict],
             location=None,
             timer_session_id=None,
+            outcome_type="competitive",
+            coop_result=None,
         ):
             return Play(
                 id=7,

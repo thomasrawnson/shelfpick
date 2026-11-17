@@ -13,7 +13,9 @@ import PlayerProfile
 
 import RankingCategorySummary
   from "./rankings/RankingCategorySummary"
+import { useLocation } from "react-router-dom"
 import MonthlyRecapPanel from "./insights/MonthlyRecapPanel"
+import YearRecapEntry from "./insights/YearRecapEntry"
 import { insightHistoryState }
   from "../ui-empty-state"
 import {
@@ -81,6 +83,8 @@ function InsightsView({
   onOpenCollection,
   onOpenPicker,
 }: Props) {
+  const location = useLocation()
+  const openYearRecap = (location.state as { openYearRecap?: boolean } | null)?.openYearRecap === true
   const [
     insights,
     setInsights,
@@ -129,7 +133,7 @@ function InsightsView({
     activeSection,
     setActiveSection,
   ] = useState<StatsSection>(
-    "collection"
+    openYearRecap ? "recaps" : "collection"
   )
 
 
@@ -461,7 +465,12 @@ function InsightsView({
       )}
 
 
-      {activeSection === "recaps" && <MonthlyRecapPanel />}
+      {activeSection === "recaps" && (
+        <>
+          <YearRecapEntry autoOpen={openYearRecap} />
+          <MonthlyRecapPanel />
+        </>
+      )}
 
 
       {activeSection === "play" && historyState === "ready" && (
@@ -1007,21 +1016,6 @@ function InsightsView({
       }
 
 
-      {activeSection === "recaps" && (
-        <article className="recaps-preview-card">
-          <p className="insight-label">
-            More stories to come
-          </p>
-
-          <h2>
-            Your year in review
-          </h2>
-
-          <p>
-            Yearly recaps will surface milestones, favourite groups, new discoveries and the games that defined your year.
-          </p>
-        </article>
-      )}
     </section>
   )
 }

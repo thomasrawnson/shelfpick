@@ -22,6 +22,9 @@ function buildId(): string {
 }
 
 export default defineConfig({
+  // The main chunk sits just above Vite's 500 kB default; PostHog itself is a separate lazy chunk.
+  build: { chunkSizeWarningLimit: 600 },
+
   define: {
     __SHELFPICK_BUILD_ID__: JSON.stringify(buildId()),
     __SHELFPICK_LEGAL_DRAFTS__:

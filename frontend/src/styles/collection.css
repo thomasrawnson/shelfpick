@@ -2057,3 +2057,88 @@
     min-height: 240px;
   }
 }
+
+/* SP-PLAY-01 play results */
+.outcome-type-field,
+.coop-result-field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.outcome-type-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+  gap: 8px;
+}
+
+.outcome-type-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--target-min);
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.outcome-type-option.selected {
+  border-color: var(--color-brand-primary);
+  background: var(--color-brand-primary-soft);
+}
+
+.outcome-type-option span {
+  letter-spacing: 0;
+  text-transform: none;
+  font-size: var(--text-support);
+  white-space: nowrap;
+}
+
+.outcome-type-option input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.outcome-type-option:focus-within {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: 2px;
+}
+
+.team-field,
+.rank-field,
+.winning-team-field {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.team-field small,
+.rank-field small {
+  color: var(--color-text-support);
+  font-weight: 500;
+}
+
+.recent-play-type {
+  margin: 4px 0 0;
+  color: var(--color-text-support);
+  font-size: var(--text-support);
+  font-weight: 700;
+}
+
+.play-confirmation-panel .rematch-button,
+.play-confirmation-panel .primary-button {
+  width: auto;
+  min-height: var(--target-min);
+  margin-right: 8px;
+}
