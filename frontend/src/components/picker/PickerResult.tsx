@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useRef,
   useState,
   type TouchEvent,
@@ -9,6 +10,7 @@ import type {
   PickerMode,
 } from "../../api/client"
 
+import { lightImpact } from "../../haptics"
 import Disclosure
   from "../ui/Disclosure"
 
@@ -95,6 +97,10 @@ function PickerResult({
     useRef<number | null>(null)
 
   const game = match.game
+
+  // Light tap each time a pick is revealed (first result and "try another").
+  useEffect(() => { void lightImpact() }, [game.bgg_id])
+
   const coverUrl =
     game.image_url ?? game.thumbnail_url ?? null
 

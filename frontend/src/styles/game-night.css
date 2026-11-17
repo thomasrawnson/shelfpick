@@ -256,3 +256,17 @@
     height: 78px;
   }
 }
+
+.game-night-get-app {
+  margin: var(--space-3, 12px) 0 0;
+}
+
+.game-night-get-app a {
+  color: var(--color-accent-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 700;
+}

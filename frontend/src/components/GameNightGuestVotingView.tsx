@@ -12,6 +12,8 @@ import BrandLogo from "./ui/BrandLogo"
 import RetryNotice from "./ui/RetryNotice"
 import { clearCredential, getCredential, isNativeIos, saveCredential } from "../native-secure-storage"
 import { PHONE_VOTING_V1_AVAILABLE } from "../game-night-availability"
+import { APP_STORE_URL } from "../app-store"
+import { lightImpact } from "../haptics"
 
 
 type Props = {
@@ -23,6 +25,19 @@ type Selection = number | "abstain" | null
 
 function credentialKey(joinToken: string) {
   return `shelfpick-game-night-guest:${joinToken}`
+}
+
+
+// Plain link to the public listing. No data is collected and nothing is tracked.
+// Hidden inside the native app, where the guest already has ShelfPick.
+function GetShelfPickLink() {
+  if (isNativeIos) return null
+  return (
+    <p className="game-night-get-app">
+      <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer">Get ShelfPick</a>
+      <span> to run your own game night.</span>
+    </p>
+  )
 }
 
 
@@ -56,6 +71,7 @@ function Results({ state }: { state: GameNightVotingPublicState }) {
         <p>{results.abstain_count} {results.abstain_count === 1 ? "person abstained" : "people abstained"}.</p>
       )}
       <p>The host will confirm the final game.</p>
+      <GetShelfPickLink />
     </section>
   )
 }
@@ -157,6 +173,7 @@ function GameNightGuestVotingView({ joinToken }: Props) {
         selection === "abstain" ? null : selection,
       )
       setState(next)
+      void lightImpact()
     } catch (err) {
       setError(err instanceof Error ? err.message : "Couldn't save your vote.")
     } finally {
@@ -197,7 +214,11 @@ function GameNightGuestVotingView({ joinToken }: Props) {
     } finally { setSubmitting(false) }
   }
 
-  if (!PHONE_VOTING_V1_AVAILABLE) {
+  // The server switch is off (503): show the truthful unavailable state, not a
+  // vote page with a retry that cannot succeed.
+  const serverUnavailable = !state && !credential && /Phone voting is unavailable/i.test(error)
+
+  if (!PHONE_VOTING_V1_AVAILABLE || serverUnavailable) {
     return <section className="screen game-night-screen game-night-guest-screen">
       <BrandLogo />
       <header>
@@ -206,7 +227,7 @@ function GameNightGuestVotingView({ joinToken }: Props) {
       </header>
       <p className="form-help">You can still choose a game together with your host. No new phone votes can be joined or cast in this version.</p>
       {!credentialReady && !error && <p role="status">Checking this device for an earlier guest entry…</p>}
-      {error && !credential && <RetryNotice message={error} onRetry={() => setRefreshKey(value => value + 1)} />}
+      {error && !credential && !serverUnavailable && <RetryNotice message={error} onRetry={() => setRefreshKey(value => value + 1)} />}
       {credentialReady && !credential && !guestRemoved && !error &&
         <p className="form-help">Guest information from an earlier vote can only be managed here on the device used to join.</p>}
       {privacyMessage && <p role="status" className="form-success">{privacyMessage}</p>}
@@ -296,6 +317,7 @@ function GameNightGuestVotingView({ joinToken }: Props) {
           {state.guest.has_submitted && (
             <p className="form-success" role="status">Your ballot is saved. You can change it until voting closes.</p>
           )}
+          {state.guest.has_submitted && <GetShelfPickLink />}
           <p className="form-help">Joined as {state.guest.display_name}. Keep this page open for results.</p>
         </form>
       )}

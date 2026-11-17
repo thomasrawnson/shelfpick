@@ -121,6 +121,33 @@ export function loadShareImage(src: string): Promise<HTMLImageElement> {
   })
 }
 
+export const POWERED_BY_BGG_SRC = "/branding/powered-by-bgg-rgb.svg"
+// Native size of the supplied logo is 342x76. It is only ever scaled uniformly.
+const POWERED_BY_BGG_ASPECT = 342 / 76
+
+// Draws the unmodified official "Powered by BGG" logo right-aligned at `right`
+// with a small boardgamegeek.com line beneath. Returns nothing; falls back to
+// plain-text attribution if the logo cannot load.
+export async function drawPoweredByBgg(
+  context: CanvasRenderingContext2D,
+  right: number,
+  top: number,
+  width = 230,
+): Promise<void> {
+  const height = width / POWERED_BY_BGG_ASPECT
+  context.textAlign = "right"
+  context.fillStyle = SHARE_CARD.inkSecondary
+  try {
+    const logo = await loadShareImage(POWERED_BY_BGG_SRC)
+    context.drawImage(logo, right - width, top, width, height)
+  } catch {
+    context.font = "700 22px 'Nunito Sans', system-ui, sans-serif"
+    context.fillText("Powered by BoardGameGeek", right, top + height / 2)
+  }
+  context.font = "600 18px 'Nunito Sans', system-ui, sans-serif"
+  context.fillText("boardgamegeek.com", right, top + height + 26)
+}
+
 export function wrapShareText(
   context: CanvasRenderingContext2D,
   text: string,
@@ -357,9 +384,8 @@ export async function renderPlayShareCard(
   context.fillStyle = SHARE_CARD.inkSecondary
   context.textAlign = "right"
   context.font = "700 24px 'Nunito Sans', system-ui, sans-serif"
-  context.fillText("A play from my shelf", 1128, 1395)
-  context.font = "600 20px 'Nunito Sans', system-ui, sans-serif"
-  context.fillText("Game data from BoardGameGeek", 1128, 1428)
+  context.fillText("A play from my shelf", 1128, 1376)
+  await drawPoweredByBgg(context, 1128, 1388)
 
   return new Promise((resolve, reject) => {
     canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error("Couldn't create the PNG.")), "image/png")

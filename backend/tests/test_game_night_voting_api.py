@@ -32,8 +32,8 @@ def voting_api(monkeypatch):
     Base.metadata.create_all(engine)
     session = Session()
     session.add_all([
-        User(id=1, email="host@example.com", tier="PRO"),
-        User(id=2, email="other@example.com", tier="PRO"),
+        User(id=1, email="host@example.com", tier="FREE"),
+        User(id=2, email="other@example.com", tier="FREE"),
     ])
     games = [
         Game(bgg_id=index, name=f"Game {index}", owned=True)
@@ -44,7 +44,7 @@ def voting_api(monkeypatch):
     session.add_all([UserGame(user_id=1, game_id=game.id) for game in games])
     session.commit()
 
-    current_user = {"value": SimpleNamespace(id=1, tier="PRO")}
+    current_user = {"value": SimpleNamespace(id=1, tier="FREE")}
 
     class FakeGameService:
         def get_games(self):
@@ -142,7 +142,7 @@ def test_host_ownership_and_join_tokens_do_not_cross_sessions(voting_api):
         f"/game-night/voting/{second_token}",
         headers={"X-Game-Night-Guest": joined["guest_credential"]},
     )
-    current_user["value"] = SimpleNamespace(id=2, tier="PRO")
+    current_user["value"] = SimpleNamespace(id=2, tier="FREE")
     wrong_owner = client.get(
         f"/game-night/voting/sessions/{first['session_id']}"
     )
@@ -191,7 +191,7 @@ def test_guest_rights_are_scoped_and_remove_own_ballot_only(voting_api):
     assert "participant_names" not in other_state
     host_state = client.get(f"/game-night/voting/sessions/{opened['session_id']}").json()
     assert host_state["participant_names"] == ["Second"]
-    current_user["value"] = SimpleNamespace(id=2, tier="PRO")
+    current_user["value"] = SimpleNamespace(id=2, tier="FREE")
     assert client.get(f"/game-night/voting/sessions/{opened['session_id']}").status_code == 404
 
 

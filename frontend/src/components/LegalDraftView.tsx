@@ -55,6 +55,12 @@ function PrivacyDraft() {
     </section>
 
     <section>
+      <h2>Game Night guests (awaiting owner and legal approval)</h2>
+      <p>A host can share a Game Night vote link. Guests need no account or email: they choose a nickname and cast one ballot. ShelfPick stores the guest nickname, a hashed guest credential and the ballot for that vote. The host sees nicknames and group totals, not each guest&apos;s individual choice.</p>
+      <p>Guest access to a vote lasts 12 hours. Under the provisional drafting position, nickname and ballot records are intended to be deleted 30 days after the access window expires. This is not an active automatic-deletion commitment until implementation, legal review and owner approval are complete. Guests can change or remove their nickname and ballot on the device they joined from.</p>
+    </section>
+
+    <section>
       <h2>Providers and BoardGameGeek</h2>
       <p>Render is the intended hosting and PostgreSQL provider. Resend sends verification and password-reset email. Their exact contracting entities, roles, regions, subprocessors and transfer safeguards remain under review.</p>
       <p>A BGG username supplied by a user is sent to BoardGameGeek to retrieve its public collection. BGG game metadata and hosted cover URLs are displayed in ShelfPick; the browser may therefore send ordinary web-request data to BGG. ShelfPick has commercial XML API application approval, but underlying cover-image rights remain separate and cover artwork stays disabled in exported images.</p>

@@ -47,7 +47,8 @@ test("Free plan leads with available Pro benefits and accurate boundaries", () =
   assert.match(markup, /Two benefits available with Pro access/)
   assert.match(markup, /count-based sessions, not named-player groups/)
   assert.match(markup, /Lock-screen timers and notifications are not included/)
-  assert.match(markup, /Phone voting.*Not offered in this release/s)
+  assert.match(markup, /Phone voting.*Host a vote from guests’ phones/s)
+  assert.doesNotMatch(markup, /Not offered in this release/)
   assert.doesNotMatch(markup, /Game Night voting from players’ phones/)
   assert.match(markup, /You’re on Free/)
   assert.match(markup, /Free<\/h2><span class="pro-plan-state">Your plan/)
@@ -85,14 +86,14 @@ test("comparison groups activities and retains confirmed Free capabilities", () 
   assert.match(markup, /ShelfPick Free and Pro feature comparison/)
 })
 
-test("comparison distinguishes Pro gates and V1 unavailable features", () => {
+test("comparison distinguishes Pro gates and free phone voting", () => {
   const markup = render(ProComparisonView, { user })
   const row = name => markup.match(new RegExp(`<tr><th scope="row"><span>${name}<\\/span>.*?<\\/th>(.*?)<\\/tr>`))?.[1]
   assert.match(row("Picker ranking influence"), /Not included.*Included/)
   assert.match(row("Discover For You"), /Not included.*Included/)
   assert.match(row("Live play timer"), /Not included.*Included/)
-  assert.match(row("Phone voting"), /Unavailable.*Unavailable/)
-  assert.match(row("Join a hosted vote"), /Unavailable.*Unavailable/)
+  assert.match(row("Phone voting"), /Included.*Included/)
+  assert.match(row("Join a hosted vote"), /No account needed.*No account needed/)
   assert.equal(row("Discover Top 100"), undefined)
   assert.doesNotMatch(markup, /Free by policy; ranked source is currently blocked/)
 })

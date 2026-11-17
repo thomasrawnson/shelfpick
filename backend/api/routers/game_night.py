@@ -46,14 +46,6 @@ class BallotRequest(BaseModel):
     candidate_bgg_id: int | None = Field(default=None, gt=0)
 
 
-def _require_enhanced(current_user: User) -> None:
-    if not can_use(current_user, Feature.GAME_NIGHT_ENHANCED):
-        raise HTTPException(
-            status_code=403,
-            detail="Phone voting requires ShelfPick Pro.",
-        )
-
-
 def _require_phone_voting() -> None:
     if not settings.game_night_phone_voting_enabled:
         raise HTTPException(
@@ -134,7 +126,6 @@ def open_game_night_voting(
     ),
 ):
     _require_phone_voting()
-    _require_enhanced(current_user)
     try:
         return GameNightVotingService(repository).open_session(
             current_user.id,
@@ -155,7 +146,6 @@ def get_game_night_voting_host_state(
     ),
 ):
     _require_phone_voting()
-    _require_enhanced(current_user)
     try:
         return GameNightVotingService(repository).host_session(
             session_id, current_user.id,
@@ -173,7 +163,6 @@ def close_game_night_voting(
     ),
 ):
     _require_phone_voting()
-    _require_enhanced(current_user)
     try:
         return GameNightVotingService(repository).close(
             session_id, current_user.id,

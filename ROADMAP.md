@@ -435,11 +435,12 @@ changed.
 The Roadmap Slice 4 Free versus Pro presentation reconciliation completed on
 28 September 2026. The comparison now leads with three implemented Pro
 benefits: more personal For You and count-based Picker recommendations, live
-play timing with an in-app indicator, and host-created Game Night phone voting.
+play timing with an in-app indicator, and host-created Game Night phone voting (superseded: phone voting became Free in
+SP-UNLOCK-01, 17 November 2026).
 It keeps Collection, core Picker, manual play logging/duration, locations,
 personal rankings, branded play sharing and basic Game Night visibly Free.
-Creating a phone-voting session is Pro; joining one as a browser guest does not
-require an account or Pro. Picker ranking influence is described accurately as
+Creating a phone-voting session was Pro at that date (now Free, see
+SP-UNLOCK-01); joining one as a browser guest never required an account or Pro. Picker ranking influence is described accurately as
 count-based only, not a named-player group preference.
 
 The presentation also records current limitations rather than marketing around
@@ -930,7 +931,7 @@ Private Beta without overbuilding it.
 
 ### SP-PB18 follow-up — COMPLETE, 28 September 2026
 
-Pro hosts can explicitly open phone voting for the existing immutable 3–5 game
+Hosts can explicitly open phone voting (Pro-only at the time; Free since SP-UNLOCK-01) for the existing immutable 3–5 game
 shortlist. ShelfPick creates a 12-hour, unguessable session-scoped join token,
 builds the join URL from the configured frontend origin and renders that exact
 URL as an accessible QR code with a copy fallback. Guests need only a bounded
@@ -939,7 +940,7 @@ authoritative ballot after refresh and supports idempotent retries, vote
 changes and explicit abstention while voting remains open.
 
 The backend restricts open/status/close controls to the authenticated owner and
-the existing `game_night_enhanced` Pro entitlement. Public session responses
+the `game_night_enhanced` entitlement (granted to Free by SP-UNLOCK-01). Public session responses
 contain only the shortlist and voting state, never collection, account or play
 history. Sessions accept at most 20 guests; joins reuse the established bounded
 request limiter. The host sees participation rather than live tally influence,
@@ -979,6 +980,17 @@ In addition:
   infrastructure for MVP validation.
 - An agreed minimal approach for linked collections that preserves user data
   isolation and existing API boundaries.
+
+### SP-UNLOCK-01 — Switch on what's built — LOCAL CANDIDATE, 17 November 2026
+
+Branch `codex/sp-unlock-01`, draft PR for owner review; not merged, deployed or
+submitted. Phone voting is free for every account (`game_night_enhanced` moved
+to FREE; `PHONE_VOTING_V1_AVAILABLE = true`; Pro copy removed). The server flag
+`GAME_NIGHT_PHONE_VOTING_ENABLED` stays false in `render.yaml`. Guests get a
+plain "Get ShelfPick" App Store link, exports carry the official Powered by BGG
+logo, light haptics and a 90-day-throttled review prompt are added, the privacy
+notice draft covers guest nicknames and ballots (awaiting owner/legal approval)
+and the iOS build number is 6. Evidence: `docs/SP-UNLOCK-01-REPORT.md`.
 
 ## Slice 5 — Private Beta readiness
 

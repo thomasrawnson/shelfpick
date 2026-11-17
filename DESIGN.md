@@ -225,6 +225,8 @@ the Free/Pro proposition are separate pre-beta priorities.
 
 ### Game Night phone voting — 28 September 2026
 
+Update (SP-UNLOCK-01, 17 November 2026): phone voting is free for every account. After a guest votes, and on the closed-results view, a plain "Get ShelfPick" App Store link appears (hidden inside the native app). Exported cards show the unmodified Powered by BGG logo with boardgamegeek.com beneath.
+
 The host explicitly opens voting from an existing shortlist. The host screen
 centres an accessible QR code, provides the same URL in a copyable field and
 shows joined/submitted progress without revealing live tallies. The mobile

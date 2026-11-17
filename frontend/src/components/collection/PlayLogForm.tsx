@@ -4,6 +4,8 @@ import {
   useState,
 } from "react"
 
+import { lightImpact } from "../../haptics"
+import { requestReviewAfterPlaySaved } from "../../review-prompt"
 import {
   getPlayers,
   recordPlay,
@@ -437,6 +439,9 @@ function PlayLogForm({
       resetForm()
       setOpen(false)
     }
+
+    void lightImpact()
+    void requestReviewAfterPlaySaved()
 
     try {
       await onSaved({

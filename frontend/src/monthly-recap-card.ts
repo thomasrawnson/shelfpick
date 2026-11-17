@@ -4,6 +4,7 @@ import {
   containImageRect,
   fillRoundedRect,
   fitShareText,
+  drawPoweredByBgg,
   loadShareImage,
   type ImageRect,
 } from "./share-card"
@@ -212,9 +213,8 @@ export async function renderMonthlyRecapCard(
   context.fillStyle = SHARE_CARD.inkSecondary
   context.textAlign = "right"
   context.font = "700 24px 'Nunito Sans', system-ui, sans-serif"
-  context.fillText("A month from my shelf", 1128, 1395)
-  context.font = "600 20px 'Nunito Sans', system-ui, sans-serif"
-  context.fillText("Game data from BoardGameGeek", 1128, 1428)
+  context.fillText("A month from my shelf", 1128, 1376)
+  await drawPoweredByBgg(context, 1128, 1388)
 
   return new Promise((resolve, reject) => {
     canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error("Couldn't create the PNG.")), "image/png")
