@@ -42,8 +42,8 @@ export async function mockShelf(page: Page) {
   await page.route("**/collection/stats**", route => route.fulfill({
     json: GAMES.map((game, index) => ({ bgg_id: game.bgg_id, play_count: PLAY_COUNTS[index], last_played_at: LAST_PLAYED[index] })),
   }))
-  await page.route(/\/games\/(\d+)\/plays$/, route => {
-    const id = Number(route.request().url().match(/games\/(\d+)\/plays/)![1])
-    return route.fulfill({ json: historyFor(id - 1000) })
+  await page.route(/\/plays\?/, route => {
+    const plays = GAMES.flatMap((_, index) => historyFor(index).recent_plays.map(play => ({ ...play, bgg_id: 1000 + index })))
+    return route.fulfill({ json: { total: plays.length, plays } })
   })
 }

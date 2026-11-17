@@ -1,18 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 
 import {
-  getCollectionStats,
-  getGameHistory,
   getGames,
+  getPlays,
   type Game,
-  type GamePlay,
 } from "../api/client"
 import {
   feedGames,
   feedPlayers,
   filterFeed,
   groupFeedByMonth,
-  mapLimited,
   NO_FILTERS,
   playSummary,
   sortFeed,
@@ -44,21 +41,17 @@ const RANGES: Array<{ value: DateRange; label: string }> = [
   { value: "year", label: "This year" },
 ]
 
-// Every game's most recent plays in one place. The data comes from each played
-// game's history (its latest plays), so very busy games show their newest only.
+// Every play on the shelf, newest first, paired with its game.
 async function loadFeed(): Promise<{ games: Game[]; entries: FeedEntry[] }> {
-  const [games, stats] = await Promise.all([getGames(), getCollectionStats()])
+  const [games, plays] = await Promise.all([getGames(), getPlays()])
   const owned = games.filter(game => game.owned)
-  const played = new Set(stats.filter(item => item.play_count > 0).map(item => item.bgg_id))
-  const histories = await mapLimited(
-    owned.filter(game => played.has(game.bgg_id)),
-    6,
-    async game => ({ game, history: await getGameHistory(game.bgg_id) }),
-  )
+  const byId = new Map(owned.map(game => [game.bgg_id, game]))
   return {
     games: owned,
-    entries: sortFeed(histories.flatMap(({ game, history }) =>
-      history.recent_plays.map((play: GamePlay) => ({ game, play })))),
+    entries: sortFeed(plays.flatMap(play => {
+      const game = byId.get(play.bgg_id)
+      return game ? [{ game, play }] : []
+    })),
   }
 }
 
@@ -98,7 +91,6 @@ function PlaysView({ onOpenGame }: Props) {
 
   const visible = useMemo(() => filterFeed(entries, filters), [entries, filters])
   const groups = useMemo(() => groupFeedByMonth(visible), [visible])
-  const filtered = filters.bggId !== null || filters.player !== null || filters.range !== "all"
 
   async function afterSave() {
     setScreen({ kind: "list" })
@@ -181,7 +173,7 @@ function PlaysView({ onOpenGame }: Props) {
       <PullIndicator {...pull} />
       <header>
         <h1>Plays</h1>
-        {!loading && entries.length > 0 && <p className="subtitle">{entries.length} recent {entries.length === 1 ? "play" : "plays"}</p>}
+        {!loading && entries.length > 0 && <p className="subtitle">{entries.length} {entries.length === 1 ? "play" : "plays"}</p>}
       </header>
 
       <button type="button" className="primary-button plays-log-button" onClick={() => { setSearch(""); setScreen({ kind: "choose" }) }}>
@@ -271,9 +263,6 @@ function PlaysView({ onOpenGame }: Props) {
               </ul>
             </section>
           ))}
-          {!filtered && entries.length > 0 && (
-            <p className="plays-note">Showing the latest plays of each game.</p>
-          )}
         </>
       )}
     </section>

@@ -146,7 +146,7 @@
 .plays-card-actions { align-items: stretch; }
 .plays-card-actions button { min-height: 44px; flex: 1; margin: 0; }
 .plays-state { display: grid; gap: 8px; justify-items: start; padding: 20px 4px; color: var(--color-text-support); }
-.plays-note, .plays-empty-note { margin: 16px 0 0; color: var(--color-text-support); font-size: 0.8125rem; }
+.plays-empty-note { margin: 16px 0 0; color: var(--color-text-support); font-size: 0.8125rem; }
 .plays-game-picker button { display: flex; gap: 12px; align-items: center; width: 100%; padding: 8px 12px 8px 8px; text-align: left; color: var(--color-text-primary); background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: 14px; font: inherit; cursor: pointer; }
 .plays-search { margin-bottom: 12px; }
 

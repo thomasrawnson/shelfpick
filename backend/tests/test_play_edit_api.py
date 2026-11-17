@@ -325,3 +325,38 @@ def test_cors_preflight_allows_patch_for_play_edits(api):
     )
     assert response.status_code == 200
     assert "PATCH" in response.headers["access-control-allow-methods"]
+
+
+def test_list_plays_is_newest_first_paged_and_scoped_to_the_account(api):
+    client, current, Session = api
+    with Session() as db:
+        db.add(UserGame(user_id=1, game_id=2))
+        db.commit()
+    ids = [
+        log(client, bgg_id=100, played_at="2026-11-01T19:00:00Z"),
+        log(client, bgg_id=200, played_at="2026-11-03T19:00:00Z"),
+        log(client, bgg_id=100, played_at="2026-11-02T19:00:00Z"),
+    ]
+    current["value"] = SimpleNamespace(id=2, tier="FREE")
+    log(client, bgg_id=100, played_at="2026-11-04T19:00:00Z")
+    current["value"] = SimpleNamespace(id=1, tier="FREE")
+
+    body = client.get("/plays").json()
+    assert body["total"] == 3
+    assert [play["id"] for play in body["plays"]] == [ids[1], ids[2], ids[0]]
+    first = body["plays"][0]
+    assert first["bgg_id"] == 200
+    assert [p["name"] for p in first["participants"]] == ["Alex", "Sam"]
+    assert first["participants"][0]["outcome"] == "win"
+
+    page = client.get("/plays", params={"limit": 1, "offset": 1}).json()
+    assert page["total"] == 3
+    assert [play["id"] for play in page["plays"]] == [ids[2]]
+
+
+def test_list_plays_empty_and_validates_paging(api):
+    client, _, _ = api
+    assert client.get("/plays").json() == {"total": 0, "plays": []}
+    assert client.get("/plays", params={"limit": 0}).status_code == 422
+    assert client.get("/plays", params={"limit": 201}).status_code == 422
+    assert client.get("/plays", params={"offset": -1}).status_code == 422

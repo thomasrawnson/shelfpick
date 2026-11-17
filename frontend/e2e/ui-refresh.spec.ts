@@ -91,7 +91,7 @@ test("Plays: filters, Rematch, Edit and Log play", async ({ page }) => {
 test("Plays shows an empty state before the first play", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.route(/\/games(\?.*)?$/, route => route.fulfill({ json: [] }))
-  await page.route("**/collection/stats**", route => route.fulfill({ json: [] }))
+  await page.route(/\/plays\?/, route => route.fulfill({ json: { total: 0, plays: [] } }))
   await page.goto("/plays")
   await expect(page.getByText("No plays yet")).toBeVisible()
   await page.screenshot({ path: `${SHOTS}/after/plays-empty-390-light.png` })
@@ -117,8 +117,8 @@ test("pulling down on Plays refreshes the list", async ({ page }) => {
   await signIn(page)
   await page.goto("/plays")
   await expect(page.locator(".plays-card").first()).toBeVisible()
-  let statsRequests = 0
-  page.on("request", request => { if (request.url().includes("/collection/stats")) statsRequests += 1 })
+  let playsRequests = 0
+  page.on("request", request => { if (/\/plays\?/.test(request.url())) playsRequests += 1 })
   await page.evaluate(() => {
     const fire = (type: string, y: number) => {
       const event = new Event(type, { bubbles: true })
@@ -129,7 +129,7 @@ test("pulling down on Plays refreshes the list", async ({ page }) => {
     fire("touchmove", 260)
     window.dispatchEvent(new Event("touchend"))
   })
-  await expect.poll(() => statsRequests).toBeGreaterThan(0)
+  await expect.poll(() => playsRequests).toBeGreaterThan(0)
 })
 
 test("game detail gets a cover-derived accent that stays readable in both themes", async ({ page }) => {

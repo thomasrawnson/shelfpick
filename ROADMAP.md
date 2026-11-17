@@ -46,7 +46,7 @@ Evidence and rollback plan: `docs/SP-PLAY-01-REPORT.md`.
 Five tabs (Tonight, Shelf, Plays, Discover, Stats) with legacy-URL redirects,
 Tonight and Shelf redesigns (owner-approved at the checkpoint), a cross-game Plays
 tab with filters, Log play, Rematch and Edit, cover-derived accents, skeleton
-loaders, pull-to-refresh and reduced-motion-aware transitions. No backend change.
+loaders, pull-to-refresh and reduced-motion-aware transitions. Adds read-only `GET /plays` (deploy backend first).
 Build number 8. Automated, browser and Simulator evidence only; physical-phone
 check, merge and submission remain owner gates. Report: `docs/SP-UI-01-REPORT.md`.
 

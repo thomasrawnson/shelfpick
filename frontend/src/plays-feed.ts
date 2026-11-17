@@ -79,21 +79,3 @@ export function playSummary(play: GamePlay): string {
   const time = play.duration_minutes ? `${play.duration_minutes} min` : null
   return [players, time].filter(Boolean).join(" · ")
 }
-
-// Runs work with at most `limit` in flight, keeping input order; a failed item is skipped.
-export async function mapLimited<T, R>(
-  items: T[],
-  limit: number,
-  work: (item: T) => Promise<R>,
-): Promise<R[]> {
-  const results: Array<R | undefined> = new Array(items.length)
-  let next = 0
-  async function worker() {
-    while (next < items.length) {
-      const index = next++
-      try { results[index] = await work(items[index]) } catch { /* Skip this game. */ }
-    }
-  }
-  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker))
-  return results.filter((value): value is R => value !== undefined)
-}

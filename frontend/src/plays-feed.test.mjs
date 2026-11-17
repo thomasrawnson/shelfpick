@@ -2,7 +2,7 @@ import assert from "node:assert/strict"
 import test from "node:test"
 
 import {
-  feedGames, feedPlayers, filterFeed, groupFeedByMonth, mapLimited, NO_FILTERS, sortFeed, winnersLabel,
+  feedGames, feedPlayers, filterFeed, groupFeedByMonth, NO_FILTERS, sortFeed, winnersLabel,
 } from "./plays-feed.ts"
 
 const game = (bgg_id, name) => ({ bgg_id, name })
@@ -38,18 +38,4 @@ test("winner labels cover competitive, co-op and unscored plays", () => {
   assert.equal(winnersLabel(play(1, "2026-01-01", ["Ann"], { participants: [{ id: 1, name: "Ann", outcome: "win" }] })), "Won by Ann")
   assert.equal(winnersLabel(play(2, "2026-01-01", [], { outcome_type: "cooperative", coop_result: "won" })), "Won together")
   assert.equal(winnersLabel(play(3, "2026-01-01", ["Ann"])), null)
-})
-
-test("mapLimited bounds concurrency, keeps order and skips failures", async () => {
-  let inFlight = 0
-  let peak = 0
-  const out = await mapLimited([1, 2, 3, 4, 5, 6], 2, async n => {
-    inFlight += 1; peak = Math.max(peak, inFlight)
-    await new Promise(resolve => setTimeout(resolve, 5))
-    inFlight -= 1
-    if (n === 4) throw new Error("boom")
-    return n * 10
-  })
-  assert.deepEqual(out, [10, 20, 30, 50, 60])
-  assert.ok(peak <= 2)
 })
