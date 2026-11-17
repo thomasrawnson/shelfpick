@@ -1,58 +1,92 @@
 # SP-UI-02 — Layout polish, compact play logging and data consistency
 
-Branch `codex/sp-ui-02`, worktree `~/Developer/_worktrees/shelfpick/sp-ui-02`, based on `origin/main` 02c503b (SP-UI-01 merged, PR #36). Controlled Track.
+Branch `codex/sp-ui-02`, worktree `~/Developer/_worktrees/shelfpick/sp-ui-02`, based on `origin/main` 02c503b (SP-UI-01 merged, PR #36). Controlled Track. The owner approved the design checkpoint on 17 Nov 2026, after one round of feedback. The owner also approved the counting rule.
 
-**Status: checkpoint (item 7). Items 2 (Log play) and 3 (Tonight) are built. Items 1, 4, 5 and 6 (fixes) wait for owner approval.**
+## What changed
 
-## Checkpoint: what changed
+### 1. Shared layout
+- The tab bar is compact: 62px tall, sitting just above the home indicator instead of padding into it. The bottom space comes from one variable, `--shelfpick-nav-clearance`, which replaces two clearances that were added together.
+- One fixed avatar spot. The "keep 56px clear" rule never matched after SP-UI-01 wrapped screens in `.page-transition`. It now covers every tab and the centred Tonight step titles.
+- Discover's "Want to Play" link and Tonight's Share button no longer meet the avatar. Share moved to the left, as the owner asked.
 
-### Log play (item 2)
-- `PlayLogForm` is now a full-screen sheet: Cancel · game title · Save in the header. The tab bar and the page behind it are hidden and inert. Escape cancels. Every entry point uses it: Plays (Log play, Rematch, Edit), game detail, game history Edit, Tonight's pick, Game Night and the live timer.
-- There is one compact row per player: winner toggle, avatar, name, score and "best N". Rows are removed through an **Edit** control, not a "Remove" link on every card.
-- There are no empty name boxes by default. Recent players show as chips (most recently played first, up to 6), above an "Add player" field. Tonight and Rematch players are prefilled. A count-only Tonight session says "add 3 more players".
-- Scores set the finishing order and winners (shared places for ties) for **Highest wins** or **Lowest wins**. Direction is guessed from earlier plays of the game and can be changed in a small menu. Tapping a trophy overrides the winner ("Winner chosen by hand · Use scores"). Places move behind "Set places manually".
-- Date, location and duration are on one summary line ("Today · Sheepfold Home · 60 min") that opens the editors. Location defaults to the one used last, and the live timer (Pro) is inside.
-- Result type is a menu. SP-PLAY-01 co-op and team behaviour is unchanged.
-- The footer shows record context for the game: "Best 3p · Avg · Worst win". Anything without data is hidden.
-- The date overflow and the clipped "COMPETITIVE" label no longer exist: those controls were replaced.
+### 2. Log play (all entry points)
+- Full-screen sheet. The header has Cancel, a small cover with the title, and Save. The tab bar is hidden and the page behind is inert.
+- Each player is one flat row: trophy, avatar, name, score and "best N". Players can be removed in Edit mode.
+- Recent-player chips appear above an "Add player" field. Players carry over from Tonight and Rematch. A count-only Tonight session says "add N more players".
+- Places and winners come from the scores, for highest or lowest wins, and ties share a place. The direction is guessed from earlier plays and can be changed. You can override the winner by hand. Places move behind "Set places manually".
+- A summary line (date · place · time) opens the editors. The default location is the last one used, and the Pro live timer sits inside.
+- Result type is a menu, and SP-PLAY-01's co-op and team behaviour is unchanged. The footer shows best score at this player count, average and worst winning score.
 
-### Tonight (item 3)
-- A disabled **Find a game** button now explains why ("Choose your player count", "Choose how much time you have").
-- A selected player count, complexity or time has a forest border. The selected time tile also has a check mark.
-- On Tonight's pick, the cover is about half the old size, so the title, details, **Log a play** and Try another fit above the tab bar.
-- "92 match" became **Great fit / Good fit / Worth a look**, shown in the forest-soft colour instead of on gold. "More reasons" explains the 0–100 scale and says it is a comparison, not a prediction.
-- Recently played titles clamp to two lines with an ellipsis, with no mid-word breaks.
+### 3. Tonight
+- A disabled button now says why ("Choose your player count", "Choose how much time you have").
+- The selected option has a forest border, and the time tile also gets a check mark.
+- The pick cover is smaller, so the title, details and **Log a play** sit above the tab bar.
+- "92 match" became **Great fit / Good fit / Worth a look**. The 0–100 scale is explained under More reasons as a comparison, not a prediction.
+- Recently played titles clamp to two lines with no mid-word breaks.
 
-### Owner feedback round 1 (17 Nov), applied
-- Tonight's pick: Share moved to the left, so it no longer meets the avatar.
-- Links are no longer underlined anywhere. They use the Forest colour at bold weight, and standalone actions end in ›.
-- Sharper type, inspired by BG Stats: dark-mode text is pure white, secondary text is brighter, and text is antialiased. The light theme is unchanged.
-- Log play: the boxes around the summary line and Competitive are gone. Rows are flat and edge to edge with hairlines and tighter radii, and a small game cover sits beside the title.
-- More stats at the bottom (group wins, win %, averages, best ever) is recorded as a separate follow-up in `ROADMAP.md`. It is not built here.
+### 4. Shelf, Plays, Discover
+- Shelf's heading is "Shelf" on every segment. Search is wider, and one 44px button switches layout. Controls are tighter.
+- Player counts read "Solo", "2 players" or "2–4 players" everywhere (`player-count.ts`).
+- Plays: compact hairline rows, about 11 per screen instead of about 5. The cover opens the game, the row opens Edit, and Rematch is a small text action.
+- Discover rows are lighter: a labelled bookmark "Want to Play" button, "Why it's trending" on Hot ("Why this match?" stays on For You), and "BGG ›" and "Not interested" on one quiet line.
 
-## Count investigation (findings so far, from code; no real data checked)
+### 5. Stats (built by a subagent; I reviewed it and fixed the leftovers)
+- "Stats" everywhere, including Settings copy.
+- Collection: one sync explanation with "Sync collection ›", and empty Shelf leaders tiles are hidden.
+- Play: "All time" label and "Timed on X of Y plays".
+- Players: Plays / Wins / Win rate columns, with "Plays each person took part in". "Most played together" ranked each player's top game, so it is now **Favourite game**. Real groups stay under "Who plays together".
+- Recaps: compact ‹ › month buttons, and "3 different games, one play each" for single-play months.
+- Year in review: segments and counter come from one helper (tested). Buttons have equal heights, the slide is shorter and celebratory, and "Timed on" is hidden at 100%.
 
-| Screen | Number | Rule (confirmed in code) |
+### Owner feedback round (checkpoint)
+- No underlined links anywhere. Links are Forest and bold, and standalone actions end in ›.
+- Dark-mode text is pure white, secondary text is brighter, and text is antialiased.
+- Log play has no boxes around the summary line or Competitive.
+- More group stats (wins, win %, average, best ever) are **recorded** in `ROADMAP.md` as a separate follow-up.
+
+### 6. Data consistency: findings and fixes
+
+**Counting rule (owner-approved): a play counts once if it is on a game in your account, whatever the game's current ownership or expansion status. A player's count is the plays they took part in, and is labelled as such.**
+
+| Screen | Before | Now |
 | --- | --- | --- |
-| Plays | 830 | Plays whose game is **currently on the shelf and not an expansion**. `PlaysView.loadFeed` drops plays whose game is not in `GET /games` (owned, `is_expansion = false`). The backend `GET /plays` joins `user_games` but not the expansion flag. |
-| Stats › Play | 839 | **Every play on the account**: `COUNT(plays) WHERE user_id` (`insights_repository.total_plays`), including removed games and expansions. A test locks this "account history" rule. |
-| Stats › Players (Tom) | 821 | **Plays where Tom's `Player` row is a participant** (`get_frequent_players`). |
+| Plays | 830: plays on games currently on the shelf, minus expansions (the frontend dropped the rest). | Every play. `GET /plays` no longer requires a shelf membership, and each play carries `game {name, cover, is_expansion, on_shelf}`. Off-shelf plays show "Not on shelf" and are read-only, because edits and rematches need the game on the shelf. |
+| Stats › Play | 839: every play on the account. | Unchanged; it was already the rule. |
+| Stats › Players (Tom) | 821: plays where Tom's player row took part. | Unchanged, now labelled "Plays each person took part in". |
 
-Likely explanations (hypotheses, need a read-only check of the real account):
-- **839 − 830 = 9:** plays on games no longer on the shelf (BGG sync removed a `bgg` membership, or the game was removed by hand; plays are kept) or on games flagged as expansions.
-- **839 − 821 = 18:** plays without Tom linked. Possible causes: not recorded, a name variant ("Thomas" is a separate player), "Unknown player" from import, or a deleted player.
-- **A Feast for Odin 6 vs 5:** imports dedupe only on the BG Stats play `uuid`, so two plays never merge. The importer skips plays marked ignored, plays with no `playerScores`, plays with no BGG id or date, and plays whose game was not on the shelf at import time. One of these is the likely cause, most likely a play logged without players or against an expansion or duplicate game entry.
-- **182 vs 181 (+15 expansions hidden):** the shelf comes from BGG sync plus manual adds, not BG Stats. BGG sync never removes a `manual` membership, so a game added by hand and later sold stays. The other possibility is that BGG "own" differs from BG Stats' owned status.
+- **830 vs 839:** the 9 plays are on games that left the shelf (BGG sync removed them or you removed them; plays are kept) or are flagged as expansions. Fixed: Plays now shows all 839.
+- **839 vs 821:** 18 plays without Tom's player linked. Possible causes: not recorded, a name variant (for example "Thomas"), "Unknown player" from import, or a deleted player. This is different by design and is labelled.
+- **A Feast for Odin, 6 vs 5:** the BG Stats importer dedupes only on the play `uuid`, so plays never merge. It skips plays marked ignored, plays with no `playerScores`, plays with no BGG id or date, and plays whose game was not on the shelf when imported. One of these is the likely cause, most likely a play logged without players or against a duplicate or expansion entry.
+  - Not changed: importing player-less plays would invent data.
+  - To confirm read-only: check that play's `ignored`, `playerScores` and `gameRefId` in your BG Stats export.
+- **182 vs 181 (+15 expansions hidden):** the shelf comes from BGG sync plus manual adds, not BG Stats. BGG sync never removes a `manual` membership, so a game added by hand and later sold stays. BGG "own" can also differ from BG Stats' owned flag. This is by design. To fix your account, remove that game from the shelf.
+- **Real bug fixed:** game history sorted same-day plays in an arbitrary order (plays are saved at noon). It now orders by date, then newest-logged. This was why `play-logging.spec.ts` failed on `main`.
 
-Proposed rule (after approval): **a play counts once if it is on a game in your account, whatever its current ownership or expansion status.** The Plays tab would show all 839 (with game name and cover from `/plays`). Players stays different by design and gets the label "plays Tom took part in". No schema change is needed.
+No schema change. Build number 8 → 9.
 
-## Evidence so far
+## Evidence
 
 | Layer | Result |
 | --- | --- |
-| Unit (`npm test`) | 177 pass. New `play-log-scoring.test.mjs`: finishing order with ties for highest and lowest wins, winner auto-select and manual override, manual places, direction inference, record context, player-count formatting, fit bands. |
-| Static | ESLint clean, `tsc -b` clean, build passes (with `VITE_API_BASE_URL` set), `check:pwa` passes, `git diff --check` clean. |
-| Browser (Playwright WebKit, iPhone 15, 390×844) | Full suite: **58 passed, 0 failed**, 46 skipped (second phone project), including `dynamic-type.spec.ts`. New `e2e/ui-polish.spec.ts`: 3-player Log play with all rows and Save on screen and no control overflow (light and dark); score-focused state; saved places from scores; Tonight hint; Time-step action on screen; pick action and title above the tab bar. `play-logging.spec.ts` (SP-PLAY-01) was rewritten for the sheet and **now passes**. It had failed on `main` because the local e2e database was behind migration `a7c1e9d3b5f2`, which I applied to the loopback `shelfpick_dev` only. |
-| Simulator / device | Not run yet. |
+| Backend (`pytest`) | **436 passed**, 14 skipped (opt-in Postgres suites). New: one rule across `/plays` total, Stats total and a player's count, covering removed games and expansions. New: same-day history order. Run with explicit local env; `backend/.env` was not copied. |
+| Frontend unit | **182 pass.** New: `play-log-scoring.test.mjs` (finishing order with ties for highest and lowest wins, auto winner and override, manual places, direction, record context, player-count format, fit bands), feed counting rule, year-recap segments = slides, win rate, Stats copy. |
+| Static | ESLint, `tsc -b`, `build` (with `VITE_API_BASE_URL`), `check:pwa`, `build:ios`, `git diff --check` all pass. `check:colors` flags only a pre-existing SP-UI-01 rule. |
+| Browser (Playwright WebKit) | Full suite **62 passed, 0 failed**, 50 skipped (second phone project), including Dynamic Type AX. New specs: `ui-polish` (Log play 3 players with all rows and Save on screen, no control overflow, places from scores; Tonight hint; Time-step and pick actions above the tab bar; avatar), `ui-layout` (avatar meets no control on any tab; each tab's last item clears the tab bar; bar ≤ 76px), `ui-stats`. |
+| **Simulator (not a physical device)** | Build 9, Debug, ad hoc signed, on iPhone 17 / iOS 27.0, against a **local** backend, signed in as the local test account. Checked: Tonight, Time step, Tonight's pick (action above the bar), Plays rows, and the Log play sheet with 3 players (no tab bar, safe area kept). Found and fixed two issues here: sticky `:hover` borders on name fields after a tap, and the Time-step title touching the avatar at native text size. |
 
-Screenshots: before = `docs/screenshots/sp-play-01/` (old Log play form) and `docs/screenshots/sp-ui-02/before/` (Tonight steps and pick), `checkpoint/` (Log play keyboard closed and score focused, Tonight's pick; light and dark) and `after/`. Covers are synthetic sample art.
+Screenshots:
+- **Before:** `docs/screenshots/sp-ui-02/before/` (Tonight), `docs/screenshots/sp-ui-01/after/` (Shelf, Plays, Discover, Stats as of SP-UI-01), `docs/screenshots/sp-play-01/` (old Log play).
+- **After:** `docs/screenshots/sp-ui-02/after/` (every tab's end state, Tonight steps, Stats sections, play-logging flows), `checkpoint/`, `simulator/`. Browser covers are synthetic sample art.
+
+## Risks and open points
+- **Owner decision:** the Stats table's win rate is wins ÷ plays taken part in. The player profile uses wins ÷ decided plays, so the two can show different numbers.
+- Off-shelf plays in the Plays tab are read-only, because the backend refuses edits to games not on the shelf.
+- Not tested: real BGG covers, VoiceOver, physical device, the keyboard on a real phone. The Simulator's text entry was unreliable, so scores were entered only in the browser tests.
+- **Deploy the backend before the app build:** `GET /plays` changed shape (additive `game`) and scope (all plays).
+- The Simulator test left a few local-only "Alex …" test players in the loopback dev database.
+
+## Owner gates (NEXT)
+1. Physical-phone check: log a real 3-player game end to end and check counts against BG Stats.
+2. Review and merge the draft PR, then deploy the backend, then build 9.
+3. Refresh App Store screenshots (Log play, Tonight, Plays and Stats changed).
+4. Submit.

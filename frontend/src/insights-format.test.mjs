@@ -7,6 +7,7 @@ let server
 let durationCoverageCopy
 let formatRecordedHours
 let winRateCopy
+let playerWinRateCopy
 
 before(async () => {
   server = await createServer({ server: { middlewareMode: true, hmr: false }, appType: "custom" })
@@ -14,6 +15,7 @@ before(async () => {
   durationCoverageCopy = helpers.durationCoverageCopy
   formatRecordedHours = helpers.formatRecordedHours
   winRateCopy = helpers.winRateCopy
+  playerWinRateCopy = helpers.playerWinRateCopy
 })
 
 after(async () => { await server?.close() })
@@ -27,7 +29,7 @@ test("recorded hours preserve missing, genuine zero and larger totals", () => {
 
 test("duration coverage distinguishes absent, partial and complete recording", () => {
   assert.equal(durationCoverageCopy(3, 0), "Play time not recorded")
-  assert.equal(durationCoverageCopy(3, 2), "2 of 3 plays timed")
+  assert.equal(durationCoverageCopy(839, 612), "Timed on 612 of 839 plays")
   assert.equal(durationCoverageCopy(3, 3), null)
   assert.equal(durationCoverageCopy(0, 0), null)
 })
@@ -38,6 +40,13 @@ test("win rate has an unavailable state when no outcome is determinable", () => 
   assert.equal(winRateCopy(66.7), "66.7%")
 })
 
+test("Stats player win rate is wins over plays taken part in, with a dash for no plays", () => {
+  assert.equal(playerWinRateCopy(301, 802), "38%")
+  assert.equal(playerWinRateCopy(0, 140), "0%")
+  assert.equal(playerWinRateCopy(2, 3), "67%")
+  assert.equal(playerWinRateCopy(0, 0), "—")
+})
+
 test("Insights uses historical scope, accurate labels and recoverable states", async () => {
   const insights = await readFile(new URL("./components/InsightsView.tsx", import.meta.url), "utf8")
   const player = await readFile(new URL("./components/players/PlayerProfile.tsx", import.meta.url), "utf8")
@@ -45,7 +54,10 @@ test("Insights uses historical scope, accurate labels and recoverable states", a
   assert.match(insights, /historical_played_games_count/)
   assert.match(insights, /Owned games played/)
   assert.match(insights, /Games in history/)
-  assert.match(insights, /Most played together/)
+  assert.match(insights, /Favourite game/)
+  assert.doesNotMatch(insights, /Most played together|marked winner|>Insights</)
+  assert.match(insights, /<h1>Stats<\/h1>/)
+  assert.match(insights, /scope="col">Win rate</)
   assert.match(insights, /Play time not recorded|durationCoverageCopy/)
   assert.match(insights, />\s*Retry\s*</)
   assert.doesNotMatch(insights, /Players’ favourites/)

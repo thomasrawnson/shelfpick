@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { formatPlayerCount } from "../../player-count"
 
 import {
   moveWishlistGameToCollection,
@@ -115,7 +116,7 @@ function WishlistGameDetail({
 
         <div className="detail-section">
           <p className="preference-label">Players</p>
-          <p>{game.min_players ?? "?"}–{game.max_players ?? "?"}</p>
+          <p>{formatPlayerCount(game.min_players, game.max_players) ?? "Unknown"}</p>
         </div>
 
         {game.categories.length > 0 && (

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 
+import { formatPlayerCount } from "../player-count"
+
 import { lightImpact } from "../haptics"
 import {
   addToWishlist,
@@ -50,6 +52,20 @@ function complexityLabel(value: number | null | undefined) {
   if (value <= 3) return "Medium"
   if (value <= 4) return "Heavy"
   return "Very heavy"
+}
+
+function BookmarkIcon({ filled }: { filled: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+      <path
+        d="M6.5 3.5h11v17l-5.5-4-5.5 4z"
+        fill={filled ? "currentColor" : "none"}
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
 }
 
 function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize }: Props) {
@@ -187,24 +203,14 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
 
   function renderCard(recommendation: DiscoverRecommendation, index: number) {
     const { game, reasons, wishlisted } = recommendation
-    const complexity = complexityLabel(game.complexity)
+    const meta = [
+      formatPlayerCount(game.min_players, game.max_players),
+      game.max_play_time ? `${game.max_play_time} min` : null,
+      complexityLabel(game.complexity),
+    ].filter(Boolean).join(" · ")
 
     return (
       <article key={game.bgg_id} className="discover-card">
-        <button
-          type="button"
-          className={wishlisted ? "discover-save-button saved" : "discover-save-button"}
-          aria-label={wishlisted
-            ? `Remove ${game.name} from Want to Play`
-            : `Save ${game.name} to Want to Play`}
-          aria-pressed={wishlisted}
-          title={wishlisted ? "Remove from Want to Play" : "Save to Want to Play"}
-          disabled={updatingIds.has(game.bgg_id)}
-          onClick={() => { void toggleWishlist(recommendation) }}
-        >
-          {wishlisted ? "✓" : "+"}
-        </button>
-
         <div className="discover-media">
           {game.image_url ? (
             <img className="discover-image" src={game.image_url} alt="" />
@@ -215,17 +221,28 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
 
         <div className="discover-copy">
           <h2>{game.name}</h2>
-          <p className="discover-meta">
-            {game.min_players}–{game.max_players} players
-            {game.max_play_time ? ` · ${game.max_play_time} min` : ""}
-            {complexity ? ` · ${complexity}` : ""}
-          </p>
-          <span className="discover-match-pill">
-            {recommendationLabel(mode, recommendation, index)}
-          </span>
+          {meta && <p className="discover-meta">{meta}</p>}
+          <div className="discover-tags">
+            <span className="discover-match-pill">
+              {recommendationLabel(mode, recommendation, index)}
+            </span>
+            <button
+              type="button"
+              className={wishlisted ? "discover-save-button saved" : "discover-save-button"}
+              aria-label={wishlisted
+                ? `Remove ${game.name} from Want to Play`
+                : `Save ${game.name} to Want to Play`}
+              aria-pressed={wishlisted}
+              disabled={updatingIds.has(game.bgg_id)}
+              onClick={() => { void toggleWishlist(recommendation) }}
+            >
+              <BookmarkIcon filled={wishlisted} />
+              <span>{wishlisted ? "Saved" : "Want to Play"}</span>
+            </button>
+          </div>
           {reasons.length > 0 && (
             <details className="discover-reason-details">
-              <summary>Why this match?</summary>
+              <summary>{mode === "hot" ? "Why it’s trending" : "Why this match?"}</summary>
               <ul className="discover-reasons">
                 {reasons.map((reason) => <li key={reason}>{reason}</li>)}
               </ul>
@@ -238,11 +255,12 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
               target="_blank"
               rel="noreferrer"
             >
-              View on BGG
+              BGG ›
             </a>
             <button
               type="button"
               className="discover-dismiss-button"
+              aria-label={`Not interested in ${game.name}`}
               onClick={() => dismissRecommendation(game.bgg_id)}
             >
               Not interested

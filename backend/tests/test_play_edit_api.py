@@ -354,6 +354,47 @@ def test_list_plays_is_newest_first_paged_and_scoped_to_the_account(api):
     assert [play["id"] for play in page["plays"]] == [ids[2]]
 
 
+def test_game_history_breaks_same_day_ties_newest_logged_first(api):
+    client, _, _ = api
+    first = log(client, played_at="2026-11-17T12:00:00Z")
+    second = log(client, played_at="2026-11-17T12:00:00Z")
+    history = client.get("/games/100/plays").json()
+    assert [play["id"] for play in history["recent_plays"]] == [second, first]
+
+
+def test_list_plays_counts_every_play_on_the_account(api):
+    """SP-UI-02 rule: Plays, Stats and the /plays total agree. Plays on a game
+    that left the shelf, or that is now flagged as an expansion, still count."""
+    client, _, Session = api
+    with Session() as db:
+        db.add(UserGame(user_id=1, game_id=2))
+        db.commit()
+    log(client, bgg_id=100, played_at="2026-11-01T19:00:00Z")
+    log(client, bgg_id=200, played_at="2026-11-02T19:00:00Z")
+    log(client, bgg_id=200, played_at="2026-11-03T19:00:00Z",
+        participants=[{"name": "Sam", "score": 3}])
+    with Session() as db:
+        # Game Two leaves the shelf; Game One is reclassified as an expansion.
+        db.query(UserGame).filter_by(user_id=1, game_id=2).delete()
+        db.get(Game, 1).is_expansion = True
+        db.commit()
+
+    body = client.get("/plays").json()
+    assert body["total"] == 3
+    shelf = {play["game"]["bgg_id"]: play["game"]["on_shelf"] for play in body["plays"]}
+    assert shelf == {100: True, 200: False}
+    assert body["plays"][0]["game"]["name"] == "Game Two"
+    assert body["plays"][-1]["game"]["is_expansion"] is True
+
+    with Session() as db:
+        from repositories.insights_repository import InsightsRepository
+        insights = InsightsRepository(db, user_id=1)
+        assert insights.total_plays() == body["total"]
+        alex = [p for p in insights.get_frequent_players(limit=10) if p.name == "Alex"]
+        # A player's count is the plays they took part in (different by design).
+        assert alex and alex[0].play_count == 2
+
+
 def test_list_plays_empty_and_validates_paging(api):
     client, _, _ = api
     assert client.get("/plays").json() == {"total": 0, "plays": []}

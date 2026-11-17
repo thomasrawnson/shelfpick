@@ -678,14 +678,11 @@ h1 {
   .app-phone-wide .collection-list,
   .app-phone-wide .wishlist-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; }
   .app-phone-wide .discover-list { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
-  .app-phone-wide .discover-card { grid-template-columns: 90px minmax(0, 1fr); gap: 12px; }
   .app-phone-wide .insight-feature-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
   .app-phone-wide .rankings-screen { max-width: 880px; margin-inline: auto; }
   .app-phone-wide .ranking-game-image { aspect-ratio: auto; height: 260px; }
 }
-@media (min-width: 1024px) {
-  .app-phone-wide .discover-card { grid-template-columns: 118px minmax(0, 1fr); }
-}
+
 
 @media (max-width: 480px) {
   .phone.app-phone {
@@ -756,33 +753,6 @@ h1 {
 
 .discover-wishlist-link {
   justify-content: flex-start;
-}
-
-.discover-card {
-  position: relative;
-  gap: 12px;
-  padding: 15px;
-  background: var(--color-surface);
-  box-shadow: var(--shadow-card);
-  border: 0;
-  border-radius: 14px;
-}
-
-.discover-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 10px;
-}
-
-.discover-actions .ghost-button {
-  width: auto;
-  min-height: var(--target-min);
-  margin: 0;
-  padding: 6px 0;
-  color: var(--sp-green);
-  border: 0;
 }
 
 /* Rankings: list length selector now filters the list as well as sharing. */
@@ -862,16 +832,13 @@ h1 {
 }
 
 .players-card-header h2,
-.players-card .player-name,
 .players-card .player-stat strong,
-.players-card .neglected-game-name strong,
-.players-card .favourite-game-copy strong {
+.players-card .neglected-game-name strong {
   color: var(--sp-text) !important;
 }
 
 .players-card-header > span,
-.players-card .player-stat span,
-.players-card .favourite-game-copy span {
+.players-card .player-stat span {
   color: var(--sp-muted) !important;
 }
 
@@ -889,11 +856,6 @@ h1 {
   margin-top: 6px;
 }
 
-@media (max-width: 480px) {
-  .discover-card {
-    padding: 13px;
-  }
-}
 
 /* Shared visual refinements */
 h1,
@@ -905,19 +867,6 @@ h3,
   font-family: var(--font-display);
 }
 
-/* Player/Insight text should use the same warm palette, never rust/red. */
-.players-card .favourite-player-link,
-.players-card .favourite-game-link,
-.players-card .player-name-link,
-.players-card .stats-game-link,
-.players-card a,
-.players-card button {
-  color: var(--sp-text) !important;
-}
-
-.players-card .favourite-game-link {
-  color: var(--sp-green) !important;
-}
 
 /* More compact player count picker: 1–5 plus a single 6+ option. */
 .player-grid {
@@ -1116,42 +1065,27 @@ h3,
   white-space: nowrap;
 }
 
-.discover-reason-details,
 .picker-reason-details {
   color: var(--sp-green);
   font-size: var(--text-support);
 }
 
-.discover-reason-details summary,
 .picker-reason-details summary {
   cursor: pointer;
   list-style: none;
 }
 
-.discover-reason-details summary::-webkit-details-marker,
 .picker-reason-details summary::-webkit-details-marker {
   display: none;
 }
 
-.discover-reason-details summary::after,
 .picker-reason-details summary::after {
   content: " +";
   color: var(--sp-muted);
 }
 
-.discover-reason-details[open] summary::after,
 .picker-reason-details[open] summary::after {
   content: " −";
-}
-
-.discover-reason-details .discover-reasons {
-  margin: 8px 0 0;
-  padding: 8px 0 0 16px;
-  color: var(--sp-secondary);
-}
-
-.discover-reason-details .discover-reasons li {
-  margin: 4px 0;
 }
 
 /* Picker result: score first, detailed reasoning only on demand. */
@@ -1317,28 +1251,13 @@ h3,
   font-weight: 800;
 }
 
-.discover-bgg-link {
-  color: var(--sp-green);
-  font-size: var(--text-support);
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.discover-bgg-link:hover {
-  color: var(--sp-text);
-  text-decoration: none;
-}
-
 /* Insight labels and recap links follow the same palette; no rust/red accents. */
 .insights-screen .insight-label,
 .insights-screen .insights-view-all,
-.insights-screen .monthly-play-game,
-.insights-screen .favourite-player-link,
-.insights-screen .favourite-game-link {
+.insights-screen .monthly-play-game {
   color: var(--sp-green) !important;
 }
 
-.insights-screen .monthly-play-game,
-.insights-screen .favourite-player-link {
+.insights-screen .monthly-play-game {
   color: var(--sp-text) !important;
 }

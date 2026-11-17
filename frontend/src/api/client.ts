@@ -230,8 +230,21 @@ export interface GamePlay extends PlayResult {
 }
 
 
+// The game a listed play belongs to. on_shelf is false once the game has
+// left the shelf; its plays still count (SP-UI-02 counting rule).
+export interface PlayGameSummary {
+  bgg_id: number
+  name: string
+  thumbnail_url: string | null
+  image_url: string | null
+  is_expansion: boolean
+  on_shelf: boolean
+}
+
+
 export interface ListedPlay extends GamePlay {
   bgg_id: number
+  game: PlayGameSummary
 }
 
 

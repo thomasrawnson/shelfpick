@@ -1,7 +1,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test"
 
 import { logIn } from "./support"
-import { GAMES, mockShelf } from "./ui-fixtures"
+import { GAMES, avatarCollisions, mockShelf } from "./ui-fixtures"
 
 // SP-UI-02: compact Log play sheet and Tonight's pick at 390x844, light and dark.
 const SHOTS = "../docs/screenshots/sp-ui-02"
@@ -199,6 +199,7 @@ for (const scheme of ["light", "dark"] as const) {
     await page.getByRole("button", { name: /Standard/ }).click()
     const timeAction = page.getByRole("button", { name: "Find a game" })
     expect(await inViewport(page, timeAction)).toBe(true)
+    if (STAGE === "after") expect(await avatarCollisions(page)).toEqual([])
     await page.screenshot({ path: `${SHOTS}/${STAGE}/tonight-time-390-${scheme}.png` })
     await timeAction.click()
 
@@ -211,6 +212,7 @@ for (const scheme of ["light", "dark"] as const) {
       expect(await inViewport(page, action)).toBe(true)
       expect(await inViewport(page, title)).toBe(true)
       await expect(page.locator(".picker-result-score")).toHaveText("Great fit")
+      expect(await avatarCollisions(page)).toEqual([])
     }
     await page.screenshot({ path: `${SHOTS}/${STAGE === "after" ? "checkpoint" : STAGE}/tonight-pick-390-${scheme}.png` })
   })

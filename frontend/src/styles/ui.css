@@ -74,7 +74,6 @@
     .collection-sort,
     .collection-back,
     .discover-tab:not(.active),
-    .discover-dismiss-button,
     .ranking-view-tabs button:not(.active),
     .stats-section-tab:not(.active)
   ):not(:disabled) {

@@ -12,7 +12,7 @@ import {
   groupFeedByMonth,
   NO_FILTERS,
   playSummary,
-  sortFeed,
+  feedEntries,
   winnersLabel,
   type DateRange,
   type FeedEntry,
@@ -41,18 +41,11 @@ const RANGES: Array<{ value: DateRange; label: string }> = [
   { value: "year", label: "This year" },
 ]
 
-// Every play on the shelf, newest first, paired with its game.
+// Every play on the account, newest first, paired with its game.
 async function loadFeed(): Promise<{ games: Game[]; entries: FeedEntry[] }> {
   const [games, plays] = await Promise.all([getGames(), getPlays()])
   const owned = games.filter(game => game.owned)
-  const byId = new Map(owned.map(game => [game.bgg_id, game]))
-  return {
-    games: owned,
-    entries: sortFeed(plays.flatMap(play => {
-      const game = byId.get(play.bgg_id)
-      return game ? [{ game, play }] : []
-    })),
-  }
+  return { games: owned, entries: feedEntries(owned, plays) }
 }
 
 function PlaysView({ onOpenGame }: Props) {
@@ -224,19 +217,30 @@ function PlaysView({ onOpenGame }: Props) {
                   const date = new Date(play.played_at).toLocaleDateString(undefined, { day: "numeric", month: "short" })
                   const result = winnersLabel(play)
                   return (
-                    <li key={play.id} className="plays-card">
-                      <button type="button" className="plays-card-main" onClick={() => onOpenGame(game.bgg_id)} aria-label={`${game.name}, ${date}. Open game`}>
-                        <span className="plays-cover"><ResilientGameArtwork src={game.thumbnail_url ?? game.image_url} alt="" gameName={game.name} /></span>
-                        <span className="plays-card-copy">
-                          <strong>{game.name}</strong>
-                          <span>{date} · {playSummary(play)}</span>
-                          {result && <span className="plays-result">{result}</span>}
-                        </span>
-                      </button>
-                      <div className="plays-card-actions">
-                        <button type="button" className="secondary-button" onClick={() => setScreen({ kind: "log", game, prefill: rematchPrefill(play), key: Date.now() })}>Rematch</button>
-                        <button type="button" className="ghost-button" onClick={() => setScreen({ kind: "edit", entry })}>Edit</button>
-                      </div>
+                    <li key={play.id} className={entry.onShelf ? "plays-card" : "plays-card off-shelf"}>
+                      {entry.onShelf ? (
+                        <>
+                          <button type="button" className="plays-cover" onClick={() => onOpenGame(game.bgg_id)} aria-label={`Open ${game.name}`}>
+                            <ResilientGameArtwork src={game.thumbnail_url ?? game.image_url} alt="" gameName={game.name} />
+                          </button>
+                          <button type="button" className="plays-card-main" onClick={() => setScreen({ kind: "edit", entry })} aria-label={`${game.name}, ${date}. Edit play`}>
+                            <strong>{game.name}</strong>
+                            <span>{date} · {playSummary(play)}{result ? ` · ${result}` : ""}</span>
+                          </button>
+                          <button type="button" className="plays-rematch" onClick={() => setScreen({ kind: "log", game, prefill: rematchPrefill(play), key: Date.now() })} aria-label={`Rematch ${game.name}`}>
+                            Rematch
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <span className="plays-cover"><ResilientGameArtwork src={game.thumbnail_url ?? game.image_url} alt="" gameName={game.name} /></span>
+                          <span className="plays-card-main">
+                            <strong>{game.name}</strong>
+                            <span>{date} · {playSummary(play)}{result ? ` · ${result}` : ""}</span>
+                          </span>
+                          <span className="plays-off-shelf">Not on shelf</span>
+                        </>
+                      )}
                     </li>
                   )
                 })}

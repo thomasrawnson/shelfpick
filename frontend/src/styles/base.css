@@ -425,7 +425,10 @@ textarea:focus-visible {
 
 :root {
 
-  --shelfpick-nav-height: 72px;
+  /* Floating tab bar (SP-UI-02): compact, sitting just above the home indicator. */
+  --shelfpick-nav-height: 62px;
+  --shelfpick-nav-bottom: max(8px, calc(env(safe-area-inset-bottom) - 12px));
+  --shelfpick-nav-clearance: calc(var(--shelfpick-nav-height) + var(--shelfpick-nav-bottom) + 24px);
 }
 
 /* Overall signed-in application */
@@ -435,9 +438,7 @@ textarea:focus-visible {
 
   min-height: 100dvh;
 
-  padding-bottom: calc(
-    var(--shelfpick-nav-height) + env(safe-area-inset-bottom)
-  );
+  padding-bottom: var(--shelfpick-nav-clearance);
 
   background: radial-gradient(
       circle at 50% -5%,

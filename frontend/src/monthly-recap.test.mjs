@@ -7,6 +7,7 @@ let server
 let renderMonthlyRecapCard
 let monthlyRecapAltText
 let monthlyRecapFileName
+let monthlyHighlight
 let monthInTimezone
 let shiftMonth
 
@@ -17,6 +18,7 @@ before(async () => {
   renderMonthlyRecapCard = renderer.renderMonthlyRecapCard
   monthlyRecapAltText = renderer.monthlyRecapAltText
   monthlyRecapFileName = renderer.monthlyRecapFileName
+  monthlyHighlight = renderer.monthlyHighlight
   monthInTimezone = monthHelpers.monthInTimezone
   shiftMonth = monthHelpers.shiftMonth
 })
@@ -54,6 +56,16 @@ test("recap copy distinguishes partial and missing duration without private data
   assert.equal(monthlyRecapFileName("2026-10"), "shelfpick-2026-10-recap.png")
   assert.equal(JSON.stringify(recap).includes("participant"), false)
   assert.equal(JSON.stringify(recap).includes("location"), false)
+})
+
+test("a month of single plays shows variety instead of a one-play favourite", () => {
+  const once = { ...recap, total_plays: 3, unique_games: 3, most_played: { ...recap.most_played, name: "Clockwork Market", play_count: 1 } }
+  assert.deepEqual(monthlyHighlight(once), { label: "Variety", value: "3 different games" })
+  assert.doesNotMatch(monthlyRecapAltText(once), /Most played/)
+  assert.match(monthlyRecapAltText(once), /3 different games, one play each/)
+  assert.deepEqual(monthlyHighlight({ ...once, total_plays: 1, unique_games: 1 }), { label: "Played", value: "Clockwork Market" })
+  assert.equal(monthlyHighlight(recap).label, "Most played")
+  assert.equal(monthlyHighlight({ ...recap, most_played: null }), null)
 })
 
 test("one-game, rights-safe artwork and long-title recaps render a 1200x1500 PNG", async () => {

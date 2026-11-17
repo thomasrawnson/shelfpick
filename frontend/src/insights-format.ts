@@ -15,7 +15,15 @@ export function durationCoverageCopy(
 ): string | null {
   if (totalPlays === 0 || durationPlays === totalPlays) return null
   if (durationPlays === 0) return "Play time not recorded"
-  return `${durationPlays} of ${totalPlays} plays timed`
+  return `Timed on ${durationPlays} of ${totalPlays} ${totalPlays === 1 ? "play" : "plays"}`
+}
+
+// Stats player table: wins over the plays that player took part in.
+export function playerWinRateCopy(
+  wins: number,
+  plays: number,
+): string {
+  return plays > 0 ? `${Math.round((wins / plays) * 100)}%` : "—"
 }
 
 export function winRateCopy(

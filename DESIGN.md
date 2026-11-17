@@ -139,6 +139,13 @@ a trailing › for standalone actions), and Tonight's pick moves Share to the le
 so it never meets the account avatar. Tonight's pick labels fit as Great fit /
 Good fit / Worth a look with the 0–100 scale explained under More reasons.
 
+Shared layout: the floating tab bar is 62px and sits just above the home
+indicator; `--shelfpick-nav-clearance` is the single bottom inset for scroll
+content. The account avatar owns a fixed top-right spot; every screen title row
+keeps 56px clear. Plays and Discover use flat hairline rows (small cover, two
+lines of text, one quiet trailing action) instead of boxed cards. Stats uses flat
+tables with shared column headings.
+
 ## Pre-beta play-entry update — 28 September 2026
 
 Picker play logging uses a dedicated narrow task screen rather than expanding

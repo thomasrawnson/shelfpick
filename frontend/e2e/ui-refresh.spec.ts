@@ -80,7 +80,7 @@ test("Plays: filters, Rematch, Edit and Log play", async ({ page }) => {
   await cards.first().getByRole("button", { name: "Rematch" }).click()
   await expect(sheet.getByText("Log play")).toBeVisible()
   await sheet.getByRole("button", { name: "Cancel" }).click()
-  await cards.first().getByRole("button", { name: "Edit" }).click()
+  await cards.first().locator(".plays-card-main").click()
   await expect(sheet.getByText("Edit play")).toBeVisible()
   await sheet.getByRole("button", { name: "Cancel" }).click()
 
@@ -180,6 +180,6 @@ test("Shelf: last row scrolls clear of the tab bar and long titles keep two line
   })
   expect(lines).toBeLessThanOrEqual(2)
   await page.screenshot({ path: `${SHOTS}/after/shelf-end-390-light.png` })
-  await page.getByRole("button", { name: "List view" }).click()
-  await expect(page.getByRole("button", { name: "List view" })).toHaveAttribute("aria-pressed", "true")
+  await page.getByRole("button", { name: "Show as list" }).click()
+  await expect(page.getByRole("button", { name: "Show as grid" })).toBeVisible()
 })

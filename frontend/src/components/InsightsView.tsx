@@ -21,6 +21,7 @@ import { insightHistoryState }
 import {
   durationCoverageCopy,
   formatRecordedHours,
+  playerWinRateCopy,
 } from "../insights-format"
 
 
@@ -150,7 +151,7 @@ function InsightsView({
         console.error(err)
 
         setError(
-          "Couldn't load your collection insights.",
+          "Couldn't load your stats.",
         )
       } finally {
         setLoading(false)
@@ -196,7 +197,7 @@ function InsightsView({
   if (loading) {
     return (
       <section className="screen insights-screen">
-        <h1>Insights</h1>
+        <h1>Stats</h1>
         <p className="subtitle" role="status">Crunching the numbers...</p>
       </section>
     )
@@ -209,7 +210,7 @@ function InsightsView({
   ) {
     return (
       <section className="screen insights-screen">
-        <h1>Insights</h1>
+        <h1>Stats</h1>
 
         <p className="error-message">
           {error}
@@ -230,17 +231,23 @@ function InsightsView({
     insights.total_plays,
   )
 
+  const durationCoverage = durationCoverageCopy(
+    insights.total_plays,
+    insights.duration_plays,
+  )
+
 
   return (
     <section className="screen insights-screen">
       <header>
-        <h1>Insights</h1>
+        <h1>Stats</h1>
       </header>
 
 
       <div
         className="stats-section-tabs"
-        aria-label="Insights sections"
+        role="group"
+        aria-label="Stats sections"
       >
         {statsSections.map(
           (section) => (
@@ -362,13 +369,16 @@ function InsightsView({
             <h2>
               Time around the table
             </h2>
+            <p className="stats-period">
+              All time
+            </p>
           </div>
 
           {historyState === "none" ? (
             <article className="stats-empty-card">
               <h2>No plays recorded yet</h2>
               <p>
-                Log your first play to start building factual play insights.
+                Log your first play to start building your play stats.
               </p>
               <button
                 type="button"
@@ -408,22 +418,11 @@ function InsightsView({
                 }
               </span>
 
-              {
-                durationCoverageCopy(
-                  insights.total_plays,
-                  insights.duration_plays,
-                )
-                && (
-                  <small>
-                    {
-                      durationCoverageCopy(
-                        insights.total_plays,
-                        insights.duration_plays,
-                      )
-                    }
-                  </small>
-                )
-              }
+              {durationCoverage && (
+                <small>
+                  {durationCoverage}
+                </small>
+              )}
             </article>
           </div>
 
@@ -564,76 +563,39 @@ function InsightsView({
           .neglected_games
           .length > 0
         && (
-          <article className="players-card neglected-card">
+          <article className="players-card neglected-card" aria-labelledby="stats-waiting-title">
             <div className="players-card-header">
-              <div>
-                <h2>
-                  Waiting on the shelf
-                </h2>
-              </div>
+              <h2 id="stats-waiting-title">
+                Waiting on the shelf
+              </h2>
             </div>
 
-            <div className="player-list">
-              {
-                insights
-                  .neglected_games
-                  .slice(
-                    0,
-                    showAllNeglected
-                      ? undefined
-                      : 3
-                  )
-                  .map(
-                    (
-                      game,
-                      index,
-                    ) => (
-                      <div
-                        className="player-row neglected-game-row"
-                        key={
-                          game.bgg_id
-                        }
-                      >
-                        <span className="player-rank">
-                          {
-                            index + 1
-                          }
-                        </span>
-
+            <table className="stats-table">
+              <thead>
+                <tr>
+                  <th scope="col">Game</th>
+                  <th scope="col">Plays</th>
+                </tr>
+              </thead>
+              <tbody>
+                {insights.neglected_games
+                  .slice(0, showAllNeglected ? undefined : 3)
+                  .map((game) => (
+                    <tr key={game.bgg_id}>
+                      <th scope="row">
                         <button
                           type="button"
-                          className="stats-game-link neglected-game-name"
-                          onClick={() =>
-                            onOpenGame(
-                              game.bgg_id
-                            )
-                          }
+                          className="stats-row-link"
+                          onClick={() => onOpenGame(game.bgg_id)}
                         >
-                          <strong>
-                            {
-                              game.name
-                            }
-                          </strong>
-
+                          {game.name}
                         </button>
-
-                        <div className="player-stat">
-                          <strong>
-                            {
-                              game
-                                .play_count
-                            }
-                          </strong>
-
-                          <span>
-                            plays
-                          </span>
-                        </div>
-                      </div>
-                    ),
-                  )
-              }
-            </div>
+                      </th>
+                      <td>{game.play_count}</td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
 
             {
               insights
@@ -669,88 +631,45 @@ function InsightsView({
           .frequent_players
           .length > 0
         && (
-          <article className="players-card">
+          <article className="players-card" aria-labelledby="stats-players-title">
             <div className="players-card-header">
-              <div>
-                <h2>
-                  Players
-                </h2>
-              </div>
-
-              <span>
-                Top 3
-              </span>
+              <h2 id="stats-players-title">
+                Players
+              </h2>
             </div>
 
-            <div className="player-list">
-              {
-                insights
-                  .frequent_players
-                  .slice(
-                    0,
-                    3
-                  )
-                  .map(
-                    (
-                      player,
-                      index,
-                    ) => (
-                      <div
-                        className="player-row"
-                        key={
-                          player.id
-                        }
+            <p className="stats-table-note">
+              Plays each person took part in, so these can add up to more than your total.
+            </p>
+
+            <table className="stats-table">
+              <thead>
+                <tr>
+                  <th scope="col">Player</th>
+                  <th scope="col">Plays</th>
+                  <th scope="col">Wins</th>
+                  <th scope="col">Win rate</th>
+                </tr>
+              </thead>
+              <tbody>
+                {insights.frequent_players.map((player) => (
+                  <tr key={player.id}>
+                    <th scope="row">
+                      <button
+                        type="button"
+                        className="stats-row-link"
+                        onClick={() => setSelectedPlayerId(player.id)}
                       >
-                        <span className="player-rank">
-                          {
-                            index + 1
-                          }
-                        </span>
-
-                        <button
-                          type="button"
-                          className="player-name player-name-link"
-                          onClick={() =>
-                            setSelectedPlayerId(
-                              player.id
-                            )
-                          }
-                        >
-                          {
-                            player.name
-                          }
-                        </button>
-
-                        <div className="player-stat">
-                          <strong>
-                            {
-                              player
-                                .play_count
-                            }
-                          </strong>
-
-                          <span>
-                            plays
-                          </span>
-                        </div>
-
-                        <div className="player-stat">
-                          <strong>
-                            {
-                              player
-                                .win_count
-                            }
-                          </strong>
-
-                          <span>
-                            marked winner
-                          </span>
-                        </div>
-                      </div>
-                    ),
-                  )
-              }
-            </div>
+                        {player.name}
+                      </button>
+                    </th>
+                    <td>{player.play_count}</td>
+                    <td>{player.win_count}</td>
+                    <td>{playerWinRateCopy(player.win_count, player.play_count)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </article>
         )
       }
@@ -762,118 +681,59 @@ function InsightsView({
           .top_games_by_player
           .length > 0
         && (
-          <article className="players-card">
+          <article className="players-card" aria-labelledby="stats-favourites-title">
             <div className="players-card-header">
-              <div>
-                <h2>
-                  Most played together
-                </h2>
-              </div>
+              <h2 id="stats-favourites-title">
+                Favourite game
+              </h2>
             </div>
 
-            <div className="player-list">
-              {
-                insights
-                  .top_games_by_player
-                  .slice(
-                    0,
-                    showAllFavourites
-                      ? undefined
-                      : 3
-                  )
-                  .map(
-                    (
-                      favourite,
-                      index,
-                    ) => (
-                      <div
-                        className="player-row favourite-game-row"
-                        key={
-                          favourite
-                            .player_id
-                        }
-                      >
-                        <span className="player-rank">
-                          {
-                            index + 1
-                          }
-                        </span>
+            <table className="stats-table">
+              <thead>
+                <tr>
+                  <th scope="col">Player</th>
+                  <th scope="col" className="stats-table-text">Game</th>
+                  <th scope="col">Plays</th>
+                </tr>
+              </thead>
+              <tbody>
+                {insights.top_games_by_player
+                  .slice(0, showAllFavourites ? undefined : 3)
+                  .map((favourite) => (
+                    <tr key={favourite.player_id}>
+                      <th scope="row">
+                        <button
+                          type="button"
+                          className="stats-row-link"
+                          onClick={() => setSelectedPlayerId(favourite.player_id)}
+                        >
+                          {favourite.player_name}
+                        </button>
+                      </th>
+                      <td className="stats-table-text">
+                        <button
+                          type="button"
+                          className="stats-row-link stats-row-link-secondary"
+                          onClick={() => onOpenGame(favourite.bgg_id)}
+                        >
+                          {favourite.game_name}
+                        </button>
+                      </td>
+                      <td>{favourite.play_count}</td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
 
-                        <div className="favourite-game-copy">
-                          <button
-                            type="button"
-                            className="favourite-player-link"
-                            onClick={() =>
-                              setSelectedPlayerId(
-                                favourite
-                                  .player_id
-                              )
-                            }
-                          >
-                            {
-                              favourite
-                                .player_name
-                            }
-                          </button>
-
-                          <button
-                            type="button"
-                            className="stats-game-link favourite-game-link"
-                            onClick={() =>
-                              onOpenGame(
-                                favourite
-                                  .bgg_id
-                              )
-                            }
-                          >
-                            {
-                              favourite
-                                .game_name
-                            }
-                          </button>
-                        </div>
-
-                        <div className="player-stat">
-                          <strong>
-                            {
-                              favourite
-                                .play_count
-                            }
-                          </strong>
-
-                          <span>
-                            plays
-                          </span>
-                        </div>
-                      </div>
-                    ),
-                  )
-              }
-            </div>
-
-            {
-              insights
-                .top_games_by_player
-                .length > 3
-              && (
-                <button
-                  type="button"
-                  className="insights-view-all"
-                  onClick={() =>
-                    setShowAllFavourites(
-                      (current) =>
-                        !current
-                    )
-                  }
-                >
-                  {
-                    showAllFavourites
-                      ? "Show less"
-                      : "View all"
-                  }
-                </button>
-              )
-            }
+            {insights.top_games_by_player.length > 3 && (
+              <button
+                type="button"
+                className="insights-view-all"
+                onClick={() => setShowAllFavourites((current) => !current)}
+              >
+                {showAllFavourites ? "Show less" : "View all"}
+              </button>
+            )}
           </article>
         )
       }
@@ -885,97 +745,43 @@ function InsightsView({
           .common_groups
           .length > 0
         && (
-          <article className="players-card">
+          <article className="players-card" aria-labelledby="stats-groups-title">
             <div className="players-card-header">
-              <div>
-                <p className="insight-label">
-                  Regular groups
-                </p>
-
-                <h2>
-                  Who plays together
-                </h2>
-              </div>
+              <h2 id="stats-groups-title">
+                Who plays together
+              </h2>
             </div>
 
-            <div className="player-list">
-              {
-                insights
-                  .common_groups
-                  .slice(
-                    0,
-                    showAllGroups
-                      ? undefined
-                      : 3
-                  )
-                  .map(
-                    (
-                      group,
-                      index,
-                    ) => (
-                      <div
-                        className="player-row common-group-row"
-                        key={
-                          group
-                            .player_ids
-                            .join("-")
-                        }
-                      >
-                        <span className="player-rank">
-                          {
-                            index + 1
-                          }
-                        </span>
+            <table className="stats-table">
+              <thead>
+                <tr>
+                  <th scope="col">Group</th>
+                  <th scope="col">Plays</th>
+                </tr>
+              </thead>
+              <tbody>
+                {insights.common_groups
+                  .slice(0, showAllGroups ? undefined : 3)
+                  .map((group) => (
+                    <tr key={group.player_ids.join("-")}>
+                      <th scope="row" className="stats-table-wrap">
+                        {group.player_names.join(" + ")}
+                      </th>
+                      <td>{group.play_count}</td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
 
-                        <div className="player-name common-group-names">
-                          {
-                            group
-                              .player_names
-                              .join(" + ")
-                          }
-                        </div>
-
-                        <div className="player-stat">
-                          <strong>
-                            {
-                              group
-                                .play_count
-                            }
-                          </strong>
-
-                          <span>
-                            plays
-                          </span>
-                        </div>
-                      </div>
-                    ),
-                  )
-              }
-            </div>
-
-            {
-              insights
-                .common_groups
-                .length > 3
-              && (
-                <button
-                  type="button"
-                  className="insights-view-all"
-                  onClick={() =>
-                    setShowAllGroups(
-                      (current) =>
-                        !current
-                    )
-                  }
-                >
-                  {
-                    showAllGroups
-                      ? "Show less"
-                      : "View all"
-                  }
-                </button>
-              )
-            }
+            {insights.common_groups.length > 3 && (
+              <button
+                type="button"
+                className="insights-view-all"
+                onClick={() => setShowAllGroups((current) => !current)}
+              >
+                {showAllGroups ? "Show less" : "View all"}
+              </button>
+            )}
           </article>
         )
       }
@@ -1001,7 +807,7 @@ function InsightsView({
             <p>
               {historyState === "none"
                 ? "Log a play with its players to start building group history."
-                : "Your plays do not include player details yet. Add players next time to build group insights."}
+                : "Your plays do not include player details yet. Add players next time to build group stats."}
             </p>
 
             <button

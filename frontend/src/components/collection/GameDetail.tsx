@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { formatPlayerCount } from "../../player-count"
 
 import type {
   Game,
@@ -146,9 +147,7 @@ function GameDetail({
           </p>
 
           <p>
-            {game.min_players ?? "?"}
-            –
-            {game.max_players ?? "?"}
+            {formatPlayerCount(game.min_players, game.max_players) ?? "Unknown"}
           </p>
         </div>
 

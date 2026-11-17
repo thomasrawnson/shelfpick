@@ -894,7 +894,7 @@ function CollectionView({
     return (
       <section className="screen collection-screen">
         <header>
-          <h1>Want to Play</h1>
+          <h1>Shelf</h1>
         </header>
 
         {sectionTabs}
@@ -942,9 +942,7 @@ function CollectionView({
   if (error && games.length === 0) {
     return (
       <section className="screen collection-screen">
-        <h1>
-          Your games
-        </h1>
+        <header><h1>Shelf</h1></header>
 
         {sectionTabs}
         <RetryNotice message={error} busy={loading} onRetry={retryCollection} />
@@ -1025,26 +1023,16 @@ function CollectionView({
       )}
       <CollectionFilters
         trailing={
-          <div className="shelf-view-toggle" role="group" aria-label="Shelf view">
-            <button
-              type="button"
-              aria-label="Grid view"
-              aria-pressed={layout === "grid"}
-              className={layout === "grid" ? "active" : ""}
-              onClick={() => changeLayout("grid")}
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5" /><rect x="13" y="4" width="7" height="7" rx="1.5" /><rect x="4" y="13" width="7" height="7" rx="1.5" /><rect x="13" y="13" width="7" height="7" rx="1.5" /></svg>
-            </button>
-            <button
-              type="button"
-              aria-label="List view"
-              aria-pressed={layout === "list"}
-              className={layout === "list" ? "active" : ""}
-              onClick={() => changeLayout("list")}
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
-            </button>
-          </div>
+          <button
+            type="button"
+            className="shelf-view-toggle"
+            aria-label={layout === "grid" ? "Show as list" : "Show as grid"}
+            onClick={() => changeLayout(layout === "grid" ? "list" : "grid")}
+          >
+            {layout === "grid"
+              ? <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+              : <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5" /><rect x="13" y="4" width="7" height="7" rx="1.5" /><rect x="4" y="13" width="7" height="7" rx="1.5" /><rect x="13" y="13" width="7" height="7" rx="1.5" /></svg>}
+          </button>
         }
         search={
           search
