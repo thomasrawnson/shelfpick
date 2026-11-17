@@ -1,11 +1,9 @@
 import { useLocation, useSearchParams } from "react-router-dom"
 
 import type { PickerPlayStyle } from "../api/client"
-import { APP_PATHS, type TonightMode } from "../routes"
-import { readTonightMode, saveTonightMode } from "../tonight-mode"
+import { APP_PATHS } from "../routes"
 import GameNightView from "./GameNightView"
 import PickerView from "./picker/PickerView"
-import SegmentedControl from "./ui/SegmentedControl"
 
 type Props = {
   defaultPlayers: number | null
@@ -18,13 +16,8 @@ type Props = {
   onUnlockPro: () => void
 }
 
-const MODES: Array<{ value: TonightMode; label: string }> = [
-  { value: "solo", label: "Just me" },
-  { value: "group", label: "A group" },
-  { value: "vote", label: "Group vote" },
-]
-
-// One place to decide what to play: alone, with a group, or by group vote.
+// One place to decide what to play: pick for yourself or the table, or send the
+// shortlist to the group to vote (?mode=vote, also the old Game Night path).
 function TonightView({
   defaultPlayers,
   defaultTime,
@@ -37,45 +30,31 @@ function TonightView({
 }: Props) {
   const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
-  const mode = readTonightMode(searchParams.get("mode"))
-  const loggingPlay = location.pathname === APP_PATHS.tonightPlay
+  const voting =
+    searchParams.get("mode") === "vote" && location.pathname !== APP_PATHS.tonightPlay
 
-  function changeMode(next: TonightMode) {
-    saveTonightMode(next)
-    setSearchParams({ mode: next }, { replace: true })
+  if (voting) {
+    return (
+      <GameNightView
+        defaultTime={defaultTime}
+        enabled={gameNightEnabled}
+        votingEnabled={votingEnabled}
+        onBack={() => setSearchParams({}, { replace: true })}
+        onViewGame={onViewGame}
+        onUnlockPro={onUnlockPro}
+      />
+    )
   }
 
   return (
-    <>
-      {!loggingPlay && (
-        <SegmentedControl
-          ariaLabel="How are you playing tonight?"
-          className="tonight-modes"
-          value={mode}
-          options={MODES}
-          onChange={changeMode}
-        />
-      )}
-      {mode === "vote" && !loggingPlay ? (
-        <GameNightView
-          defaultTime={defaultTime}
-          enabled={gameNightEnabled}
-          votingEnabled={votingEnabled}
-          onBack={() => changeMode("group")}
-          onViewGame={onViewGame}
-          onUnlockPro={onUnlockPro}
-        />
-      ) : (
-        <PickerView
-          key={mode}
-          onViewGame={onViewGame}
-          onViewCollection={onViewShelf}
-          defaultPlayers={mode === "solo" ? 1 : defaultPlayers}
-          defaultTime={defaultTime}
-          defaultPlayStyle={defaultPlayStyle}
-        />
-      )}
-    </>
+    <PickerView
+      onViewGame={onViewGame}
+      onViewCollection={onViewShelf}
+      onGroupVote={() => setSearchParams({ mode: "vote" })}
+      defaultPlayers={defaultPlayers}
+      defaultTime={defaultTime}
+      defaultPlayStyle={defaultPlayStyle}
+    />
   )
 }
 

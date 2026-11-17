@@ -26,3 +26,58 @@
 .segmented-control.tonight-modes button { min-width: 0; padding-inline: 4px; white-space: nowrap; font-size: 0.875rem; }
 .app-content .collection-heading-row { padding-right: 56px; }
 .app-top-bar { padding-right: 4px; }
+
+/* Tonight: left-aligned title row shared with the avatar, one-row group size. */
+.app-content > .screen > header { min-height: 56px; display: flex; flex-direction: column; justify-content: center; text-align: left; }
+.player-step-screen .tonight-header { text-align: left; margin: 0 0 12px; }
+.player-step-screen .tonight-header h1 { margin: 0; font-size: 1.5rem; line-height: 1.15; text-align: left; }
+.tonight-eyebrow { margin: 0 0 2px; color: var(--color-accent-text); font-size: 0.75rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.player-step-screen .picker-step-centered { align-items: stretch; text-align: left; }
+.player-step-screen .picker-essential-label { text-align: left; margin: 8px 0; }
+.player-step-screen .player-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.player-step-screen .player-chip { min-height: 52px; padding: 0; }
+.player-step-screen .player-chip strong { font-size: 1.125rem; }
+.player-step-screen .player-chip.solo strong { font-size: 0.8125rem; }
+.tonight-choose-players {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; min-height: 44px; margin: 6px 0 0; padding: 0 4px;
+  color: var(--color-brand-primary); background: transparent; border: 0;
+  font: inherit; font-weight: 700; cursor: pointer;
+}
+.tonight-vote-button {
+  width: 100%; min-height: 48px; margin-top: 8px;
+  color: var(--color-brand-primary); background: transparent;
+  border: 1px solid var(--color-border); border-radius: var(--radius-md);
+  font: inherit; font-weight: 700; cursor: pointer;
+}
+.player-step-screen .picker-step-actions { display: grid; gap: 4px; }
+.player-step-screen .player-grid,
+.player-step-screen .player-complexity-section,
+.player-step-screen .advanced-filters { width: 100%; max-width: none; margin-inline: 0; padding-inline: 0; box-sizing: border-box; }
+.player-step-screen .preference-label { margin-left: 0; }
+
+/* Compact screen titles and Shelf controls. */
+.app-content > .screen > header h1,
+.app-content > .screen > .collection-heading-row > header h1 { font-size: 1.5rem; line-height: 1.15; margin: 0; }
+.collection-heading-row { align-items: center; gap: 10px; margin-bottom: 8px; }
+.collection-heading-row header .subtitle { margin: 2px 0 0; font-size: 0.8125rem; }
+.collection-heading-row .collection-add-button { min-height: 36px; padding: 0 14px; font-size: 0.875rem; border-radius: 999px; }
+.collection-section-tabs button { min-height: 40px; font-size: 0.9375rem; }
+.collection-section-tabs { margin-bottom: 8px; }
+.collection-tools { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; margin-bottom: 12px; padding: 4px 0 8px; background: var(--color-bg); }
+.collection-search-sort-row { display: flex; align-items: center; gap: 8px; }
+.collection-search-wrap { flex: 1; min-width: 0; }
+.collection-search-sort-row .collection-search { min-height: 40px; }
+.collection-sort { min-height: 40px; }
+.shelf-layout-button {
+  flex: none; display: grid; place-items: center; width: 40px; height: 40px; padding: 0;
+  color: var(--color-brand-primary); background: var(--color-surface-raised);
+  border: 1px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer;
+}
+.shelf-layout-button svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.collection-tools .filter-tabs { display: flex; gap: 6px; padding: 0; background: transparent; border: 0; }
+.collection-tools .filter-tabs button {
+  flex: none; min-height: 32px; padding: 0 14px; border: 1px solid var(--color-border);
+  border-radius: 999px; background: transparent; color: var(--color-text-support); font-size: 0.8125rem; font-weight: 700;
+}
+.collection-tools .filter-tabs button.active { color: var(--color-text-inverse); background: var(--color-brand-primary); border-color: var(--color-brand-primary); }

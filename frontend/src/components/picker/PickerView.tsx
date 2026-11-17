@@ -44,6 +44,7 @@ type Step =
 type Props = {
   onViewGame: (bggId: number) => void;
   onViewCollection: () => void;
+  onGroupVote?: () => void;
   defaultPlayers?: number | null;
   defaultTime?: number | null;
   defaultPlayStyle?: PickerPlayStyle | null;
@@ -56,6 +57,7 @@ function savedPlayStyleOrFallback(value: PickerPlayStyle | null | undefined): Pi
 function PickerView({
   onViewGame,
   onViewCollection,
+  onGroupVote,
   defaultPlayers = null,
   defaultTime = null,
   defaultPlayStyle = null,
@@ -353,6 +355,7 @@ function PickerView({
           onOpenMechanics={() => setStep("play_style")}
           onClearFineTune={clearFineTune}
           onContinue={() => setStep("time")}
+          onGroupVote={onGroupVote}
         />
       )}
 

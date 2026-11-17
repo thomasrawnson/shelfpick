@@ -382,7 +382,7 @@ function GameNightView({ enabled, votingEnabled, defaultTime = null, onBack, onV
   return (
     <section className="screen game-night-screen">
       <button type="button" className="collection-back" onClick={onBack}>
-        ← Back to Pick
+        ← Back to Tonight
       </button>
 
       <header>

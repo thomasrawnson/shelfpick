@@ -987,7 +987,7 @@ function CollectionView({
           </h1>
 
           <p className="subtitle">
-            {games.length} games on your shelf
+            {games.length} {games.length === 1 ? "game" : "games"}
           </p>
         </header>
 
@@ -1000,7 +1000,7 @@ function CollectionView({
           data-add-game-trigger
           onClick={openAddGame}
         >
-          Add game
+          + Add
         </button>}
       </div>
 
@@ -1018,6 +1018,20 @@ function CollectionView({
         />
       )}
       <CollectionFilters
+        trailing={
+          <button
+            type="button"
+            className="shelf-layout-button"
+            aria-label={layout === "grid" ? "Show as list" : "Show as grid"}
+            onClick={() => changeLayout(layout === "grid" ? "list" : "grid")}
+          >
+            {layout === "grid" ? (
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+            ) : (
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5" /><rect x="13" y="4" width="7" height="7" rx="1.5" /><rect x="4" y="13" width="7" height="7" rx="1.5" /><rect x="13" y="13" width="7" height="7" rx="1.5" /></svg>
+            )}
+          </button>
+        }
         search={
           search
         }
@@ -1056,20 +1070,6 @@ function CollectionView({
         }
       />
 
-
-      <div className="shelf-layout-toggle" role="group" aria-label="Shelf layout">
-        {(["grid", "list"] as const).map((option) => (
-          <button
-            type="button"
-            key={option}
-            className={layout === option ? "active" : ""}
-            aria-pressed={layout === option}
-            onClick={() => changeLayout(option)}
-          >
-            {option === "grid" ? "Grid" : "List"}
-          </button>
-        ))}
-      </div>
 
       <CollectionGameList
         layout={layout}

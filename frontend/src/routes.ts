@@ -42,7 +42,7 @@ export const APP_PATHS = {
   settingsPro: "/settings/pro",
 } as const
 
-export type TonightMode = "solo" | "group" | "vote"
+export type TonightMode = "pick" | "vote"
 
 export function tonightModePath(mode: TonightMode): string {
   return `${APP_PATHS.tonight}?mode=${mode}`

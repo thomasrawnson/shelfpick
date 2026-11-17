@@ -36,6 +36,7 @@ type Props = {
   onOpenMechanics: () => void
   onClearFineTune: () => void
   onContinue: () => void
+  onGroupVote?: () => void
 }
 
 
@@ -116,6 +117,7 @@ function PlayerStep({
   onOpenMechanics,
   onClearFineTune,
   onContinue,
+  onGroupVote,
 }: Props) {
   const activeFineTuneCount = [
     mode !== "best_match",
@@ -127,11 +129,12 @@ function PlayerStep({
 
   const fineTuneHint = activeFineTuneCount > 0
     ? `${activeFineTuneCount} preference${activeFineTuneCount === 1 ? "" : "s"} applied`
-    : "Optional preferences"
+    : undefined
 
   return (
     <section className="screen picker-step-screen player-step-screen">
-      <header>
+      <header className="tonight-header">
+        <p className="tonight-eyebrow">Tonight</p>
         <h1>What should we play?</h1>
       </header>
 
@@ -163,20 +166,6 @@ function PlayerStep({
           </div>
         ) : (
           <>
-            <button
-              type="button"
-              className="picker-navigation-card"
-              onClick={onChoosePlayers}
-            >
-              <span>
-                <strong>Choose specific players</strong>
-                <small>Use known player preferences and play history</small>
-              </span>
-              <span className="picker-navigation-chevron" aria-hidden="true">›</span>
-            </button>
-
-            <p className="player-or">or choose a group size</p>
-
             <div className="player-grid">
               {playerOptions.map((option) => (
                 <button
@@ -205,6 +194,14 @@ function PlayerStep({
                 </button>
               ))}
             </div>
+            <button
+              type="button"
+              className="tonight-choose-players"
+              onClick={onChoosePlayers}
+            >
+              Choose players by name
+              <span aria-hidden="true">›</span>
+            </button>
           </>
         )}
 
@@ -338,8 +335,17 @@ function PlayerStep({
             disabled={players === null}
             onClick={onContinue}
           >
-            Continue
+            Find a game
           </button>
+          {onGroupVote && (
+            <button
+              type="button"
+              className="tonight-vote-button"
+              onClick={onGroupVote}
+            >
+              Let the group vote instead
+            </button>
+          )}
         </div>
       </div>
     </section>

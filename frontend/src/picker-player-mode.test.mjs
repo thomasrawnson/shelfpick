@@ -62,7 +62,7 @@ test("count-only mode retains the player-count choices and selected count", () =
 
   assert.match(markup, />What should we play\?</)
   assert.doesNotMatch(markup, /Set the table and any limits/)
-  assert.match(markup, />Choose specific players</)
+  assert.match(markup, /Choose players by name/)
   assert.match(markup, />Complexity</)
   assert.match(markup, />Fine-tune</)
   assert.match(markup, /class="player-grid"/)

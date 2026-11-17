@@ -46,8 +46,8 @@ for (const scheme of ["light", "dark"] as const) {
     await expect(page.getByRole("heading", { name: "Shelf" })).toBeVisible()
     await page.waitForLoadState("networkidle")
     await page.screenshot({ path: `${SHOTS}/shelf-grid-${scheme}.png` })
-    await page.getByRole("button", { name: "List", exact: true }).click()
+    await page.getByRole("button", { name: "Show as list" }).click()
     await page.screenshot({ path: `${SHOTS}/shelf-list-${scheme}.png` })
-    await page.getByRole("button", { name: "Grid", exact: true }).click()
+    await page.getByRole("button", { name: "Show as grid" }).click()
   })
 }

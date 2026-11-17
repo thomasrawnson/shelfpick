@@ -1,3 +1,5 @@
+import type { ReactNode } from "react"
+
 import FilterTabs
   from "../ui/FilterTabs"
 
@@ -28,6 +30,7 @@ type Props = {
   onPlayFilterChange: (
     value: PlayFilter,
   ) => void
+  trailing?: ReactNode
 }
 
 
@@ -38,23 +41,10 @@ function CollectionFilters({
   onSearchChange,
   onSortChange,
   onPlayFilterChange,
+  trailing,
 }: Props) {
   return (
     <div className="collection-tools">
-      <FilterTabs
-        value={playFilter}
-        ariaLabel="Filter collection"
-        options={[
-          { value: "all", label: "All" },
-          { value: "played", label: "Played" },
-          { value: "never", label: "Unplayed" },
-        ]}
-        onChange={
-          onPlayFilterChange
-        }
-      />
-
-
       <div className="collection-search-sort-row">
         <label
           className="collection-search-wrap"
@@ -121,7 +111,21 @@ function CollectionFilters({
             </option>
           </select>
         </label>
+        {trailing}
       </div>
+
+      <FilterTabs
+        value={playFilter}
+        ariaLabel="Filter collection"
+        options={[
+          { value: "all", label: "All" },
+          { value: "played", label: "Played" },
+          { value: "never", label: "Unplayed" },
+        ]}
+        onChange={
+          onPlayFilterChange
+        }
+      />
     </div>
   )
 }
