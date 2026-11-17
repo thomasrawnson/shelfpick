@@ -40,10 +40,13 @@ test("win rate has an unavailable state when no outcome is determinable", () => 
   assert.equal(winRateCopy(66.7), "66.7%")
 })
 
-test("Stats player win rate is wins over plays taken part in, with a dash for no plays", () => {
-  assert.equal(playerWinRateCopy(301, 802), "38%")
+test("Stats player win rate is wins over decided plays, formatted like the player profile", () => {
+  // Same text as the profile for the same numbers (profile: 66.7%).
+  assert.equal(playerWinRateCopy(2, 3), winRateCopy(66.7))
+  assert.equal(playerWinRateCopy(2, 3), "66.7%")
+  assert.equal(playerWinRateCopy(301, 790), "38.1%")
   assert.equal(playerWinRateCopy(0, 140), "0%")
-  assert.equal(playerWinRateCopy(2, 3), "67%")
+  // No decided plays (every result unknown): a dash, not 0%.
   assert.equal(playerWinRateCopy(0, 0), "—")
 })
 

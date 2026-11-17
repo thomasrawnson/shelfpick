@@ -304,6 +304,16 @@ def test_player_profile_and_history_use_new_outcomes(api):
     stats = client.get(f"/players/{alex['id']}/stats").json()
     assert (stats["wins"], stats["losses"], stats["unknown_results"]) == (2, 1, 1)
     assert stats["win_rate"] == 66.7
+    # Stats › Players uses the same rule: wins / decided plays (co-op wins
+    # count; the play with no recorded result is left out of the rate).
+    with Session() as db:
+        from repositories.insights_repository import InsightsRepository
+        summary = next(
+            p for p in InsightsRepository(db, user_id=1).get_frequent_players()
+            if p.name == "Alex"
+        )
+    assert (summary.play_count, summary.win_count, summary.decided_count) == (4, 2, 3)
+    assert round(summary.win_count / summary.decided_count * 100, 1) == stats["win_rate"]
     history = client.get("/games/100/plays").json()
     assert history["recent_plays"][0]["outcome_type"] in {
         "competitive", "cooperative"
@@ -393,6 +403,7 @@ def test_list_plays_counts_every_play_on_the_account(api):
         alex = [p for p in insights.get_frequent_players(limit=10) if p.name == "Alex"]
         # A player's count is the plays they took part in (different by design).
         assert alex and alex[0].play_count == 2
+        assert (alex[0].win_count, alex[0].decided_count) == (2, 2)
 
 
 def test_list_plays_empty_and_validates_paging(api):

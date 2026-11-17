@@ -27,9 +27,9 @@ const INSIGHTS = {
   last_played: { bgg_id: 2, name: "Lantern Grove", played_at: "2026-11-14T19:00:00Z" },
   never_played_count: 23,
   frequent_players: [
-    { id: 1, name: "Tom", play_count: 802, win_count: 301 },
-    { id: 2, name: "Wales", play_count: 512, win_count: 190 },
-    { id: 3, name: "Sister", play_count: 140, win_count: 0 },
+    { id: 1, name: "Tom", play_count: 802, win_count: 301, decided_count: 790 },
+    { id: 2, name: "Wales", play_count: 512, win_count: 190, decided_count: 505 },
+    { id: 3, name: "Sister", play_count: 140, win_count: 0, decided_count: 0 },
   ],
   monthly_activity: { plays: 12, unique_games: 7, new_games: 1, repeat_plays: 5, recent_plays: [] },
   neglected_games: [
@@ -102,8 +102,9 @@ for (const scheme of ["light", "dark"] as const) {
 
     await openSection(page, "Players")
     await expect(page.getByRole("columnheader", { name: "Win rate" })).toBeVisible()
-    await expect(page.getByRole("row", { name: /Tom/ }).getByText("38%")).toBeVisible()
-    await expect(page.getByRole("row", { name: /Sister/ }).getByText("0%")).toBeVisible()
+    // Wins / decided plays, as on the player profile.
+    await expect(page.getByRole("row", { name: /Tom/ }).getByText("38.1%")).toBeVisible()
+    await expect(page.getByRole("row", { name: /Sister/ }).getByText("—")).toBeVisible()
     await expect(page.getByText("marked winner")).toHaveCount(0)
     await expect(page.getByRole("heading", { name: "Favourite game" })).toBeVisible()
     await page.screenshot({ path: `${SHOTS}/stats-players-390-${scheme}.png`, fullPage: true })

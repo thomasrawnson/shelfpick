@@ -277,6 +277,8 @@ export interface PlayerSummary {
   name: string
   play_count: number
   win_count: number
+  // Plays with a known result (win, loss or draw); the win-rate denominator.
+  decided_count: number
 }
 
 export interface CollectionInsights {

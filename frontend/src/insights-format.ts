@@ -18,12 +18,14 @@ export function durationCoverageCopy(
   return `Timed on ${durationPlays} of ${totalPlays} ${totalPlays === 1 ? "play" : "plays"}`
 }
 
-// Stats player table: wins over the plays that player took part in.
+// Stats player table: the same rule and format as the player profile.
+// Win rate = wins / decided plays (wins, losses and draws); plays with no
+// recorded result are left out. Rounded to one decimal, as the backend does.
 export function playerWinRateCopy(
   wins: number,
-  plays: number,
+  decided: number,
 ): string {
-  return plays > 0 ? `${Math.round((wins / plays) * 100)}%` : "—"
+  return winRateCopy(decided > 0 ? Math.round((wins / decided) * 1000) / 10 : null)
 }
 
 export function winRateCopy(

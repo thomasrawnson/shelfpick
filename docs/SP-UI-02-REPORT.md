@@ -34,7 +34,7 @@ Branch `codex/sp-ui-02`, worktree `~/Developer/_worktrees/shelfpick/sp-ui-02`, b
 - "Stats" everywhere, including Settings copy.
 - Collection: one sync explanation with "Sync collection ›", and empty Shelf leaders tiles are hidden.
 - Play: "All time" label and "Timed on X of Y plays".
-- Players: Plays / Wins / Win rate columns, with "Plays each person took part in". "Most played together" ranked each player's top game, so it is now **Favourite game**. Real groups stay under "Who plays together".
+- Players: Plays / Wins / Win rate columns, with "Plays each person took part in". **Win rate = wins ÷ decided plays** (owner decision, 17 Nov). Decided plays are wins, losses and draws; plays with no recorded result are left out. The table and the player profile use the same outcome rules and format, so they show identical numbers. Co-op wins now count in the table too: it used to read only the raw winner flag. "Most played together" ranked each player's top game, so it is now **Favourite game**. Real groups stay under "Who plays together".
 - Recaps: compact ‹ › month buttons, and "3 different games, one play each" for single-play months.
 - Year in review: segments and counter come from one helper (tested). Buttons have equal heights, the slide is shorter and celebratory, and "Timed on" is hidden at 100%.
 
@@ -79,7 +79,6 @@ Screenshots:
 - **After:** `docs/screenshots/sp-ui-02/after/` (every tab's end state, Tonight steps, Stats sections, play-logging flows), `checkpoint/`, `simulator/`. Browser covers are synthetic sample art.
 
 ## Risks and open points
-- **Owner decision:** the Stats table's win rate is wins ÷ plays taken part in. The player profile uses wins ÷ decided plays, so the two can show different numbers.
 - Off-shelf plays in the Plays tab are read-only, because the backend refuses edits to games not on the shelf.
 - Not tested: real BGG covers, VoiceOver, physical device, the keyboard on a real phone. The Simulator's text entry was unreliable, so scores were entered only in the browser tests.
 - **Deploy the backend before the app build:** `GET /plays` changed shape (additive `game`) and scope (all plays).

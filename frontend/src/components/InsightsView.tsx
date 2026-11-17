@@ -639,7 +639,7 @@ function InsightsView({
             </div>
 
             <p className="stats-table-note">
-              Plays each person took part in, so these can add up to more than your total.
+              Plays each person took part in, so these can add up to more than your total. Win rate counts only plays with a recorded result.
             </p>
 
             <table className="stats-table">
@@ -665,7 +665,7 @@ function InsightsView({
                     </th>
                     <td>{player.play_count}</td>
                     <td>{player.win_count}</td>
-                    <td>{playerWinRateCopy(player.win_count, player.play_count)}</td>
+                    <td>{playerWinRateCopy(player.win_count, player.decided_count)}</td>
                   </tr>
                 ))}
               </tbody>
