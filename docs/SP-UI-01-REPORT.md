@@ -32,6 +32,10 @@ Screenshots: `docs/screenshots/sp-ui-01/before/` (old Pick, Collection, Discover
 - Real BGG cover art, VoiceOver on a device, haptics and the native pull gesture were not tested.
 - `e2e/support.ts` and `playwright.config.ts` now read `E2E_API_PORT` / `E2E_WEB_PORT` (default 8000/5173) so tests can run when another server holds the ports.
 
+## Accepted exception: npm audit
+
+On 2026-11-17 the CI `npm audit --audit-level=high` step began failing on this branch and on `main` (12 high advisories, now 17 after a safe `npm audit fix`: `glob`, `minimatch`, `picomatch` under vite 8 and vite-plugin-pwa). Not caused by this change. The only npm fix is `--force` (downgrades vite to 6.2.7). Owner accepted merging with the gate red; the packages are build-time tooling and not part of the shipped app. A proper dependency fix is a separate follow-up.
+
 ## Owner gates (NEXT)
 
 1. Physical-phone check with real covers (Tonight, Shelf, Plays, game detail, pick result) and a VoiceOver pass.
