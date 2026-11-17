@@ -6,7 +6,7 @@
 .app-top-bar {
   position: absolute;
   top: 0;
-  right: 0;
+  right: 17px;
   min-height: 0;
   height: 0;
   align-items: flex-start;
@@ -25,7 +25,7 @@
 }
 .segmented-control.tonight-modes button { min-width: 0; padding-inline: 4px; white-space: nowrap; font-size: 0.875rem; }
 .app-content .collection-heading-row { padding-right: 56px; }
-.app-top-bar { padding-right: 4px; }
+
 
 /* Tonight: left-aligned title row shared with the avatar, one-row group size. */
 .app-content > .screen > header { min-height: 56px; display: flex; flex-direction: column; justify-content: center; text-align: left; }
@@ -38,19 +38,7 @@
 .player-step-screen .player-chip { min-height: 52px; padding: 0; }
 .player-step-screen .player-chip strong { font-size: 1.125rem; }
 .player-step-screen .player-chip.solo strong { font-size: 0.8125rem; }
-.tonight-choose-players {
-  display: flex; align-items: center; justify-content: space-between;
-  width: 100%; min-height: 44px; margin: 6px 0 0; padding: 0 4px;
-  color: var(--color-brand-primary); background: transparent; border: 0;
-  font: inherit; font-weight: 700; cursor: pointer;
-}
-.tonight-vote-button {
-  width: 100%; min-height: 48px; margin-top: 8px;
-  color: var(--color-brand-primary); background: transparent;
-  border: 1px solid var(--color-border); border-radius: var(--radius-md);
-  font: inherit; font-weight: 700; cursor: pointer;
-}
-.player-step-screen .picker-step-actions { display: grid; gap: 4px; }
+
 .player-step-screen .player-grid,
 .player-step-screen .player-complexity-section,
 .player-step-screen .advanced-filters { width: 100%; max-width: none; margin-inline: 0; padding-inline: 0; box-sizing: border-box; }
@@ -82,17 +70,23 @@
 }
 .collection-tools .filter-tabs button.active { color: var(--color-text-inverse); background: var(--color-brand-primary); border-color: var(--color-brand-primary); }
 
-/* Tonight: more room at the top, calm spacing, a row of recent covers to fill the screen. */
+/* Tonight: one spacing rhythm (16px between groups), full-width tappable rows. */
 .player-step-screen { padding-top: 12px; }
-.player-step-screen .tonight-header { margin: 0 0 16px; }
-.player-step-screen .picker-step-centered { display: flex; flex-direction: column; gap: 6px; }
-.player-step-screen .picker-essential-label { margin: 0; }
+.player-step-screen .tonight-header { margin: 0 0 20px; }
+.player-step-screen .picker-step-centered { display: flex; flex-direction: column; gap: 16px; }
+.player-step-screen .picker-essential-label { margin: 0 0 -6px; }
 .player-step-screen .player-chip { min-height: 52px; }
-.player-step-screen .tonight-choose-players { margin-top: 4px; }
-.player-step-screen .player-complexity-section { margin: 10px 0 0; }
-.player-step-screen .player-complexity-section .preference-label { margin: 0 0 8px; }
-.player-step-screen .advanced-filters { margin: 8px 0 0; }
-.player-step-screen .picker-step-actions { margin-top: 14px !important; }
+.player-step-screen .picker-step-centered > .player-complexity-section,
+.player-step-screen .picker-step-centered > .advanced-filters { margin: 0 !important; }
+.player-step-screen .player-complexity-section .preference-label { margin: 0 0 8px; font-size: 0.9375rem; }
+.player-step-screen .complexity-option { min-height: 48px; color: var(--color-text-primary); }
+.player-step-screen .complexity-option strong { font-size: 1rem; }
+.player-step-screen .complexity-option.selected { color: var(--color-brand-primary); }
+.player-step-screen .advanced-filters summary { padding-inline: 16px; min-height: 52px; }
+.player-step-screen .advanced-filters summary strong { font-size: 1rem; }
+.player-step-screen .ui-disclosure-chevron { font-size: 1.5rem; line-height: 1; }
+.player-step-screen .picker-step-actions { margin: 0 !important; display: grid; gap: 4px; }
+.player-step-screen .picker-step-actions .primary-button { min-height: 52px; margin: 0 !important; }
 .tonight-recent { margin-top: 18px; }
 .tonight-recent h2 { margin: 0 0 12px; color: var(--color-text-support); font-family: inherit; font-size: 0.8125rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
 .tonight-recent ul { display: flex; gap: 12px; margin: 0; padding: 0 0 8px; list-style: none; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; }
@@ -103,3 +97,20 @@
 .tonight-recent-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .tonight-recent-cover .game-artwork-placeholder { width: 100%; height: 100%; }
 .tonight-recent-name { font-size: 0.8125rem; font-weight: 700; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+.tonight-choose-players {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; min-height: 52px; margin: 0; padding: 0 16px;
+  color: var(--color-text-primary); background: var(--color-surface-raised);
+  border: 1px solid var(--color-border); border-radius: var(--radius-md);
+  font: inherit; font-weight: 700; cursor: pointer;
+}
+.tonight-choose-players svg { width: 22px; height: 22px; fill: none; stroke: var(--color-brand-primary); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.tonight-vote-button {
+  width: 100%; min-height: 48px; margin: 0; padding: 0;
+  color: var(--color-brand-primary); background: transparent; border: 0;
+  font: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; cursor: pointer;
+}
+/* Lighter floating tab bar, and room so content clears it. */
+.app-nav { box-shadow: 0 2px 8px var(--color-shadow); }
+.app-content { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }

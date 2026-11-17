@@ -202,8 +202,8 @@ function PlayerStep({
               className="tonight-choose-players"
               onClick={onChoosePlayers}
             >
-              Choose players by name
-              <span aria-hidden="true">›</span>
+              <span>Choose players by name</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
             </button>
           </>
         )}
@@ -346,7 +346,7 @@ function PlayerStep({
               className="tonight-vote-button"
               onClick={onGroupVote}
             >
-              Let the group vote instead
+              Start a group vote
             </button>
           )}
         </div>
