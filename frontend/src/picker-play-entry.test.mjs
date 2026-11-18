@@ -50,21 +50,20 @@ function renderEntry(playerNames = []) {
   }))
 }
 
-test("dedicated play entry presents one primary save and proportionate navigation", () => {
+test("Picker play entry is a sheet with Cancel and one Save, prefilled with tonight's players", () => {
   const markup = renderEntry(["Alex", "Morgan"])
 
-  assert.match(markup, /<h1[^>]*>Log a play<\/h1>/)
-  assert.match(markup, /<h2>Cascadia<\/h2>/)
-  assert.match(markup, /Alex, Morgan/)
+  assert.match(markup, /role="dialog"/)
+  assert.match(markup, /<h2[^>]*>Cascadia<\/h2>/)
   assert.match(markup, /value="Alex"/)
   assert.match(markup, /value="Morgan"/)
-  assert.equal((markup.match(/>Save play<\/button>/g) ?? []).length, 1)
+  assert.equal((markup.match(/aria-label="Save play"/g) ?? []).length, 1)
   assert.match(markup, />Cancel<\/button>/)
 })
 
-test("count-only Picker entry keeps distinct blank participant rows", () => {
+test("count-only Picker entry asks for the players instead of blank rows", () => {
   const markup = renderEntry()
 
-  assert.match(markup, />2 players<\/p>/)
-  assert.equal((markup.match(/placeholder="Player name"/g) ?? []).length, 2)
+  assert.match(markup, /add 2 more players/)
+  assert.equal((markup.match(/placeholder="Player name"/g) ?? []).length, 0)
 })

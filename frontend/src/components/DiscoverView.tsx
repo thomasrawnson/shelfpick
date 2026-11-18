@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 
+import { formatPlayerCount } from "../player-count"
+
 import { lightImpact } from "../haptics"
 import {
   addToWishlist,
@@ -11,6 +13,9 @@ import {
   type DiscoverRecommendation,
 } from "../api/client"
 import RetryNotice from "./ui/RetryNotice"
+import PullIndicator from "./ui/PullIndicator"
+import Skeleton from "./ui/Skeleton"
+import { usePullToRefresh } from "../use-pull-to-refresh"
 import { Analytics } from "../analytics"
 import { discoverEmptyCopy, discoverPersonalisationCopy } from "../discover-state"
 
@@ -49,6 +54,20 @@ function complexityLabel(value: number | null | undefined) {
   return "Very heavy"
 }
 
+function BookmarkIcon({ filled }: { filled: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">
+      <path
+        d="M6.5 3.5h11v17l-5.5-4-5.5 4z"
+        fill={filled ? "currentColor" : "none"}
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
 function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize }: Props) {
   const [mode, setMode] = useState<DiscoverMode>("hot")
   const [recommendations, setRecommendations] = useState<DiscoverRecommendation[]>([])
@@ -58,6 +77,7 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
   const [actionError, setActionError] = useState("")
   const [reloadKey, setReloadKey] = useState(0)
   const [dismissedCount, setDismissedCount] = useState(0)
+  const [openReasons, setOpenReasons] = useState<Set<number>>(new Set())
   const [personalisationStatus, setPersonalisationStatus] =
     useState<DiscoverPersonalisationStatus>("unknown")
   const [personalisationSignals, setPersonalisationSignals] =
@@ -119,6 +139,8 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
     setLoading(true)
     setReloadKey((current) => current + 1)
   }
+
+  const pull = usePullToRefresh(() => { retry() })
 
   async function toggleWishlist(recommendation: DiscoverRecommendation) {
     const bggId = recommendation.game.bgg_id
@@ -182,24 +204,14 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
 
   function renderCard(recommendation: DiscoverRecommendation, index: number) {
     const { game, reasons, wishlisted } = recommendation
-    const complexity = complexityLabel(game.complexity)
+    const meta = [
+      formatPlayerCount(game.min_players, game.max_players),
+      game.max_play_time ? `${game.max_play_time} min` : null,
+      complexityLabel(game.complexity),
+    ].filter(Boolean).join(" · ")
 
     return (
       <article key={game.bgg_id} className="discover-card">
-        <button
-          type="button"
-          className={wishlisted ? "discover-save-button saved" : "discover-save-button"}
-          aria-label={wishlisted
-            ? `Remove ${game.name} from Want to Play`
-            : `Save ${game.name} to Want to Play`}
-          aria-pressed={wishlisted}
-          title={wishlisted ? "Remove from Want to Play" : "Save to Want to Play"}
-          disabled={updatingIds.has(game.bgg_id)}
-          onClick={() => { void toggleWishlist(recommendation) }}
-        >
-          {wishlisted ? "✓" : "+"}
-        </button>
-
         <div className="discover-media">
           {game.image_url ? (
             <img className="discover-image" src={game.image_url} alt="" />
@@ -210,39 +222,65 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
 
         <div className="discover-copy">
           <h2>{game.name}</h2>
-          <p className="discover-meta">
-            {game.min_players}–{game.max_players} players
-            {game.max_play_time ? ` · ${game.max_play_time} min` : ""}
-            {complexity ? ` · ${complexity}` : ""}
-          </p>
-          <span className="discover-match-pill">
-            {recommendationLabel(mode, recommendation, index)}
-          </span>
-          {reasons.length > 0 && (
-            <details className="discover-reason-details">
-              <summary>Why this match?</summary>
-              <ul className="discover-reasons">
-                {reasons.map((reason) => <li key={reason}>{reason}</li>)}
-              </ul>
-            </details>
-          )}
+          {meta && <p className="discover-meta">{meta}</p>}
+          <div className="discover-tags">
+            <span className="discover-match-pill">
+              {recommendationLabel(mode, recommendation, index)}
+            </span>
+            <button
+              type="button"
+              className={wishlisted ? "discover-save-button saved" : "discover-save-button"}
+              aria-label={wishlisted
+                ? `Remove ${game.name} from Want to Play`
+                : `Save ${game.name} to Want to Play`}
+              aria-pressed={wishlisted}
+              disabled={updatingIds.has(game.bgg_id)}
+              onClick={() => { void toggleWishlist(recommendation) }}
+            >
+              <BookmarkIcon filled={wishlisted} />
+              <span>{wishlisted ? "Saved" : "Want to Play"}</span>
+            </button>
+          </div>
           <div className="discover-actions">
+            {reasons.length > 0 && (
+              <button
+                type="button"
+                className="discover-reasons-toggle"
+                aria-expanded={openReasons.has(game.bgg_id)}
+                aria-controls={`discover-reasons-${game.bgg_id}`}
+                onClick={() => setOpenReasons((current) => {
+                  const next = new Set(current)
+                  if (next.has(game.bgg_id)) next.delete(game.bgg_id)
+                  else next.add(game.bgg_id)
+                  return next
+                })}
+              >
+                {mode === "hot" ? "Why it’s trending" : "Why this match?"}
+              </button>
+            )}
             <a
               className="discover-bgg-link"
               href={`https://boardgamegeek.com/boardgame/${game.bgg_id}`}
               target="_blank"
               rel="noreferrer"
             >
-              View on BGG
+              BGG ›
             </a>
             <button
               type="button"
               className="discover-dismiss-button"
+              aria-label={`Not interested in ${game.name}`}
+              title="Not interested"
               onClick={() => dismissRecommendation(game.bgg_id)}
             >
-              Not interested
+              Hide
             </button>
           </div>
+          {reasons.length > 0 && openReasons.has(game.bgg_id) && (
+            <ul className="discover-reasons" id={`discover-reasons-${game.bgg_id}`}>
+              {reasons.map((reason) => <li key={reason}>{reason}</li>)}
+            </ul>
+          )}
         </div>
       </article>
     )
@@ -250,6 +288,7 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
 
   return (
     <section className="screen discover-screen">
+      <PullIndicator {...pull} />
       <header className="discover-header">
         <div>
           <h1>Discover</h1>
@@ -299,7 +338,7 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
         </div>
       ) : (
         <>
-          {loading && <p className="subtitle">Finding games...</p>}
+          {loading && <Skeleton rows={4} label="Finding games" />}
           {error && <RetryNotice message={error} busy={loading} onRetry={retry} />}
           {actionError && <p className="error-message" role="alert">{actionError}</p>}
           {mode === "for_you" && recommendations.length > 0 && personalisationStatus === "personalised" && (

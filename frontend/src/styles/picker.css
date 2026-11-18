@@ -768,96 +768,8 @@
   text-align: center;
 }
 
-.picker-result-actions .play-form {
-  text-align: left;
-}
-
 /* Dedicated Picker play entry */
 
-.picker-play-entry {
-  display: grid;
-  gap: 20px;
-  text-align: left;
-}
-
-.picker-play-entry-header h1,
-.picker-play-entry-header p {
-  margin: 0;
-}
-
-.picker-play-entry-header h1 {
-  margin-top: 14px;
-  color: var(--color-text-primary);
-  font-family: var(--font-display);
-  font-size: 28px;
-  line-height: 1.15;
-}
-
-.picker-play-entry-header p {
-  margin-top: 7px;
-  color: var(--color-text-support);
-  font-size: var(--text-support);
-  line-height: 1.5;
-}
-
-.picker-play-entry-back {
-  margin: 0;
-}
-
-.picker-play-game-summary {
-  display: grid;
-  grid-template-columns: 72px minmax(0, 1fr);
-  align-items: center;
-  gap: 14px;
-  padding: 14px;
-  background: var(--color-surface-raised);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-}
-
-.picker-play-game-artwork {
-  width: 72px;
-  height: 72px;
-  overflow: hidden;
-  background: var(--color-surface);
-  border-radius: 10px;
-}
-
-.picker-play-game-artwork > * {
-  width: 100%;
-  height: 100%;
-}
-
-.picker-play-game-summary h2,
-.picker-play-game-summary p {
-  margin: 0;
-  overflow-wrap: anywhere;
-}
-
-.picker-play-game-summary h2 {
-  color: var(--color-text-primary);
-  font-family: var(--font-display);
-  font-size: 18px;
-  line-height: 1.25;
-}
-
-.picker-play-game-summary p {
-  margin-top: 5px;
-  color: var(--color-text-support);
-  font-size: var(--text-support);
-}
-
-.picker-play-entry .play-form-dedicated {
-  margin-top: 0;
-  padding: 0;
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-}
-
-.picker-play-entry .play-form-heading {
-  display: none;
-}
 
 .picker-play-entry-missing {
   display: grid;
@@ -1567,7 +1479,7 @@
 .picker-cover-wrap {
   position: relative;
 
-  width: min(100%, 278px);
+  width: min(100%, 190px, 22dvh);
 
   margin: 0 auto;
 }
@@ -1883,7 +1795,7 @@
 }
 
 .picker-try-another:hover:not(:disabled) {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .picker-try-another:disabled {
@@ -1950,7 +1862,7 @@
   }
 
   .picker-cover-wrap {
-    width: min(100%, 252px);
+    width: min(100%, 180px, 22dvh);
   }
 
   .picker-match-score {
@@ -1979,7 +1891,7 @@
   }
 
   .picker-cover-wrap {
-    width: 288px;
+    width: 220px;
   }
 }
 
@@ -2065,7 +1977,8 @@
 .fine-tune-screen .preference-chip.selected {
   color: var(--color-brand-primary) !important;
   background: var(--color-brand-primary-soft) !important;
-  border-color: var(--color-border) !important;
+  border-color: var(--color-brand-primary) !important;
+  box-shadow: inset 0 0 0 1px var(--color-brand-primary);
   font-weight: 800;
 }
 
@@ -2968,10 +2881,12 @@
   margin: 0;
 }
 
+/* Share sits on the left so it never meets the avatar in the top-right corner. */
 .picker-result-heading-row .picker-share-icon-button {
   position: static;
-  grid-column: 3;
-  justify-self: end;
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
   transform: none;
 }
 
@@ -2997,10 +2912,6 @@
   letter-spacing: -0.015em;
 }
 
-.picker-cover-wrap {
-  width: min(100%, 264px);
-}
-
 .picker-cover-image,
 .picker-cover-placeholder {
   border-radius: 14px;
@@ -3010,7 +2921,7 @@
 }
 
 .picker-result-status {
-  width: min(100%, 264px);
+  width: min(100%, 300px);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -3027,10 +2938,12 @@
   align-items: baseline;
   gap: 4px !important;
   padding: 6px 10px;
-  color: var(--color-on-accent);
-  background: var(--shelfpick-gold);
+  color: var(--color-brand-primary);
+  background: var(--color-brand-primary-soft);
   border: 0;
   border-radius: 999px;
+  font-size: var(--text-meta);
+  font-weight: 800;
   box-shadow: none;
 }
 
@@ -3072,13 +2985,10 @@
   color: var(--color-brand-primary);
   font-size: var(--text-meta);
   font-weight: 750;
-  text-decoration: underline;
-  text-decoration-color: transparent;
-  text-underline-offset: 3px;
+  text-decoration: none;
 }
 
 .picker-hero-link:hover .picker-view-game {
-  text-decoration-color: currentColor;
 }
 
 .picker-fit-summary {
@@ -3194,4 +3104,41 @@
   margin: 0 0 8px;
   color: var(--color-danger);
   font-size: var(--text-support);
+}
+
+
+/* SP-UI-02: Tonight hints, selected time and the fit scale. */
+.picker-action-hint {
+  margin: 6px 0 0;
+  color: var(--color-text-support);
+  font-size: var(--text-support);
+  font-weight: 700;
+  text-align: center;
+}
+
+.time-tile {
+  position: relative;
+}
+
+.time-tile-check {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 20px;
+  height: 20px;
+  padding: 2px;
+  border-radius: 50%;
+  background: var(--color-brand-primary);
+  fill: none;
+  stroke: var(--color-text-inverse);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.picker-fit-scale {
+  margin: 10px 0 0;
+  color: var(--color-text-support);
+  font-size: var(--text-meta);
+  line-height: 1.4;
 }

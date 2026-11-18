@@ -26,14 +26,14 @@ colors:
   dark-canvas: "#151816"
   dark-surface: "#202521"
   dark-surface-raised: "#29302B"
-  dark-ink: "#F4F1E8"
-  dark-ink-secondary: "#AAB4AD"
+  dark-ink: "#FFFFFF"
+  dark-ink-secondary: "#B8C1BA"
   dark-line: "#39413B"
   black-canvas: "#000000"
   black-surface: "#0B0E0C"
   black-surface-raised: "#151A17"
-  black-ink: "#F7F4EB"
-  black-ink-secondary: "#BAC5BD"
+  black-ink: "#FFFFFF"
+  black-ink-secondary: "#C4CEC6"
   black-line: "#465149"
 typography:
   display:
@@ -120,6 +120,31 @@ components:
     typography: "{typography.label}"
     rounded: "{rounded.lg}"
 ---
+
+## SP-UI-02 compact logging and sharper type — 17 November 2026
+
+Log play is a full-screen sheet in every entry point: Cancel, a small game cover
+with the title, and Save in the header; the tab bar is hidden. One summary row
+(date · place · time, opening the editors) and the result-type menu sit on a flat
+hairline row with no boxes. Players are flat hairline rows: trophy toggle, avatar,
+name, boxed score, "best N". Recent players are chips above an Add player field.
+Scores set places and winners (highest or lowest wins, ties shared) with a manual
+override; places move behind "Set places manually". A footer shows best score at
+this player count, average and worst winning score. This replaces the 28 September
+dedicated play-entry screen.
+
+Inspired by BG Stats' scanning density (not its look): dark-mode text is pure
+white with a brighter secondary tone, links are never underlined (Forest colour,
+a trailing › for standalone actions), and Tonight's pick moves Share to the left
+so it never meets the account avatar. Tonight's pick labels fit as Great fit /
+Good fit / Worth a look with the 0–100 scale explained under More reasons.
+
+Shared layout: the floating tab bar is 62px and sits just above the home
+indicator; `--shelfpick-nav-clearance` is the single bottom inset for scroll
+content. The account avatar owns a fixed top-right spot; every screen title row
+keeps 56px clear. Plays and Discover use flat hairline rows (small cover, two
+lines of text, one quiet trailing action) instead of boxed cards. Stats uses flat
+tables with shared column headings.
 
 ## Pre-beta play-entry update — 28 September 2026
 
@@ -241,6 +266,25 @@ and play logging. Copy explains that a session-scoped browser identity restores
 one ballot but cannot guarantee one real person across multiple browsers or
 devices. Invalid and expired links explain that the session is unavailable;
 closed links show final results.
+
+## Five-tab shell — SP-UI-01 (17 November 2026)
+
+Tabs are **Tonight · Shelf · Plays · Discover · Stats** (single words, one row).
+Tonight is the Picker with group size, complexity and Fine-tune, a text action
+"Start a group vote" (old Game Night, `?mode=vote`) and a quiet Recently played
+cover row. Shelf is the Collection (Owned, Want to Play, Ranking) with a grid
+(default) / list toggle, covers fitted without cropping and a two-line title.
+Plays lists recent plays across games with game, player and date filters, a
+prominent Log play, Rematch and Edit. Stats is the renamed Insights. Old URLs
+redirect (`legacyRedirect` in `routes.ts`); guest voting links never change.
+
+- Header: the avatar sits in the title row at the page padding; screen titles are 1.5rem.
+- Spacing: Tonight uses one 16px rhythm between control groups; rows are full-width and tappable.
+- Cover accent: game detail and the pick result tint from the cover (`cover-accent.ts`);
+  accent text is adjusted to WCAG AA on every light and dark surface, with a palette fallback
+  when the cover cannot be read (CORS).
+- Motion: tab transition, pick reveal and skeleton shimmer all switch off under reduced motion.
+  Pull-to-refresh on Shelf, Plays and Discover; light haptic on tab change.
 
 ## Colors
 

@@ -2,6 +2,7 @@ from collections import Counter
 from statistics import median
 
 from sqlalchemy import and_, func
+from sqlalchemy.orm import selectinload
 
 from database.models import (
     Game as DatabaseGame,
@@ -211,7 +212,9 @@ class PlayReadRepository:
                 == bgg_id,
             )
             .order_by(
-                DatabasePlay.played_at.desc()
+                DatabasePlay.played_at.desc(),
+                # Same-day plays (logged at noon) keep newest-logged first.
+                DatabasePlay.id.desc(),
             )
             .limit(limit)
             .all()
@@ -234,6 +237,62 @@ class PlayReadRepository:
             }
             for play, game_bgg_id in rows
         ]
+
+    def list_plays(
+        self,
+        limit: int,
+        offset: int,
+    ) -> dict:
+        """Newest-first plays on the account, with the full count.
+
+        Counting rule (SP-UI-02): a play counts once if it is on a game in the
+        account, whatever the game's current ownership or expansion status.
+        This matches Stats' total. Each play carries a small game summary so
+        plays on games that left the shelf can still be listed.
+        """
+        if self.user_id is None:
+            return {"total": 0, "plays": []}
+
+        base = (
+            self.db.query(DatabasePlay, DatabaseGame, UserGame.user_id)
+            .join(DatabaseGame, DatabaseGame.id == DatabasePlay.game_id)
+            .outerjoin(
+                UserGame,
+                and_(
+                    UserGame.game_id == DatabaseGame.id,
+                    UserGame.user_id == self.user_id,
+                ),
+            )
+            .filter(DatabasePlay.user_id == self.user_id)
+        )
+        total = base.count()
+        rows = (
+            base.order_by(
+                DatabasePlay.played_at.desc(),
+                DatabasePlay.id.desc(),
+            )
+            .options(selectinload(DatabaseGame.mechanics))
+            .offset(offset)
+            .limit(limit)
+            .all()
+        )
+        return {
+            "total": total,
+            "plays": [
+                {
+                    **serialize_play(play, game),
+                    "game": {
+                        "bgg_id": game.bgg_id,
+                        "name": game.name,
+                        "thumbnail_url": game.thumbnail_url,
+                        "image_url": game.image_url,
+                        "is_expansion": bool(game.is_expansion),
+                        "on_shelf": membership_id is not None,
+                    },
+                }
+                for play, game, membership_id in rows
+            ],
+        }
 
     def get_game_history(
         self,
@@ -271,7 +330,9 @@ class PlayReadRepository:
                 == database_game.id,
             )
             .order_by(
-                DatabasePlay.played_at.desc()
+                DatabasePlay.played_at.desc(),
+                # Same-day plays (logged at noon) keep newest-logged first.
+                DatabasePlay.id.desc(),
             )
             .limit(limit)
             .all()

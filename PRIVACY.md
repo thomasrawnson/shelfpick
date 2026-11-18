@@ -38,6 +38,7 @@ Runtime packages from `frontend/package.json` that ship in the web and iOS build
 | Analytics events and random anonymous ID | PostHog EU Cloud (processor); ID and opt-out choice in device local storage | Count feature use, drop-off and retention | PostHog project retention (owner to confirm); stops when the user opts out |
 | Review-prompt state (last request date, saved-play count) | Device only (local storage) | Limit the review prompt to once per 90 days | Until app data is cleared |
 | Year in Review banner dismissal (one flag per year) | Device only (local storage) | Stop showing the Pick banner after it is dismissed | Until app data is cleared |
+| Shelf layout choice (grid or list) | Device only (local storage) | Remember how the Shelf is shown | Until app data is cleared |
 | One-time verification/reset token hashes, keyed-hash abuse counters, request IDs, server logs | Our server | Security and operations | Render logs 7 days; abuse rows removed on a later write after 24 hours; expired tokens have no scheduled cleanup (per SP-IOS-21B) |
 | Email address and message for verification/reset mail | Resend (processor) | Transactional email | Resend log retention 30 days (per SP-IOS-21B); confirm |
 | BGG username (public collection requests) | Sent to BoardGameGeek | Import a public collection | Per BGG |

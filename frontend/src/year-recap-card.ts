@@ -98,7 +98,7 @@ export async function renderYearRecapCard(
   const metrics: Array<[string, string]> = [
     [String(recap.total_plays), recap.total_plays === 1 ? "PLAY" : "PLAYS"],
     [String(recap.unique_games), recap.unique_games === 1 ? "GAME" : "GAMES"],
-    [timed, recap.total_duration_minutes === null ? "PLAY TIME" : `PLAYED · ${recap.duration_plays} TIMED`],
+    [timed, recap.total_duration_minutes === null ? "PLAY TIME" : recap.duration_plays < recap.total_plays ? `PLAYED · ${recap.duration_plays} TIMED` : "PLAYED"],
   ]
   metrics.forEach(([value, caption], index) => {
     const x = MARGIN + index * 316

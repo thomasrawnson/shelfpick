@@ -47,6 +47,11 @@ function TimeStep({
                 aria-pressed={selected}
                 onClick={() => onSelect(option.value)}
               >
+                {selected && (
+                  <svg className="time-tile-check" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="m5 12.5 4.5 4.5L19 7.5" />
+                  </svg>
+                )}
                 <strong>{option.label}</strong>
                 <span>{option.description}</span>
               </button>
@@ -61,10 +66,14 @@ function TimeStep({
             type="button"
             className="primary-button"
             disabled={maxPlayTime === null || loading}
+            aria-describedby={maxPlayTime === null ? "time-step-hint" : undefined}
             onClick={onFindGame}
           >
             {loading ? "Searching the shelf..." : actionLabel}
           </button>
+          {maxPlayTime === null && (
+            <p id="time-step-hint" className="picker-action-hint">Choose how much time you have</p>
+          )}
 
           <button
             type="button"

@@ -39,6 +39,7 @@ function GameHistory({
   onRematch,
 }: Props) {
   const [editingPlayId, setEditingPlayId] = useState<number | null>(null);
+  const editingPlay = history?.recent_plays.find((play) => play.id === editingPlayId) ?? null;
   const [confirmingPlayId, setConfirmingPlayId] = useState<number | null>(null);
 
   const [deletingPlayId, setDeletingPlayId] = useState<number | null>(null);
@@ -148,21 +149,18 @@ function GameHistory({
             <div className="recent-plays">
               <p className="preference-label">Recent plays</p>
 
-              {history.recent_plays.map((play) =>
-                editingPlayId === play.id ? (
-                  <div className="recent-play-detail" key={play.id}>
-                    <PlayLogForm
-                      game={game}
-                      editingPlay={play}
-                      presentation="dedicated"
-                      onCancel={() => setEditingPlayId(null)}
-                      onSaved={async () => {
-                        setEditingPlayId(null);
-                        await onPlayEdited();
-                      }}
-                    />
-                  </div>
-                ) : (
+              {editingPlay && (
+                <PlayLogForm
+                  game={game}
+                  editingPlay={editingPlay}
+                  onClose={() => setEditingPlayId(null)}
+                  onSaved={async () => {
+                    await onPlayEdited();
+                  }}
+                />
+              )}
+
+              {history.recent_plays.map((play) => (
                 <div className="recent-play-detail" key={play.id}>
                   <div className="recent-play-header">
                     <div>
@@ -308,8 +306,7 @@ function GameHistory({
                     <p className="error-message">{deleteError}</p>
                   )}
                 </div>
-                ),
-              )}
+              ))}
             </div>
           ) : (
             <p className="history-empty">

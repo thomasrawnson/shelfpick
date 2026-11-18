@@ -54,15 +54,15 @@ function renderResult() {
   }))
 }
 
-test("Picker result keeps the match value unchanged and outside the artwork", () => {
+test("Picker result explains the fit outside the artwork, with the scale in More reasons", () => {
   const markup = renderResult()
 
   assert.match(
     markup,
     /picker-cover-wrap[\s\S]*Cover art<\/div><\/div><div class="picker-result-status">/,
   )
-  assert.match(markup, /aria-label="Match score 87"/)
-  assert.match(markup, /<strong>87<\/strong><span>match<\/span>/)
+  assert.match(markup, /<span class="picker-result-score">Great fit<\/span>/)
+  assert.match(markup, /Great fit: 87 of 100\./)
 })
 
 test("Picker result exposes the intended scan and action hierarchy", () => {

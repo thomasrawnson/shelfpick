@@ -60,8 +60,8 @@ for (const status of ["running", "paused"]) {
     assert.match(markup, /If Pro returns, this timer and its controls will be restored/)
     assert.match(markup, /Log this play manually/)
     assert.match(markup, /Saving here will not finish or discard the retained timer/)
-    assert.match(markup, /value="Alex"/)
-    assert.match(markup, /value="The Dice Cup"/)
+    // The explanation stays readable; the prefilled sheet opens from this button.
+    assert.match(markup, />Log this play<\/button>/)
     assert.doesNotMatch(markup, />Pause<|>Resume<|>Finish<|Discard timer/)
   })
 }
@@ -73,8 +73,6 @@ test("finished timer after Pro loss opens an ordinary prefilled save form", () =
   assert.match(markup, /Finished timer retained/)
   assert.match(markup, /Save your finished play/)
   assert.match(markup, /retained timer is removed only after that save succeeds/)
-  assert.match(markup, /value="15"/)
-  assert.match(markup, /value="Alex"/)
-  assert.match(markup, /value="The Dice Cup"/)
+  assert.match(markup, />Save play<\/button>/)
   assert.doesNotMatch(markup, />Pause<|>Resume<|>Finish<|Discard timer/)
 })

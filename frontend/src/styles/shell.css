@@ -1,0 +1,218 @@
+/* SP-UI-01: five-tab shell, compact header and Tonight mode control. Loaded last. */
+
+/* Tonight mode control. */
+
+/* Compact header: the avatar sits on the screen's title row instead of above it. */
+.app-top-bar {
+  position: absolute;
+  top: 0;
+  right: 22px;
+  min-height: 0;
+  height: 0;
+  align-items: flex-start;
+  padding: calc(8px + env(safe-area-inset-top)) 0 0;
+  overflow: visible;
+}
+.app-phone { position: relative; }
+/* One fixed avatar spot: every screen's title row keeps 56px clear on the right. */
+.page-transition > .screen > header,
+.page-transition > .screen > .collection-heading-row > header { padding-right: 56px; }
+/* Centred step titles keep the same clearance on both sides so they stay centred. */
+.app-content .picker-step-screen:not(.player-step-screen) > header { padding-inline: 56px; }
+.app-content { padding-top: calc(4px + env(safe-area-inset-top)); }
+
+/* Keep titles and primary controls clear of the avatar in the title row. */
+.segmented-control.tonight-modes {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 4px 56px 12px 0;
+}
+.segmented-control.tonight-modes button { min-width: 0; padding-inline: 4px; white-space: nowrap; font-size: 0.875rem; }
+.app-content .collection-heading-row { padding-right: 56px; }
+
+
+/* Tonight: left-aligned title row shared with the avatar, one-row group size. */
+.app-content > .screen > header { min-height: 56px; display: flex; flex-direction: column; justify-content: center; text-align: left; }
+.player-step-screen .tonight-header { text-align: left; margin: 0 0 12px; }
+.player-step-screen .tonight-header h1 { margin: 0; font-size: 1.5rem; line-height: 1.15; text-align: left; }
+.tonight-eyebrow { margin: 0 0 2px; color: var(--color-accent-text); font-size: 0.75rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.player-step-screen .picker-step-centered { align-items: stretch; text-align: left; }
+.player-step-screen .picker-essential-label { text-align: left; margin: 8px 0; }
+.player-step-screen .player-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.player-step-screen .player-chip { min-height: 52px; padding: 0; }
+.player-step-screen .player-chip strong { font-size: 1.125rem; }
+.player-step-screen .player-chip.solo strong { font-size: 0.8125rem; }
+
+.player-step-screen .player-grid,
+.player-step-screen .player-complexity-section,
+.player-step-screen .advanced-filters { width: 100%; max-width: none; margin-inline: 0; padding-inline: 0; box-sizing: border-box; }
+.player-step-screen .preference-label { margin-left: 0; }
+
+/* Compact screen titles and Shelf controls. */
+.app-content > .screen > header h1,
+.app-content > .screen > .collection-heading-row > header h1 { font-size: 1.5rem; line-height: 1.15; margin: 0; }
+.collection-heading-row { align-items: center; gap: 10px; margin-bottom: 8px; }
+.collection-heading-row header .subtitle { margin: 2px 0 0; font-size: 0.8125rem; }
+.collection-heading-row .collection-add-button { min-height: 36px; padding: 0 14px; font-size: 0.875rem; border-radius: 999px; }
+.collection-section-tabs button { min-height: 40px; font-size: 0.9375rem; }
+.collection-section-tabs { margin-bottom: 8px; }
+.collection-tools { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; margin-bottom: 8px; padding: 2px 0 4px; background: var(--color-bg); }
+.collection-search-sort-row { display: grid; grid-template-columns: minmax(0, 1fr) 72px var(--target-min); align-items: center; gap: 6px; }
+/* One button switches layout; it shows the layout it will switch to. */
+.shelf-view-toggle { display: grid; place-items: center; width: var(--target-min); height: var(--target-min); padding: 0; color: var(--color-brand-primary); background: transparent; border: 1px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; }
+.shelf-view-toggle svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.collection-search-wrap { flex: 1 1 0; min-width: 0; }
+.collection-sort-wrap { width: 72px; min-width: 0; display: block; }
+.collection-sort { width: 100%; max-width: none; padding-inline: 10px 4px; background-color: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: var(--radius-md); }
+.collection-search-sort-row .collection-search { min-height: 40px; }
+.collection-sort { min-height: 40px; }
+.collection-tools .filter-tabs { display: flex; gap: 6px; padding: 0; background: transparent; border: 0; }
+.collection-tools .filter-tabs button {
+  flex: none; min-height: 32px; padding: 0 14px; border: 1px solid var(--color-border);
+  border-radius: 999px; background: transparent; color: var(--color-text-support); font-size: 0.8125rem; font-weight: 700;
+}
+.collection-tools .filter-tabs button.active { color: var(--color-text-inverse); background: var(--color-brand-primary); border-color: var(--color-brand-primary); }
+
+/* Tonight: one spacing rhythm (16px between groups), full-width tappable rows. */
+.player-step-screen { padding-top: 12px; }
+.player-step-screen .tonight-header { margin: 0 0 20px; }
+.player-step-screen .picker-step-centered { display: flex; flex-direction: column; gap: 16px; }
+.player-step-screen .picker-essential-label { margin: 0 0 -6px; }
+.player-step-screen .player-chip { min-height: 52px; }
+.player-step-screen .picker-step-centered > .player-complexity-section,
+.player-step-screen .picker-step-centered > .advanced-filters { margin: 0 !important; }
+.player-step-screen .player-complexity-section .preference-label { margin: 0 0 8px; font-size: 0.9375rem; }
+.player-step-screen .complexity-option { min-height: 48px; color: var(--color-text-primary); }
+.player-step-screen .complexity-option strong { font-size: 1rem; }
+.player-step-screen .complexity-option.selected { color: var(--color-brand-primary); }
+.player-step-screen .advanced-filters summary { padding-inline: 16px; min-height: 52px; }
+/* The open Fine-tune body keeps the same 16px inset as its header. */
+.player-step-screen .advanced-filters .ui-disclosure-body { padding-inline: 16px; }
+.player-step-screen .advanced-filters summary strong { font-size: 1rem; }
+.player-step-screen .ui-disclosure-chevron { font-size: 1.5rem; line-height: 1; }
+.player-step-screen .picker-step-actions { margin: 0 !important; display: grid; gap: 4px; }
+.player-step-screen .picker-step-actions .primary-button { min-height: 52px; margin: 0 !important; }
+.tonight-recent { margin-top: 18px; }
+.tonight-recent h2 { margin: 0 0 12px; color: var(--color-text-support); font-family: inherit; font-size: 0.8125rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.tonight-recent ul { display: flex; gap: 12px; margin: 0; padding: 0 0 8px; list-style: none; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; }
+.tonight-recent ul::-webkit-scrollbar { display: none; }
+.tonight-recent li { flex: none; width: 96px; scroll-snap-align: start; }
+.tonight-recent button { display: grid; gap: 6px; width: 100%; padding: 0; text-align: left; color: var(--color-text-primary); background: transparent; border: 0; cursor: pointer; }
+.tonight-recent-cover { display: block; width: 96px; aspect-ratio: 1; overflow: hidden; background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: 14px; }
+.tonight-recent-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tonight-recent-cover .game-artwork-placeholder { width: 100%; height: 100%; }
+.tonight-recent-name { font-size: 0.8125rem; font-weight: 700; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; overflow-wrap: normal; word-break: normal; hyphens: none; }
+
+.tonight-choose-players {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; min-height: 52px; margin: 0; padding: 0 16px;
+  color: var(--color-text-primary); background: var(--color-surface-raised);
+  border: 1px solid var(--color-border); border-radius: var(--radius-md);
+  font: inherit; font-weight: 700; cursor: pointer;
+}
+.tonight-choose-players svg { width: 22px; height: 22px; fill: none; stroke: var(--color-brand-primary); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.tonight-vote-button {
+  width: 100%; min-height: 48px; margin: 0; padding: 0;
+  color: var(--color-brand-primary); background: transparent; border: 0;
+  font: inherit; font-weight: 700; text-decoration: none; cursor: pointer;
+}
+/* Lighter floating tab bar, and room so content clears it. */
+.app-nav { box-shadow: 0 2px 8px var(--color-shadow); }
+
+/* Skeleton loaders (static under reduced motion). */
+.skeleton { display: grid; gap: 12px; margin-top: 12px; }
+.skeleton-tile { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.skeleton-block { display: block; height: 76px; border-radius: 16px; background: var(--color-surface-raised); }
+.skeleton-tile .skeleton-block { height: 168px; }
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton-block { background: linear-gradient(90deg, var(--color-surface-raised) 0%, var(--color-border) 50%, var(--color-surface-raised) 100%); background-size: 200% 100%; animation: skeleton-shimmer 1.4s ease-in-out infinite; }
+}
+@keyframes skeleton-shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+
+/* Plays tab. */
+.plays-log-button { width: 100%; min-height: 48px; margin: 2px 0 10px; }
+.plays-filters { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.plays-filters select, .plays-search { min-height: 44px; width: 100%; padding: 0 12px; color: var(--color-text-primary); background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: var(--radius-md); font: inherit; }
+.plays-range { display: flex; gap: 6px; margin-bottom: 8px; }
+.plays-range button { min-height: 32px; padding: 0 14px; color: var(--color-text-support); background: transparent; border: 1px solid var(--color-border); border-radius: 999px; font: inherit; font-size: 0.8125rem; font-weight: 700; }
+.plays-range button.active { color: var(--color-text-inverse); background: var(--color-brand-primary); border-color: var(--color-brand-primary); }
+.plays-month h2 { margin: 18px 0 8px; color: var(--color-text-support); font-family: inherit; font-size: 0.8125rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.plays-month ul, .plays-game-picker { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+/* Compact play rows (SP-UI-02): cover opens the game, the row edits the play, Rematch is a small action. */
+.plays-month ul { gap: 0; border-block: 1px solid var(--color-border); }
+.plays-card { display: flex; align-items: center; gap: 10px; min-height: 60px; padding: 6px 0; }
+.plays-card + .plays-card { border-top: 1px solid var(--color-border); }
+.plays-cover { flex: none; width: 44px; height: 44px; overflow: hidden; padding: 0; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 6px; display: block; cursor: pointer; }
+.plays-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.plays-cover .game-artwork-placeholder { width: 100%; height: 100%; }
+.plays-card-main { flex: 1 1 auto; display: grid; gap: 1px; min-width: 0; min-height: var(--target-min); padding: 0; text-align: left; color: var(--color-text-primary); background: transparent; border: 0; font: inherit; cursor: pointer; }
+.plays-card-main strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.plays-card-main span { overflow: hidden; color: var(--color-text-support); font-size: 0.8125rem; text-overflow: ellipsis; white-space: nowrap; }
+.plays-rematch { flex: none; min-height: var(--target-min); padding: 0 4px; color: var(--color-brand-primary); background: transparent; border: 0; font: inherit; font-size: 0.875rem; font-weight: 800; cursor: pointer; }
+.plays-state { display: grid; gap: 8px; justify-items: start; padding: 20px 4px; color: var(--color-text-support); }
+.plays-empty-note { margin: 16px 0 0; color: var(--color-text-support); font-size: 0.8125rem; }
+.plays-game-picker button { display: flex; gap: 12px; align-items: center; width: 100%; padding: 8px 12px 8px 8px; text-align: left; color: var(--color-text-primary); background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: 14px; font: inherit; cursor: pointer; }
+.plays-search { margin-bottom: 12px; }
+
+/* Cover-derived accent (SP-UI-01). Text colours are contrast-checked in code (AA, both themes). */
+.has-cover-accent { --cover-accent-text: var(--cover-accent-text-light); }
+:root[data-theme="dark"] .has-cover-accent,
+:root[data-theme="black"] .has-cover-accent { --cover-accent-text: var(--cover-accent-text-dark); }
+.collection-detail.has-cover-accent .collection-detail-image {
+  width: 100%; height: auto; aspect-ratio: 4 / 3; margin: 0 0 18px; border-radius: 22px;
+  background: color-mix(in srgb, var(--cover-accent) 26%, var(--color-surface-raised));
+  box-shadow: 0 18px 38px color-mix(in srgb, var(--cover-accent) 28%, transparent);
+  display: grid; place-items: center;
+}
+.collection-detail.has-cover-accent .collection-detail-image img { width: auto; height: 100%; max-width: 100%; background: transparent; object-fit: contain; }
+.has-cover-accent .eyebrow, .has-cover-accent .picker-result-mode { color: var(--cover-accent-text); }
+.picker-result-card.has-cover-accent .picker-cover-wrap {
+  background: color-mix(in srgb, var(--cover-accent) 22%, var(--color-surface-raised));
+  border-radius: 22px; box-shadow: 0 18px 38px color-mix(in srgb, var(--cover-accent) 28%, transparent);
+}
+.picker-result-card.has-cover-accent .picker-result-score strong { color: var(--cover-accent-text); }
+
+/* Pick reveal. */
+@media (prefers-reduced-motion: no-preference) {
+  .picker-result-card .picker-cover-wrap { animation: pick-reveal 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+  @keyframes pick-reveal { from { opacity: 0; transform: translateY(14px) scale(0.96); } to { opacity: 1; transform: none; } }
+}
+
+/* Pull to refresh and tab transitions. */
+.pull-indicator { display: grid; place-items: center; overflow: hidden; margin: 0 0 4px; }
+.pull-spinner { width: 20px; height: 20px; border: 2px solid var(--color-border); border-top-color: var(--color-brand-primary); border-radius: 50%; }
+@media (prefers-reduced-motion: no-preference) {
+  .pull-spinner.is-spinning { animation: pull-spin 700ms linear infinite; }
+  @keyframes pull-spin { to { transform: rotate(360deg); } }
+  .page-transition { animation: page-in 220ms ease-out both; }
+  @keyframes page-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+}
+
+/* Dynamic Type: keep my compact controls from splitting words at the AX sizes. */
+@supports (font: -apple-system-body) {
+  :root[data-native-ios] .collection-section-tabs { grid-template-columns: repeat(auto-fit, minmax(min(100%, 6em), 1fr)) !important; }
+  :root[data-native-ios] .collection-section-tabs button { font-size: var(--text-support); overflow-wrap: normal; word-break: keep-all; }
+  :root[data-native-ios] .player-step-screen .player-complexity-section .complexity-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 6em), 1fr)); }
+  :root[data-native-ios] .player-step-screen .complexity-option strong { font-size: var(--text-support); }
+  :root[data-native-ios] .player-step-screen .complexity-option { overflow-wrap: normal; word-break: keep-all; }
+  :root[data-native-ios] .player-step-screen .player-chip strong { font-size: 1.25rem; }
+  :root[data-native-ios] .player-step-screen .player-chip.solo strong { font-size: var(--text-support); }
+  :root[data-native-ios] .player-step-screen .player-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 3.5em), 1fr)); }
+  :root[data-native-ios] .plays-range { flex-wrap: wrap; }
+  :root[data-native-ios] .plays-filters { grid-template-columns: 1fr; }
+  :root[data-native-ios] .plays-card-main strong, :root[data-native-ios] .plays-card-main span { white-space: normal; }
+}
+
+/* Shelf grid refinement: whole cover visible, two-line titles that line up, readable plays badge. */
+.collection-tile-cover { background: color-mix(in srgb, var(--color-brand-primary) 8%, var(--color-surface-raised)); }
+.collection-tile-cover img { object-fit: contain; }
+.collection-tile strong { min-height: 2.5em; }
+.collection-tile-plays {
+  color: #fff; background: rgb(20 24 22 / 90%); border: 1px solid rgb(255 255 255 / 40%);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+}
+.plays-off-shelf { flex: none; color: var(--color-text-support); font-size: 0.75rem; font-weight: 700; }
+.plays-card.off-shelf .plays-card-main { cursor: default; }
+/* Missing artwork in a 44px play cover: the mark only, no caption. */
+.plays-cover .game-artwork-placeholder { display: grid; place-items: center; padding: 0; }
+.plays-cover .game-artwork-placeholder-copy { display: none; }
+.plays-cover .game-artwork-placeholder-mark { transform: scale(0.6); }

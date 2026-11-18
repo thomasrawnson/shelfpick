@@ -1,0 +1,638 @@
+/* Log play sheet (SP-UI-02): one compact form over the app, no tab bar. */
+
+.play-sheet-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  background: var(--color-overlay);
+}
+
+.play-sheet {
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 560px);
+  height: 100%;
+  max-height: 100dvh;
+  padding-top: env(safe-area-inset-top);
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  outline: none;
+}
+
+@media (min-width: 700px) {
+  .play-sheet-layer {
+    align-items: center;
+  }
+
+  .play-sheet {
+    height: auto;
+    max-height: min(860px, calc(100dvh - 48px));
+    padding-top: 0;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+  }
+}
+
+.play-sheet-header {
+  display: grid;
+  grid-template-columns: minmax(64px, auto) minmax(0, 1fr) minmax(64px, auto);
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.play-sheet-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.play-sheet-cover {
+  display: block;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--color-surface-raised);
+}
+
+.play-sheet-cover img,
+.play-sheet-cover > * {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.play-sheet-title-text {
+  min-width: 0;
+  text-align: left;
+}
+
+.play-sheet-title h2 {
+  margin: 0;
+  overflow: hidden;
+  font-size: 17px;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.play-sheet-title-text > span {
+  display: block;
+  color: var(--color-text-support);
+  font-size: var(--text-meta);
+  font-weight: 700;
+}
+
+.sheet-text-button,
+.sheet-save-button {
+  min-height: var(--target-min);
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-brand-primary);
+  font: inherit;
+  font-size: var(--text-support);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.play-sheet-header > :first-child {
+  justify-self: start;
+}
+
+.play-sheet-header > :last-child {
+  justify-self: end;
+}
+
+.sheet-strong {
+  font-weight: 800;
+}
+
+.sheet-save-button {
+  padding: 0 var(--space-4);
+  border-radius: 999px;
+  background: var(--color-brand-primary);
+  color: var(--color-text-inverse);
+  font-weight: 800;
+}
+
+.sheet-save-button:hover:not(:disabled) {
+  background: var(--color-brand-primary-hover);
+}
+
+.sheet-text-button:disabled,
+.sheet-save-button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.play-sheet-form,
+.play-saved {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 var(--space-4) calc(var(--space-6) + env(safe-area-inset-bottom));
+}
+
+/* These sections run edge to edge with hairlines, like a native grouped list. */
+.play-sheet-form > .play-summary-row,
+.play-sheet-form > .play-rows,
+.play-sheet-form > .play-details {
+  margin-inline: calc(var(--space-4) * -1);
+}
+
+.play-sheet-form input,
+.play-sheet-form select {
+  min-width: 0;
+  min-height: var(--target-min);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: var(--text-body);
+}
+
+.play-sheet-form input {
+  padding: 0 var(--space-2);
+}
+
+.play-sheet-form input:focus-visible,
+.play-sheet-form select:focus-visible,
+.play-sheet button:focus-visible {
+  outline: 3px solid var(--color-brand-primary);
+  outline-offset: 2px;
+}
+
+/* Summary line: date · place · time, and the result type menu. */
+
+.play-summary-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3) var(--space-1) var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.play-summary-button {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+  min-height: var(--target-min);
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: var(--text-body);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.play-summary-icon {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: var(--color-text-support);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.play-summary-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.play-summary-hint {
+  color: var(--color-brand-primary);
+}
+
+.play-summary-chevron {
+  flex: none;
+  color: var(--color-text-support);
+}
+
+.play-type-menu,
+.play-direction-menu {
+  position: relative;
+  display: block;
+  flex: none;
+}
+
+.play-type-menu::after,
+.play-direction-menu::after {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  content: "▾";
+  color: currentColor;
+  font-size: 12px;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.play-type-menu {
+  color: var(--color-brand-primary);
+}
+
+.play-direction-menu {
+  color: var(--color-text-support);
+}
+
+.play-sheet-form .play-type-menu select,
+.play-sheet-form .play-direction-menu select {
+  padding: 0 var(--space-5) 0 var(--space-2);
+  background: transparent;
+  border-color: transparent;
+  color: var(--color-brand-primary);
+  font-size: var(--text-support);
+  font-weight: 800;
+  appearance: none;
+}
+
+.play-sheet-form .play-direction-menu select {
+  min-height: 36px;
+  background-color: transparent;
+  color: var(--color-text-support);
+  font-weight: 700;
+}
+
+.play-details {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 6rem);
+  align-items: end;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-4) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface-raised);
+}
+
+.play-details label {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.play-details label > span {
+  color: var(--color-text-support);
+  font-size: var(--text-meta);
+  font-weight: 700;
+}
+
+.play-details input {
+  width: 100%;
+  height: 40px;
+  min-height: 40px;
+}
+
+/* iOS draws date inputs taller and centred; match the other fields. */
+.play-details input[type="date"] {
+  display: flex;
+  align-items: center;
+  appearance: none;
+  text-align: left;
+}
+
+.play-details input[type="date"]::-webkit-date-and-time-value {
+  margin: 0;
+  text-align: left;
+}
+
+.play-details-wide {
+  grid-column: 1 / -1;
+}
+
+.play-timer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.play-timer-clock {
+  font-variant-numeric: tabular-nums;
+  font-size: 20px;
+}
+
+/* Player rows */
+
+.play-players-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: calc(var(--space-2) * -1);
+}
+
+.play-players-head .preference-label {
+  flex: 1 1 auto;
+  margin: 0;
+}
+
+.play-rows {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-block: 1px solid var(--color-border);
+  border-radius: 0;
+  background: var(--color-surface);
+  overflow: hidden;
+}
+
+.play-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 56px;
+  padding: var(--space-1) var(--space-4) var(--space-1) var(--space-3);
+}
+
+.play-row + .play-row {
+  border-top: 1px solid var(--color-border);
+}
+
+.play-row.winner {
+  background: var(--color-brand-accent-soft);
+}
+
+.play-row-avatar.player-avatar {
+  width: 28px;
+  height: 28px;
+  font-size: 11px;
+}
+
+.play-sheet-form .play-row-name {
+  flex: 1 1 auto;
+  width: 0;
+  padding: 0 var(--space-1);
+  border-color: transparent;
+  background: transparent;
+  font-weight: 700;
+}
+
+/* Only the field being edited shows a border (hover sticks after a tap on iOS). */
+.play-sheet-form .play-row-name:focus {
+  border-color: var(--color-border);
+}
+
+.play-sheet-form .play-row-team {
+  flex: 0 0 4.5rem;
+  width: 4.5rem;
+}
+
+.play-sheet-form .play-row-score {
+  flex: 0 0 4.25rem;
+  width: 4.25rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.play-sheet-form .play-row-place {
+  flex: 0 0 2.75rem;
+  width: 2.75rem;
+  text-align: center;
+}
+
+.play-row-best {
+  flex: 0 0 3.25rem;
+  overflow: hidden;
+  color: var(--color-text-support);
+  font-size: var(--text-meta);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.play-winner-toggle,
+.play-row-remove {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--target-min);
+  height: var(--target-min);
+  margin: 0 calc(var(--space-1) * -1);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-border);
+  cursor: pointer;
+}
+
+.play-winner-toggle svg {
+  color: var(--color-text-support);
+  opacity: 0.45;
+}
+
+.play-winner-toggle[aria-pressed="true"] svg {
+  color: var(--color-accent-text);
+  opacity: 1;
+}
+
+.play-row-remove {
+  color: var(--color-danger);
+  font-size: 24px;
+  font-weight: 800;
+}
+
+/* Add player: recent chips and a name field */
+
+.play-add {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.play-add-hint {
+  margin: 0;
+  color: var(--color-text-support);
+  font-size: var(--text-support);
+}
+
+.play-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.play-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 3px 12px 3px 4px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: var(--text-support);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.play-chip .player-avatar {
+  width: 26px;
+  height: 26px;
+  font-size: 10px;
+}
+
+.play-add-field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.play-add-field input {
+  flex: 1 1 auto;
+  width: 0;
+}
+
+.play-winner-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: calc(var(--space-2) * -1);
+  color: var(--color-text-support);
+  font-size: var(--text-support);
+}
+
+.play-winner-note .sheet-text-button {
+  padding: 0;
+}
+
+.play-choice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.play-choice legend {
+  float: left;
+  margin-right: var(--space-2);
+  font-size: var(--text-support);
+  font-weight: 700;
+}
+
+.play-choice-option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target-min);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.play-choice-option.selected {
+  border-color: var(--color-brand-primary);
+  background: var(--color-brand-primary-soft);
+  color: var(--color-brand-primary);
+}
+
+.play-choice-option input {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.play-inline-select {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-support);
+  font-weight: 700;
+}
+
+.play-inline-select select {
+  flex: 1 1 auto;
+  padding: 0 var(--space-2);
+}
+
+.play-records {
+  margin: 0;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-support);
+  font-size: var(--text-meta);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.play-saved {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.play-saved strong {
+  font-family: var(--font-display, Lora, Georgia, serif);
+  font-size: 24px;
+}
+
+.play-saved-actions {
+  display: grid;
+  gap: var(--space-2);
+  width: min(100%, 320px);
+}
+
+.play-sheet-form input[type="number"] {
+  appearance: textfield;
+}
+
+.play-sheet-form input[type="number"]::-webkit-inner-spin-button,
+.play-sheet-form input[type="number"]::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+/* The small title cover shows only the mark when artwork is missing. */
+.play-sheet-cover .game-artwork-placeholder-copy {
+  display: none;
+}
+
+.play-sheet-cover .game-artwork-placeholder {
+  display: grid;
+  place-items: center;
+  padding: 0;
+}
+
+.play-sheet-cover .game-artwork-placeholder-mark {
+  transform: scale(0.6);
+}

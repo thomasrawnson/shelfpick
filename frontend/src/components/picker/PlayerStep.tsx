@@ -1,3 +1,4 @@
+import type { ReactNode } from "react"
 import type {
   PickerComplexityBand,
   PickerMode,
@@ -36,6 +37,8 @@ type Props = {
   onOpenMechanics: () => void
   onClearFineTune: () => void
   onContinue: () => void
+  onGroupVote?: () => void
+  footer?: ReactNode
 }
 
 
@@ -116,6 +119,8 @@ function PlayerStep({
   onOpenMechanics,
   onClearFineTune,
   onContinue,
+  onGroupVote,
+  footer,
 }: Props) {
   const activeFineTuneCount = [
     mode !== "best_match",
@@ -127,11 +132,12 @@ function PlayerStep({
 
   const fineTuneHint = activeFineTuneCount > 0
     ? `${activeFineTuneCount} preference${activeFineTuneCount === 1 ? "" : "s"} applied`
-    : "Optional preferences"
+    : undefined
 
   return (
     <section className="screen picker-step-screen player-step-screen">
-      <header>
+      <header className="tonight-header">
+        <p className="tonight-eyebrow">Tonight</p>
         <h1>What should we play?</h1>
       </header>
 
@@ -163,20 +169,6 @@ function PlayerStep({
           </div>
         ) : (
           <>
-            <button
-              type="button"
-              className="picker-navigation-card"
-              onClick={onChoosePlayers}
-            >
-              <span>
-                <strong>Choose specific players</strong>
-                <small>Use known player preferences and play history</small>
-              </span>
-              <span className="picker-navigation-chevron" aria-hidden="true">›</span>
-            </button>
-
-            <p className="player-or">or choose a group size</p>
-
             <div className="player-grid">
               {playerOptions.map((option) => (
                 <button
@@ -205,6 +197,14 @@ function PlayerStep({
                 </button>
               ))}
             </div>
+            <button
+              type="button"
+              className="tonight-choose-players"
+              onClick={onChoosePlayers}
+            >
+              <span>Choose players by name</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+            </button>
           </>
         )}
 
@@ -336,11 +336,26 @@ function PlayerStep({
             type="button"
             className="primary-button"
             disabled={players === null}
+            aria-describedby={players === null ? "player-step-hint" : undefined}
             onClick={onContinue}
           >
-            Continue
+            Find a game
           </button>
+          {players === null && (
+            <p id="player-step-hint" className="picker-action-hint">Choose your player count</p>
+          )}
+          {onGroupVote && (
+            <button
+              type="button"
+              className="tonight-vote-button"
+              onClick={onGroupVote}
+            >
+              Start a group vote
+            </button>
+          )}
         </div>
+
+        {footer}
       </div>
     </section>
   )

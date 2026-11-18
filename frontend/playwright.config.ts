@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test"
 
-import { API_ORIGIN, BACKEND_DIR, WEB_ORIGIN, backendEnv, backendPython } from "./e2e/support"
+import { API_ORIGIN, API_PORT, BACKEND_DIR, WEB_ORIGIN, WEB_PORT, backendEnv, backendPython } from "./e2e/support"
 
 const reuseExistingServer = process.env.E2E_REUSE_SERVERS === "true"
 
@@ -26,7 +26,7 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: `"${backendPython()}" -m uvicorn api.main:app --host 127.0.0.1 --port 8000`,
+      command: `"${backendPython()}" -m uvicorn api.main:app --host 127.0.0.1 --port ${API_PORT}`,
       cwd: BACKEND_DIR,
       env: backendEnv() as Record<string, string>,
       url: `${API_ORIGIN}/health`,
@@ -36,7 +36,7 @@ export default defineConfig({
       stderr: "pipe",
     },
     {
-      command: "npm run dev -- --host 127.0.0.1 --port 5173 --strictPort",
+      command: `npm run dev -- --host 127.0.0.1 --port ${WEB_PORT} --strictPort`,
       env: { VITE_API_BASE_URL: API_ORIGIN },
       url: WEB_ORIGIN,
       reuseExistingServer,

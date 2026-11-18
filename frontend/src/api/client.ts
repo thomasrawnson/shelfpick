@@ -230,6 +230,24 @@ export interface GamePlay extends PlayResult {
 }
 
 
+// The game a listed play belongs to. on_shelf is false once the game has
+// left the shelf; its plays still count (SP-UI-02 counting rule).
+export interface PlayGameSummary {
+  bgg_id: number
+  name: string
+  thumbnail_url: string | null
+  image_url: string | null
+  is_expansion: boolean
+  on_shelf: boolean
+}
+
+
+export interface ListedPlay extends GamePlay {
+  bgg_id: number
+  game: PlayGameSummary
+}
+
+
 export interface GameHistory {
   bgg_id: number
   play_count: number
@@ -259,6 +277,8 @@ export interface PlayerSummary {
   name: string
   play_count: number
   win_count: number
+  // Plays with a known result (win, loss or draw); the win-rate denominator.
+  decided_count: number
 }
 
 export interface CollectionInsights {
@@ -978,12 +998,37 @@ export async function restoreRankingGame(
 }
 
 
+const PLAYS_PAGE_SIZE = 200
+
+// Every play on the shelf, newest first, fetched a page at a time.
+export async function getPlays(): Promise<ListedPlay[]> {
+  const plays: ListedPlay[] = []
+  for (;;) {
+    const response = await apiFetch(`/plays?limit=${PLAYS_PAGE_SIZE}&offset=${plays.length}`)
+    if (!response.ok) throw new Error(`Plays request failed: ${response.status}`)
+    const page = await response.json() as { total: number; plays: ListedPlay[] }
+    plays.push(...page.plays)
+    if (page.plays.length === 0 || plays.length >= page.total) return plays
+  }
+}
+
+
+// Newest play on the account, used for "last used" defaults.
+export async function getLatestPlay(): Promise<ListedPlay | null> {
+  const response = await apiFetch("/plays?limit=1&offset=0")
+  if (!response.ok) throw new Error(`Plays request failed: ${response.status}`)
+  const page = await response.json() as { plays: ListedPlay[] }
+  return page.plays[0] ?? null
+}
+
+
 export async function getGameHistory(
   bggId: number,
+  limit?: number,
 ): Promise<GameHistory> {
   const response =
     await apiFetch(
-      `/games/${bggId}/plays`,
+      limit ? `/games/${bggId}/plays?limit=${limit}` : `/games/${bggId}/plays`,
     )
 
   if (!response.ok) {

@@ -1,15 +1,17 @@
 import { useState } from "react"
+import { formatPlayerCount } from "../../player-count"
 
 import type {
   Game,
   GameHistory as GameHistoryData,
   GamePlay,
 } from "../../api/client"
+import { useCoverAccent } from "../../use-cover-accent"
 import { rematchPrefill, type PlayPrefill } from "../../play-results"
 
 import ResilientGameArtwork from "../ResilientGameArtwork"
 import GameHistory from "./GameHistory"
-import PlayLogForm from "./PlayLogForm"
+import { LogPlayButton } from "./PlayLogForm"
 
 type Props = {
   game: Game
@@ -28,6 +30,8 @@ function GameDetail({
   onPlaySaved,
   onRemove,
 }: Props) {
+  const accentStyle = useCoverAccent(game.image_url ?? game.thumbnail_url, game.name)
+
   const [
     confirmingRemove,
     setConfirmingRemove,
@@ -73,10 +77,10 @@ function GameDetail({
         className="collection-back"
         onClick={onBack}
       >
-        ← Back to collection
+        ← Back to shelf
       </button>
 
-      <article className="collection-detail">
+      <article className="collection-detail has-cover-accent" style={accentStyle}>
         <div className="collection-detail-image">
           <ResilientGameArtwork
             src={game.image_url ?? game.thumbnail_url}
@@ -125,11 +129,11 @@ function GameDetail({
           </div>
         </div>
 
-        <PlayLogForm
+        <LogPlayButton
           key={rematch?.key ?? 0}
           game={game}
           onSaved={onPlaySaved}
-          initialOpen={rematch !== null}
+          defaultOpen={rematch !== null}
           initialPlayerCount={rematch?.prefill.names.length}
           initialPlayerNames={rematch?.prefill.names}
           initialTeams={rematch?.prefill.teams}
@@ -143,9 +147,7 @@ function GameDetail({
           </p>
 
           <p>
-            {game.min_players ?? "?"}
-            –
-            {game.max_players ?? "?"}
+            {formatPlayerCount(game.min_players, game.max_players) ?? "Unknown"}
           </p>
         </div>
 

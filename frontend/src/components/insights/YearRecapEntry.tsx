@@ -42,8 +42,7 @@ function YearRecapEntry({ autoOpen = false }: Props) {
 
   return (
     <article className="year-recap-entry recaps-preview-card" aria-labelledby="year-recap-entry-title">
-      <p className="insight-label">{year} in review</p>
-      <h2 id="year-recap-entry-title">Your year in review</h2>
+      <h2 id="year-recap-entry-title">Your {year} in games</h2>
       {loading && <p role="status" aria-busy="true">Loading your {year} plays…</p>}
       {!loading && error && (
         <>
@@ -52,7 +51,7 @@ function YearRecapEntry({ autoOpen = false }: Props) {
         </>
       )}
       {!loading && recap && recap.total_plays === 0 && (
-        <p>No plays recorded in {year} yet. Save a play and your year in review will appear here.</p>
+        <p>No plays recorded in {year} yet. Save a play and your recap will appear here.</p>
       )}
       {!loading && recap && recap.total_plays > 0 && (
         <>

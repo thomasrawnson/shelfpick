@@ -1,3 +1,4 @@
+import { formatPlayerCount } from "../player-count"
 import {
   useEffect,
   useRef,
@@ -276,9 +277,7 @@ function WishlistView({
               <span className="wishlist-card-body">
                 <strong>{game.name}</strong>
                 <span className="wishlist-meta">
-                  {game.min_players !== null && game.max_players !== null
-                    ? `${game.min_players}–${game.max_players} players`
-                    : "Player count unavailable"}
+                  {formatPlayerCount(game.min_players, game.max_players) ?? "Player count unavailable"}
                   {game.max_play_time !== null
                     ? ` · ${game.max_play_time} min`
                     : ""}

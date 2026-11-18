@@ -62,12 +62,14 @@ class FakeInsightsRepository:
                 name="Tom",
                 play_count=10,
                 win_count=4,
+                decided_count=8,
             ),
             PlayerSummary(
                 id=2,
                 name="Wales",
                 play_count=8,
                 win_count=3,
+                decided_count=8,
             ),
         ]
     

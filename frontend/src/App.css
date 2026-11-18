@@ -3,6 +3,7 @@
 @import "./styles/navigation.css";
 @import "./styles/picker.css";
 @import "./styles/collection.css";
+@import "./styles/play-sheet.css";
 @import "./styles/insights.css";
 @import "./styles/setup.css";
 @import "./styles/settings.css";
@@ -17,3 +18,4 @@
 @import "./styles/ui.css";
 @import "./styles/legal.css";
 @import "./styles/native-dynamic-type.css";
+@import "./styles/shell.css";

@@ -121,12 +121,12 @@ function SettingsSectionView({ section, user, onUserChange, onAccountDeleted }: 
       <BggAttribution />
     </>}
     {section === "plays" && <div className="settings-info-panel">
-      <p>Review recorded plays, participants and game history in Insights.</p>
-      <Link className="secondary-button settings-section-action" to={APP_PATHS.insights}>Open Insights</Link>
+      <p>Review recorded plays, participants and game history in Stats.</p>
+      <Link className="secondary-button settings-section-action" to={APP_PATHS.stats}>Open Stats</Link>
     </div>}
     {section === "help" && <div className="settings-info-panel">
       <h2>Using ShelfPick</h2>
-      <p>Use Picker for a recommendation from your shelf, Collection to manage games, and Insights to review recorded plays.</p>
+      <p>Use Picker for a recommendation from your shelf, Collection to manage games, and Stats to review recorded plays.</p>
       <a className="secondary-button settings-section-action" href={SUPPORT_EMAIL_URL}>Contact support</a>
     </div>}
     {section === "about" && <div className="settings-info-panel">
