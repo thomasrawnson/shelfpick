@@ -1,3 +1,4 @@
+import { EntitlementsProvider } from "./entitlements";
 import {
   useCallback,
   useEffect,
@@ -527,6 +528,7 @@ function App() {
 
   return (
     <main className="app-shell">
+      <EntitlementsProvider entitlements={user.entitlements}>
       <LiveTimerProvider enabled={user.entitlements.includes("live_play_enhancements")}>
       <section className={`phone app-phone${["shelf", "plays", "discover", "stats"].includes(view) || location.pathname === APP_PATHS.settingsPro ? " app-phone-wide" : ""}`} ref={appScrollRef}>
         <AppHeader
@@ -679,6 +681,7 @@ function App() {
         <AppNavigation view={view} onChangeView={navigateToView} />
       </section>
       </LiveTimerProvider>
+      </EntitlementsProvider>
     </main>
   );
 }

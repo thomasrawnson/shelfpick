@@ -137,7 +137,7 @@ until the reviewed Blueprint is applied in a later, explicitly authorized step.
 3. For `board-game-picker-api`, confirm region **Frankfurt**, plan
    `0.5c-512mb`, branch `main`, root directory `backend`, build command
    `pip install -r requirements.txt`, pre-deploy command
-   `alembic upgrade head`, start command `bash start.sh`, health path
+   `alembic upgrade head && python -m scripts.seed_scoresheets`, start command `bash start.sh`, health path
    `/health`, runtime environment `PYTHON_VERSION=3.12.14`, and
    **Auto-Deploy: Off**. Confirm the latest
    deploy is the same commit and `Live`.
@@ -268,8 +268,15 @@ the DNS records Render supplies.
 
 GitHub Actions checks continue independently of Render. Once the approved
 commit passes CI and the owner authorises deployment, manually deploy that
-exact commit. Render then runs `alembic upgrade head` as the API's pre-deploy
-command. A failed migration prevents the new API version from starting.
+exact commit. Render then runs `alembic upgrade head && python -m
+scripts.seed_scoresheets` as the API's pre-deploy command. A failed migration,
+or an invalid template in `scoresheets/templates`, prevents the new API version
+from starting. Seeding is idempotent: unchanged templates write nothing and a
+changed template becomes the sheet's next version while older plays keep the
+version they were logged on. The script reads `../scoresheets/templates`, so
+the deploy must check out the whole repository, not only `backend/`. If the
+service is not managed by `render.yaml`, update the dashboard pre-deploy
+command by hand.
 
 ## 3. Release verification
 

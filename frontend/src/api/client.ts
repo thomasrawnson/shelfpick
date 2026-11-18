@@ -1,3 +1,4 @@
+import type { Breakdown, ScoresheetSchema } from "../scoresheets/engine"
 import { request, responseError, SessionExpiredError } from "./request"
 import { resetConfirmationBody } from "../reset-link"
 import {
@@ -203,6 +204,8 @@ export interface PlayParticipant {
   team?: string | null
   rank?: number | null
   role?: string | null
+  // Scoresheet entries by category id; null for plain scores.
+  score_breakdown?: Breakdown | null
 }
 
 
@@ -226,7 +229,30 @@ export interface GamePlay extends PlayResult {
   duration_minutes: number | null
   location: string | null
   source: string
+  scoresheet_id?: number | null
+  scoresheet_version?: number | null
+  result_overridden?: boolean
   participants: GamePlayParticipant[]
+}
+
+
+// The scoresheet a play is logged on. Scores and, unless override is true,
+// the result are calculated on the server from each player's breakdown.
+export interface PlayScoresheet {
+  scoresheet_id: number | null
+  scoresheet_version: number | null
+  result_override: boolean
+}
+
+
+export interface Scoresheet {
+  id: number
+  bgg_id: number
+  kind: "builtin" | "custom"
+  version: number
+  current_version: number
+  archived: boolean
+  schema: ScoresheetSchema
 }
 
 
@@ -1055,6 +1081,7 @@ export async function recordPlay(
     outcome_type: "competitive",
     coop_result: null,
   },
+  scoresheet?: PlayScoresheet,
 ): Promise<Play> {
   const response =
     await apiFetch(
@@ -1077,6 +1104,7 @@ export async function recordPlay(
           picker_session_id:
             pickerSessionId,
           ...result,
+          ...scoresheet,
         }),
       },
     )
@@ -1091,11 +1119,53 @@ export async function recordPlay(
 }
 
 
-export interface PlayEdit extends PlayResult {
+export interface PlayEdit extends PlayResult, Partial<PlayScoresheet> {
   played_at: string
   duration_minutes: number | null
   location: string | null
   participants: PlayParticipant[]
+}
+
+
+export async function getScoresheets(bggId: number): Promise<Scoresheet[]> {
+  const response = await apiFetch(`/scoresheets?bgg_id=${encodeURIComponent(bggId)}`)
+  if (!response.ok) throw new Error(`Scoresheet request failed: ${response.status}`)
+  return response.json()
+}
+
+
+export async function getScoresheet(id: number, version?: number | null): Promise<Scoresheet> {
+  const query = version ? `?version=${encodeURIComponent(version)}` : ""
+  const response = await apiFetch(`/scoresheets/${id}${query}`)
+  if (!response.ok) throw new Error(`Scoresheet request failed: ${response.status}`)
+  return response.json()
+}
+
+
+async function writeScoresheet(path: string, method: "POST" | "PUT", schema: ScoresheetSchema): Promise<Scoresheet> {
+  const response = await apiFetch(path, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ schema }),
+  })
+  if (!response.ok) throw new Error(await readError(response, "Couldn't save this scoresheet."))
+  return response.json()
+}
+
+
+export function createScoresheet(schema: ScoresheetSchema): Promise<Scoresheet> {
+  return writeScoresheet("/scoresheets", "POST", schema)
+}
+
+
+export function updateScoresheet(id: number, schema: ScoresheetSchema): Promise<Scoresheet> {
+  return writeScoresheet(`/scoresheets/${id}`, "PUT", schema)
+}
+
+
+export async function deleteScoresheet(id: number): Promise<void> {
+  const response = await apiFetch(`/scoresheets/${id}`, { method: "DELETE" })
+  if (!response.ok) throw new Error(`Scoresheet delete failed: ${response.status}`)
 }
 
 

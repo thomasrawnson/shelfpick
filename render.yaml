@@ -6,7 +6,7 @@ services:
     plan: 0.5c-512mb
     rootDir: backend
     buildCommand: pip install -r requirements.txt
-    preDeployCommand: alembic upgrade head
+    preDeployCommand: alembic upgrade head && python -m scripts.seed_scoresheets
     startCommand: bash start.sh
     healthCheckPath: /health
     autoDeployTrigger: "off"

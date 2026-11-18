@@ -30,6 +30,22 @@ and validate the work before asking Tom to resume beta. Internal testing
 continues. This instruction supersedes older immediate-beta and post-launch
 timing below; existing completed slices remain historical implementation facts.
 
+### SP-SCORE-01 Scoresheets in the app — IMPLEMENTED; DRAFT PR (18 November 2026)
+
+Branch `codex/sp-score-01`; not merged, deployed or submitted. The Log play and
+Edit play sheet offers "Use scoresheet" when a built-in or custom sheet exists
+for the game: a category × player grid, a maths keyboard (+ − ×, no eval),
+running totals and a calculated winner, rank or co-op band that the player can
+override (marked "Winner chosen by hand"). The server scores every play from
+its breakdown (`backend/services/scoresheet_engine.py`) and stores totals,
+ranks and the sheet version; the client only previews. Built-ins are seeded
+idempotently from `scoresheets/templates` (25 on `main`; SCORE-00b's 19 load
+once PR #35 merges) by `python -m scripts.seed_scoresheets`, now part of the
+Render pre-deploy command. Custom sheets use the same schema behind the new
+`custom_scoresheets` capability (Pro; hidden from Free until SP-PRO-01). BG
+Stats export still sends totals only. Migration `d2b6f0a9c4e8` is additive and
+must run, with the seed, before build 12. Evidence: `docs/SP-SCORE-01-REPORT.md`.
+
 ### SP-PLAY-01 Play logging foundation — LOCAL CANDIDATE, 17 November 2026
 
 Branch `sp-play-01`, draft PR for owner review; not merged, deployed or

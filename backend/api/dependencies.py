@@ -21,6 +21,8 @@ from services.collection_service import CollectionService
 from services.game_service import GameService
 from services.insights_service import InsightsService
 from services.play_service import PlayService
+from repositories.scoresheet_repository import ScoresheetRepository
+from services.scoresheet_service import ScoresheetService
 from services.live_timer_service import LiveTimerService
 from repositories.live_timer_repository import LiveTimerRepository
 from services.ranking_service import RankingService
@@ -79,12 +81,22 @@ def get_play_repository(
     )
 
 
+def get_scoresheet_service(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> ScoresheetService:
+    return ScoresheetService(
+        ScoresheetRepository(db=db, user_id=current_user.id)
+    )
+
+
 def get_play_service(
+    scoresheets: ScoresheetService = Depends(get_scoresheet_service),
     repository: PlayRepository = Depends(
         get_play_repository
     ),
 ) -> PlayService:
-    return PlayService(repository)
+    return PlayService(repository, scoresheets)
 
 
 def get_live_timer_service(
