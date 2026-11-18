@@ -54,3 +54,7 @@ Screenshots: `docs/screenshots/sp-settings-01/before/` (390×844 dark, before) a
 ## Owner confirmations
 
 - 2026-11-18: YouTube URL `https://www.youtube.com/@shelfpick` confirmed by the owner.
+
+## Merge with SP-SCORE-01 (18 November 2026)
+
+`main` (SP-SCORE-01, migration `d2b6f0a9c4e8`) was merged into this branch, and `b8d2f4a6c1e3` now revises `d2b6f0a9c4e8`, so Alembic has one head: `a7c1e9d3b5f2 → d2b6f0a9c4e8 → b8d2f4a6c1e3`. On the merged code: backend 527 passed; migration tests for play results, scoresheets and feedback 3/3; `alembic check` clean; frontend 205 passed; lint, tsc, build and PWA pass; Playwright on iPhone 15 (scoresheets, settings layout, play logging) 17/17. The settings footer still hard-codes build `11` in `frontend/src/app-links.ts`; bump it with the next iOS build number.

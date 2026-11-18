@@ -25,6 +25,7 @@ from api.routers import (
     picker,
     plays,
     rankings,
+    scoresheets,
     wishlist,
 )
 
@@ -100,6 +101,10 @@ app.include_router(
 
 app.include_router(
     plays.router
+)
+
+app.include_router(
+    scoresheets.router
 )
 
 app.include_router(

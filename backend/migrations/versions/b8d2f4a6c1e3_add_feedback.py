@@ -1,7 +1,7 @@
 """Add the feedback table for in-app feature ideas and problem reports.
 
 Revision ID: b8d2f4a6c1e3
-Revises: a7c1e9d3b5f2
+Revises: d2b6f0a9c4e8
 
 New table only; no existing rows change. Rows belong to a user and are removed
 with the account. The downgrade drops the table.
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 revision = "b8d2f4a6c1e3"
-down_revision = "a7c1e9d3b5f2"
+down_revision = "d2b6f0a9c4e8"
 branch_labels = None
 depends_on = None
 

@@ -23,6 +23,9 @@ class FakePlayRepository:
         timer_session_id: str | None = None,
         outcome_type: str = "competitive",
         coop_result: str | None = None,
+        scoresheet_id: int | None = None,
+        scoresheet_version: int | None = None,
+        result_overridden: bool = False,
     ) -> Play:
         self.created = {
             "bgg_id": bgg_id,
@@ -47,7 +50,7 @@ class FakePlayRepository:
 
 def test_record_play_uses_repository():
     repository = FakePlayRepository()
-    service = PlayService(repository)
+    service = PlayService(repository, scoresheets=None)
 
     played_at = datetime(
         2026,

@@ -151,6 +151,12 @@
 }
 
 /* These sections run edge to edge with hairlines, like a native grouped list. */
+/* The form scrolls; its sections keep their height instead of shrinking
+   (sections with overflow: hidden would otherwise collapse to nothing). */
+.play-sheet-form > * {
+  flex-shrink: 0;
+}
+
 .play-sheet-form > .play-summary-row,
 .play-sheet-form > .play-rows,
 .play-sheet-form > .play-details {

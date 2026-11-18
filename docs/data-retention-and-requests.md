@@ -19,7 +19,7 @@ Auth rate-limit HMAC rows are a separate security control: rows older than 24 ho
 1. Receive the request only through **hello@plutonightlabs.com** after the owner confirms monitoring and escalation; record receipt without copying unnecessary personal data.
 2. Verify identity using a signed-in confirmation or a single-use link to the registered email. Never request or accept the account password by email.
 3. Confirm scope and any applicable exception with the privacy owner/legal reviewer.
-4. Export only rows owned by the authenticated user: account/profile/preferences, collection/wishlist, players, plays/participants, rankings/comparisons, Picker sessions/events, timers and hosted Game Night sessions/guests/ballots. Do not include password hashes, tokens, credential hashes, internal secrets or another user's data.
+4. Export only rows owned by the authenticated user: account/profile/preferences, collection/wishlist, players, plays/participants (including scoresheet breakdowns), custom scoresheets and their versions, rankings/comparisons, Picker sessions/events, timers and hosted Game Night sessions/guests/ballots. Do not include password hashes, tokens, credential hashes, internal secrets or another user's data.
 5. Deliver through **[APPROVED SECURE METHOD]**, record completion and delete working files after **7 days**. Retain the resolved case record for **12 months**, subject to qualified review.
 
 ## Deletion request

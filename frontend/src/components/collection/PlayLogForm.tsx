@@ -13,6 +13,8 @@ import {
   getGameHistory,
   getLatestPlay,
   getPlayers,
+  getScoresheet,
+  getScoresheets,
   recordPlay,
   updatePlay,
   type CoopResult,
@@ -20,7 +22,25 @@ import {
   type GamePlay,
   type OutcomeType,
   type Player,
+  type PlayParticipant,
+  type PlayResult,
+  type PlayScoresheet,
+  type Scoresheet,
 } from "../../api/client"
+import { useEntitlement } from "../../entitlements"
+import {
+  cellValue,
+  completeBreakdown,
+  openRoundCount,
+  scorePlay,
+  sheetRows,
+  targetReached,
+  type Breakdown,
+  type ScoresheetSchema,
+} from "../../scoresheets/engine"
+import { formatNumber } from "../../scoresheets/math-input"
+import ScoresheetGrid from "../scoresheets/ScoresheetGrid"
+import ScoresheetBuilder from "../scoresheets/ScoresheetBuilder"
 import {
   OUTCOME_TYPES,
   autoWinners,
@@ -108,6 +128,12 @@ function editModes(drafts: PlayerDraft[]) {
   return { manualPlaces, winnersOverridden: !manualPlaces && !winnersMatch }
 }
 
+// Entries for categories the sheet still has; used when switching sheets.
+function pruneBreakdown(schema: ScoresheetSchema, breakdown: Breakdown | null | undefined): Breakdown {
+  const ids = new Set(schema.categories.map((category) => category.id))
+  return Object.fromEntries(Object.entries(breakdown ?? {}).filter(([id]) => ids.has(id)))
+}
+
 function TrophyIcon() {
   return <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
     <path fill="currentColor" d="M7 3h10v2h3v3a4 4 0 0 1-4 4h-.3A5 5 0 0 1 13 14.9V18h3v2H8v-2h3v-3.1A5 5 0 0 1 8.3 12H8a4 4 0 0 1-4-4V5h3V3Zm0 4H6v1a2 2 0 0 0 1 1.7V7Zm10 0v2.7A2 2 0 0 0 18 8V7h-1Z" />
@@ -136,9 +162,14 @@ function PlayLogForm({
   const detailsId = `${ids}-details`
   const liveTimer = useLiveTimer()
   const isEditing = editingPlay !== null
+  const canBuildSheets = useEntitlement("custom_scoresheets")
+  const editingSheetId = editingPlay?.scoresheet_id ?? null
   const [initial] = useState(() => {
     if (editingPlay) {
       const edit = draftsFromPlay(editingPlay)
+      if (editingSheetId !== null) {
+        return { ...edit, manualPlaces: false, winnersOverridden: editingPlay.result_overridden === true }
+      }
       return { ...edit, ...editModes(edit.drafts) }
     }
     return {
@@ -177,6 +208,21 @@ function PlayLogForm({
   const [bgStatsUrl, setBGStatsUrl] = useState<string | null>(null)
   const savePending = useRef(false)
   const lastSaved = useRef<PlayPrefill | null>(null)
+  const [sheets, setSheets] = useState<Scoresheet[]>([])
+  const [sheet, setSheet] = useState<Scoresheet | null>(null)
+  const [sheetLoading, setSheetLoading] = useState(editingSheetId !== null)
+  const [chosenSheetId, setChosenSheetId] = useState<number | null>(null)
+  const [breakdowns, setBreakdowns] = useState<Breakdown[]>(() => (
+    editingSheetId !== null && editingPlay
+      ? editingPlay.participants.map((participant) => participant.score_breakdown ?? {})
+      : initial.drafts.map(() => ({}))
+  ))
+  const [teamBreakdown, setTeamBreakdown] = useState<Breakdown>(() => (
+    editingSheetId !== null && editingPlay ? editingPlay.participants[0]?.score_breakdown ?? {} : {}
+  ))
+  const [extraRounds, setExtraRounds] = useState<Record<string, number>>({})
+  const [builder, setBuilder] = useState<{ editing: Scoresheet | null } | null>(null)
+  const completeNotified = useRef(editingSheetId !== null)
   const [, redrawTimer] = useState(0)
   const matchingTimer = liveTimer.timer?.game.bgg_id === game.bgg_id ? liveTimer.timer : null
 
@@ -211,14 +257,67 @@ function PlayLogForm({
     }
   }, [game.bgg_id])
 
-  const competitive = outcomeType === "competitive"
+  useEffect(() => {
+    getScoresheets(game.bgg_id)
+      .then((list) => {
+        setSheets(list)
+        setChosenSheetId((current) => current ?? list[0]?.id ?? null)
+      })
+      .catch((err) => console.error(err))
+  }, [game.bgg_id])
+
+  useEffect(() => {
+    if (editingSheetId === null) return
+    getScoresheet(editingSheetId, editingPlay?.scoresheet_version)
+      .then(setSheet)
+      .catch((err) => {
+        console.error(err)
+        setError("Couldn't load this play's scoresheet.")
+      })
+      .finally(() => setSheetLoading(false))
+  }, [editingSheetId, editingPlay?.scoresheet_version])
+
+  const schema = sheet?.schema ?? null
+  const cooperativeSheet = schema?.win_condition === "cooperative"
+  const effectiveOutcome: OutcomeType = schema
+    ? cooperativeSheet ? "cooperative" : players.length === 1 ? "solo" : "competitive"
+    : outcomeType
+  const competitive = effectiveOutcome === "competitive"
+  const columnBreakdowns = cooperativeSheet ? [teamBreakdown] : players.map((_, index) => breakdowns[index] ?? {})
+  const roundCounts: Record<string, number> = schema
+    ? Object.fromEntries(schema.categories
+      .filter((category) => category.scope === "per_round")
+      .map((category) => [category.id, Math.max(openRoundCount(columnBreakdowns, category.id), extraRounds[category.id] ?? 1)]))
+    : {}
+  const anyEntry = columnBreakdowns.some((breakdown) => Object.keys(breakdown).length > 0)
+  const fullScore = schema ? scorePlay(schema, columnBreakdowns) : null
+  // No result until something has been entered: an empty sheet is not a tie.
+  const scored = fullScore && !anyEntry ? { ...fullScore, ranks: null, winners: [] } : fullScore
+  const soloTarget = schema && scored && effectiveOutcome === "solo" ? targetReached(schema, scored.totals[0]) : null
   const mode = { direction, winnersOverridden, manualPlaces }
-  const shown = competitive ? resolveCompetitive(players, mode) : players
+  const shown = schema && scored
+    ? players.map((player, index) => ({
+        ...player,
+        score: formatNumber(scored.totals[cooperativeSheet ? 0 : index] ?? 0),
+        rank: "",
+        isWinner: competitive && (winnersOverridden ? player.isWinner : scored.winners.includes(index)),
+      }))
+    : competitive ? resolveCompetitive(players, mode) : players
+  const sheetComplete = schema !== null && (cooperativeSheet || players.length > 0)
+    && columnBreakdowns.every((breakdown) => sheetRows(schema, roundCounts)
+      .every((row) => row.category.type === "boolean" || cellValue(breakdown, row) !== undefined))
+
+  useEffect(() => {
+    if (!sheetComplete) { completeNotified.current = false; return }
+    if (completeNotified.current) return
+    completeNotified.current = true
+    void lightImpact()
+  }, [sheetComplete])
   const records = useMemo(() => recordContext(history, players.length, direction), [history, players.length, direction])
   const avatarFor = (name: string) => knownPlayers.find((player) => normalName(player.name) === normalName(name))?.avatar_key
   const inPlay = new Set(players.map((player) => normalName(player.name)))
   const chips = knownPlayers.filter((player) => !inPlay.has(normalName(player.name))).slice(0, CHIP_LIMIT)
-  const canAdd = outcomeType !== "solo" || players.length === 0
+  const canAdd = schema !== null || outcomeType !== "solo" || players.length === 0
   const missing = !isEditing && initialPlayerNames.length === 0 && initialPlayerCount > players.length
     ? initialPlayerCount - players.length
     : 0
@@ -236,12 +335,14 @@ function PlayLogForm({
       return
     }
     setPlayers((current) => [...current, emptyDraft(trimmed)])
+    setBreakdowns((current) => [...players.map((_, index) => current[index] ?? {}), {}])
     setNewName("")
     setError("")
   }
 
   function removePlayer(index: number) {
     setPlayers((current) => current.filter((_, at) => at !== index))
+    setBreakdowns((current) => current.filter((_, at) => at !== index))
     if (players.length <= 1) setRemoving(false)
   }
 
@@ -261,6 +362,9 @@ function PlayLogForm({
     setCoopResult("")
     setWinningTeam("")
     setPlayers(draftsFor(previous.names, previous.teams))
+    setBreakdowns(previous.names.map(() => ({})))
+    setTeamBreakdown({})
+    setExtraRounds({})
     setManualPlaces(false)
     setWinnersOverridden(false)
     setError("")
@@ -268,9 +372,59 @@ function PlayLogForm({
     setBGStatsUrl(null)
   }
 
+  function applySheet(next: Scoresheet) {
+    setSheet(next)
+    setBreakdowns(players.map((_, index) => pruneBreakdown(next.schema, breakdowns[index])))
+    setTeamBreakdown(pruneBreakdown(next.schema, teamBreakdown))
+    setExtraRounds({})
+    setManualPlaces(false)
+    setWinnersOverridden(false)
+    setError("")
+  }
+
+  // Back to plain score entry; each player keeps their total.
+  function switchToPlainScores() {
+    setPlayers(shown.map((player) => ({ ...player, isWinner: winnersOverridden ? player.isWinner : false })))
+    setOutcomeType(effectiveOutcome)
+    setSheet(null)
+    setError("")
+  }
+
+  function updateBreakdown(column: number, breakdown: Breakdown) {
+    if (cooperativeSheet) setTeamBreakdown(breakdown)
+    else setBreakdowns((current) => players.map((_, index) => (index === column ? breakdown : current[index] ?? {})))
+    setError("")
+  }
+
+  type Built = { participants: PlayParticipant[]; result: PlayResult; scoresheet: PlayScoresheet | undefined }
+
+  function buildSheetPlay(drafts: PlayerDraft[]): Built | string {
+    if (!schema || !sheet || !scored) return "Choose a scoresheet."
+    if (!anyEntry) return "Enter at least one score on the scoresheet."
+    if (effectiveOutcome === "cooperative" && coopResult === "") return "Choose whether the group won."
+    const override = competitive && winnersOverridden
+    const participants = drafts.map((player, index) => ({
+      name: player.name.trim(),
+      score: scored.totals[cooperativeSheet ? 0 : index] ?? 0,
+      is_winner: player.isWinner,
+      rank: override ? null : scored.ranks?.[index] ?? null,
+      team: null,
+      role: null,
+      score_breakdown: completeBreakdown(schema, columnBreakdowns[cooperativeSheet ? 0 : index] ?? {}, roundCounts),
+    }))
+    const shared = effectiveOutcome === "cooperative" || effectiveOutcome === "solo"
+    const sharedResult = soloTarget !== null ? (soloTarget ? "won" : "lost") : coopResult === "" ? null : coopResult
+    return {
+      participants,
+      result: { outcome_type: effectiveOutcome, coop_result: shared ? sharedResult : null },
+      scoresheet: { scoresheet_id: sheet.id, scoresheet_version: sheet.version, result_override: override },
+    }
+  }
+
   async function savePlay() {
     if (savePending.current) return
-    const drafts = competitive ? shown : players
+    if (sheetLoading) return
+    const drafts = competitive || schema ? shown : players
     const names = drafts.map((player) => player.name.trim())
     if (drafts.length === 0) {
       setError("Add at least one player.")
@@ -284,16 +438,34 @@ function PlayLogForm({
       setError("The same player can't be added twice.")
       return
     }
-    if (drafts.some((player) => player.score.trim() !== "" && Number.isNaN(Number(player.score)))) {
+    if (!schema && drafts.some((player) => player.score.trim() !== "" && Number.isNaN(Number(player.score)))) {
       setError("Scores must be numbers.")
       return
     }
-    const built = buildResult(outcomeType, drafts, coopResult, winningTeam)
-    if (!built.ok) {
-      setError(built.error)
-      return
+    let built: Built
+    if (schema) {
+      const sheetPlay = buildSheetPlay(drafts)
+      if (typeof sheetPlay === "string") {
+        setError(sheetPlay)
+        return
+      }
+      built = sheetPlay
+    } else {
+      const plain = buildResult(outcomeType, drafts, coopResult, winningTeam)
+      if (!plain.ok) {
+        setError(plain.error)
+        return
+      }
+      built = {
+        participants: plain.participants,
+        result: plain.result,
+        // Leaving a scoresheet on an edited play goes back to plain scores.
+        scoresheet: editingSheetId !== null
+          ? { scoresheet_id: null, scoresheet_version: null, result_override: false }
+          : undefined,
+      }
     }
-    const { participants, result } = built
+    const { participants, result, scoresheet } = built
     const durationMinutes = duration.trim() === "" ? null : Number(duration)
     if (durationMinutes !== null && (Number.isNaN(durationMinutes) || durationMinutes < 0)) {
       setError("Duration must be a valid number.")
@@ -317,6 +489,7 @@ function PlayLogForm({
           location: location.trim() === "" ? null : location.trim(),
           participants,
           ...result,
+          ...scoresheet,
         })
       } else {
         const savedPlay = await recordPlay(
@@ -328,6 +501,7 @@ function PlayLogForm({
           location,
           timerSessionId ?? (matchingTimer?.status === "finished" ? matchingTimer.public_id : null),
           result,
+          scoresheet,
         )
         url = createBGStatsPlayUrl(game, savedPlay, participants, durationMinutes, result)
       }
@@ -353,7 +527,7 @@ function PlayLogForm({
     }
 
     lastSaved.current = {
-      outcomeType,
+      outcomeType: effectiveOutcome,
       location: location.trim(),
       names,
       teams: drafts.map((player) => player.team.trim()),
@@ -393,6 +567,33 @@ function PlayLogForm({
   const teams = Array.from(new Map(players.map((player) => player.team.trim()).filter(Boolean)
     .map((team) => [team.toLowerCase(), team] as const)).values())
   const done = onDone ?? onClose
+  const chosenSheet = sheets.find((item) => item.id === chosenSheetId) ?? sheets[0] ?? null
+
+  if (builder !== null) {
+    return (
+      <Sheet labelledBy={titleId} onEscape={() => setBuilder(null)}>
+        <ScoresheetBuilder
+          gameName={game.name}
+          bggId={game.bgg_id}
+          editing={builder.editing}
+          titleId={titleId}
+          onCancel={() => setBuilder(null)}
+          onSaved={(savedSheet) => {
+            setSheets((current) => [...current.filter((item) => item.id !== savedSheet.id), savedSheet])
+            setChosenSheetId(savedSheet.id)
+            applySheet(savedSheet)
+            setBuilder(null)
+          }}
+          onDeleted={(id) => {
+            setSheets((current) => current.filter((item) => item.id !== id))
+            setChosenSheetId(null)
+            if (sheet?.id === id) switchToPlainScores()
+            setBuilder(null)
+          }}
+        />
+      </Sheet>
+    )
+  }
 
   return (
     <Sheet labelledBy={titleId} onEscape={() => { if (!saving) (saved ? done : onClose)() }}>
@@ -461,7 +662,7 @@ function PlayLogForm({
               </span>
               <span className="play-summary-chevron" aria-hidden="true">{detailsOpen ? "▴" : "▾"}</span>
             </button>
-            <label className="play-type-menu">
+            {!schema && <label className="play-type-menu">
               <span className="sr-only">Result type</span>
               <select
                 value={outcomeType}
@@ -469,7 +670,7 @@ function PlayLogForm({
               >
                 {OUTCOME_TYPES.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
               </select>
-            </label>
+            </label>}
           </div>
 
           {detailsOpen && (
@@ -530,7 +731,7 @@ function PlayLogForm({
 
           <div className="play-players-head">
             <span className="preference-label">Players · {players.length}</span>
-            {competitive && !manualPlaces && (
+            {competitive && !manualPlaces && !schema && (
               <label className="play-direction-menu">
                 <span className="sr-only">Scoring</span>
                 <select
@@ -594,7 +795,7 @@ function PlayLogForm({
                       value={player.name}
                       onChange={(event) => updatePlayer(index, { name: event.target.value })}
                     />
-                    {outcomeType === "team" && (
+                    {effectiveOutcome === "team" && (
                       <input
                         className="play-row-team"
                         type="text"
@@ -606,16 +807,18 @@ function PlayLogForm({
                         onChange={(event) => updatePlayer(index, { team: event.target.value })}
                       />
                     )}
-                    <input
-                      className="play-row-score"
-                      type="number"
-                      inputMode="decimal"
-                      placeholder="Score"
-                      aria-label={`Score for ${label}`}
-                      value={player.score}
-                      onChange={(event) => updatePlayer(index, { score: event.target.value })}
-                    />
-                    {competitive && (
+                    {schema
+                      ? <span className="play-row-total" aria-label={`${label} total ${player.score}`}>{player.score}</span>
+                      : <input
+                          className="play-row-score"
+                          type="number"
+                          inputMode="decimal"
+                          placeholder="Score"
+                          aria-label={`Score for ${label}`}
+                          value={player.score}
+                          onChange={(event) => updatePlayer(index, { score: event.target.value })}
+                        />}
+                    {competitive && !schema && (
                       // Always present so every score box lines up, with or without a record.
                       best !== null
                         ? <span className="play-row-best" aria-label={`${label}'s best: ${best}`}>best {best}</span>
@@ -659,7 +862,80 @@ function PlayLogForm({
             </div>
           )}
 
-          {competitive && players.length > 1 && (
+          {schema && sheet && scored ? (
+            <section className="scoresheet-section" aria-label="Scoresheet">
+              <div className="scoresheet-head">
+                <span className="preference-label">{schema.name}</span>
+                {sheet.kind === "custom" && canBuildSheets && sheet.version === sheet.current_version && (
+                  <button type="button" className="sheet-text-button" onClick={() => setBuilder({ editing: sheet })}>Edit sheet</button>
+                )}
+                <button type="button" className="sheet-text-button" onClick={switchToPlainScores}>Plain scores</button>
+              </div>
+              {sheet.version < sheet.current_version && (
+                <p className="scoresheet-meta">Logged on version {sheet.version} of this sheet. Newer plays use version {sheet.current_version}.</p>
+              )}
+              {players.length === 0 && !cooperativeSheet
+                ? <p className="scoresheet-meta">Add players to fill in the scoresheet.</p>
+                : <ScoresheetGrid
+                    sheet={schema}
+                    columns={cooperativeSheet ? ["Team"] : shown.map((player, index) => player.name.trim() || `Player ${index + 1}`)}
+                    breakdowns={columnBreakdowns}
+                    roundCounts={roundCounts}
+                    scored={scored}
+                    caption={`${schema.name} scoresheet`}
+                    onChange={updateBreakdown}
+                    onAddRound={(id) => setExtraRounds((current) => ({ ...current, [id]: (roundCounts[id] ?? 1) + 1 }))}
+                  />}
+              {sheetComplete && <p className="scoresheet-meta" role="status">All scores entered.</p>}
+              {cooperativeSheet && (
+                <p className="scoresheet-result">
+                  Team score {formatNumber(scored.totals[0] ?? 0)}{scored.resultBand ? ` · ${scored.resultBand}` : ""}
+                </p>
+              )}
+              {soloTarget !== null && (
+                <p className="scoresheet-result">
+                  {soloTarget ? "Target reached: won" : `Below the target of ${formatNumber(schema.target_score ?? 0)}: lost`}
+                </p>
+              )}
+            </section>
+          ) : sheetLoading ? (
+            <p className="scoresheet-meta" role="status">Loading scoresheet…</p>
+          ) : (sheets.length > 0 || canBuildSheets) && (
+            <div className="scoresheet-picker">
+              {sheets.length > 1 && (
+                <label className="play-inline-select">
+                  <span>Scoresheet</span>
+                  <select value={chosenSheet?.id ?? ""} onChange={(event) => setChosenSheetId(Number(event.target.value))}>
+                    {sheets.map((item) => (
+                      <option key={item.id} value={item.id}>{item.schema.name}{item.kind === "custom" ? " (yours)" : ""}</option>
+                    ))}
+                  </select>
+                </label>
+              )}
+              {chosenSheet && (
+                <button type="button" className="secondary-button" onClick={() => applySheet(chosenSheet)}>
+                  Use scoresheet
+                </button>
+              )}
+              {canBuildSheets && (
+                <button type="button" className="sheet-text-button" onClick={() => setBuilder({ editing: null })}>
+                  Build a scoresheet
+                </button>
+              )}
+            </div>
+          )}
+
+          {competitive && players.length > 1 && schema && (
+            <div className="play-winner-note" role="status">
+              {winnersOverridden
+                ? <><span className="scoresheet-override">Winner chosen by hand.</span> <button type="button" className="sheet-text-button" onClick={() => setWinnersOverridden(false)}>Use calculated result</button></>
+                : <span>{scored && scored.winners.length > 0
+                    ? `Calculated: ${scored.winners.map((index) => shown[index]?.name.trim()).join(" and ")} ${scored.winners.length > 1 ? "share the win" : "wins"}.`
+                    : anyEntry ? "No winner yet." : "Enter scores to see the winner."}</span>}
+            </div>
+          )}
+
+          {competitive && players.length > 1 && !schema && (
             <div className="play-winner-note">
               {manualPlaces
                 ? <button type="button" className="sheet-text-button" onClick={() => { setManualPlaces(false); setWinnersOverridden(false) }}>Use scores for places</button>
@@ -669,9 +945,9 @@ function PlayLogForm({
             </div>
           )}
 
-          {(outcomeType === "cooperative" || outcomeType === "solo") && (
+          {(effectiveOutcome === "cooperative" || effectiveOutcome === "solo") && soloTarget === null && (
             <fieldset className="play-choice">
-              <legend>{outcomeType === "solo" ? "Result" : "Did the group win?"}</legend>
+              <legend>{effectiveOutcome === "solo" ? "Result" : "Did the group win?"}</legend>
               {(["won", "lost"] as const).map((value) => (
                 <label key={value} className={coopResult === value ? "play-choice-option selected" : "play-choice-option"}>
                   <input type="radio" name={`${ids}-coop`} value={value} checked={coopResult === value} onChange={() => setCoopResult(value)} />
@@ -681,7 +957,7 @@ function PlayLogForm({
             </fieldset>
           )}
 
-          {outcomeType === "team" && (
+          {effectiveOutcome === "team" && (
             <label className="play-inline-select">
               <span>Winning team</span>
               <select value={winningTeam} onChange={(event) => setWinningTeam(event.target.value)}>

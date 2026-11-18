@@ -179,3 +179,42 @@ for (const size of ACCESSIBILITY_BODY_SIZES) test.describe(`Settings at ${size.n
     expect.soft(clipped, `${size.name}: clipped Settings rows`).toEqual([])
   })
 })
+
+// SP-SCORE-01: the scoresheet grid and maths keyboard keep words whole at the AX sizes.
+import { execFileSync } from "node:child_process"
+import path from "node:path"
+
+import { BACKEND_DIR, backendEnv, backendPython } from "./support"
+
+for (const size of ACCESSIBILITY_BODY_SIZES) test.describe(`Scoresheet at ${size.name}`, () => {
+  test(`${size.name}: grid and maths keyboard`, async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "iPhone 15")
+    execFileSync(backendPython(), [path.join(BACKEND_DIR, "../frontend/e2e/scoresheet_games.py")], {
+      cwd: BACKEND_DIR, env: { ...backendEnv(), PYTHONPATH: BACKEND_DIR }, encoding: "utf8",
+    })
+    await emulateNativeDynamicType(page, size.px)
+    await logIn(page, "local-free@shelfpick.app")
+    await expect(page).toHaveURL(/\/tonight/)
+    // At AX sizes the shelf list is very long; open the game directly.
+    await page.goto("/shelf/owned/266192")
+    await page.getByRole("button", { name: "Log a play" }).click()
+    const sheet = page.getByRole("dialog")
+    for (const name of ["Ana", "Ben"]) {
+      await sheet.getByLabel("Add player").fill(name)
+      await sheet.getByLabel("Add player").press("Enter")
+    }
+    await sheet.getByRole("button", { name: "Use scoresheet" }).click()
+    await expect(sheet.getByRole("table")).toBeVisible()
+    await expectWordsWhole(page, `Scoresheet grid at ${size.name}`, ".play-sheet")
+    await sheet.getByRole("button", { name: /^Birds, Ana:/ }).click()
+    const keypad = sheet.locator(".math-keyboard")
+    await keypad.getByRole("button", { name: "4", exact: true }).click()
+    await keypad.getByRole("button", { name: "plus", exact: true }).click()
+    await keypad.getByRole("button", { name: "2", exact: true }).click()
+    await expect(keypad.getByRole("status")).toHaveAttribute("aria-label", "Entry: 4 plus 2 equals 6")
+    await expectWordsWhole(page, `Maths keyboard at ${size.name}`, ".play-sheet")
+    await page.screenshot({ path: `../docs/screenshots/sp-score-01/keyboard-${size.name}.png` })
+    await keypad.getByRole("button", { name: "Next", exact: true }).click()
+    await expect(sheet.getByRole("button", { name: /^Birds, Ana: 6$/ })).toBeVisible()
+  })
+})
