@@ -49,6 +49,9 @@ def serialize_play(
         "source": play.source,
         "outcome_type": play.outcome_type,
         "coop_result": play.coop_result,
+        "scoresheet_id": play.scoresheet_id,
+        "scoresheet_version": play.scoresheet_version,
+        "result_overridden": play.result_overridden,
         "participants": [
             {
                 "id": participant.id,
@@ -58,6 +61,7 @@ def serialize_play(
                 "team": participant.team,
                 "rank": participant.rank,
                 "role": participant.role,
+                "score_breakdown": participant.score_breakdown,
                 "outcome": _participant_outcome(participant, play, game),
             }
             for participant in play.participants

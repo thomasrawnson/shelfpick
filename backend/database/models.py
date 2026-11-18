@@ -16,6 +16,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
     func,
+    text,
 )
 
 from sqlalchemy.orm import (
@@ -680,6 +681,28 @@ class Play(Base):
         nullable=True,
     )
 
+    # The scoresheet and exact sheet version the breakdowns were entered on.
+    # Null for plays logged with plain scores.
+    scoresheet_id: Mapped[int | None] = mapped_column(
+        ForeignKey("scoresheets.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+
+    scoresheet_version: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+    )
+
+    # True when the player set the winners, ranks or result by hand instead
+    # of taking the scoresheet's calculated result.
+    result_overridden: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default="false",
+    )
+
     participants = relationship(
         "PlayParticipant",
         back_populates="play",
@@ -761,6 +784,12 @@ class PlayParticipant(Base):
 
     role: Mapped[str | None] = mapped_column(
         String(50),
+        nullable=True,
+    )
+
+    # Scoresheet entries by category id; null for plain-score plays.
+    score_breakdown: Mapped[dict | None] = mapped_column(
+        JSON,
         nullable=True,
     )
 
@@ -1145,4 +1174,91 @@ class Mechanic(Base):
         unique=True,
         nullable=False,
         index=True,
+    )
+
+
+class Scoresheet(Base):
+    """A scoring template: built in (no owner) or built by one user.
+
+    ``schema`` holds the current version; every version, including the
+    current one, is kept in ``scoresheet_versions`` so plays logged on an
+    older version stay readable and editable.
+    """
+
+    __tablename__ = "scoresheets"
+
+    __table_args__ = (
+        Index(
+            "uq_scoresheets_builtin_bgg_game_id",
+            "bgg_game_id",
+            unique=True,
+            postgresql_where=text("owner_user_id IS NULL"),
+            sqlite_where=text("owner_user_id IS NULL"),
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+
+    bgg_game_id: Mapped[int | None] = mapped_column(
+        Integer, nullable=True, index=True,
+    )
+
+    owner_user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=True,
+        index=True,
+    )
+
+    schema: Mapped[dict] = mapped_column(JSON, nullable=False)
+
+    format_version: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    version: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=1, server_default="1",
+    )
+
+    # Deleting a custom sheet archives it so plays logged on it still read.
+    archived_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(),
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+
+class ScoresheetVersion(Base):
+    __tablename__ = "scoresheet_versions"
+
+    __table_args__ = (
+        UniqueConstraint(
+            "scoresheet_id",
+            "version",
+            name="uq_scoresheet_versions_sheet_version",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+
+    scoresheet_id: Mapped[int] = mapped_column(
+        ForeignKey("scoresheets.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+
+    version: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    schema: Mapped[dict] = mapped_column(JSON, nullable=False)
+
+    format_version: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(),
     )

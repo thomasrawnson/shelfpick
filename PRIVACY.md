@@ -31,7 +31,7 @@ Runtime packages from `frontend/package.json` that ship in the web and iOS build
 | Data | Where stored (device / our server / none) | Why | Retention |
 |------|-------------------------------------------|-----|-----------|
 | Email, password hash, display name, verification state, tier, optional BGG username, preferences | Our server (Render PostgreSQL) | Accounts and sign-in | Until account deletion (in-app, after password confirmation) |
-| Collection, wishlist, plays (dates, duration, optional location, participant names and scores), rankings, Picker criteria and events, timer drafts | Our server | Core features | Until account deletion |
+| Collection, wishlist, plays (dates, duration, optional location, participant names, scores and per-category scoresheet entries), custom scoresheets a Pro user builds (name, categories, rules), rankings, Picker criteria and events, timer drafts | Our server | Core features | Until account deletion |
 | Game Night host sessions and candidate lists | Our server | Hosted votes | Access expires after 12 hours; rows are not yet deleted automatically |
 | Game Night guest nickname, hashed guest credential, ballot | Our server | Phone voting without an account | Access 12 hours; provisional 30-day deletion after expiry is **not implemented or approved** |
 | Guest credential and bearer access token | Device (browser local storage on web; Keychain on iOS for the sign-in token) | Keep a guest or user signed in | Until sign-out, expiry or app deletion |

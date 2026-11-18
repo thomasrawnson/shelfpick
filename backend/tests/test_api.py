@@ -661,6 +661,9 @@ def test_record_play_returns_404_for_unknown_game():
             timer_session_id=None,
             outcome_type="competitive",
             coop_result=None,
+            scoresheet_id=None,
+            scoresheet_version=None,
+            result_override=False,
         ):
             return None
 
@@ -718,6 +721,9 @@ def test_record_play_links_picker_conversion():
             timer_session_id=None,
             outcome_type="competitive",
             coop_result=None,
+            scoresheet_id=None,
+            scoresheet_version=None,
+            result_override=False,
         ):
             return Play(
                 id=7,
