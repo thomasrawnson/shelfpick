@@ -1,0 +1,403 @@
+/* Scoresheets in the Log play sheet (SP-SCORE-01): the category × player
+   grid, the maths keyboard and the custom sheet builder. */
+
+.scoresheet-section,
+.scoresheet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.scoresheet-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.scoresheet-head .preference-label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.scoresheet-meta,
+.builder-help {
+  margin: 0;
+  color: var(--color-text-support);
+  font-size: var(--text-support);
+}
+
+.scoresheet-result {
+  margin: 0;
+  font-weight: 700;
+}
+
+.scoresheet-override {
+  color: var(--color-accent-text);
+  font-weight: 700;
+}
+
+.scoresheet-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.scoresheet-scroll:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: 2px;
+}
+
+.scoresheet-grid {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.scoresheet-grid th,
+.scoresheet-grid td {
+  padding: 0;
+  border-bottom: 1px solid var(--color-border);
+  text-align: center;
+}
+
+.scoresheet-grid thead th {
+  padding: var(--space-2);
+  color: var(--color-text-support);
+  font-size: var(--text-support);
+  font-weight: 700;
+}
+
+.scoresheet-player {
+  min-width: 4.5rem;
+  max-width: 8rem;
+  overflow-wrap: anywhere;
+}
+
+/* Category labels stay in view while players scroll sideways. */
+.scoresheet-grid .scoresheet-corner,
+.scoresheet-grid .scoresheet-category {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 7.5rem;
+  max-width: 11rem;
+  padding: var(--space-2) var(--space-3);
+  border-right: 1px solid var(--color-border);
+  background: var(--color-surface);
+  font-size: var(--text-support);
+  text-align: left;
+}
+
+.scoresheet-grid .scoresheet-category {
+  font-weight: 600;
+  overflow-wrap: break-word;
+}
+
+.scoresheet-multiplier {
+  margin-left: var(--space-1);
+  color: var(--color-text-support);
+  font-size: var(--text-meta);
+  font-weight: 700;
+}
+
+.scoresheet-cell {
+  display: block;
+  width: 100%;
+  min-width: var(--target-min);
+  min-height: var(--target-min);
+  padding: var(--space-2);
+  border: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: var(--text-body);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.scoresheet-cell:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: -2px;
+}
+
+.scoresheet-cell.active {
+  background: var(--color-brand-primary-soft);
+  box-shadow: inset 0 0 0 2px var(--color-brand-primary);
+}
+
+.scoresheet-tick[aria-pressed="true"] {
+  color: var(--color-brand-primary);
+  font-weight: 800;
+}
+
+.scoresheet-add-round th {
+  padding: var(--space-1) var(--space-3);
+  text-align: left;
+}
+
+.scoresheet-grid tfoot th,
+.scoresheet-grid tfoot td {
+  border-bottom: 0;
+  background: var(--color-surface-raised);
+}
+
+.scoresheet-grid .scoresheet-total {
+  padding: var(--space-2);
+}
+
+.scoresheet-total-value {
+  display: block;
+  font-size: var(--text-body);
+  font-weight: 800;
+}
+
+.scoresheet-rank {
+  display: block;
+  color: var(--color-text-support);
+  font-size: var(--text-meta);
+  font-weight: 700;
+}
+
+.scoresheet-total.winner {
+  background: var(--color-brand-accent-soft);
+}
+
+.scoresheet-total.winner .scoresheet-rank {
+  color: var(--color-accent-text);
+}
+
+.play-row-total {
+  flex: 0 0 auto;
+  min-width: 3rem;
+  font-size: var(--text-body);
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  text-align: right;
+}
+
+.scoresheet-picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Maths keyboard: docked to the bottom of the sheet's scrolling form. */
+.math-keyboard {
+  position: sticky;
+  bottom: calc(var(--space-2) * -1);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-card);
+}
+
+.math-keyboard-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.math-keyboard-label {
+  font-weight: 800;
+}
+
+.math-keyboard-help {
+  color: var(--color-text-support);
+  font-size: var(--text-support);
+}
+
+.math-display {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  min-height: var(--target-min);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.math-display:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: 2px;
+}
+
+.math-expression {
+  font-size: 1.375rem;
+  font-weight: 800;
+}
+
+.math-result {
+  color: var(--color-text-support);
+  font-size: var(--text-body);
+  font-weight: 700;
+}
+
+.math-error {
+  margin: 0;
+}
+
+.math-keys {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-1);
+}
+
+.math-key {
+  min-height: var(--target-min);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.math-key-op {
+  color: var(--color-brand-primary);
+}
+
+.math-key:active {
+  background: var(--color-brand-primary-soft);
+}
+
+.math-key:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: 1px;
+}
+
+.math-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.math-actions > button {
+  flex: 1 1 8rem;
+  min-height: var(--target-min);
+  margin: 0;
+}
+
+/* Builder */
+.scoresheet-builder h3 {
+  margin: var(--space-2) 0 0;
+}
+
+.builder-field {
+  display: flex;
+  flex: 1 1 9rem;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  font-size: var(--text-support);
+  font-weight: 700;
+}
+
+.builder-field input,
+.builder-field select {
+  width: 100%;
+  padding: 0 var(--space-2);
+}
+
+.builder-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.builder-categories {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.builder-category fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.builder-checks,
+.builder-category-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+}
+
+.builder-check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--target-min);
+  font-size: var(--text-support);
+}
+
+.builder-check input {
+  min-height: auto;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: none;
+}
+
+.builder-ties {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.builder-add {
+  align-self: flex-start;
+  margin: 0;
+}
+
+.builder-remove {
+  color: var(--color-danger);
+}
+
+.builder-delete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--text-support);
+}
+
+.builder-danger {
+  margin: 0;
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .scoresheet-cell,
+  .math-key {
+    transition: background-color 120ms ease;
+  }
+}
