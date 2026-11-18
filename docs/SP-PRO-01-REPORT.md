@@ -49,7 +49,8 @@ and test Pro grants are untouched.
   server to confirm, checking up to four times, 2.5 s apart (the server allows
   one RevenueCat lookup per user every 2 s), for RevenueCat to catch up.
   Pro shows only after the server confirms it. Loading plans times out after
-  15 s with Try again.
+  60 s with Try again (was 15 s; that hid the cause of a TestFlight failure),
+  and the message now ends with the SDK's error code and text.
 
 ## Changed along the way
 

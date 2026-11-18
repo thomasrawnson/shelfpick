@@ -34,7 +34,10 @@ type Deps = {
   prepareTimeoutMs?: number
 }
 
-const PREPARE_TIMEOUT_MS = 15_000
+// Long enough for RevenueCat and StoreKit to answer on a slow connection and
+// to report their own error, which a shorter wait hid (1.2 (15) showed only
+// "taking too long"). Still bounded, so the paywall never loads forever.
+const PREPARE_TIMEOUT_MS = 60_000
 
 function withTimeout<T>(work: Promise<T>, ms: number): Promise<T> {
   return new Promise<T>((resolve, reject) => {
