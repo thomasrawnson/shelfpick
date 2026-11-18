@@ -5,25 +5,57 @@ import type { AuthUser } from "../auth"
 import { APP_PATHS } from "../routes"
 import { rememberSettingsEntry } from "../settings-focus"
 import { Analytics } from "../analytics"
-import { getThemePreference, setThemePreference, type ThemePreference } from "../theme"
 import ProfileSettings from "./ProfileSettings"
 import SetupView from "./SetupView"
+import BggAttribution from "./ui/BggAttribution"
 import { deleteAccount } from "../api/client"
+import { APP_VERSION, SOCIAL_LINKS } from "../app-links"
 import { LEGAL_DRAFTS_ENABLED } from "../legal-drafts"
 import { PUBLIC_LEGAL_LINKS_ENABLED, PRIVACY_POLICY_URL, TERMS_URL, SUPPORT_EMAIL_URL } from "../public-legal-links"
 import { deleteAccountAndClearSession } from "../account-deletion-session"
 
-type Section = "profile" | "preferences" | "appearance" | "collection-data" | "plays" | "help" | "about"
+type Section = "profile" | "preferences" | "collection-data" | "import" | "whats-new" | "help"
 type Props = {
   section: Section
   user: AuthUser
   onUserChange: (user: AuthUser) => void
   onAccountDeleted?: () => void
+  onLogout?: () => Promise<void>
+  onLogoutAll?: () => Promise<void>
 }
 
 const titles: Record<Section, string> = {
-  profile: "Profile", preferences: "Preferences", appearance: "Appearance",
-  "collection-data": "Collection & Data", plays: "Plays", help: "Help", about: "About",
+  profile: "Profile", preferences: "Picker defaults",
+  "collection-data": "BoardGameGeek sync", import: "Import plays",
+  "whats-new": "What's new", help: "Help",
+}
+
+function PlanPanel({ user }: { user: AuthUser }) {
+  const isPro = user.tier === "PRO"
+  return <div className="settings-info-panel settings-plan-panel">
+    <h2>Plan</h2>
+    <p>{isPro ? "ShelfPick Pro" : "ShelfPick Free"}</p>
+    {!isPro && <Link className="secondary-button settings-section-action" to={APP_PATHS.settingsPro}>Compare plans</Link>}
+  </div>
+}
+
+function SessionActions({ onLogout, onLogoutAll }: { onLogout: () => Promise<void>; onLogoutAll?: () => Promise<void> }) {
+  const [error, setError] = useState("")
+  const [loggingOutAll, setLoggingOutAll] = useState(false)
+  return <div className="settings-session-actions">
+    <button type="button" className="settings-logout" onClick={() => {
+      setError("")
+      void onLogout().catch((failure) => setError(failure instanceof Error ? failure.message : "Couldn't log out."))
+    }}>Log out</button>
+    {onLogoutAll && <button type="button" className="settings-logout" disabled={loggingOutAll} onClick={() => {
+      setLoggingOutAll(true); setError("")
+      void onLogoutAll().catch((failure) => {
+        setError(failure instanceof Error ? failure.message : "Couldn't log out all sessions.")
+        setLoggingOutAll(false)
+      })
+    }}>{loggingOutAll ? "Logging out…" : "Log out all devices"}</button>}
+    {error && <p className="error-message" role="alert">{error}</p>}
+  </div>
 }
 
 function SettingsBackLink({ section }: { section: Section }) {
@@ -40,28 +72,6 @@ function AnalyticsSetting() {
     }} />
     <span>Share anonymous usage analytics</span>
   </label>
-}
-
-function AppearanceSettings() {
-  const [theme, setTheme] = useState<ThemePreference>(getThemePreference)
-  function chooseTheme(value: ThemePreference) {
-    setThemePreference(value)
-    setTheme(value)
-    Analytics.track("settings_changed", { setting: "theme", value })
-  }
-  const options: Array<{ value: ThemePreference; label: string }> = [
-    { value: "system", label: "Use device setting" },
-    { value: "light", label: "Light" },
-    { value: "dark", label: "Dark" },
-    { value: "black", label: "Black (experimental)" },
-  ]
-  return <fieldset className="settings-theme-list">
-    <legend>Choose how ShelfPick looks on this device</legend>
-    {options.map((option) => <label key={option.value} className="settings-theme-option">
-      <span>{option.label}</span>
-      <input type="radio" name="appearance" value={option.value} checked={theme === option.value} onChange={() => chooseTheme(option.value)} />
-    </label>)}
-  </fieldset>
 }
 
 export function AccountDeletion({ onDeleted }: { onDeleted?: () => void }) {
@@ -101,38 +111,43 @@ export function AccountDeletion({ onDeleted }: { onDeleted?: () => void }) {
   </form>
 }
 
-function BggAttribution() {
-  return <a className="bgg-attribution" href="https://boardgamegeek.com/" target="_blank" rel="noopener noreferrer">
-    <img src="/branding/powered-by-bgg-rgb.svg" alt="Powered by BoardGameGeek" />
-    <span className="sr-only"> (opens in a new tab)</span>
-  </a>
-}
-
-function SettingsSectionView({ section, user, onUserChange, onAccountDeleted }: Props) {
+function SettingsSectionView({ section, user, onUserChange, onAccountDeleted, onLogout, onLogoutAll }: Props) {
   return <section className="screen settings-screen settings-detail-screen" aria-labelledby="settings-section-heading">
     <SettingsBackLink section={section} />
     <header className="settings-heading"><h1 id="settings-section-heading">{titles[section]}</h1></header>
-    {section === "profile" && <><ProfileSettings user={user} onChange={onUserChange} mode="profile" /><AccountDeletion onDeleted={onAccountDeleted} /></>}
+    {section === "profile" && <>
+      <ProfileSettings user={user} onChange={onUserChange} mode="profile" />
+      <PlanPanel user={user} />
+      <AccountDeletion onDeleted={onAccountDeleted} />
+      {onLogout && <SessionActions onLogout={onLogout} onLogoutAll={onLogoutAll} />}
+    </>}
     {section === "preferences" && <ProfileSettings user={user} onChange={onUserChange} mode="preferences" />}
-    {section === "appearance" && <AppearanceSettings />}
     {section === "collection-data" && <>
-      <SetupView initialUsername={user.bgg_username} onUsernameChange={(username) => onUserChange({ ...user, bgg_username: username })} compact />
+      <SetupView initialUsername={user.bgg_username} onUsernameChange={(username) => onUserChange({ ...user, bgg_username: username })} compact part="sync" />
       <p className="settings-attribution">Collection information is imported from BoardGameGeek. BoardGameGeek is not affiliated with ShelfPick.</p>
       <BggAttribution />
     </>}
-    {section === "plays" && <div className="settings-info-panel">
-      <p>Review recorded plays, participants and game history in Stats.</p>
-      <Link className="secondary-button settings-section-action" to={APP_PATHS.stats}>Open Stats</Link>
+    {section === "import" && <>
+      <SetupView compact part="import" />
+      <p className="settings-attribution">Your collection, plays and players are stored in your ShelfPick account, so they come back when you sign in on another device.</p>
+    </>}
+    {section === "whats-new" && <div className="settings-info-panel">
+      <h2>Version {APP_VERSION}</h2>
+      <ul className="settings-whats-new">
+        <li>Shelf, Plays and Discover share one cleaner layout with a shorter tab bar.</li>
+        <li>Discover rows are more compact, so you see more games at once.</li>
+        <li>Win rates count only plays with a winner, matching player profiles.</li>
+      </ul>
     </div>}
     {section === "help" && <div className="settings-info-panel">
       <h2>Using ShelfPick</h2>
       <p>Use Picker for a recommendation from your shelf, Collection to manage games, and Stats to review recorded plays.</p>
       <a className="secondary-button settings-section-action" href={SUPPORT_EMAIL_URL}>Contact support</a>
     </div>}
-    {section === "about" && <div className="settings-info-panel">
-      <h2>ShelfPick</h2>
+    {section === "help" && <div className="settings-info-panel">
+      <h2>About ShelfPick</h2>
       <p>A calm way to choose from your collection and keep track of what reaches the table.</p>
-      <p className="settings-row-detail">Made by Pluto Night Labs</p>
+      <p className="settings-row-detail">Version {APP_VERSION} · Made by Pluto Night Labs</p>
       <AnalyticsSetting />
       <p className="settings-row-detail">Anonymous counts of which features are used help improve ShelfPick. No account details, search text or notes are included.</p>
       <BggAttribution />
@@ -144,7 +159,7 @@ function SettingsSectionView({ section, user, onUserChange, onAccountDeleted }: 
         <a href={PRIVACY_POLICY_URL} target="_blank" rel="noopener noreferrer">Privacy Policy<span className="sr-only"> (opens in a new tab)</span></a>
         <a href={TERMS_URL} target="_blank" rel="noopener noreferrer">Terms of Use<span className="sr-only"> (opens in a new tab)</span></a>
       </nav>}
-      <a className="secondary-button settings-section-action" href="https://plutonightlabs.com/"
+      <a className="secondary-button settings-section-action" href={SOCIAL_LINKS.website.url}
         target="_blank" rel="noopener noreferrer">
         Pluto Night Labs<span className="sr-only"> (opens in a new tab)</span>
       </a>

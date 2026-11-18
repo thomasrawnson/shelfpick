@@ -4,7 +4,7 @@
 > DRAFT written 2026-11-17 from the repository (dependencies, backend models) and the existing privacy notice draft. It is an inventory, not legal advice. Every `TODO` is an owner decision or an App Store Connect value that cannot be read from this repository; `privacy-check.sh --release` is expected to fail until they are resolved.
 
 - **Policy URL:** https://plutonightlabs.com/shelfpick/privacy/ (published before phone voting; see "Open items")
-- **Last reviewed:** 2026-11-17
+- **Last reviewed:** 2026-11-18
 - **Collects any personal data?** Yes (account email, display name, collection and play data; Game Night guest nicknames and ballots)
 - **Tracking (ATT prompt needed)?** No. Anonymous product analytics (PostHog EU, SP-ANL-001) are collected but not used for tracking; no advertising or crash-reporting SDK is connected; no cross-app or cross-site tracking.
 - **Children's audience?** No. Accounts require a 13+ self-declaration; App Store age rating 4+ (owner decisions of 2026-11-15). Children's Code applicability has not been independently reviewed.
@@ -38,6 +38,9 @@ Runtime packages from `frontend/package.json` that ship in the web and iOS build
 | Analytics events and random anonymous ID | PostHog EU Cloud (processor); ID and opt-out choice in device local storage | Count feature use, drop-off and retention | PostHog project retention (owner to confirm); stops when the user opts out |
 | Review-prompt state (last request date, saved-play count) | Device only (local storage) | Limit the review prompt to once per 90 days | Until app data is cleared |
 | Year in Review banner dismissal (one flag per year) | Device only (local storage) | Stop showing the Pick banner after it is dismissed | Until app data is cleared |
+| In-app feedback: type, message, "email me back" choice; optionally app version, build, OS version and device type (only when "Include app and device info" is on) | Our server (`feedback` table, linked to the account) and emailed to hello@plutonightlabs.com through Resend. The account email is included in that email only when the user asks for a reply | Feature ideas and problem reports (SP-SETTINGS-01) | Until account deletion (rows are deleted with the account); the inbox copy follows the mailbox's own retention. Owner to confirm a retention period |
+| Feedback written while offline | Device only (local storage outbox, per account) until it is sent | Avoid losing a message with no connection | Removed once sent, or when the account is deleted on this device |
+| Tip count (Supporter badge) | Device only (local storage) | Thank users who tipped | Until app data is cleared. The tip jar is hidden in release builds until a StoreKit purchase layer exists |
 | Shelf layout choice (grid or list) | Device only (local storage) | Remember how the Shelf is shown | Until app data is cleared |
 | One-time verification/reset token hashes, keyed-hash abuse counters, request IDs, server logs | Our server | Security and operations | Render logs 7 days; abuse rows removed on a later write after 24 hours; expired tokens have no scheduled cleanup (per SP-IOS-21B) |
 | Email address and message for verification/reset mail | Resend (processor) | Transactional email | Resend log retention 30 days (per SP-IOS-21B); confirm |
@@ -72,11 +75,14 @@ The owner enters these; this repository cannot read them.
 2. **Guest-data wording.** `docs/privacy-notice-draft.md` and the in-app draft describe nicknames, ballots, the 12-hour window and the provisional 30-day retention. The owner approved the wording on 2026-11-17; no lawyer has reviewed it, and the retention is not implemented.
 3. **App Store Connect answers** need checking against the guest data above before the build that enables phone voting ships.
 4. **App-level privacy manifest** was added on 2026-11-17 and is not yet in a released build; confirm it matches the App Store Connect answers.
-5. This repository's `privacy-check.sh` reads only a root `package.json`; ShelfPick's dependencies are in `frontend/package.json`, so the dependency table above is maintained by hand.
+5. **Feedback (SP-SETTINGS-01).** The feedback message is user content linked to the account, and device details are optional. The App Store Connect answers and `PrivacyInfo.xcprivacy` already declare Other User Content (linked, App Functionality); the owner should confirm that covers feedback and decide whether optional device details need declaring. Add feedback to the hosted privacy policy before the build that ships it.
+6. **Tip jar.** In-app purchases would add Purchase History if a StoreKit layer is added (Apple processes payment). Not shipped yet.
+7. This repository's `privacy-check.sh` reads only a root `package.json`; ShelfPick's dependencies are in `frontend/package.json`, so the dependency table above is maintained by hand.
 
 ## Change log
 
 | Date | Change | By |
 |------|--------|----|
+| 2026-11-18 | In-app feedback (server table, Resend notification, offline outbox) and device-only tip count added (SP-SETTINGS-01) | Claude Code, for owner review |
 | 2026-11-17 | App privacy manifest added; manifest section updated | Claude Code, for owner review |
 | 2026-11-17 | Initial privacy inventory (SP-POLISH-02), including SP-UNLOCK-01 additions: guest nicknames and ballots, haptics and in-app review plugins | Claude Code, for owner review |

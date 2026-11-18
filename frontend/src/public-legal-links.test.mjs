@@ -24,7 +24,7 @@ after(async () => {
 test("approved public links render only when explicitly enabled in the build", () => {
   const markup = renderToStaticMarkup(React.createElement(MemoryRouter, null,
     React.createElement(SettingsSectionView, {
-      section: "about",
+      section: "help",
       user: { id: 1, email: "test@example.com", display_name: "Test", tier: "FREE" },
       onUserChange: () => {},
     })))

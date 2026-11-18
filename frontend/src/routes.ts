@@ -34,11 +34,10 @@ export const APP_PATHS = {
   settings: "/settings",
   settingsProfile: "/settings/profile",
   settingsPreferences: "/settings/preferences",
-  settingsAppearance: "/settings/appearance",
   settingsCollectionData: "/settings/collection-data",
-  settingsPlays: "/settings/plays",
+  settingsImport: "/settings/import",
   settingsHelp: "/settings/help",
-  settingsAbout: "/settings/about",
+  settingsWhatsNew: "/settings/whats-new",
   settingsPro: "/settings/pro",
 } as const
 
