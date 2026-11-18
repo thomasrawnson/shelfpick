@@ -57,6 +57,8 @@ from services.account_service import (
     AccountService,
     InvalidAccountPasswordError,
 )
+from api.routers.billing import get_revenuecat_client
+from services.billing_service import RevenueCatClient
 
 router = APIRouter(
     prefix="/auth",
@@ -749,9 +751,10 @@ def delete_account(
     request: DeleteAccountRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
+    revenuecat: RevenueCatClient | None = Depends(get_revenuecat_client),
 ):
     try:
-        AccountService(db).delete_account(
+        AccountService(db, revenuecat).delete_account(
             current_user, request.password
         )
     except InvalidAccountPasswordError as exc:

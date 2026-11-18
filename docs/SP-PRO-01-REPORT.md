@@ -129,3 +129,7 @@ Remove the two RevenueCat secrets (billing turns off, existing purchase rows
 keep working until expiry) or redeploy the previous commit. Do not downgrade
 the migration while purchase rows exist. Deploy order: API with the migration,
 secrets and webhook, then the app build.
+
+## Follow-up: erasing the RevenueCat customer on account deletion (18 November 2026)
+
+Deleting a ShelfPick account now also asks RevenueCat to erase the customer, using the random account ID, after the database deletion has committed. A failure never undoes the deletion; it is logged as a warning with the random ID so the record can be erased by hand. This needs the RevenueCat secret key to have read and write access to customer information (see the runbook). Backend: 656 passed, 17 skipped on a disposable PostgreSQL database; `alembic check` clean. Not deployed.

@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timezone
 
 from sqlalchemy import select
@@ -26,6 +27,12 @@ from database.models import (
     UserOperationLease,
     UserWishlistGame,
 )
+from services.billing_service import (
+    RevenueCatClient,
+    RevenueCatUnavailableError,
+)
+
+logger = logging.getLogger(__name__)
 
 
 class InvalidAccountPasswordError(ValueError):
@@ -33,8 +40,9 @@ class InvalidAccountPasswordError(ValueError):
 
 
 class AccountService:
-    def __init__(self, db: Session):
+    def __init__(self, db: Session, revenuecat: RevenueCatClient | None = None):
         self.db = db
+        self.revenuecat = revenuecat
 
     def delete_account(self, user: User, password: str) -> None:
         if (
@@ -117,8 +125,28 @@ class AccountService:
                     model.user_id == user.id
                 ).delete(synchronize_session=False)
 
+            purchase_account_id = user.public_id
             self.db.delete(user)
             self.db.commit()
         except Exception:
             self.db.rollback()
             raise
+
+        self._erase_purchase_record(purchase_account_id)
+
+    def _erase_purchase_record(self, purchase_account_id: str) -> None:
+        """Ask RevenueCat to erase the customer once our own deletion is final.
+
+        The account is already gone, so a failure must not undo it. The random
+        ID is logged on failure so the record can be removed by hand; nothing
+        else identifies the person.
+        """
+        if self.revenuecat is None:
+            return
+        try:
+            self.revenuecat.delete_customer(purchase_account_id)
+        except RevenueCatUnavailableError:
+            logger.warning(
+                "RevenueCat erasure failed; delete customer %s by hand",
+                purchase_account_id,
+            )

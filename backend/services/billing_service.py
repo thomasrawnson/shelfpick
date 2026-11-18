@@ -80,6 +80,27 @@ class RevenueCatClient:
             ) from exc
         return subscriber if isinstance(subscriber, dict) else {}
 
+    def delete_customer(self, app_user_id: str) -> None:
+        """Erase the customer's record at RevenueCat (queued on their side).
+
+        A 404 means there is nothing to erase. It does not cancel an Apple
+        subscription; that stays with the user.
+        """
+        try:
+            response = httpx.delete(
+                f"{self._base_url}/subscribers/{app_user_id}",
+                headers={"Authorization": f"Bearer {self._secret_api_key}"},
+                timeout=self._timeout,
+            )
+        except httpx.HTTPError as exc:
+            raise RevenueCatUnavailableError(
+                "RevenueCat could not be reached"
+            ) from exc
+        if response.status_code not in (200, 404):
+            raise RevenueCatUnavailableError(
+                f"RevenueCat answered {response.status_code}"
+            )
+
 
 def _parse_time(value) -> datetime | None:
     if not value or not isinstance(value, str):
