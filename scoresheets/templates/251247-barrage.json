@@ -1,0 +1,69 @@
+{
+  "format_version": 1,
+  "bgg_id": 251247,
+  "name": "Barrage",
+  "supported_players": [
+    2,
+    4
+  ],
+  "win_condition": "highest",
+  "rounds": 5,
+  "categories": [
+    {
+      "id": "vp_track",
+      "label": "Victory points on the track",
+      "help": "Victory points on the board track before final scoring (contracts, bonus tiles, technology and everything scored during the five rounds).",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "objective_tile",
+      "label": "Objective tile",
+      "help": "Points from the Objective tile: 15 for first, 10 for second, 5 for third; tied players split their tiers evenly, rounding up.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "resource_sets",
+      "label": "Sets of five resources",
+      "help": "Excavators, Concrete Mixers and Credits in your personal supply, counted together (not those still on the Construction Wheel); enter the number of full sets of 5.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "water_drops",
+      "label": "Water Drops in dams",
+      "help": "One point for each Water Drop held in your Personal Dams.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "last_round_energy",
+      "label": "Energy in the last round",
+      "help": "Energy Units you produced in the fifth round; the most wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once",
+      "tie_break_direction": "higher"
+    }
+  ],
+  "tie_breakers": [
+    "last_round_energy"
+  ],
+  "source": {
+    "rulebook_title": "Barrage Core Rulebook (English)",
+    "edition_or_year": "Base game, 2019",
+    "url": "https://c.tabletopia.com/games/barrage-leeghwater-project/rules/barrage-core-rulebook-eng-low/en",
+    "checked_against_rulebook": true
+  },
+  "notes": "Base game only. Read from a Tabletopia-hosted copy of the publisher rulebook PDF (Cranio Creations), not from the publisher site; the rulebook refers to 2-4 player setups, so 2-4 is taken from its setup text. Solo/Automa rules, the 5th-player expansion and the Duel version are excluded. The track entry covers all in-game scoring and includes any laps past 100."
+}

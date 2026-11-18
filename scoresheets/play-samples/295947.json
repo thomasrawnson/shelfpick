@@ -1,0 +1,312 @@
+{
+  "bgg_id": 295947,
+  "provenance": "real plays, totals only, anonymised (no names, dates or places)",
+  "plays": [
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 90,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 79,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 86,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 90,
+          "winner": true
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 84,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 83,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 79,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 86,
+          "winner": true
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 90,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 92,
+          "winner": true
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 86,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 90,
+          "winner": true
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 94,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 84,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 93,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 93,
+          "winner": true
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 93,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 98,
+          "winner": true
+        },
+        {
+          "name": "P3",
+          "total": 88,
+          "winner": false
+        },
+        {
+          "name": "P4",
+          "total": 84,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 93,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 84,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 85,
+          "winner": false
+        },
+        {
+          "name": "P4",
+          "total": 85,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 93,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 93,
+          "winner": true
+        },
+        {
+          "name": "P3",
+          "total": 90,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 89,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 89,
+          "winner": true
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 92,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 89,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 91,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 93,
+          "winner": true
+        },
+        {
+          "name": "P3",
+          "total": 79,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 99,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 69,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 94,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 97,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 87,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 93,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 90,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 87,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 100,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 89,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 97,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 94,
+          "winner": false
+        }
+      ]
+    }
+  ]
+}

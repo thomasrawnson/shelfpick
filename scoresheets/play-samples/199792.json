@@ -1,0 +1,20 @@
+{
+  "bgg_id": 199792,
+  "provenance": "real plays, totals only, anonymised (no names, dates or places)",
+  "plays": [
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 55,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 68,
+          "winner": true
+        }
+      ]
+    }
+  ]
+}

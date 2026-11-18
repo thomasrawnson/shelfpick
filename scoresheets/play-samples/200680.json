@@ -1,0 +1,198 @@
+{
+  "bgg_id": 200680,
+  "provenance": "real plays, totals only, anonymised (no names, dates or places)",
+  "plays": [
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 32,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 25,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 36,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 45,
+          "winner": true
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 48,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 41,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 25,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 48,
+          "winner": true
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 37,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 43,
+          "winner": true
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 23,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 27,
+          "winner": false
+        },
+        {
+          "name": "P3",
+          "total": 35,
+          "winner": true
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 35,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 40,
+          "winner": true
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 46,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 30,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 42,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 43,
+          "winner": true
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 30,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 31,
+          "winner": true
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 47,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 41,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 21,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 41,
+          "winner": true
+        },
+        {
+          "name": "P3",
+          "total": 24,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 39,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 30,
+          "winner": false
+        }
+      ]
+    }
+  ]
+}

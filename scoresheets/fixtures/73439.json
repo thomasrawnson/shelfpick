@@ -1,0 +1,47 @@
+{
+  "bgg_id": 73439,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "vp_tokens": 45,
+        "events": 5,
+        "tradesmen": 14,
+        "empty_cathedral_levels": 0,
+        "characters": 12
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "vp_tokens": 50,
+        "events": 4,
+        "tradesmen": 10,
+        "empty_cathedral_levels": 1,
+        "characters": 14
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "vp_tokens": 38,
+        "events": 6,
+        "tradesmen": 12,
+        "empty_cathedral_levels": 0,
+        "characters": 9
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 76,
+      "Ben": 76,
+      "Cleo": 65
+    },
+    "winner": [
+      "Ana",
+      "Ben"
+    ]
+  }
+}

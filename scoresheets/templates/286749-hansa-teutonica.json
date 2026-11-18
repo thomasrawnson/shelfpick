@@ -1,0 +1,89 @@
+{
+  "format_version": 1,
+  "bgg_id": 286749,
+  "name": "Hansa Teutonica: Big Box",
+  "supported_players": [
+    3,
+    5
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "track_points",
+      "label": "Prestige track",
+      "help": "Prestige points earned during play and marked on the track or scorepad.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "developed_abilities",
+      "label": "Fully developed abilities",
+      "help": "Abilities you have emptied completely, excluding City Keys (4 points each).",
+      "type": "count",
+      "points_per": 4,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "bonus_markers",
+      "label": "Bonus markers",
+      "help": "Points from your collected bonus markers, used or not: 1 marker 1, 2-3 give 3, 4-5 give 6, 6-7 give 10, 8-9 give 15, 10 or more give 21.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "special_points",
+      "label": "Special spaces",
+      "help": "Points from your merchant in the special end-game space on the map (for example Coellen).",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "cities",
+      "label": "Controlled cities",
+      "help": "Cities where you hold the most trading posts (2 points each).",
+      "type": "count",
+      "points_per": 2,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "network",
+      "label": "Largest network",
+      "help": "Trading posts in your largest connected network multiplied by your City Keys value.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "actions_developed",
+      "label": "Actions ability developed",
+      "help": "How far your Actions ability is developed; the fewest wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once",
+      "tie_break_direction": "lower"
+    }
+  ],
+  "tie_breakers": [
+    "actions_developed",
+    "network",
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "Hansa Teutonica Big Box rulebook (English)",
+    "edition_or_year": "Pegasus Spiele, 2020-2021",
+    "url": "https://cdn.pegasus.de/public/media/db/40/7c/1717757162/4250231718076_gb.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Read from the publisher-hosted English PDF; the text layer has duplicated lines on some pages but the end-game scoring and tie rules were legible. That rulebook states 3 to 5 players; the box and BoardGameGeek list 2 to 5 but no two-player rules were found in the PDF, so 3 to 5 is used. Tie-break: the player whose Actions ability is least developed wins, then the larger network score. Britannia and Eastern maps share the same scoring. Solo and variants excluded."
+}

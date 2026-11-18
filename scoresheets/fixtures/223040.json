@@ -1,0 +1,40 @@
+{
+  "bgg_id": 223040,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "base_strength": 80,
+        "bonuses": 60,
+        "penalties": 20
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "base_strength": 70,
+        "bonuses": 70,
+        "penalties": 20
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "base_strength": 75,
+        "bonuses": 40,
+        "penalties": 10
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 120,
+      "Ben": 120,
+      "Cleo": 105
+    },
+    "winner": [
+      "Ben"
+    ]
+  }
+}

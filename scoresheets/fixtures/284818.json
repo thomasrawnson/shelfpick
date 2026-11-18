@@ -1,0 +1,46 @@
+{
+  "bgg_id": 284818,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "prestige": 62,
+        "gold_left": 3
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "prestige": 70,
+        "gold_left": 0
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "prestige": 55,
+        "gold_left": 7
+      }
+    },
+    {
+      "name": "Dev",
+      "scores": {
+        "prestige": 64,
+        "gold_left": 3
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 68,
+      "Ben": 70,
+      "Cleo": 69,
+      "Dev": 70
+    },
+    "winner": [
+      "Ben",
+      "Dev"
+    ]
+  }
+}

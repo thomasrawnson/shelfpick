@@ -1,0 +1,87 @@
+{
+  "format_version": 1,
+  "bgg_id": 266164,
+  "name": "Babylonia",
+  "supported_players": [
+    2,
+    4
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "ziggurat_points",
+      "label": "Ziggurat points",
+      "help": "Points taken whenever you placed a token beside a ziggurat: one for each ziggurat you touch at that moment.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "crop_fields",
+      "label": "Crop fields",
+      "help": "Points from crop field tiles your farmers claimed, including the city-count fields.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "city_nobles",
+      "label": "Noble points at cities",
+      "help": "Points from your matching nobles whenever a city was surrounded (2 for each noble that matches and touches or connects to the city).",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "city_tiles",
+      "label": "City tile points",
+      "help": "Points everyone took each time a city tile was won: your city count at that moment.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "ziggurat_card_city_bonus",
+      "label": "Ziggurat card city bonus",
+      "help": "Extra points from the Ziggurat card that pays 1 point for every two cities you hold when cities are scored.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "ziggurat_card_ten",
+      "label": "Ziggurat card: 10 points",
+      "help": "Tick if you took the one-time Ziggurat card that gives 10 points immediately.",
+      "type": "boolean",
+      "points_per": 10,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "cities_owned",
+      "label": "Cities in front of you",
+      "help": "City tiles you hold at the end; the most wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "cities_owned",
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "Babylonia rulebook",
+    "edition_or_year": "Ludonova, 2019",
+    "url": "https://ludonova.com/wp-content/uploads/2023/10/Babylonia_Rulebook_EN.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Base game, standard Ziggurat Card set; the 7-of-9 variant and no other variant is covered. Points are scored on the board track during play, so the sheet asks for running points by source; enter the totals from each source. Read the publisher (Ludonova) PDF. Player count taken from the rulebook setup, which gives board layouts for 2, 3 and 4 players."
+}

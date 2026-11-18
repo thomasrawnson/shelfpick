@@ -1,0 +1,68 @@
+{
+  "format_version": 1,
+  "bgg_id": 73439,
+  "name": "Troyes",
+  "supported_players": [
+    2,
+    4
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "vp_tokens",
+      "label": "Victory points gained in play",
+      "help": "Total of the victory point tokens you collected during the game.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "events",
+      "label": "Events you are present on",
+      "help": "Un-countered event cards (including Marauding) where you have a cube; 1 point each.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "tradesmen",
+      "label": "Tradesmen on activity cards",
+      "help": "Total of the points printed on the spaces your citizens occupy on activity cards.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "empty_cathedral_levels",
+      "label": "Cathedral levels with no cubes",
+      "help": "How many of the 3 cathedral levels you have no cubes on (lose 2 points each).",
+      "type": "count",
+      "points_per": -2,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "characters",
+      "label": "Character cards",
+      "help": "Points you score from all the revealed character cards, including other players' characters.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "Troyes rules (English)",
+    "edition_or_year": "Pearl Games, 2010 game; rules file dated April 2017",
+    "url": "https://pearlgames.be/wp-content/uploads/2017/08/TROYES_RULES_ENG_04_04_17LD.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Base game only; Dice, Ladies of Troyes, bonus cards and the solo rules (le Roy) are out of scope. Read from the publisher-hosted PDF. The rulebook states no tie-break, so ties are shared. Round count depends on player count (6, 5 or 4) so rounds is null. Supported players 2 to 4 from the rulebook setup text. Character card points depend on each character's own criteria; enter the sum."
+}

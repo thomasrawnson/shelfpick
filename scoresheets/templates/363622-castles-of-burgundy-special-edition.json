@@ -1,0 +1,89 @@
+{
+  "format_version": 1,
+  "bgg_id": 363622,
+  "name": "The Castles of Burgundy: Special Edition",
+  "supported_players": [
+    2,
+    4
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "points_in_play",
+      "label": "Points earned during play",
+      "help": "Everything already on your score track: tiles, completed regions, bonus tiles and goods sales.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "unsold_goods",
+      "label": "Unsold goods",
+      "help": "One point for each goods tile you did not sell.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "silver",
+      "label": "Silver coins",
+      "help": "One point for each silver coin you still hold.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "worker_pairs",
+      "label": "Pairs of workers",
+      "help": "One point for each full pair of worker tokens you still hold.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "monastery_end",
+      "label": "Monastery end bonuses",
+      "help": "Points from your placed yellow monastery tiles that score at game end.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "empty_spaces",
+      "label": "Empty spaces",
+      "help": "Empty hex spaces in your duchy (key spaces excluded). Scores nothing; fewer wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once",
+      "tie_break_direction": "lower"
+    },
+    {
+      "id": "turn_order_place",
+      "label": "Turn order place",
+      "help": "Your place on the turn order track, 1 for first. Scores nothing; the player furthest back wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once",
+      "tie_break_direction": "higher"
+    }
+  ],
+  "tie_breakers": [
+    "empty_spaces",
+    "turn_order_place"
+  ],
+  "source": {
+    "rulebook_title": "The Castles of Burgundy: Special Edition rulebook (Hungarian edition)",
+    "edition_or_year": "Special Edition",
+    "url": "https://tarsasjatekok.com/files/common/d/d0/d01/d01f94fda3c58c369d3b079adcf3c83e/castles-of-brugundy-spec-jatekszabaly-by-kok-o.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Special Edition rules (not the 2011 original, template 84876). Read in Hungarian from a distributor-hosted translation of the publisher rulebook; no English publisher PDF was reachable, so wording was checked against the Hungarian text. Solo (Chateauma), 2v2 team and cooperative variants excluded. Player count 2-4 for standard play comes from the rules text. Turn-order tie-break is read as the player last in turn order."
+}

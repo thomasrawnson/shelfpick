@@ -1,0 +1,52 @@
+{
+  "bgg_id": 286749,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "track_points": 12,
+        "developed_abilities": 1,
+        "bonus_markers": 6,
+        "special_points": 0,
+        "cities": 5,
+        "network": 21,
+        "actions_developed": 3
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "track_points": 15,
+        "developed_abilities": 2,
+        "bonus_markers": 3,
+        "special_points": 8,
+        "cities": 4,
+        "network": 11,
+        "actions_developed": 4
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "track_points": 9,
+        "developed_abilities": 0,
+        "bonus_markers": 1,
+        "special_points": 0,
+        "cities": 3,
+        "network": 12,
+        "actions_developed": 2
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 53,
+      "Ben": 53,
+      "Cleo": 28
+    },
+    "winner": [
+      "Ana"
+    ]
+  }
+}

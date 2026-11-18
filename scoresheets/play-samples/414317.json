@@ -1,0 +1,30 @@
+{
+  "bgg_id": 414317,
+  "provenance": "real plays, totals only, anonymised (no names, dates or places)",
+  "plays": [
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 73,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 84,
+          "winner": true
+        },
+        {
+          "name": "P3",
+          "total": 56,
+          "winner": false
+        },
+        {
+          "name": "P4",
+          "total": 79,
+          "winner": false
+        }
+      ]
+    }
+  ]
+}
