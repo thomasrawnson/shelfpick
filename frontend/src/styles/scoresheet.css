@@ -39,6 +39,7 @@
 }
 
 .scoresheet-scroll {
+  flex-shrink: 0;
   overflow-x: auto;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -72,8 +73,8 @@
 }
 
 .scoresheet-player {
-  min-width: 4.5rem;
-  max-width: 8rem;
+  min-width: min(4.5rem, 28vw);
+  max-width: min(8rem, 40vw);
   overflow-wrap: anywhere;
 }
 
@@ -83,8 +84,8 @@
   position: sticky;
   left: 0;
   z-index: 1;
-  min-width: 7.5rem;
-  max-width: 11rem;
+  min-width: min(7.5rem, 36vw);
+  max-width: min(11rem, 46vw);
   padding: var(--space-2) var(--space-3);
   border-right: 1px solid var(--color-border);
   background: var(--color-surface);

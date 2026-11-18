@@ -85,9 +85,11 @@ export default function ScoresheetGrid({ sheet, columns, breakdowns, roundCounts
             {rows.map((row, rowIndex) => {
               const isLastRound = row.round !== null && sheet.rounds === null
                 && row.round === (roundCounts[row.category.id] ?? 1) - 1
-              const multiplier = row.category.points_per !== 1 && row.round === null
-                ? ` ×${formatNumber(row.category.points_per)}`
-                : ""
+              const multiplier = row.round !== null || row.category.points_per === 1
+                ? ""
+                : row.category.points_per === 0
+                  ? "tie-break"
+                  : `×${formatNumber(row.category.points_per)}`
               return [
                 <tr key={row.key}>
                   <th scope="row" className="scoresheet-category">
