@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import {
   cellProblem,
@@ -67,6 +67,22 @@ export default function ScoresheetGrid({ sheet, columns, breakdowns, roundCounts
     window.setTimeout(() => cellRefs.current.get(cellKey(row, column))?.focus(), 0)
   }
 
+  const keyboardHost = useRef<HTMLDivElement>(null)
+
+  // Keep the cell being typed into visible just above the docked keyboard.
+  useEffect(() => {
+    if (!active) return
+    const cell = cellRefs.current.get(cellKey(active.row, active.column))
+    const keyboard = keyboardHost.current?.querySelector(".math-keyboard")
+    const scroller = cell?.closest(".play-sheet-form")
+    if (!cell || !keyboard || !scroller) return
+    const cellBox = cell.getBoundingClientRect()
+    const limit = keyboard.getBoundingClientRect().top - 12
+    const top = scroller.getBoundingClientRect().top + 8
+    const shift = cellBox.bottom > limit ? cellBox.bottom - limit : cellBox.top < top ? cellBox.top - top : 0
+    if (shift !== 0) scroller.scrollBy({ top: shift, behavior: "smooth" })
+  }, [active])
+
   const activeRow = active ? rows[active.row] : null
   const activeValue = active && activeRow ? cellValue(breakdowns[active.column] ?? {}, activeRow) : undefined
 
@@ -94,7 +110,7 @@ export default function ScoresheetGrid({ sheet, columns, breakdowns, roundCounts
                 <tr key={row.key}>
                   <th scope="row" className="scoresheet-category">
                     <span>{row.label}</span>
-                    {multiplier && <span className="scoresheet-multiplier">{multiplier}</span>}
+                    {multiplier && <><span className="sr-only">, </span><span className="scoresheet-multiplier">{multiplier}</span></>}
                   </th>
                   {columns.map((name, column) => {
                     const value = cellValue(breakdowns[column] ?? {}, row)
@@ -166,6 +182,8 @@ export default function ScoresheetGrid({ sheet, columns, breakdowns, roundCounts
         </table>
       </div>
 
+      {active && activeRow && <div className="math-keyboard-spacer" aria-hidden="true" />}
+      <div ref={keyboardHost}>
       {active && activeRow && (
         <MathKeyboard
           key={`${active.row}:${active.column}`}
@@ -183,6 +201,7 @@ export default function ScoresheetGrid({ sheet, columns, breakdowns, roundCounts
           }}
         />
       )}
+      </div>
     </div>
   )
 }

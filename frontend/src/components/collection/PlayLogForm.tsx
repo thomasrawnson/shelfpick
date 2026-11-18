@@ -321,7 +321,10 @@ function PlayLogForm({
       .filter((category) => category.scope === "per_round")
       .map((category) => [category.id, Math.max(openRoundCount(columnBreakdowns, category.id), extraRounds[category.id] ?? 1)]))
     : {}
-  const scored = schema ? scorePlay(schema, columnBreakdowns) : null
+  const anyEntry = columnBreakdowns.some((breakdown) => Object.keys(breakdown).length > 0)
+  const fullScore = schema ? scorePlay(schema, columnBreakdowns) : null
+  // No result until something has been entered: an empty sheet is not a tie.
+  const scored = fullScore && !anyEntry ? { ...fullScore, ranks: null, winners: [] } : fullScore
   const soloTarget = schema && scored && effectiveOutcome === "solo" ? targetReached(schema, scored.totals[0]) : null
   const mode = { direction, winnersOverridden, manualPlaces }
   const shown = schema && scored
@@ -429,6 +432,7 @@ function PlayLogForm({
 
   function buildSheetPlay(drafts: PlayerDraft[]): Built | string {
     if (!schema || !sheet || !scored) return "Choose a scoresheet."
+    if (!anyEntry) return "Enter at least one score on the scoresheet."
     if (effectiveOutcome === "cooperative" && coopResult === "") return "Choose whether the group won."
     const override = competitive && winnersOverridden
     const participants = drafts.map((player, index) => ({
@@ -959,7 +963,7 @@ function PlayLogForm({
                 ? <><span className="scoresheet-override">Winner chosen by hand.</span> <button type="button" className="sheet-text-button" onClick={() => setWinnersOverridden(false)}>Use calculated result</button></>
                 : <span>{scored && scored.winners.length > 0
                     ? `Calculated: ${scored.winners.map((index) => shown[index]?.name.trim()).join(" and ")} ${scored.winners.length > 1 ? "share the win" : "wins"}.`
-                    : "No winner yet."}</span>}
+                    : anyEntry ? "No winner yet." : "Enter scores to see the winner."}</span>}
             </div>
           )}
 

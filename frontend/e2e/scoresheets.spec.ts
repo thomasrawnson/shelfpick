@@ -98,6 +98,8 @@ for (const scheme of ["light", "dark"] as const) {
       await form.getByRole("button", { name: "Use scoresheet" }).click()
       await expect(form.getByRole("table")).toBeVisible()
       await expect(form.getByLabel("Result type")).toHaveCount(0)
+      // An empty sheet has no winner yet.
+      await expect(form.getByText("Enter scores to see the winner.")).toBeVisible()
 
       // "40+12" shows its running result, and Next moves down the column.
       await form.getByRole("button", { name: new RegExp(`^Birds, ${ana}:`) }).click()

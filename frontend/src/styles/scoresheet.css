@@ -187,19 +187,49 @@
   gap: var(--space-2);
 }
 
-/* Maths keyboard: docked to the bottom of the sheet's scrolling form. */
+/* Maths keyboard: docked to the bottom of the screen on phones, like the
+   system keyboard; the spacer lets the last rows scroll above it. */
 .math-keyboard {
-  position: sticky;
-  bottom: calc(var(--space-2) * -1);
+  position: fixed;
+  bottom: 0;
+  left: 50%;
   z-index: 2;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  padding: var(--space-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  width: min(100%, 560px);
+  max-height: 75dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-3) var(--space-3) calc(var(--space-3) + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--color-border);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   background: var(--color-surface-raised);
   box-shadow: var(--shadow-card);
+  transform: translateX(-50%);
+}
+
+.math-keyboard-spacer {
+  flex: none;
+  height: 60dvh;
+}
+
+/* The centred card layout keeps the keypad inside the card. */
+@media (min-width: 700px) {
+  .math-keyboard {
+    position: sticky;
+    bottom: 0;
+    left: auto;
+    width: auto;
+    max-height: none;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    transform: none;
+  }
+
+  .math-keyboard-spacer {
+    display: none;
+  }
 }
 
 .math-keyboard-head {
