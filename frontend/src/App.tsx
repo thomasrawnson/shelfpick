@@ -632,7 +632,7 @@ function App() {
 
             <Route
               path={APP_PATHS.settingsPro}
-              element={<ProComparisonView user={user} />}
+              element={<ProComparisonView user={user} onUserChange={setUser} />}
             />
 
             <Route

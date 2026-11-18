@@ -684,6 +684,34 @@ export async function login(
 }
 
 
+export interface BillingAccount {
+  app_user_id: string
+  billing_available: boolean
+  pro: boolean
+  source: "purchase" | "grant" | null
+  plan: "LIFETIME" | "YEARLY" | null
+  expires_at: string | null
+}
+
+export async function getBillingAccount(): Promise<BillingAccount> {
+  const response = await apiFetch("/billing/account")
+  if (!response.ok) {
+    throw new Error(await readError(response, "Couldn't load your plan. Please try again."))
+  }
+  return response.json()
+}
+
+// Asks the server to re-check this account's purchase with RevenueCat. The
+// request carries nothing: the server decides from RevenueCat's record.
+export async function syncBilling(): Promise<BillingAccount> {
+  const response = await apiFetch("/billing/sync", { method: "POST" })
+  if (!response.ok) {
+    throw new Error(await readError(response, "Couldn't confirm your purchase. Please try again."))
+  }
+  return response.json()
+}
+
+
 export async function getMe():
 Promise<AuthUser> {
   const response =

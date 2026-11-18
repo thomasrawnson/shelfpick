@@ -42,9 +42,12 @@ test("Settings plan pill opens the comparison route for Free users", () => {
 test("Free plan leads with available Pro benefits and accurate boundaries", () => {
   const markup = render(ProComparisonView, { user })
   assert.match(markup, /Free covers the essentials/)
+  assert.match(markup, /Deeper stats/)
+  assert.match(markup, /Help my H-index/)
+  assert.match(markup, /Custom scoresheets/)
   assert.match(markup, /More personal recommendations/)
   assert.match(markup, /Live play timing/)
-  assert.match(markup, /Two benefits available with Pro access/)
+  assert.match(markup, /Five benefits available with Pro access/)
   assert.match(markup, /count-based sessions, not named-player groups/)
   assert.match(markup, /Lock-screen timers and notifications are not included/)
   assert.match(markup, /Phone voting.*Host a vote from guests’ phones/s)
@@ -52,22 +55,19 @@ test("Free plan leads with available Pro benefits and accurate boundaries", () =
   assert.doesNotMatch(markup, /Game Night voting from players’ phones/)
   assert.match(markup, /You’re on Free/)
   assert.match(markup, /Free<\/h2><span class="pro-plan-state">Your plan/)
-  assert.match(markup, /One-off unlock/)
-  assert.match(markup, /Purchases are not available yet/)
-  assert.match(markup, /not a subscription/)
-  assert.match(markup, /No price or Buy action is shown/)
-  assert.doesNotMatch(markup, /<button[^>]*>.*(?:Buy|Unlock ShelfPick Pro)/s)
-  assert.doesNotMatch(markup, /£3\.99|photo upload/i)
+  assert.match(markup, /Get ShelfPick Pro/)
+  assert.doesNotMatch(markup, /Purchases are not available yet/)
+  assert.doesNotMatch(markup, /One-off unlock|photo upload/i)
 })
 
-test("Pro plan is current without a purchase action", () => {
+test("Pro plan is current and shows the plan, not a purchase prompt", () => {
   const markup = render(ProComparisonView, {
     user: { ...user, tier: "PRO", entitlements: ["game_night_basic", "personalized_discover"] },
   })
   assert.match(markup, /Pro<\/h2><span class="pro-plan-state">Your plan/)
   assert.match(markup, /Pro is active/)
   assert.match(markup, /Your Pro access is active/)
-  assert.doesNotMatch(markup, /Unlock ShelfPick Pro/)
+  assert.doesNotMatch(markup, /Unlock ShelfPick Pro|Get ShelfPick Pro/)
 })
 
 test("comparison groups activities and retains confirmed Free capabilities", () => {
@@ -92,6 +92,12 @@ test("comparison distinguishes Pro gates and free phone voting", () => {
   assert.match(row("Picker ranking influence"), /Not included.*Included/)
   assert.match(row("Discover For You"), /Not included.*Included/)
   assert.match(row("Live play timer"), /Not included.*Included/)
+  assert.match(row("Help my H-index"), /Not included.*Included/)
+  assert.match(row("Trends and H-index"), /Included.*Included/)
+  assert.match(row("Records and head-to-head"), /Not included.*Included/)
+  assert.match(row("Stats filters"), /Not included.*Included/)
+  assert.match(row("Built-in scoresheets"), /Included.*Included/)
+  assert.match(row("Custom scoresheets"), /Not included.*Included/)
   assert.match(row("Phone voting"), /Included.*Included/)
   assert.match(row("Join a hosted vote"), /No account needed.*No account needed/)
   assert.equal(row("Discover Top 100"), undefined)

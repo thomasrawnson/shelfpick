@@ -46,6 +46,24 @@ Render pre-deploy command. Custom sheets use the same schema behind the new
 Stats export still sends totals only. Migration `d2b6f0a9c4e8` is additive and
 must run, with the seed, before build 12. Evidence: `docs/SP-SCORE-01-REPORT.md`.
 
+### SP-PRO-01 Sell Pro (lifetime and yearly) — LOCAL CANDIDATE, 18 November 2026
+
+Branch `sp-pro-01` from `origin/main` ee43a05 (SP-STATS-01 merged); draft PR for
+owner review, not merged, deployed or submitted. Pro Lifetime
+(`com.plutonightlabs.shelfpick.pro.lifetime`) and Pro Yearly
+(`com.plutonightlabs.shelfpick.pro.yearly`) are bought through RevenueCat
+(`@revenuecat/purchases-capacitor` 14.1.1, signed in with the new random
+`users.public_id`). The server grants Pro only from RevenueCat's record
+(`POST /billing/sync`, `POST /billing/revenuecat/webhook`), stored in
+`purchase_entitlements`; expiry or refund returns the account to Free, and
+manual test grants are untouched. One paywall screen at Settings > Pro shows
+store prices, auto-renew terms, Privacy and Terms links, Restore and Manage
+subscription, and refuses to sell until the public legal links are enabled in
+the build. Migration `c4e7a9b2d6f1` is additive. iOS build number is 14.
+Not tested: a real sandbox purchase (needs the RevenueCat project, keys and an
+App Store sandbox tester). Evidence, owner gates and rollback:
+`docs/SP-PRO-01-REPORT.md`.
+
 ### SP-STATS-01 Stats 2.0 — LOCAL CANDIDATE, 18 November 2026
 
 Branch `sp-stats-01` from `origin/main` 601dea0 (SP-PLAY-01 and SP-SCORE-01
