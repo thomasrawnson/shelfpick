@@ -1,0 +1,53 @@
+{
+  "bgg_id": 230802,
+  "provenance": "real plays, totals only, anonymised (no names, dates or places)",
+  "plays": [
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 48,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 63,
+          "winner": true
+        },
+        {
+          "name": "P3",
+          "total": 55,
+          "winner": false
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 47,
+          "winner": false
+        },
+        {
+          "name": "P2",
+          "total": 49,
+          "winner": true
+        }
+      ]
+    },
+    {
+      "players": [
+        {
+          "name": "P1",
+          "total": 50,
+          "winner": true
+        },
+        {
+          "name": "P2",
+          "total": 28,
+          "winner": false
+        }
+      ]
+    }
+  ]
+}

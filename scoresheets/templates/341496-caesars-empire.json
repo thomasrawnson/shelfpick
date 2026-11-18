@@ -1,0 +1,106 @@
+{
+  "format_version": 1,
+  "bgg_id": 341496,
+  "name": "Caesar's Empire",
+  "supported_players": [
+    2,
+    5
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "road_points",
+      "label": "Road points",
+      "help": "Points collected on the score track during play for roads on routes back to Rome, including any doubled by gold.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "cities",
+      "label": "City tokens",
+      "help": "Add the value of your highest city token in each colour; lower tokens of a colour score nothing (all tokens of a colour add up if you use the optional 2-3 player rule).",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "different_treasures",
+      "label": "Sets of different treasures",
+      "help": "Points for each set of different treasures, as read from the score table on your board (gold does not count).",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "same_treasures",
+      "label": "Sets of the same treasure",
+      "help": "Points for each column of identical treasures, as read from the score table on your board (gold does not count).",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "gold_points",
+      "label": "Gold",
+      "help": "Points shown under the furthest gold token on your gold track.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "roads_bonus",
+      "label": "Most roads left",
+      "help": "Tick if you have the most roads still unplaced; tied players all tick it (10 points).",
+      "type": "boolean",
+      "points_per": 10,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "city_colours",
+      "label": "City colours",
+      "help": "Number of different city colours you hold; the most wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "gold_tokens",
+      "label": "Gold tokens",
+      "help": "Number of gold tokens you collected; the most wins a tie after colours.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "roads_left",
+      "label": "Roads left",
+      "help": "Roads still unplaced in front of you; the most wins a tie after gold.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "city_colours",
+    "gold_tokens",
+    "roads_left"
+  ],
+  "source": {
+    "rulebook_title": "Cäsars Imperium Regel (German edition of the Caesar's Empire rulebook)",
+    "edition_or_year": "Holy Grail Games, 2022; German edition by Asmodee Germany",
+    "url": "https://asmodee-resources.azureedge.net/media/germanyprod/Regeln/C%C3%A4sars_Imperium_Regel_DE.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Base game only. Read the publisher-hosted German edition from Asmodee Germany and cross-checked the English rulebook text as uploaded on Scribd (a third-party copy, not publisher-hosted). Both give the same scoring and tie-breakers. The rulebook states no further tie rule after the third tie-breaker. The 2-3 player variants are not modelled beyond the city-colour note. Player count 2-5 is from the rulebook board sides (2/3 and 4/5)."
+}

@@ -1,0 +1,61 @@
+{
+  "format_version": 1,
+  "bgg_id": 224517,
+  "name": "Brass: Birmingham",
+  "supported_players": [
+    2,
+    4
+  ],
+  "win_condition": "highest",
+  "rounds": 2,
+  "categories": [
+    {
+      "id": "link_points",
+      "label": "Canal and rail links",
+      "help": "Points from your links at the end of each era (1 per linked-location icon); enter one value per era.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "per_round"
+    },
+    {
+      "id": "industry_points",
+      "label": "Flipped industries",
+      "help": "Points shown on your flipped industry tiles at the end of each era; enter one value per era.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "per_round"
+    },
+    {
+      "id": "income_level",
+      "label": "Income level",
+      "help": "Your income level when the game ends (may be negative); the highest wins a tie.",
+      "type": "number",
+      "points_per": 0,
+      "allow_negative": true,
+      "scope": "once"
+    },
+    {
+      "id": "money",
+      "label": "Money left",
+      "help": "Pounds remaining at the end of the game; the most breaks a further tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "income_level",
+    "money",
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "Brass: Birmingham Rulebook",
+    "edition_or_year": "Roxley Games, v2018.11",
+    "url": "https://cdn.shopify.com/s/files/1/0246/2190/8043/files/Brass-Birmingham-Rulebook.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Two eras (canal, then rail): enter the canal era value first, then rail. Read from the publisher-hosted PDF. If still tied after income and money the rulebook says the players draw, recorded here as a shared win. The shorter introductory game with extra scoring, and the Lancashire game, are excluded. Player count 2 to 4 comes from the rulebook setup rules for 2, 3 and 4 players."
+}

@@ -1,0 +1,89 @@
+{
+  "format_version": 1,
+  "bgg_id": 270844,
+  "name": "Imperial Settlers: Empires of the North",
+  "supported_players": [
+    2,
+    4
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "vp_track",
+      "label": "Victory Points on the track",
+      "help": "The score your marker shows on the scoreboard before the end-of-game bonuses below.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "empire_cards",
+      "label": "Cards in your Empire",
+      "help": "One point for each card in your Empire, counting starting locations, Basic Fields, Field upgrades and conquered Islands.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "resource_pairs",
+      "label": "Pairs of spare Resources",
+      "help": "One point for each full pair of Resources left in your supply. Resources placed on cards do not count.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "gold_left",
+      "label": "Gold left",
+      "help": "One point for each Gold left in your supply. Gold placed on cards does not count.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "locations",
+      "label": "Locations in your Empire",
+      "help": "Number of Locations in your Empire. Scores nothing; the most wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "workers",
+      "label": "Workers",
+      "help": "Workers you have at the end. Scores nothing; the most wins a tie after Locations.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "cards_in_hand",
+      "label": "Cards in hand",
+      "help": "Cards left in your hand. Scores nothing; the most wins a tie after Workers.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "locations",
+    "workers",
+    "cards_in_hand",
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "Imperial Settlers: Empires of the North rulebook",
+    "edition_or_year": "Base game, 2019",
+    "url": "https://cdn.1j1ju.com/medias/ce/e4/18-imperial-settlers-empires-of-the-north-rulebook.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Base game only; solo mode and expansions excluded. Read from the 1jour-1jeu.com copy of the English publisher PDF (identical text to the aadl.org copy). Player count 2-4 comes from the components list (2-4 player side of the scoreboard); the rulebook has no explicit player-count line. Edition other than the first printing not checked."
+}

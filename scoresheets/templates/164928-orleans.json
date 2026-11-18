@@ -1,0 +1,96 @@
+{
+  "format_version": 1,
+  "bgg_id": 164928,
+  "name": "Orléans",
+  "supported_players": [
+    2,
+    4
+  ],
+  "win_condition": "highest",
+  "rounds": 18,
+  "categories": [
+    {
+      "id": "coins",
+      "label": "Coins",
+      "help": "Coins left in your purse at the end (1 point each).",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "brocade",
+      "label": "Brocade",
+      "help": "Brocade goods tiles you own (5 points each).",
+      "type": "count",
+      "points_per": 5,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "wool",
+      "label": "Wool",
+      "help": "Wool goods tiles you own (4 points each).",
+      "type": "count",
+      "points_per": 4,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "wine",
+      "label": "Wine",
+      "help": "Wine goods tiles you own (3 points each).",
+      "type": "count",
+      "points_per": 3,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "cheese",
+      "label": "Cheese",
+      "help": "Cheese goods tiles you own (2 points each).",
+      "type": "count",
+      "points_per": 2,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "grain",
+      "label": "Grain",
+      "help": "Grain goods tiles you own (1 point each).",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "stations_and_citizens",
+      "label": "Trading stations and citizens",
+      "help": "Add your built trading stations to your collected citizen tiles (include the leftover citizen tile if you won it), then multiply by your development status. Enter the result.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "development_position",
+      "label": "Development track position",
+      "help": "How far along the development track your marker is. Scores nothing; the player further ahead wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "development_position",
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "Orléans rulebook (English section)",
+    "edition_or_year": "dlp games, 2014",
+    "url": "https://cdn.1j1ju.com/medias/ca/06/cc-orleans-rulebook.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Base game only; expansions (Trade & Intrigue, The Plague, Stories) and the optional place-tile exclusion rule are out of scope. Rounds are 18 but entries are single end-of-game values, so rounds is 18 for reference only. Read from a retailer-hosted copy (1jour-1jeu CDN) of the publisher PDF, not from dlp games directly. Supported players 2 to 4 taken from the rulebook's 2, 3 and 4 player setup rules. The development position is the track space reached; compare the marker positions on the board."
+}

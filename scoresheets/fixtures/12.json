@@ -1,0 +1,136 @@
+{
+  "bgg_id": 12,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "starting_tablets": 10,
+        "gods": [
+          1,
+          0,
+          2
+        ],
+        "pharaohs": [
+          5,
+          -2,
+          0
+        ],
+        "nile_floods": [
+          4,
+          6,
+          5
+        ],
+        "gold": [
+          1,
+          2,
+          0
+        ],
+        "civilization": [
+          5,
+          -5,
+          10
+        ],
+        "zero_floor_correction": [
+          0,
+          0,
+          0
+        ],
+        "monument_variety": 8,
+        "monument_sets": 15,
+        "sun_bonus": 5,
+        "highest_sun": 13
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "starting_tablets": 10,
+        "gods": [
+          0,
+          1,
+          1
+        ],
+        "pharaohs": [
+          -2,
+          5,
+          5
+        ],
+        "nile_floods": [
+          3,
+          2,
+          7
+        ],
+        "gold": [
+          2,
+          1,
+          1
+        ],
+        "civilization": [
+          10,
+          5,
+          5
+        ],
+        "zero_floor_correction": [
+          0,
+          0,
+          0
+        ],
+        "monument_variety": 10,
+        "monument_sets": 5,
+        "sun_bonus": 0,
+        "highest_sun": 12
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "starting_tablets": 10,
+        "gods": [
+          1,
+          1,
+          0
+        ],
+        "pharaohs": [
+          0,
+          -2,
+          -2
+        ],
+        "nile_floods": [
+          0,
+          0,
+          0
+        ],
+        "gold": [
+          0,
+          1,
+          2
+        ],
+        "civilization": [
+          -5,
+          5,
+          -5
+        ],
+        "zero_floor_correction": [
+          0,
+          0,
+          0
+        ],
+        "monument_variety": 3,
+        "monument_sets": 0,
+        "sun_bonus": -5,
+        "highest_sun": 9
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 81,
+      "Ben": 81,
+      "Cleo": 12
+    },
+    "winner": [
+      "Ana"
+    ]
+  }
+}

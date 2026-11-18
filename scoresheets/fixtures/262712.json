@@ -1,0 +1,46 @@
+{
+  "bgg_id": 262712,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "artifact_points": 2,
+        "monument_points": 5,
+        "place_of_power_points": 4,
+        "first_player_token": true,
+        "pool_essences": 5
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "artifact_points": 3,
+        "monument_points": 4,
+        "place_of_power_points": 5,
+        "first_player_token": false,
+        "pool_essences": 7
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "artifact_points": 1,
+        "monument_points": 3,
+        "place_of_power_points": 2,
+        "first_player_token": false,
+        "pool_essences": 9
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 12,
+      "Ben": 12,
+      "Cleo": 6
+    },
+    "winner": [
+      "Ben"
+    ]
+  }
+}

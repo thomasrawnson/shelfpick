@@ -1,0 +1,46 @@
+{
+  "bgg_id": 251247,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "vp_track": 95,
+        "objective_tile": 15,
+        "resource_sets": 3,
+        "water_drops": 2,
+        "last_round_energy": 9
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "vp_track": 100,
+        "objective_tile": 10,
+        "resource_sets": 2,
+        "water_drops": 3,
+        "last_round_energy": 11
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "vp_track": 90,
+        "objective_tile": 5,
+        "resource_sets": 4,
+        "water_drops": 1,
+        "last_round_energy": 7
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 115,
+      "Ben": 115,
+      "Cleo": 100
+    },
+    "winner": [
+      "Ben"
+    ]
+  }
+}

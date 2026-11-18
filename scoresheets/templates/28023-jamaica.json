@@ -1,0 +1,79 @@
+{
+  "format_version": 1,
+  "bgg_id": 28023,
+  "name": "Jamaica",
+  "supported_players": [
+    2,
+    6
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "race_position",
+      "label": "Race position",
+      "help": "White number printed on the space where your ship stopped.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "doubloons",
+      "label": "Doubloons",
+      "help": "Gold doubloons left in your holds.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "treasures",
+      "label": "Treasure cards",
+      "help": "Total of the plus values on your treasure cards (+3 to +7).",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "cursed_treasures",
+      "label": "Cursed treasure cards",
+      "help": "Total of the cursed treasure values as a positive number (2 to 4 each); it is subtracted.",
+      "type": "number",
+      "points_per": -1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "behind_minus_five",
+      "label": "On or before the -5 space",
+      "help": "Tick if your ship ended on the -5 space or any space before it (costs 5 points).",
+      "type": "boolean",
+      "points_per": -5,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "race_order",
+      "label": "Race order",
+      "help": "Your place in the race: 1 for the ship furthest along, 2 for the next, and so on; the lower number wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once",
+      "tie_break_direction": "lower"
+    }
+  ],
+  "tie_breakers": [
+    "race_order",
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "Jamaica rules (English)",
+    "edition_or_year": "Space Cowboys, 2021/2022 edition",
+    "url": "https://cdn.svc.asmodee.net/production-spacecowboys/uploads/2025/11/59baa2_78a0a418f3b1464e87c0b72b851028ee.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Base game, publisher-hosted PDF. Player count 2-6 is from the 6 ships and boards plus the two-player Ghost Ship section; the rulebook text has no explicit range. The Ghost Ship rules and The Crew expansion are excluded. The rulebook does not say whether the -5 space itself carries a printed white number; this template follows its separate 5-point cost wording, so confirm on the board."
+}

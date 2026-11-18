@@ -1,0 +1,41 @@
+{
+  "format_version": 1,
+  "bgg_id": 284818,
+  "name": "Caylus 1303",
+  "supported_players": [
+    2,
+    5
+  ],
+  "win_condition": "highest",
+  "rounds": 9,
+  "categories": [
+    {
+      "id": "prestige",
+      "label": "Prestige points",
+      "help": "Total of all prestige point tokens you earned during the game.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "gold_left",
+      "label": "Gold left over",
+      "help": "Gold resources still in your supply at the end (2 points each).",
+      "type": "count",
+      "points_per": 2,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "Caylus 1303 Spielregel (German)",
+    "edition_or_year": "Space Cowboys, 2019; German edition, Auflage A 2020",
+    "url": "https://produkte.hutter-trade.com/files/products/19/200/de/huc_19_10050_Caylus_1303_Auflage_A_2020_Rules_dt_sc.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Read the German rulebook hosted by the German distributor (Hutter Trade), not the publisher's own site (the Space Cowboys PDF links were refused). The gold icon in the end-of-game sentence was confirmed by viewing the page image. Supported players 2 to 5 from the setup rules. Rulebook says ties are shared. Per-round entries are not needed because prestige is simply totalled. Expansions excluded."
+}
