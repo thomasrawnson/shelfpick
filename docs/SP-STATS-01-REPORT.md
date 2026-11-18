@@ -69,7 +69,7 @@ while loading; marks use the brand token. The Stats section tabs now wrap
 
 | Layer | Result |
 | --- | --- |
-| Re-check after merging `origin/main` c768e16 (SP-SETTINGS-01), 18 Nov | Only conflict: the `npm test` list in `frontend/package.json` (stats tests combined with `tip-jar`, `feedback`). Backend `pytest` 593 passed, 16 skipped, one Alembic head `b8d2f4a6c1e3`, `alembic check` clean. Frontend `npm test` 225 passed, lint, build, `check:pwa` pass. Playwright and Simulator not re-run after the merge. |
+| Re-check after merging `origin/main` c768e16 (SP-SETTINGS-01), 18 Nov | Only conflict: the `npm test` list in `frontend/package.json` (stats tests combined with `tip-jar`, `feedback`). Backend `pytest` 593 passed, 16 skipped, one Alembic head `b8d2f4a6c1e3`, `alembic check` clean. Frontend `npm test` 225 passed, lint, build, `check:pwa` pass. Playwright `stats-trends` and `ui-stats` re-run after the merge: 12 passed (iPhone 15 project; the iPhone SE project skips these specs). Simulator not re-run after the merge. |
 | Backend automated | `pytest`: 541 passed, 15 skipped (disposable DB `shelfpick_stats01_test`, migrated to head, 25 built-in sheets seeded). `alembic check`: no drift. |
 | 10,000-play budget (local PostgreSQL) | plays-per-month 2 ms, heatmap 1 ms, H-index 2 ms, streak 2 ms, records 53 ms, head-to-head 83 ms, filtered records 18 ms, filter-options 6 ms, Picker boosts 2 ms (limit 500 ms) |
 | Frontend automated | `npm test` 208 passed incl. `stats-model`, `stats-contrast` (light, dark, black: bars and every heatmap level >= 3:1, chart text >= 4.5:1) and `stats-trends` (tables, locked preview, Pro-only toggle); `npm run lint`, `npm run build` (with `VITE_API_BASE_URL`), `npm run check:pwa` pass |
