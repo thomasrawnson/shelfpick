@@ -156,3 +156,26 @@ for (const size of ACCESSIBILITY_BODY_SIZES) test.describe(`Five tabs at ${size.
     }
   })
 })
+
+// SP-SETTINGS-01: Settings rows grow with the text instead of clipping it.
+for (const size of ACCESSIBILITY_BODY_SIZES) test.describe(`Settings at ${size.name}`, () => {
+  test(`${size.name}: Settings rows grow and keep words whole`, async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== "iPhone 15")
+    await emulateNativeDynamicType(page, size.px)
+    await mockShelf(page)
+    await logIn(page, "local-free@shelfpick.app")
+    await expect(page).toHaveURL(/\/tonight/)
+    await page.goto("/settings")
+    await expect(page.getByRole("heading", { name: "Settings", level: 1 })).toBeVisible()
+    await page.waitForLoadState("networkidle")
+    await expectWordsWhole(page, `Settings at ${size.name}`, "main")
+    const clipped = await page.locator(".settings-row, .settings-upsell, .settings-profile-link").evaluateAll((rows) => rows
+      .filter((row) => row.scrollHeight > row.clientHeight + 1 || Array.from(row.querySelectorAll("span")).some((part) => {
+        const box = part.getBoundingClientRect()
+        const rowBox = row.getBoundingClientRect()
+        return box.height > 0 && (box.top < rowBox.top - 1 || box.bottom > rowBox.bottom + 1)
+      }))
+      .map((row) => (row.textContent ?? "").trim()))
+    expect.soft(clipped, `${size.name}: clipped Settings rows`).toEqual([])
+  })
+})

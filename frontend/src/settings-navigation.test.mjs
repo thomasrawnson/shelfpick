@@ -19,27 +19,107 @@ const user = {
   avatar_key: "forest", tier: "FREE", entitlements: ["game_night_basic"],
 }
 
+// Settings reads the device theme through window.shelfPickTheme.
+const settingsWindow = { shelfPickTheme: { getPreference: () => "dark", setPreference: () => {} } }
+
 before(async () => {
+  globalThis.window = settingsWindow
   server = await createServer({ server: { middlewareMode: true, hmr: false }, appType: "custom" })
   SettingsView = (await server.ssrLoadModule("/src/components/SettingsView.tsx")).default
   SettingsSectionView = (await server.ssrLoadModule("/src/components/SettingsSectionView.tsx")).default
   AppNavigation = (await server.ssrLoadModule("/src/components/AppNavigation.tsx")).default
 })
 
-after(async () => { await server?.close() })
+after(async () => { delete globalThis.window; await server?.close() })
 
 function render(view, props, path = "/settings") {
   return renderToStaticMarkup(React.createElement(MemoryRouter, { initialEntries: [path] }, React.createElement(view, props)))
 }
 
-test("settings overview links to each focused settings section", () => {
-  const markup = render(SettingsView, { user, onLogout: () => {} })
-  for (const path of ["profile", "preferences", "appearance", "collection-data", "plays", "pro", "help", "about"]) {
+test("Settings root lists the groups in the agreed order with no avatar header", () => {
+  const markup = render(SettingsView, { user, purchases: null })
+  for (const path of ["profile", "pro", "preferences", "collection-data", "import", "whats-new", "help"]) {
     assert.match(markup, new RegExp(`href="/settings/${path}"`))
   }
-  assert.match(markup, /Your account/)
-  assert.match(markup, /Your ShelfPick/)
-  assert.match(markup, /Support/)
+  assert.deepEqual(
+    [...markup.matchAll(/<h2 id="[^"]+">([^<]+)<\/h2>/g)].map((match) => match[1]),
+    ["Appearance", "Players and picking", "Collection", "Data and backup", "Support ShelfPick", "Feedback", "Follow ShelfPick", "About"],
+  )
+  assert.match(markup, /Account, plan and log out/)
+  assert.match(markup, /aria-label="Plan: Free. Compare plans"[^>]*>FREE</)
+  assert.match(markup, /4 players · 60 min/)
+  assert.match(markup, /Import plays<\/span><span class="settings-row-value">BG Stats</)
+  assert.match(markup, /ShelfPick 1\.1 \(11\) · Pluto Night Labs/)
+  assert.match(markup, /alt="Powered by BoardGameGeek"/)
+  assert.doesNotMatch(markup, /Log out<|Play history|settings\/appearance/)
+})
+
+test("Theme is an inline menu with an accessible name and the current value", () => {
+  const markup = render(SettingsView, { user, purchases: null })
+  const labelId = /<span class="settings-row-label" id="([^"]+)">Theme</.exec(markup)?.[1]
+  assert.ok(labelId, "Theme label has an id")
+  assert.match(markup, new RegExp(`<select class="settings-row-select" aria-labelledby="${labelId}">`))
+  assert.deepEqual(
+    [...markup.matchAll(/<option value="([a-z]+)"/g)].map((match) => match[1]),
+    ["dark", "light", "system", "black"],
+  )
+  assert.match(markup, /<option value="dark" selected="">/)
+})
+
+test("Free users see the Pro upsell card; Pro users see neither the card nor Compare plans", () => {
+  const free = render(SettingsView, { user, purchases: null })
+  assert.match(free, /class="settings-upsell" href="\/settings\/pro"[^>]*>.*Unlock ShelfPick Pro/)
+  const pro = render(SettingsView, { user: { ...user, tier: "PRO" }, purchases: null })
+  assert.match(pro, /aria-label="Plan: ShelfPick Pro">PRO</)
+  assert.doesNotMatch(pro, /Unlock ShelfPick Pro|settings-upsell|href="\/settings\/pro"/)
+})
+
+test("External rows come from SOCIAL_LINKS and say they open outside the app", async () => {
+  const { SOCIAL_LINKS, REVIEW_URL, CONTACT_URL } = await server.ssrLoadModule("/src/app-links.ts")
+  assert.equal(SOCIAL_LINKS.website.url, "https://plutonightlabs.com")
+  assert.equal(SOCIAL_LINKS.youtube.url, "https://www.youtube.com/@shelfpick")
+  const markup = render(SettingsView, { user, purchases: null })
+  for (const link of [SOCIAL_LINKS.website, SOCIAL_LINKS.youtube]) {
+    const escaped = link.url.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&")
+    assert.match(markup, new RegExp(`href="${escaped}" target="_blank" rel="noopener noreferrer" aria-label="[^"]+, ${link.label.replace(".", "\\.")} \\(opens outside ShelfPick\\)"`))
+  }
+  assert.equal(REVIEW_URL, "https://apps.apple.com/app/id6833957995?action=write-review")
+  assert.match(markup, /href="https:\/\/apps\.apple\.com\/app\/id6833957995\?action=write-review" target="_blank"[^>]*aria-label="Leave a review \(opens the App Store\)"/)
+  assert.match(markup, new RegExp(`href="${CONTACT_URL}" target="_blank"[^>]*aria-label="Contact, Email us \\(opens your email app\\)"`))
+  // Every new-window link in the root says where it goes.
+  const external = [...markup.matchAll(/<a [^>]*target="_blank"[^>]*>/g)].map((match) => match[0])
+  for (const tag of external) assert.match(tag, /aria-label="[^"]*\(opens [^)]+\)"|class="bgg-attribution"/)
+})
+
+test("Every Settings row and control has an accessible name", () => {
+  const markup = render(SettingsView, { user, purchases: { loadProducts: async () => [], purchase: async () => ({ status: "cancelled" }) } })
+  const rows = [...markup.matchAll(/<(a|button)[^>]*class="settings-row"[^>]*>(.*?)<\/\1>/g)]
+  assert.ok(rows.length >= 11)
+  for (const [, , inner] of rows) assert.match(inner, /settings-row-label">[^<]/)
+  assert.match(markup, /<button type="button" class="settings-row" data-settings-entry="tips">/)
+  assert.match(markup, />Request a feature</)
+  assert.match(markup, />Report a problem</)
+})
+
+test("Profile shows the plan and ends with Log out", () => {
+  const markup = render(SettingsSectionView, {
+    section: "profile", user, onUserChange: () => {}, onLogout: async () => {},
+  }, "/settings/profile")
+  assert.match(markup, /ShelfPick Free/)
+  assert.match(markup, /href="\/settings\/pro"[^>]*>Compare plans/)
+  assert.ok(markup.lastIndexOf(">Log out<") > markup.indexOf("Delete my account"), "Log out sits below account deletion")
+  const pro = render(SettingsSectionView, { section: "profile", user: { ...user, tier: "PRO" }, onUserChange: () => {}, onLogout: async () => {} }, "/settings/profile")
+  assert.match(pro, /ShelfPick Pro/)
+  assert.doesNotMatch(pro, /Compare plans/)
+})
+
+test("BoardGameGeek sync times read as short relative values", async () => {
+  const { relativeSyncTime } = await server.ssrLoadModule("/src/bgg-sync-time.ts")
+  const now = new Date("2026-11-18T12:00:00Z")
+  assert.equal(relativeSyncTime(new Date("2026-11-18T11:59:40Z"), now), "Just now")
+  assert.equal(relativeSyncTime(new Date("2026-11-18T11:15:00Z"), now), "45m ago")
+  assert.equal(relativeSyncTime(new Date("2026-11-18T09:00:00Z"), now), "3h ago")
+  assert.equal(relativeSyncTime(new Date("2026-11-15T12:00:00Z"), now), "3d ago")
 })
 
 test("profile and preferences render only their selected controls", () => {
@@ -67,10 +147,14 @@ test("legacy preferences without play style use the neutral option", () => {
   assert.match(preferences, /aria-pressed="true">No preference</)
 })
 
-test("Collection and Data keeps import controls separate from profile and account controls", () => {
+test("BoardGameGeek sync and import have their own screens without account controls", () => {
+  const imports = render(SettingsSectionView, { section: "import", user, onUserChange: () => {} }, "/settings/import")
+  assert.match(imports, /Import BG Stats history/)
+  assert.doesNotMatch(imports, /Sync BoardGameGeek|Log out/)
+
   const markup = render(SettingsSectionView, { section: "collection-data", user, onUserChange: () => {} }, "/settings/collection-data")
   assert.match(markup, /Sync BoardGameGeek/)
-  assert.match(markup, /Import BG Stats history/)
+  assert.doesNotMatch(markup, /Import BG Stats history/)
   assert.match(markup, /BoardGameGeek is not affiliated with ShelfPick/)
   assert.match(markup, /src="\/branding\/powered-by-bgg-rgb\.svg"/)
   assert.match(markup, /href="https:\/\/boardgamegeek\.com\/"/)
@@ -97,10 +181,11 @@ test("focused settings sections provide a route back to the overview", () => {
   assert.doesNotMatch(markup, /Sync BoardGameGeek|Usual player count/)
 })
 
-test("About links to Pluto Night Labs with an accessible new-tab indication", () => {
-  const markup = render(SettingsSectionView, { section: "about", user, onUserChange: () => {} }, "/settings/about")
+test("Help links to Pluto Night Labs with an accessible new-tab indication", () => {
+  const markup = render(SettingsSectionView, { section: "help", user, onUserChange: () => {} }, "/settings/help")
 
-  assert.match(markup, /href="https:\/\/plutonightlabs\.com\/"/)
+  assert.match(markup, /href="https:\/\/plutonightlabs\.com"/)
+  assert.match(markup, /Version 1\.1/)
   assert.match(markup, /target="_blank"/)
   assert.match(markup, /rel="noopener noreferrer"/)
   assert.match(markup, /Pluto Night Labs<span class="sr-only"> \(opens in a new tab\)<\/span>/)
@@ -114,28 +199,6 @@ test("Help exposes support contact without publishing legal drafts", () => {
   const markup = render(SettingsSectionView, { section: "help", user, onUserChange: () => {} }, "/settings/help")
   assert.match(markup, /href="mailto:hello@plutonightlabs\.com\?subject=ShelfPick%20support"/)
   assert.match(markup, /Contact support/)
-})
-
-test("Appearance offers the experimental Black theme without a plan gate", () => {
-  globalThis.window = {
-    shelfPickTheme: {
-      getPreference: () => "black",
-      setPreference: () => {},
-    },
-  }
-  const markup = render(
-    SettingsSectionView,
-    { section: "appearance", user, onUserChange: () => {} },
-    "/settings/appearance",
-  )
-
-  assert.match(markup, /Black \(experimental\)/)
-  assert.match(markup, /checked="" value="black"/)
-  assert.match(markup, /Use device setting/)
-  assert.match(markup, />Light</)
-  assert.match(markup, />Dark</)
-  assert.doesNotMatch(markup, /Pro|upgrade|unlock/i)
-  delete globalThis.window
 })
 
 test("primary navigation keeps all five named buttons in order", () => {

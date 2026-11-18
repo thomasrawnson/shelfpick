@@ -19,7 +19,8 @@ import {
 import { SessionExpiredError } from "./api/request";
 import RetryNotice from "./components/ui/RetryNotice";
 import BrandLogo from "./components/ui/BrandLogo";
-import { getMe } from "./api/client";
+import { getMe, sendFeedback } from "./api/client";
+import { clearQueuedFeedback, flushFeedbackOutbox } from "./feedback";
 
 import { clearToken, restoreToken, type AuthUser } from "./auth";
 
@@ -331,6 +332,16 @@ function App() {
     return () => { active = false; };
   }, [restoreAttempt]);
 
+  // Feedback written offline is sent once this account is signed in and online.
+  const userId = user?.id;
+  useEffect(() => {
+    if (userId === undefined) return;
+    const flush = () => { void flushFeedbackOutbox(userId, sendFeedback); };
+    flush();
+    window.addEventListener("online", flush);
+    return () => window.removeEventListener("online", flush);
+  }, [userId]);
+
   useEffect(() => {
     function handleAuthExpired() {
       setSessionExpired(true);
@@ -420,7 +431,7 @@ function App() {
     return pageShell(
       <LegalDraftView
         kind={legalDraftKind}
-        backTo={user ? APP_PATHS.settingsAbout : APP_PATHS.login}
+        backTo={user ? APP_PATHS.settingsHelp : APP_PATHS.login}
       />,
     );
   }
@@ -529,12 +540,12 @@ function App() {
     <main className="app-shell">
       <LiveTimerProvider enabled={user.entitlements.includes("live_play_enhancements")}>
       <section className={`phone app-phone${["shelf", "plays", "discover", "stats"].includes(view) || location.pathname === APP_PATHS.settingsPro ? " app-phone-wide" : ""}`} ref={appScrollRef}>
-        <AppHeader
+        {location.pathname !== APP_PATHS.settings && <AppHeader
           user={user}
           onOpenSettings={() => {
             navigate(APP_PATHS.settings);
           }}
-        />
+        />}
 
         <div className="app-content">
           <div className="page-transition" key={view}>
@@ -602,22 +613,20 @@ function App() {
               }
             />
 
-            <Route
-              path={APP_PATHS.settings}
-              element={<SettingsView user={user} onLogout={handleLogout} onLogoutAll={handleLogoutAll} />}
-            />
-
+            <Route path={APP_PATHS.settings} element={<SettingsView user={user} />} />
             <Route
               path={APP_PATHS.settingsProfile}
-              element={<SettingsSectionView section="profile" user={user} onUserChange={setUser} onAccountDeleted={finishLogout} />}
+              element={<SettingsSectionView section="profile" user={user} onUserChange={setUser}
+                onAccountDeleted={() => { clearQueuedFeedback(user.id); finishLogout(); }} onLogout={handleLogout} onLogoutAll={handleLogoutAll} />}
             />
-
-            <Route path={APP_PATHS.settingsPreferences} element={<SettingsSectionView section="preferences" user={user} onUserChange={setUser} />} />
-            <Route path={APP_PATHS.settingsAppearance} element={<SettingsSectionView section="appearance" user={user} onUserChange={setUser} />} />
-            <Route path={APP_PATHS.settingsCollectionData} element={<SettingsSectionView section="collection-data" user={user} onUserChange={setUser} />} />
-            <Route path={APP_PATHS.settingsPlays} element={<SettingsSectionView section="plays" user={user} onUserChange={setUser} />} />
-            <Route path={APP_PATHS.settingsHelp} element={<SettingsSectionView section="help" user={user} onUserChange={setUser} />} />
-            <Route path={APP_PATHS.settingsAbout} element={<SettingsSectionView section="about" user={user} onUserChange={setUser} />} />
+            {([
+              [APP_PATHS.settingsPreferences, "preferences"],
+              [APP_PATHS.settingsCollectionData, "collection-data"],
+              [APP_PATHS.settingsImport, "import"],
+              [APP_PATHS.settingsWhatsNew, "whats-new"],
+              [APP_PATHS.settingsHelp, "help"],
+            ] as const).map(([path, section]) => <Route key={path} path={path}
+              element={<SettingsSectionView section={section} user={user} onUserChange={setUser} />} />)}
 
             <Route
               path={APP_PATHS.settingsPro}

@@ -131,10 +131,20 @@
     aspect-ratio: auto;
     overflow-wrap: anywhere;
   }
-  :root[data-native-ios] :is(.time-option, .settings-row, .wishlist-card-main, .collection-game) {
+  :root[data-native-ios] :is(.time-option, .wishlist-card-main, .collection-game) {
     min-width: 0;
     overflow-wrap: anywhere;
   }
+  /* Settings rows wrap the value under the label instead of squeezing words. */
+  :root[data-native-ios] .settings-row-body { flex-wrap: wrap; row-gap: 2px; }
+  :root[data-native-ios] .settings-row-label { flex-basis: min-content; }
+  :root[data-native-ios] .settings-row-value { flex-wrap: wrap; }
+  :root[data-native-ios] :is(.settings-row-label, .settings-row-value, .settings-profile-copy) { min-width: 0; overflow-wrap: break-word; }
+  :root[data-native-ios] .settings-profile-card { flex-wrap: wrap; padding-bottom: var(--space-2); }
+  /* The pill stays beside the name at normal sizes and drops below it only
+     when the text grows; the em basis scales with the text. */
+  :root[data-native-ios] .settings-profile-link { flex: 1 1 13em; padding-right: 40px; }
+  :root[data-native-ios] .settings-plan-pill { height: auto; margin-left: var(--space-3); }
   :root[data-native-ios] .auth-screen {
     flex: 0 0 auto;
     min-width: 0;

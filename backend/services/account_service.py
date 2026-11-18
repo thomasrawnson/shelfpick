@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from auth.security import verify_password
 from database.models import (
     AuthToken,
+    Feedback,
     GameComparison,
     GameNightBallot,
     GameNightGuest,
@@ -96,6 +97,7 @@ class AccountService:
                 UserWishlistGame,
                 UserGame,
                 AuthToken,
+                Feedback,
                 UserOperationLease,
                 Player,
             ):

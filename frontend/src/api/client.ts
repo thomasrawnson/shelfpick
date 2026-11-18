@@ -1,4 +1,5 @@
 import { request, responseError, SessionExpiredError } from "./request"
+import { FeedbackOfflineError, type FeedbackPayload } from "../feedback"
 import { resetConfirmationBody } from "../reset-link"
 import {
   clearToken,
@@ -1019,6 +1020,22 @@ export async function getLatestPlay(): Promise<ListedPlay | null> {
   if (!response.ok) throw new Error(`Plays request failed: ${response.status}`)
   const page = await response.json() as { plays: ListedPlay[] }
   return page.plays[0] ?? null
+}
+
+
+export async function sendFeedback(payload: FeedbackPayload): Promise<void> {
+  let response: Response
+  try {
+    response = await apiFetch("/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    })
+  } catch (error) {
+    if (error instanceof Error && error.cause instanceof TypeError) throw new FeedbackOfflineError()
+    throw error
+  }
+  if (!response.ok) throw await responseError(response, "Couldn't send your message. Try again.")
 }
 
 

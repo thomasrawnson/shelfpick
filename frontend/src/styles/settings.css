@@ -3,6 +3,11 @@
   padding-bottom: var(--space-5);
 }
 
+/* The Settings root is a compact grouped list: 14px between groups. */
+.settings-screen:not(.settings-detail-screen) {
+  gap: 14px;
+}
+
 .settings-detail-screen {
   gap: var(--space-4);
 }
@@ -12,7 +17,11 @@
 }
 
 .settings-heading h1 {
-  margin: 0 0 var(--space-2);
+  margin: 0;
+}
+
+.settings-detail-screen .settings-heading h1 {
+  margin-bottom: var(--space-2);
 }
 
 .settings-heading p {
@@ -21,136 +30,312 @@
 }
 
 .settings-section h2 {
-  margin: 0 0 var(--space-2);
-  color: var(--text-primary);
-  font-family: var(--font-ui);
-  font-size: var(--text-body);
-  font-weight: 800;
-}
-
-.settings-list {
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-}
-
-.settings-theme-list {
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-}
-
-.settings-theme-list legend {
-  padding: 0 0 var(--space-2);
+  margin: 0 0 6px var(--space-4);
   color: var(--text-secondary);
-  font-size: var(--text-support);
-}
-
-.settings-theme-option {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 52px;
-  padding: var(--space-2) var(--space-4);
-  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: var(--text-overline);
   font-weight: 700;
-  cursor: pointer;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-.settings-theme-option + .settings-theme-option {
-  border-top: 1px solid var(--line);
+.settings-list,
+.settings-profile-card {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
 }
 
-.settings-theme-option:hover {
-  background: var(--color-surface-raised);
-}
-
-.settings-theme-option:has(input:focus-visible) {
-  outline: 2px solid var(--color-brand-primary);
-  outline-offset: -3px;
-}
-
-.settings-theme-option input {
-  width: 20px;
-  height: 20px;
-  margin: 0;
-  accent-color: var(--color-brand-primary);
-}
-
-.settings-row {
+.settings-profile-card {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+}
+
+.settings-profile-link {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 60px;
+  align-items: center;
   gap: var(--space-3);
-  min-height: 52px;
-  padding: var(--space-2) var(--space-4);
+  /* Room on the right for the plan pill, which sits beside the chevron. */
+  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-3);
   text-decoration: none;
 }
 
-.settings-row.settings-row-link {
-  display: flex;
-  width: 100%;
+.settings-profile-link .player-avatar {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
 }
 
-.settings-row-copy {
+.settings-profile-copy {
   display: flex;
   flex: 1;
   min-width: 0;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
 }
 
-.settings-row-chevron {
-  width: 9px;
-  height: 9px;
+.settings-profile-subtitle {
+  color: var(--text-secondary);
+  font-size: var(--text-support);
+}
+
+.settings-plan-pill {
+  position: relative;
+  display: inline-flex;
   flex: 0 0 auto;
-  border-top: 2px solid var(--text-secondary);
-  border-right: 2px solid var(--text-secondary);
-  transform: rotate(45deg);
+  height: 24px;
+  min-height: 0;
+  align-items: center;
+  margin-right: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  font-size: var(--text-meta);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-decoration: none;
 }
 
-.settings-row + .settings-row {
+/* A 44pt hit area around the small pill. */
+a.settings-plan-pill::after {
+  content: "";
+  position: absolute;
+  inset: -11px -6px;
+}
+
+.settings-plan-pill.settings-plan-pro {
+  border-color: var(--color-brand-accent);
+  color: var(--color-brand-accent);
+  background: color-mix(in srgb, var(--color-brand-accent) 14%, transparent);
+}
+
+.settings-profile-link .settings-row-chevron {
+  position: absolute;
+  right: var(--space-4);
+}
+
+.settings-row {
+  position: relative;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  padding-left: var(--space-3);
+  text-decoration: none;
+}
+
+.settings-icon {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  color: var(--settings-tint);
+  background: color-mix(in srgb, var(--settings-tint) 18%, transparent);
+}
+
+.settings-icon svg { width: 18px; height: 18px; }
+.settings-icon-gold { --settings-tint: var(--color-brand-accent); }
+.settings-icon-green { --settings-tint: var(--color-success); }
+.settings-icon-blue { --settings-tint: var(--color-info); }
+.settings-icon-red { --settings-tint: var(--color-danger); }
+.settings-icon-neutral { --settings-tint: var(--color-text-support); }
+
+/* The divider starts at the label, inset past the icon tile. */
+.settings-row-body {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 6px var(--space-4) 6px 0;
+}
+
+.settings-row + .settings-row .settings-row-body {
   border-top: 1px solid var(--line);
 }
 
 .settings-row-label {
+  flex: 1 1 auto;
+  min-width: 0;
   color: var(--text-primary);
   font-size: var(--text-body);
-  font-weight: 700;
+  font-weight: 600;
 }
 
-.settings-row-detail {
+.settings-row-value {
+  display: inline-flex;
+  flex: 0 1 auto;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
   color: var(--text-secondary);
   font-size: var(--text-support);
   text-align: right;
 }
 
-.settings-row-copy .settings-row-detail {
+.settings-status-dot {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--text-secondary);
+}
+
+.settings-status-dot.is-on { background: var(--color-success); }
+
+.settings-version-pill {
+  padding: 1px 8px;
+  border-radius: 999px;
+  color: var(--color-brand-accent);
+  background: color-mix(in srgb, var(--color-brand-accent) 16%, transparent);
+  font-size: var(--text-meta);
+  font-weight: 700;
+}
+
+.settings-row-chevron {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  margin: 0 2px 0 4px;
+  border-top: 2px solid var(--text-secondary);
+  border-right: 2px solid var(--text-secondary);
+  transform: rotate(45deg);
+}
+
+.settings-row-external {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  color: var(--text-secondary);
+}
+
+.settings-row-detail {
+  color: var(--text-secondary);
+  font-size: var(--text-support);
+}
+
+/* Sheet rows are buttons that look like the link rows. */
+button.settings-row {
+  margin: 0;
+  padding-block: 0;
+  padding-right: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
   text-align: left;
+  cursor: pointer;
 }
 
-.settings-row-pending .settings-row-detail {
-  white-space: nowrap;
+/* Inline menu: the native select covers the row and stays invisible. */
+.settings-row-select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  font-size: 16px;
+  cursor: pointer;
+  appearance: none;
 }
 
-.settings-row-link:hover {
+.settings-menu-row:has(.settings-row-select:focus-visible) {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: -3px;
+}
+
+.settings-row-updown {
+  width: 10px;
+  height: 14px;
+  flex: 0 0 auto;
+  color: var(--text-secondary);
+}
+
+.settings-profile-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px var(--space-2);
+}
+
+.settings-supporter {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 1px 8px;
+  border-radius: 999px;
+  color: var(--color-brand-accent);
+  background: color-mix(in srgb, var(--color-brand-accent) 16%, transparent);
+  font-size: var(--text-meta);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.settings-upsell {
+  display: flex;
+  min-height: 56px;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--color-brand-accent) 45%, var(--line));
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-brand-accent) 8%, var(--color-surface));
+  text-decoration: none;
+}
+
+.settings-upsell .settings-row-label { color: var(--color-brand-accent); }
+
+.settings-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+  color: var(--text-secondary);
+  font-size: var(--text-meta);
+  text-align: center;
+}
+
+.settings-footer p { margin: 0; }
+
+.settings-row:hover,
+.settings-upsell:hover,
+.settings-profile-link:hover {
   background: var(--color-surface-raised);
 }
 
-.settings-row-link:focus-visible,
+.settings-row:focus-visible,
+.settings-upsell:focus-visible,
+.settings-profile-link:focus-visible,
 .settings-logout:focus-visible {
   outline: 2px solid var(--color-brand-primary);
   outline-offset: -3px;
 }
 
+.settings-plan-pill:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: 2px;
+}
+
+.settings-session-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
 .settings-logout {
-  align-self: flex-start;
   min-height: var(--target-min);
   padding: 0 var(--space-4);
   border: 1px solid var(--line);
@@ -161,6 +346,10 @@
   font-weight: 700;
   cursor: pointer;
 }
+
+.settings-session-actions .error-message { flex-basis: 100%; }
+.settings-whats-new { margin: 0; padding-left: 1.2em; }
+.settings-whats-new li + li { margin-top: var(--space-2); }
 
 .settings-danger-button {
   min-height: 44px;
@@ -238,4 +427,149 @@
 
 .setup-screen-compact .setup-divider {
   margin: 0;
+}
+
+/* Tip jar and feedback sheets reuse the Log play sheet shell. */
+.tip-jar-body,
+.feedback-form,
+.feedback-done {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-4) var(--space-4) calc(var(--space-6) + env(safe-area-inset-bottom));
+}
+
+.tip-jar-body p,
+.feedback-done p { margin: 0; color: var(--text-secondary); }
+
+.tip-jar-thanks strong,
+.feedback-done strong {
+  color: var(--text-primary);
+  font-size: 1.25rem;
+}
+
+.tip-jar-thanks .settings-supporter { align-self: flex-start; }
+
+.tip-jar-options {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  list-style: none;
+}
+
+.tip-jar-options li + li { border-top: 1px solid var(--line); }
+
+.tip-jar-option {
+  display: flex;
+  width: 100%;
+  min-height: 56px;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-3);
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tip-jar-option:hover:not(:disabled) { background: var(--color-surface-raised); }
+.tip-jar-option:focus-visible { outline: 2px solid var(--color-brand-primary); outline-offset: -3px; }
+.tip-jar-option:disabled { cursor: default; opacity: 0.7; }
+.tip-jar-name { flex: 1 1 auto; min-width: 0; font-weight: 700; }
+
+.tip-jar-price {
+  flex: 0 0 auto;
+  padding: 4px 12px;
+  border-radius: 999px;
+  color: var(--color-text-inverse);
+  background: var(--color-brand-primary);
+  font-size: var(--text-support);
+  font-weight: 800;
+}
+
+.tip-jar-error { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); }
+
+/* Three types on one row; at the largest text sizes they stack. */
+.feedback-form .segmented-control { grid-template-columns: repeat(auto-fit, minmax(min(100%, 96px), 1fr)); }
+
+.feedback-field { display: flex; flex-direction: column; gap: 6px; }
+.feedback-field label { font-weight: 700; }
+
+.feedback-field textarea {
+  width: 100%;
+  min-height: 140px;
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-raised);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: max(16px, var(--text-body));
+  resize: vertical;
+}
+
+.feedback-field textarea:focus { border-color: var(--color-brand-primary); outline: none; }
+.feedback-field textarea[aria-invalid="true"] { border-color: var(--color-danger); }
+.feedback-count { align-self: flex-end; color: var(--text-secondary); font-size: var(--text-meta); }
+.feedback-count.is-over { color: var(--color-danger); font-weight: 700; }
+
+.feedback-toggle {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 6px var(--space-4);
+  color: var(--text-primary);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.feedback-toggle + .feedback-toggle { border-top: 1px solid var(--line); }
+
+/* iOS-style switch on a real checkbox. */
+.feedback-toggle input {
+  position: relative;
+  width: 51px;
+  height: 31px;
+  flex: 0 0 auto;
+  margin: 0;
+  border-radius: 999px;
+  background: var(--line);
+  appearance: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.feedback-toggle input::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  transition: transform 0.2s;
+}
+
+.feedback-toggle input:checked { background: var(--color-brand-primary); }
+.feedback-toggle input:checked::after { transform: translateX(20px); }
+.feedback-toggle input:focus-visible { outline: 2px solid var(--color-brand-primary); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .feedback-toggle input,
+  .feedback-toggle input::after { transition: none; }
 }

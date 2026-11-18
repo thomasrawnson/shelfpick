@@ -226,6 +226,37 @@ class AuthToken(Base):
     )
 
 
+class Feedback(Base):
+    """A feature idea, problem report or note sent from Settings."""
+
+    __tablename__ = "feedback"
+
+    __table_args__ = (
+        CheckConstraint(
+            "type IN ('feature', 'problem', 'other')",
+            name="ck_feedback_type",
+        ),
+        Index("ix_feedback_user_created", "user_id", "created_at"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False,
+    )
+    type: Mapped[str] = mapped_column(String(12), nullable=False)
+    message: Mapped[str] = mapped_column(Text, nullable=False)
+    wants_reply: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false",
+    )
+    app_version: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    build: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    os: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    device: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(),
+    )
+
+
 class AuthRateLimit(Base):
     __tablename__ = "auth_rate_limits"
 
