@@ -42,6 +42,13 @@ class FakeRevenueCat:
         self.subscribers: dict[str, dict] = {}
         self.fail = False
         self.lookups: list[str] = []
+        self.deleted: list[str] = []
+
+    def delete_customer(self, app_user_id):
+        if self.fail:
+            raise RevenueCatUnavailableError("down")
+        self.deleted.append(app_user_id)
+        self.subscribers.pop(app_user_id, None)
 
     def fetch_subscriber(self, app_user_id):
         self.lookups.append(app_user_id)
@@ -534,6 +541,70 @@ def test_deleting_an_account_removes_its_purchase_record(billing_api):
 
     with api.Session() as db:
         assert db.scalars(select(PurchaseEntitlement)).all() == []
+
+
+def test_deleting_an_account_through_the_route_erases_the_revenuecat_customer(
+    billing_api,
+):
+    api = billing_api
+    account_id = api.app_user_id(1)
+    api.revenuecat.lifetime(account_id)
+    sync(api)
+
+    response = api.client.request(
+        "DELETE", "/auth/account", json={"password": "correct horse"},
+    )
+
+    assert response.status_code == 200
+    assert api.revenuecat.deleted == [account_id]
+    assert account_id not in api.revenuecat.subscribers
+
+
+def test_a_revenuecat_failure_does_not_undo_the_account_deletion(
+    billing_api, caplog,
+):
+    api = billing_api
+    account_id = api.app_user_id(1)
+    api.revenuecat.fail = True
+
+    with caplog.at_level("WARNING"):
+        response = api.client.request(
+            "DELETE", "/auth/account", json={"password": "correct horse"},
+        )
+
+    assert response.status_code == 200
+    with api.Session() as db:
+        assert db.get(User, 1) is None
+    # The random ID is logged so the record can be removed by hand.
+    assert account_id in caplog.text
+    assert "a@example.com" not in caplog.text
+
+
+def test_a_wrong_password_erases_nothing_at_revenuecat(billing_api):
+    api = billing_api
+    api.revenuecat.lifetime(api.app_user_id(1))
+
+    response = api.client.request(
+        "DELETE", "/auth/account", json={"password": "wrong"},
+    )
+
+    assert response.status_code == 403
+    assert api.revenuecat.deleted == []
+    with api.Session() as db:
+        assert db.get(User, 1) is not None
+
+
+def test_account_deletion_works_when_purchases_are_not_configured(billing_api):
+    api = billing_api
+    app.dependency_overrides[get_revenuecat_client] = lambda: None
+
+    response = api.client.request(
+        "DELETE", "/auth/account", json={"password": "correct horse"},
+    )
+
+    assert response.status_code == 200
+    with api.Session() as db:
+        assert db.get(User, 1) is None
 
 
 def test_tier_and_entitlements_in_the_user_response_follow_purchases(billing_api):

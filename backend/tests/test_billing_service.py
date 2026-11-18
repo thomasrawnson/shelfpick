@@ -207,3 +207,51 @@ def test_unknown_subscriber_reads_as_empty(monkeypatch):
     )
 
     assert RevenueCatClient("sk").fetch_subscriber("abc") == {}
+
+
+def test_client_deletes_the_customer_with_the_server_secret(monkeypatch):
+    seen = {}
+
+    def fake_delete(url, headers, timeout):
+        seen.update(url=url, headers=headers)
+        return httpx.Response(200, json={"deleted": True},
+                              request=httpx.Request("DELETE", url))
+
+    monkeypatch.setattr(httpx, "delete", fake_delete)
+
+    RevenueCatClient("sk_test_not_real").delete_customer("abc-123")
+
+    assert seen["url"].endswith("/subscribers/abc-123")
+    assert seen["headers"]["Authorization"] == "Bearer sk_test_not_real"
+
+
+def test_deleting_an_unknown_customer_counts_as_done(monkeypatch):
+    monkeypatch.setattr(
+        httpx, "delete",
+        lambda url, headers, timeout: httpx.Response(
+            404, request=httpx.Request("DELETE", url)),
+    )
+
+    RevenueCatClient("sk").delete_customer("abc")
+
+
+@pytest.mark.parametrize("status", [401, 403, 429, 500])
+def test_a_refused_or_failed_delete_is_reported(monkeypatch, status):
+    monkeypatch.setattr(
+        httpx, "delete",
+        lambda url, headers, timeout: httpx.Response(
+            status, request=httpx.Request("DELETE", url)),
+    )
+
+    with pytest.raises(RevenueCatUnavailableError):
+        RevenueCatClient("sk").delete_customer("abc")
+
+
+def test_a_network_failure_on_delete_is_reported(monkeypatch):
+    def boom(url, headers, timeout):
+        raise httpx.ConnectTimeout("slow")
+
+    monkeypatch.setattr(httpx, "delete", boom)
+
+    with pytest.raises(RevenueCatUnavailableError):
+        RevenueCatClient("sk").delete_customer("abc")
