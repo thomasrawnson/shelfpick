@@ -1,0 +1,52 @@
+{
+  "bgg_id": 270844,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "vp_track": 25,
+        "empire_cards": 11,
+        "resource_pairs": 3,
+        "gold_left": 2,
+        "locations": 8,
+        "workers": 2,
+        "cards_in_hand": 3
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "vp_track": 27,
+        "empire_cards": 9,
+        "resource_pairs": 2,
+        "gold_left": 3,
+        "locations": 7,
+        "workers": 4,
+        "cards_in_hand": 1
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "vp_track": 22,
+        "empire_cards": 10,
+        "resource_pairs": 4,
+        "gold_left": 1,
+        "locations": 7,
+        "workers": 1,
+        "cards_in_hand": 2
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 41,
+      "Ben": 41,
+      "Cleo": 37
+    },
+    "winner": [
+      "Ana"
+    ]
+  }
+}

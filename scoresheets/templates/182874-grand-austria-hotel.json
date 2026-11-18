@@ -1,0 +1,96 @@
+{
+  "format_version": 1,
+  "bgg_id": 182874,
+  "name": "Grand Austria Hotel",
+  "supported_players": [
+    2,
+    4
+  ],
+  "win_condition": "highest",
+  "rounds": 7,
+  "categories": [
+    {
+      "id": "vp_track",
+      "label": "Victory points on the track",
+      "help": "Your marker on the Victory Point track before final scoring, including any 75-point marker and Emperor scoring from earlier rounds.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "staff_end_points",
+      "label": "Staff end-game points",
+      "help": "Points from your played Staff cards that score at game end.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "rooms_row_1",
+      "label": "Occupied rooms, row 1",
+      "help": "Occupied rooms in the bottom row of your hotel; 1 point each.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "rooms_row_2",
+      "label": "Occupied rooms, row 2",
+      "help": "Occupied rooms in the second row; 2 points each.",
+      "type": "count",
+      "points_per": 2,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "rooms_row_3",
+      "label": "Occupied rooms, row 3",
+      "help": "Occupied rooms in the third row; 3 points each.",
+      "type": "count",
+      "points_per": 3,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "rooms_row_4",
+      "label": "Occupied rooms, row 4",
+      "help": "Occupied rooms in the top row; 4 points each.",
+      "type": "count",
+      "points_per": 4,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "leftover_supplies",
+      "label": "Leftover krones, dishes and drinks",
+      "help": "Krones plus dishes and drinks still in your kitchen, 1 point each; the most wins a tie.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once",
+      "tie_break_direction": "higher"
+    },
+    {
+      "id": "cafe_guests",
+      "label": "Guests left in the cafe",
+      "help": "Guests still waiting in your cafe; each costs you 5 points.",
+      "type": "count",
+      "points_per": -5,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "leftover_supplies"
+  ],
+  "source": {
+    "rulebook_title": "Grand Austria Hotel rules (English)",
+    "edition_or_year": "Base game, (c) 2015 Lookout GmbH",
+    "url": "https://lookout-spiele.de/wp-content/uploads/GAH_rules_EN_web.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Base game only. Read from the publisher (Lookout) PDF. 2-4 players taken from the setup text (dice for 2, 3 and 4 players). Expansions and variants excluded. The tie-break counts krones, dishes and drinks together, as the rulebook phrases it."
+}

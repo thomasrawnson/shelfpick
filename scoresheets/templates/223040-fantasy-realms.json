@@ -1,0 +1,51 @@
+{
+  "format_version": 1,
+  "bgg_id": 223040,
+  "name": "Fantasy Realms",
+  "supported_players": [
+    2,
+    6
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "base_strength",
+      "label": "Base strength",
+      "help": "Add up the printed base strength of every card in your final hand, skipping any card that was blanked.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once",
+      "tie_break_direction": "lower"
+    },
+    {
+      "id": "bonuses",
+      "label": "Bonuses",
+      "help": "Total of all bonus points your hand earns from card effects.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "penalties",
+      "label": "Penalties",
+      "help": "Total of all penalty points your hand suffers, entered as a positive number.",
+      "type": "number",
+      "points_per": -1,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "base_strength"
+  ],
+  "source": {
+    "rulebook_title": "Fantasy Realms Deluxe Edition rulebook",
+    "edition_or_year": "Deluxe Edition, rulebook dated 2023-01-03",
+    "url": "https://wizkids.com/posters/repository/wizkids/Fantasy-Realms-Deluxe---Rulebook-WEB-2023-01-03.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Read from the publisher (WizKids) PDF. Scores a hand of base strength plus bonuses minus penalties; the lowest base strength wins a tie. The rulebook does not state a player count, so 2-6 comes from the box and is unverified here. Individual card effects (blanking, clearing, Cursed Items, Extra Suits, Chaos Realms variants) are worked out by the players; enter the resulting totals."
+}

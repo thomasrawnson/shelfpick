@@ -1,0 +1,51 @@
+{
+  "format_version": 1,
+  "bgg_id": 244521,
+  "name": "The Quacks of Quedlinburg",
+  "supported_players": [
+    2,
+    4
+  ],
+  "win_condition": "highest",
+  "rounds": 9,
+  "categories": [
+    {
+      "id": "round_vp",
+      "label": "Victory points this round",
+      "help": "Points moved on the scoring track this round: scoring-space points, spoon points, bonus die and any chip or card bonuses.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "per_round"
+    },
+    {
+      "id": "bought_vp",
+      "label": "Points bought at the end",
+      "help": "After the last round, points bought at 5 coins or 2 rubies each; enter how many you bought.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "last_round_pot_space",
+      "label": "Last-round pot position",
+      "help": "How far along your pot you got in round 9. Scores nothing; the furthest wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "last_round_pot_space",
+    "shared"
+  ],
+  "source": {
+    "rulebook_title": "The Quacks of Quedlinburg rulebook (English)",
+    "edition_or_year": "Schmidt Spiele, 2018",
+    "url": "https://cdn.1j1ju.com/medias/ba/73/db-the-quacks-of-quedlinburg-rulebook.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Base game only; Herb Witches, Alchemists, test-tube variant and other expansions excluded. Read from a retailer-hosted copy (1jour-1jeu CDN) of the Schmidt Spiele rulebook, not the publisher site. The rulebook does not say how to compare an exploded pot in the tie-break; use the space your last chip reached. Players 2 to 4 from the rulebook. A fan-made summary (not used) was ignored."
+}

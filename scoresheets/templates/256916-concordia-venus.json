@@ -1,0 +1,104 @@
+{
+  "format_version": 1,
+  "bgg_id": 256916,
+  "name": "Concordia Venus",
+  "supported_players": [
+    2,
+    5
+  ],
+  "win_condition": "highest",
+  "rounds": null,
+  "categories": [
+    {
+      "id": "vesta",
+      "label": "Vesta",
+      "help": "Total from your Vesta cards: 1 point per full 10 sestertii of cash plus the printed value of your goods, for each Vesta card.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "jupiter",
+      "label": "Jupiter",
+      "help": "Total from your Jupiter cards: 1 point per city with one of your houses, excluding brick cities, for each card (at most 15 per card).",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "saturnus",
+      "label": "Saturnus",
+      "help": "Total from your Saturnus cards: 1 point per province where you have a house, for each card.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "venus",
+      "label": "Venus",
+      "help": "Total from your Venus cards: 2 points per province where you have at least 2 houses, for each card (at most 14 per card).",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "mercurius",
+      "label": "Mercurius",
+      "help": "Total from your Mercurius cards: 2 points per goods type your houses produce, for each card (at most 10 per card).",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "mars",
+      "label": "Mars",
+      "help": "Total from your Mars cards: 2 points per colonist you have on the map, for each card (at most 12 per card).",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "minerva",
+      "label": "Minerva",
+      "help": "Total from your Minerva cards: the printed points per city of that card's type where you have a house.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "concordia_card",
+      "label": "Concordia card",
+      "help": "Tick if you took the Concordia card by buying the last card of the display or building your 15th house.",
+      "type": "boolean",
+      "points_per": 7,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "praefectus_magnus",
+      "label": "Praefectus Magnus",
+      "help": "Tick if you hold the Praefectus Magnus, or would have received it next. Scores nothing; wins a tie.",
+      "type": "boolean",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once"
+    }
+  ],
+  "tie_breakers": [
+    "praefectus_magnus"
+  ],
+  "source": {
+    "rulebook_title": "Concordia Venus Spielregel (German rules)",
+    "edition_or_year": "Concordia Venus, 2018",
+    "url": "https://www.spielezar.ch/modules/genzo_zar/views/pdf/spielregeln-concordia-venus.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Individual game for 2-5 players only; the 4 or 6 player team game is excluded, as is the interim scoring (its points are reset to zero and do not count toward the final total). Read in German from a Swiss retailer mirror of the publisher rulebook; the Rio Grande English PDF was blocked by a bot check and was not read. Wording and worked example verified against the German text. Scoring of each deity is entered as the total for all your cards of that deity."
+}

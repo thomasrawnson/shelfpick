@@ -16,6 +16,7 @@ from api.routers import (
     collection,
     discover,
     export_config,
+    feedback,
     games,
     game_night,
     health,
@@ -133,4 +134,8 @@ app.include_router(
 
 app.include_router(
     wishlist.router
+)
+
+app.include_router(
+    feedback.router
 )

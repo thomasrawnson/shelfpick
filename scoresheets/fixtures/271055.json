@@ -1,0 +1,55 @@
+{
+  "bgg_id": 271055,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "points_in_play": 40,
+        "tableau_cards": 22,
+        "vaults": 6,
+        "orbs": 2,
+        "elemental_markers": 12,
+        "dwellings": 18,
+        "prophecies": 5,
+        "resources_left": 6
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "points_in_play": 38,
+        "tableau_cards": 25,
+        "vaults": 8,
+        "orbs": 1,
+        "elemental_markers": 14,
+        "dwellings": 16,
+        "prophecies": 3,
+        "resources_left": 4
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "points_in_play": 30,
+        "tableau_cards": 18,
+        "vaults": 4,
+        "orbs": 0,
+        "elemental_markers": 10,
+        "dwellings": 12,
+        "prophecies": 6,
+        "resources_left": 5
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 105,
+      "Ben": 105,
+      "Cleo": 80
+    },
+    "winner": [
+      "Ana"
+    ]
+  }
+}

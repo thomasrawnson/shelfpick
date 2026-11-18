@@ -1,0 +1,52 @@
+{
+  "bgg_id": 363622,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "points_in_play": 180,
+        "unsold_goods": 2,
+        "silver": 3,
+        "worker_pairs": 2,
+        "monastery_end": 8,
+        "empty_spaces": 1,
+        "turn_order_place": 1
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "points_in_play": 182,
+        "unsold_goods": 1,
+        "silver": 4,
+        "worker_pairs": 3,
+        "monastery_end": 5,
+        "empty_spaces": 0,
+        "turn_order_place": 3
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "points_in_play": 170,
+        "unsold_goods": 3,
+        "silver": 2,
+        "worker_pairs": 1,
+        "monastery_end": 6,
+        "empty_spaces": 2,
+        "turn_order_place": 2
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 195,
+      "Ben": 195,
+      "Cleo": 182
+    },
+    "winner": [
+      "Ben"
+    ]
+  }
+}

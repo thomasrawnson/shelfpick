@@ -1,0 +1,58 @@
+{
+  "bgg_id": 256916,
+  "provenance": "hand-calculated",
+  "players": [
+    {
+      "name": "Ana",
+      "scores": {
+        "vesta": 3,
+        "jupiter": 18,
+        "saturnus": 28,
+        "venus": 20,
+        "mercurius": 16,
+        "mars": 30,
+        "minerva": 12,
+        "concordia_card": true,
+        "praefectus_magnus": false
+      }
+    },
+    {
+      "name": "Ben",
+      "scores": {
+        "vesta": 5,
+        "jupiter": 12,
+        "saturnus": 21,
+        "venus": 14,
+        "mercurius": 10,
+        "mars": 20,
+        "minerva": 52,
+        "concordia_card": false,
+        "praefectus_magnus": true
+      }
+    },
+    {
+      "name": "Cleo",
+      "scores": {
+        "vesta": 2,
+        "jupiter": 9,
+        "saturnus": 20,
+        "venus": 12,
+        "mercurius": 8,
+        "mars": 16,
+        "minerva": 30,
+        "concordia_card": false,
+        "praefectus_magnus": false
+      }
+    }
+  ],
+  "expected": {
+    "totals": {
+      "Ana": 134,
+      "Ben": 134,
+      "Cleo": 97
+    },
+    "winner": [
+      "Ben"
+    ]
+  }
+}

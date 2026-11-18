@@ -10,6 +10,7 @@ import {
   type CollectionSyncResult,
 } from "../api/client"
 import { Analytics } from "../analytics"
+import { rememberBggSync } from "../bgg-sync-time"
 
 
 type Props = {
@@ -18,6 +19,8 @@ type Props = {
     username: string,
   ) => void
   compact?: boolean
+  // Settings shows BGG sync and BG Stats import on separate screens.
+  part?: "all" | "sync" | "import"
 }
 
 
@@ -25,6 +28,7 @@ function SetupView({
   initialUsername,
   onUsernameChange,
   compact = false,
+  part = "all",
 }: Props) {
   const [username, setUsername] =
     useState(
@@ -79,6 +83,7 @@ function SetupView({
         )
 
       setSyncResult(result)
+      rememberBggSync()
       Analytics.track("collection_import_completed", { source: "settings_bgg", result_count: result.games_synced })
       
       onUsernameChange?.(
@@ -146,9 +151,9 @@ function SetupView({
       </header>}
 
 
-      <div className="setup-card">
+      {part !== "import" && <div className="setup-card">
         <div className="setup-step">
-          <span>1</span>
+          {part === "all" && <span>1</span>}
 
           <div>
             <strong>
@@ -220,17 +225,17 @@ function SetupView({
             {syncError}
           </p>
         )}
-      </div>
+      </div>}
 
 
-      <div className="setup-divider">
+      {part === "all" && <div className="setup-divider">
         <span>then</span>
-      </div>
+      </div>}
 
 
-      <div className="setup-card">
+      {part !== "sync" && <div className="setup-card">
         <div className="setup-step">
-          <span>2</span>
+          {part === "all" && <span>2</span>}
 
           <div>
             <strong>
@@ -333,7 +338,7 @@ function SetupView({
             {importError}
           </p>
         )}
-      </div>
+      </div>}
     </section>
   )
 }

@@ -1,0 +1,123 @@
+{
+  "format_version": 1,
+  "bgg_id": 12,
+  "name": "Ra",
+  "supported_players": [
+    3,
+    5
+  ],
+  "win_condition": "highest",
+  "rounds": 3,
+  "categories": [
+    {
+      "id": "starting_tablets",
+      "label": "Starting tablets",
+      "help": "Fame you start with: two 5-point tablets, so enter 10.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "gods",
+      "label": "Gods",
+      "help": "God tiles you hold at the end of the epoch; 2 fame each.",
+      "type": "count",
+      "points_per": 2,
+      "allow_negative": false,
+      "scope": "per_round"
+    },
+    {
+      "id": "pharaohs",
+      "label": "Pharaohs",
+      "help": "Fame for Pharaoh majority: +5 for most, -2 for fewest, nothing if all equal; enter the net, which may be negative.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": true,
+      "scope": "per_round"
+    },
+    {
+      "id": "nile_floods",
+      "label": "Nile and floods",
+      "help": "Nile plus flood tiles counted this epoch; 1 each, but enter 0 if you hold no flood tile.",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "per_round"
+    },
+    {
+      "id": "gold",
+      "label": "Gold",
+      "help": "Gold tiles at the end of the epoch; 3 fame each.",
+      "type": "count",
+      "points_per": 3,
+      "allow_negative": false,
+      "scope": "per_round"
+    },
+    {
+      "id": "civilization",
+      "label": "Civilization",
+      "help": "Fame for civilization tiles: -5 for none, 5 for three different, 10 for four, 15 for five; enter the net.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": true,
+      "scope": "per_round"
+    },
+    {
+      "id": "zero_floor_correction",
+      "label": "Zero-floor correction",
+      "help": "Fame you get back when losses would push your tablets below zero, so your total stays at 0 (normally 0).",
+      "type": "count",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "per_round"
+    },
+    {
+      "id": "monument_variety",
+      "label": "Monuments, different kinds",
+      "help": "Final epoch only: 1 per different monument up to 6, 10 for seven kinds, 15 for all eight.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "monument_sets",
+      "label": "Monuments, matching sets",
+      "help": "Final epoch only: 5 for each group of three identical monuments, 10 for four, 15 for five.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": false,
+      "scope": "once"
+    },
+    {
+      "id": "sun_bonus",
+      "label": "Suns",
+      "help": "Final epoch only: +5 if your suns add up highest, -5 if lowest, nothing if all equal; enter the net.",
+      "type": "number",
+      "points_per": 1,
+      "allow_negative": true,
+      "scope": "once"
+    },
+    {
+      "id": "highest_sun",
+      "label": "Highest sun number",
+      "help": "The highest numbered sun you own; the higher wins a tie.",
+      "type": "count",
+      "points_per": 0,
+      "allow_negative": false,
+      "scope": "once",
+      "tie_break_direction": "higher"
+    }
+  ],
+  "tie_breakers": [
+    "highest_sun"
+  ],
+  "source": {
+    "rulebook_title": "English Rules for RA",
+    "edition_or_year": "Original Ra rules, 3-5 players (pre-2009 text)",
+    "url": "https://kubix.com.ua/upload/iblock/47e/6dq2jgtp6w775eebf6yvb2lbxzpl8fvy.pdf",
+    "checked_against_rulebook": true
+  },
+  "notes": "Base game only. The publisher PDF on riograndegames.com returned 403, so this was read from a third-party mirror (kubix.com.ua) of the English rules; it was not OCR. That text covers 3-5 players, so the later 2-player rule of the 2009 edition is not verified and not included. Fame cannot go below zero in the rulebook, so enter any correction under the zero-floor category. The tie-break compares highest numbered sun among tied players."
+}

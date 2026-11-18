@@ -6,7 +6,8 @@ Versioned, hand-written scoresheet templates for ShelfPick. Content and data onl
 - `templates/<bgg_id>-<slug>.json`: one template per game.
 - `fixtures/<bgg_id>.json`: a worked example per template (entries, expected totals and winner).
 - `score.mjs`, `validate.mjs`, `lib/json-schema.mjs`: scoring engine, validator and a small dependency-free JSON Schema checker.
-- [`PROPOSED-GAMES.md`](PROPOSED-GAMES.md): the approved game list.
+- [`PROPOSED-GAMES.md`](PROPOSED-GAMES.md), [`PROPOSED-GAMES-2.md`](PROPOSED-GAMES-2.md): the approved game lists.
+- `play-samples/<bgg_id>.json`: anonymised totals from real plays (no names, dates or places), used to check winner rules.
 
 ## Check everything
 
