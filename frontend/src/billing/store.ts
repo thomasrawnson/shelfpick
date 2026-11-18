@@ -55,6 +55,22 @@ function errorCode(error: unknown): string | null {
   return typeof code === "string" || typeof code === "number" ? String(code) : null
 }
 
+const SUPPORT_DETAIL_MAX = 220
+
+// A short, secret-free line for support when the store fails: the SDK error
+// code and what the SDK said. Never includes keys or account details.
+export function describeStoreError(error: unknown): string {
+  const code = errorCode(error)
+  const fields = typeof error === "object" && error !== null
+    ? error as { message?: unknown; underlyingErrorMessage?: unknown }
+    : {}
+  const parts = [fields.message, fields.underlyingErrorMessage]
+    .filter((part): part is string => typeof part === "string" && part.trim() !== "")
+  const text = parts.length > 0 ? parts.join(" – ") : typeof error === "string" ? error : "Unknown error"
+  const line = code === null ? text : `${code}: ${text}`
+  return line.length > SUPPORT_DETAIL_MAX ? `${line.slice(0, SUPPORT_DETAIL_MAX - 1)}…` : line
+}
+
 function userCancelled(error: unknown): boolean {
   return errorCode(error) === USER_CANCELLED
     || (typeof error === "object" && error !== null && (error as { userCancelled?: unknown }).userCancelled === true)

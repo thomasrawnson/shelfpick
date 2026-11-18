@@ -291,6 +291,25 @@ test("loading plans gives up after the timeout instead of hanging", async () => 
   await assert.rejects(store.prepare("a"), /taking too long/)
 })
 
+test("a store error is described with its code and what the SDK said", () => {
+  const describe = storeModule.describeStoreError
+  assert.equal(
+    describe({ code: "23", message: "There's a problem with your configuration.", underlyingErrorMessage: "None of the products could be fetched" }),
+    "23: There's a problem with your configuration. – None of the products could be fetched",
+  )
+  assert.equal(describe({ code: 7, message: "Network error" }), "7: Network error")
+  assert.equal(describe(new Error("The App Store is taking too long to respond.")), "The App Store is taking too long to respond.")
+  assert.equal(describe("odd"), "odd")
+  assert.equal(describe(undefined), "Unknown error")
+  assert.equal(describe({ code: "9" }), "9: Unknown error")
+})
+
+test("a very long store error is cut to a short support line", () => {
+  const line = storeModule.describeStoreError({ code: "1", message: "x".repeat(1000) })
+  assert.ok(line.length <= 220)
+  assert.ok(line.endsWith("…"))
+})
+
 test("store reads the subscription management link", async () => {
   const store = storeModule.createProStore({ apiKey: "k", loadSdk: async () => fakeSdk() })
   assert.equal(await store.managementUrl(), "https://apps.apple.com/account/subscriptions")
