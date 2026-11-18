@@ -43,6 +43,9 @@ class PlayWriteRepository:
         timer_session_id: str | None = None,
         outcome_type: str = "competitive",
         coop_result: str | None = None,
+        scoresheet_id: int | None = None,
+        scoresheet_version: int | None = None,
+        result_overridden: bool = False,
     ) -> DomainPlay | None:
         if self.user_id is None:
             raise ValueError(
@@ -113,6 +116,9 @@ class PlayWriteRepository:
             timer_session_id=timer_session_id,
             outcome_type=outcome_type,
             coop_result=coop_result,
+            scoresheet_id=scoresheet_id,
+            scoresheet_version=scoresheet_version,
+            result_overridden=result_overridden,
         )
 
         if played_at is not None:
@@ -188,6 +194,7 @@ class PlayWriteRepository:
             team=data.get("team"),
             rank=data.get("rank"),
             role=data.get("role"),
+            score_breakdown=data.get("score_breakdown"),
         )
 
     def get_play_for_edit(self, play_id: int) -> dict | None:
@@ -203,6 +210,9 @@ class PlayWriteRepository:
             "location": play.location,
             "outcome_type": play.outcome_type,
             "coop_result": play.coop_result,
+            "scoresheet_id": play.scoresheet_id,
+            "scoresheet_version": play.scoresheet_version,
+            "result_override": play.result_overridden,
             "participants": [
                 {
                     "name": p.name,
@@ -211,6 +221,7 @@ class PlayWriteRepository:
                     "team": p.team,
                     "rank": p.rank,
                     "role": p.role,
+                    "score_breakdown": p.score_breakdown,
                 }
                 for p in play.participants
             ],
@@ -258,6 +269,9 @@ class PlayWriteRepository:
         play.location = state["location"]
         play.outcome_type = state["outcome_type"]
         play.coop_result = state["coop_result"]
+        play.scoresheet_id = state["scoresheet_id"]
+        play.scoresheet_version = state["scoresheet_version"]
+        play.result_overridden = state["result_override"]
         play.player_count = len(state["participants"])
 
         play.participants.clear()

@@ -13,6 +13,7 @@ class Feature(str, Enum):
     GAME_NIGHT_ENHANCED = "game_night_enhanced"
     ADVANCED_STATS = "advanced_stats"
     LIVE_PLAY_ENHANCEMENTS = "live_play_enhancements"
+    CUSTOM_SCORESHEETS = "custom_scoresheets"
 
 
 FEATURES_BY_TIER: dict[PlanTier, frozenset[Feature]] = {

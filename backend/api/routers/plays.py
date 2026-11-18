@@ -73,6 +73,9 @@ def record_play(
             timer_session_id=play_data.timer_session_id,
             outcome_type=play_data.outcome_type,
             coop_result=play_data.coop_result,
+            scoresheet_id=play_data.scoresheet_id,
+            scoresheet_version=play_data.scoresheet_version,
+            result_override=play_data.result_override,
         )
     except ValueError as exc:
         raise HTTPException(

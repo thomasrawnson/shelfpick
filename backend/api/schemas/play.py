@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import (
     BaseModel,
@@ -27,6 +27,9 @@ class PlayParticipantCreate(BaseModel):
     rank: int | None = Field(default=None, ge=1, le=99)
 
     role: str | None = Field(default=None, max_length=50)
+
+    # Scoresheet entries by category id; the server computes the score.
+    score_breakdown: dict[str, Any] | None = Field(default=None, max_length=60)
 
 
 class PlayerCreate(BaseModel):
@@ -60,6 +63,14 @@ class PlayCreate(BaseModel):
 
     coop_result: CoopResult | None = None
 
+    scoresheet_id: int | None = Field(default=None, gt=0)
+
+    scoresheet_version: int | None = Field(default=None, ge=1)
+
+    # True keeps the client's winners, ranks and result instead of the
+    # scoresheet's calculated result.
+    result_override: bool = False
+
     picker_session_id: str | None = Field(
         default=None,
         min_length=36,
@@ -87,6 +98,12 @@ class PlayUpdate(BaseModel):
     outcome_type: OutcomeType | None = None
 
     coop_result: CoopResult | None = None
+
+    scoresheet_id: int | None = Field(default=None, gt=0)
+
+    scoresheet_version: int | None = Field(default=None, ge=1)
+
+    result_override: bool | None = None
 
 
 class LiveTimerStart(BaseModel):

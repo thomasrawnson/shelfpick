@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from auth.security import verify_password
@@ -17,6 +18,8 @@ from database.models import (
     Play,
     PlayParticipant,
     Player,
+    Scoresheet,
+    ScoresheetVersion,
     User,
     UserGame,
     UserOperationLease,
@@ -87,6 +90,15 @@ class AccountService:
             ).delete(synchronize_session=False)
             self.db.query(Play).filter(
                 Play.user_id == user.id
+            ).delete(synchronize_session=False)
+            custom_sheet_ids = select(Scoresheet.id).where(
+                Scoresheet.owner_user_id == user.id
+            )
+            self.db.query(ScoresheetVersion).filter(
+                ScoresheetVersion.scoresheet_id.in_(custom_sheet_ids)
+            ).delete(synchronize_session=False)
+            self.db.query(Scoresheet).filter(
+                Scoresheet.owner_user_id == user.id
             ).delete(synchronize_session=False)
 
             for model in (
