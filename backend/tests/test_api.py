@@ -16,6 +16,7 @@ from api.current_user import (
 )
 from api.dependencies import (
     get_live_timer_service,
+    get_picker_h_index_boosts,
     get_picker_personal_rankings,
 )
 from database.models import User
@@ -41,11 +42,15 @@ def neutral_picker_rankings():
     app.dependency_overrides[
         get_picker_personal_rankings
     ] = lambda: []
+    app.dependency_overrides[
+        get_picker_h_index_boosts
+    ] = lambda: None
     yield
-    app.dependency_overrides.pop(
+    for dependency in (
         get_picker_personal_rankings,
-        None,
-    )
+        get_picker_h_index_boosts,
+    ):
+        app.dependency_overrides.pop(dependency, None)
 
 
 class FakeLiveTimerService:

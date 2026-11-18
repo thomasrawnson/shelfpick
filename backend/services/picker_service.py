@@ -212,6 +212,7 @@ class PickerService:
         ]
         | None = None,
         personal_rankings: list[dict] | None = None,
+        h_index_boosts: dict[int, dict] | None = None,
     ) -> list[PickerMatch]:
         play_stats = play_stats or {}
 
@@ -242,6 +243,9 @@ class PickerService:
                     game.bgg_id,
                     0,
                 ),
+                (h_index_boosts or {}).get(
+                    game.bgg_id
+                ),
             )
             for game in eligible_games
         ]
@@ -266,6 +270,7 @@ class PickerService:
         play_stats: GamePlayStats | None = None,
         group_play_stats: GamePlayStats | None = None,
         personal_ranking_score: int = 0,
+        h_index_boost: dict | None = None,
     ) -> PickerMatch:
         score = 35
 
@@ -382,6 +387,19 @@ class PickerService:
             reasons.extend(
                 group_reasons
             )
+
+        if h_index_boost is not None:
+            # Pro "Help my H-index": bounded, deterministic, and only
+            # explained when it changes the capped score.
+            boosted = min(
+                score + h_index_boost["points"],
+                100,
+            )
+            if boosted != max(0, min(score, 100)):
+                score = boosted
+                reasons.append(
+                    h_index_boost["reason"]
+                )
 
         score_without_ranking = max(
             0,

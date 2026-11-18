@@ -84,6 +84,7 @@ function PickerView({
   const [categoryOptions, setCategoryOptions] = useState<string[]>([]);
   const [mechanicOptions, setMechanicOptions] = useState<string[]>([]);
   const [mode, setMode] = useState<PickerMode>("best_match");
+  const [helpHIndex, setHelpHIndex] = useState(false);
   const [matches, setMatches] = useState<PickerMatch[]>([]);
   const [matchIndex, setMatchIndex] = useState(0);
   const [noMatchGuidance, setNoMatchGuidance] =
@@ -182,6 +183,7 @@ function PickerView({
         preferredCategories,
         preferredMechanics,
         mode,
+        helpHIndex,
       });
 
       setPickerSessionId(response.session_id);
@@ -269,6 +271,7 @@ function PickerView({
     setPreferredCategories([]);
     setPreferredMechanics([]);
     setMode("best_match");
+    setHelpHIndex(false);
     setMatches([]);
     setMatchIndex(0);
     setError("");
@@ -283,6 +286,7 @@ function PickerView({
     setPreferredCategories([]);
     setPreferredMechanics([]);
     setMode("best_match");
+    setHelpHIndex(false);
   }
 
   function viewGame() {
@@ -352,6 +356,8 @@ function PickerView({
           youngestPlayerAge={youngestPlayerAge}
           playStyle={playStyle}
           mode={mode}
+          helpHIndex={helpHIndex}
+          onHelpHIndexChange={setHelpHIndex}
           onSelectCount={chooseGroupSize}
           onComplexityChange={setComplexityBand}
           onYoungestPlayerAgeChange={setYoungestPlayerAge}

@@ -46,6 +46,19 @@ Render pre-deploy command. Custom sheets use the same schema behind the new
 Stats export still sends totals only. Migration `d2b6f0a9c4e8` is additive and
 must run, with the seed, before build 12. Evidence: `docs/SP-SCORE-01-REPORT.md`.
 
+### SP-STATS-01 Stats 2.0 — LOCAL CANDIDATE, 18 November 2026
+
+Branch `sp-stats-01` from `origin/main` 601dea0 (SP-PLAY-01 and SP-SCORE-01
+merged); draft PR for owner review, not merged, deployed or submitted. The Stats
+tab opens on a new **Trends** section: weekly play streak, H-index with a "play
+these to raise it" list, a 12 or 24 month plays chart and a calendar heatmap,
+all Free, as hand-rolled accessible SVG with table alternatives. Pro
+(`advanced_stats`, now enforced) adds per-game score records, head-to-head,
+date/player/location/player-count filters and a Picker "Help my H-index" option
+(bounded +6/+3 boost, deterministic, explained in the result; 403 for Free). The
+owner reopened the October H-index decision. No migration or dependency; iOS
+build number is 13. Evidence and rollback: `docs/SP-STATS-01-REPORT.md`.
+
 ### SP-PLAY-01 Play logging foundation — LOCAL CANDIDATE, 17 November 2026
 
 Branch `sp-play-01`, draft PR for owner review; not merged, deployed or

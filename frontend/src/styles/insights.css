@@ -5,8 +5,8 @@
 }
 
 .stats-section-tabs {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 5px;
   margin: -10px 0 20px;
   padding: 4px;
@@ -16,8 +16,9 @@
 }
 
 .stats-section-tab {
+  flex: 1 1 auto;
   min-height: var(--target-min);
-  padding: 8px 5px;
+  padding: 8px 8px;
   color: var(--text-muted);
   background: transparent;
   border: 0;

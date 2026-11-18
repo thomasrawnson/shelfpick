@@ -5,6 +5,8 @@ import type {
   PickerPlayStyle,
 } from "../../api/client"
 
+import { useEntitlement } from "../../entitlements"
+
 import ActionRow
   from "../ui/ActionRow"
 
@@ -22,6 +24,8 @@ type Props = {
   youngestPlayerAge: number | null
   playStyle: PickerPlayStyle
   mode: PickerMode
+  helpHIndex: boolean
+  onHelpHIndexChange: (value: boolean) => void
   onSelectCount:
     (players: number | null) => void
   onComplexityChange:
@@ -109,6 +113,8 @@ function PlayerStep({
   youngestPlayerAge,
   playStyle,
   mode,
+  helpHIndex,
+  onHelpHIndexChange,
   onSelectCount,
   onComplexityChange,
   onYoungestPlayerAgeChange,
@@ -122,8 +128,10 @@ function PlayerStep({
   onGroupVote,
   footer,
 }: Props) {
+  const canHelpHIndex = useEntitlement("advanced_stats")
   const activeFineTuneCount = [
     mode !== "best_match",
+    canHelpHIndex && helpHIndex,
     playStyle !== "any",
     preferredCategories.length > 0,
     preferredMechanics.length > 0,
@@ -274,6 +282,28 @@ function PlayerStep({
               ))}
             </div>
           </div>
+
+          {canHelpHIndex && (
+            <div className="advanced-h-index">
+              <span className="advanced-preference-label">H-index</span>
+              <button
+                type="button"
+                className={
+                  helpHIndex
+                    ? "preference-chip selected"
+                    : "preference-chip"
+                }
+                aria-pressed={helpHIndex}
+                onClick={() => onHelpHIndexChange(!helpHIndex)}
+              >
+                Help my H-index
+              </button>
+              <p className="advanced-hint">
+                Lifts games that are one or two plays from counting toward a
+                higher H-index. The result tells you when it did.
+              </p>
+            </div>
+          )}
 
           <div className="advanced-play-style">
             <span className="advanced-preference-label">Play style</span>

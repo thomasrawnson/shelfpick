@@ -1,4 +1,4 @@
-from fastapi import Depends
+from fastapi import Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from api.current_user import get_current_user
 from bgg.client import BGGClient
@@ -8,6 +8,7 @@ from repositories.game_repository import GameRepository
 from repositories.game_night_voting_repository import GameNightVotingRepository
 from repositories.insights_repository import InsightsRepository
 from repositories.play_repository import PlayRepository
+from repositories.stats_repository import StatsRepository
 from repositories.picker_analytics_repository import (
     PickerAnalyticsRepository,
 )
@@ -20,6 +21,8 @@ from services.bgstats_play_import_service import (
 from services.collection_service import CollectionService
 from services.game_service import GameService
 from services.insights_service import InsightsService
+from repositories.stats_repository import StatsFilters
+from services.stats_service import StatsService
 from services.play_service import PlayService
 from repositories.scoresheet_repository import ScoresheetRepository
 from services.scoresheet_service import ScoresheetService
@@ -167,6 +170,29 @@ def get_insights_service(
     )
 
     return InsightsService(repository)
+
+
+def get_stats_service(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> StatsService:
+    return StatsService(StatsRepository(db, current_user.id))
+
+
+def get_picker_h_index_boosts(
+    help_h_index: bool = Query(False),
+    current_user: User = Depends(get_current_user),
+    service: StatsService = Depends(get_stats_service),
+) -> dict[int, dict] | None:
+    """Pro "Help my H-index": per-game Picker boosts, or None when off."""
+    if not help_h_index:
+        return None
+    if not can_use(current_user, Feature.ADVANCED_STATS):
+        raise HTTPException(
+            status_code=403,
+            detail="Help my H-index requires Pro.",
+        )
+    return service.picker_h_index_boosts(StatsFilters(timezone="UTC"))
 
 
 def get_bgstats_play_import_service(

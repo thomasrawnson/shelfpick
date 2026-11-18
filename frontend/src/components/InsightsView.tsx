@@ -16,6 +16,7 @@ import RankingCategorySummary
 import { useLocation } from "react-router-dom"
 import MonthlyRecapPanel from "./insights/MonthlyRecapPanel"
 import YearRecapEntry from "./insights/YearRecapEntry"
+import TrendsPanel from "./stats/TrendsPanel"
 import { insightHistoryState }
   from "../ui-empty-state"
 import {
@@ -26,6 +27,7 @@ import {
 
 
 type StatsSection =
+  | "trends"
   | "collection"
   | "play"
   | "group"
@@ -35,6 +37,10 @@ const statsSections: Array<{
   id: StatsSection
   label: string
 }> = [
+  {
+    id: "trends",
+    label: "Trends",
+  },
   {
     id: "collection",
     label: "Collection",
@@ -134,7 +140,7 @@ function InsightsView({
     activeSection,
     setActiveSection,
   ] = useState<StatsSection>(
-    openYearRecap ? "recaps" : "collection"
+    openYearRecap ? "recaps" : "trends"
   )
 
 
@@ -275,6 +281,11 @@ function InsightsView({
           ),
         )}
       </div>
+
+
+      {activeSection === "trends" && (
+        <TrendsPanel onOpenGame={onOpenGame} />
+      )}
 
 
       {activeSection === "collection" && (

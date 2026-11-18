@@ -9,6 +9,7 @@ from fastapi import (
 
 from api.dependencies import (
     get_game_service,
+    get_picker_h_index_boosts,
     get_picker_analytics_repository,
     get_picker_personal_rankings,
     get_play_repository,
@@ -148,6 +149,9 @@ def pick_games(
         None,
         max_length=300,
     ),
+    h_index_boosts: dict[int, dict] | None = Depends(
+        get_picker_h_index_boosts
+    ),
 ):
     if (
         len(player_ids)
@@ -242,6 +246,7 @@ def pick_games(
                 if player_ids
                 else personal_rankings
             ),
+            h_index_boosts=h_index_boosts,
         )
     )
 
