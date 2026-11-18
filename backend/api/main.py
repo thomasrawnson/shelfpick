@@ -13,6 +13,7 @@ from api.dependencies import (
 
 from api.routers import (
     auth,
+    billing,
     collection,
     discover,
     export_config,
@@ -134,6 +135,10 @@ app.include_router(
 
 app.include_router(
     wishlist.router
+)
+
+app.include_router(
+    billing.router
 )
 
 app.include_router(

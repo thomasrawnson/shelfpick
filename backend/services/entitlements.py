@@ -25,7 +25,8 @@ FEATURES_BY_TIER: dict[PlanTier, frozenset[Feature]] = {
 }
 
 
-def resolve_tier(user) -> PlanTier:
+def _granted_tier(user) -> PlanTier:
+    """The tier set directly on the account (manual and test grants)."""
     raw_tier = getattr(user, "tier", None)
 
     if isinstance(raw_tier, PlanTier):
@@ -35,6 +36,23 @@ def resolve_tier(user) -> PlanTier:
         return PlanTier(str(raw_tier).upper())
     except (TypeError, ValueError):
         return PlanTier.FREE
+
+
+def resolve_tier(user) -> PlanTier:
+    """PRO for a manual grant or an unexpired verified purchase, else FREE.
+
+    Expiry is judged here against the clock, so a lapsed yearly plan stops
+    unlocking Pro even before the provider's notification arrives.
+    """
+    granted = _granted_tier(user)
+    if granted is PlanTier.PRO:
+        return granted
+
+    purchase = getattr(user, "purchase_entitlement", None)
+    if purchase is not None and purchase.is_active():
+        return PlanTier.PRO
+
+    return granted
 
 
 def entitlements_for(user) -> list[Feature]:
