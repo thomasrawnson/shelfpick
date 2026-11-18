@@ -389,6 +389,73 @@ following are true:
 For destructive or uncertain schema incidents, use point-in-time recovery to
 a separate database, validate it, then update the API's database connection.
 
+### Pro purchases: RevenueCat setup and rollout (SP-PRO-01)
+
+ShelfPick sells **Pro Lifetime** (`com.plutonightlabs.shelfpick.pro.lifetime`,
+non-consumable) and **Pro Yearly** (`com.plutonightlabs.shelfpick.pro.yearly`,
+auto-renewing) through RevenueCat. The server grants Pro only from RevenueCat's
+own record of the account's purchase; a client claim, a webhook body or a
+forged request grants nothing. Manual and test Pro grants on `users.tier` keep
+working and are never changed by billing.
+
+Owner setup, in this order (the repository cannot do any of it):
+
+1. In RevenueCat, create a project and an iOS app for the ShelfPick bundle ID
+   and add the App Store Connect in-app purchase key.
+2. Add the two products. Create one entitlement with identifier `pro`
+   (or set `REVENUECAT_ENTITLEMENT_ID`) and attach both products to it.
+3. Create the `default` offering and make it current. Add the yearly product
+   as the **Annual** package and the lifetime product as the **Lifetime**
+   package; the app reads `offering.annual` and `offering.lifetime`.
+4. Keep RevenueCat's default of transferring a purchase to the newest
+   signed-in app user ID. ShelfPick signs each account in with its random
+   `users.public_id`, so a restore on a second device returns Pro to the same
+   account, and a purchase shared by two ShelfPick accounts moves to the one
+   that restores it (the webhook then downgrades the first).
+5. In App Store Connect, point App Store Server Notifications (V2) for the
+   app at the URL RevenueCat shows, so renewals, expiry and refunds reach it
+   within minutes.
+6. In RevenueCat > Integrations > Webhooks, add
+   `https://api.<your-domain>/billing/revenuecat/webhook`, set the
+   Authorization header value to a long random string, and send both
+   sandbox and production events.
+
+Environment (Render dashboard, API service; all secrets):
+
+| Variable | Value |
+| --- | --- |
+| `REVENUECAT_SECRET_API_KEY` | RevenueCat **secret** API key (v1). Server-side lookups only. |
+| `REVENUECAT_WEBHOOK_AUTH` | The exact Authorization header value entered in the webhook above. |
+| `REVENUECAT_ENTITLEMENT_ID` | Optional; defaults to `pro`. |
+
+Set the first two together: the API refuses to start with only one. Until both
+are set, `/billing/*` answers 503 and nothing can be sold. The iOS build also
+needs `VITE_REVENUECAT_IOS_API_KEY` (the public `appl_` SDK key, safe to ship)
+in `frontend/.env.ios`, and `VITE_PUBLIC_LEGAL_LINKS_ENABLED=true`: the paywall
+refuses to offer a purchase until the approved Privacy Policy and Terms links
+can be shown beside the price.
+
+Deploy order: the migration (`c4e7a9b2d6f1`, part of the pre-deploy command) is
+additive and keeps the previous release working, because `users.public_id` has
+a database default. Then deploy the API, then add the secrets and the webhook,
+then ship the app build. Verify with a sandbox purchase on a TestFlight build
+and a sandbox tester: the account should show Pro, a Restore on a second
+install should return it, and `purchase_entitlements.environment` should read
+`SANDBOX`. App Review buys in the sandbox against production, so sandbox
+purchases are accepted and grant real Pro on the account that made them.
+
+Rollback: remove `REVENUECAT_SECRET_API_KEY` and `REVENUECAT_WEBHOOK_AUTH` (with
+both gone, billing is off and existing purchase rows keep working until their
+expiry), or redeploy the previous commit. Do not downgrade the migration while
+purchase rows exist.
+
+Operations: a failed RevenueCat lookup (HTTP 502 from `/billing/sync` or the
+webhook) never grants or removes Pro; RevenueCat retries webhooks. Refunds and
+expiry arrive by webhook, and an expired yearly plan stops unlocking Pro at its
+expiry time even if a notification is late. A deletion request for a user must
+also be raised with RevenueCat; the account deletion in the app removes only
+ShelfPick's own purchase row.
+
 ## 6. Release log
 
 | Date | Commit | Deploy | Migration | Email | Backup/restore | Notes |

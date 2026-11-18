@@ -37,7 +37,7 @@ export default defineConfig({
     },
     {
       command: `npm run dev -- --host 127.0.0.1 --port ${WEB_PORT} --strictPort`,
-      env: { VITE_API_BASE_URL: API_ORIGIN },
+      env: { VITE_API_BASE_URL: API_ORIGIN, VITE_PUBLIC_LEGAL_LINKS_ENABLED: "true" },
       url: WEB_ORIGIN,
       reuseExistingServer,
       timeout: 60_000,

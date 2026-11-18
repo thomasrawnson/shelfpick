@@ -1,5 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import secrets
+import uuid
 
 from sqlalchemy import (
     CheckConstraint,
@@ -117,6 +118,23 @@ class User(Base):
         server_default="FREE",
     )
 
+    # Identifies this account to the purchase provider (RevenueCat app user
+    # ID) without exposing the email address or the internal numeric ID.
+    public_id: Mapped[str] = mapped_column(
+        String(36),
+        nullable=False,
+        unique=True,
+        default=lambda: str(uuid.uuid4()),
+    )
+
+    purchase_entitlement: Mapped["PurchaseEntitlement | None"] = relationship(
+        "PurchaseEntitlement",
+        uselist=False,
+        lazy="selectin",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+
     password_hash: Mapped[str | None] = mapped_column(
         String(255),
         nullable=True,
@@ -225,6 +243,62 @@ class AuthToken(Base):
         nullable=False,
         server_default=func.now(),
     )
+
+
+class PurchaseEntitlement(Base):
+    """Pro access bought in the App Store, as last verified with RevenueCat.
+
+    Only the server writes this row, from RevenueCat's own subscriber record.
+    Manual and test Pro grants stay on ``users.tier`` and are not touched here.
+    """
+
+    __tablename__ = "purchase_entitlements"
+
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('ACTIVE', 'EXPIRED', 'REVOKED')",
+            name="ck_purchase_entitlements_status",
+        ),
+        CheckConstraint(
+            "plan IN ('LIFETIME', 'YEARLY')",
+            name="ck_purchase_entitlements_plan",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+    )
+    status: Mapped[str] = mapped_column(String(10), nullable=False)
+    plan: Mapped[str] = mapped_column(String(10), nullable=False)
+    product_id: Mapped[str] = mapped_column(String(120), nullable=False)
+    store: Mapped[str | None] = mapped_column(String(24), nullable=True)
+    environment: Mapped[str] = mapped_column(String(12), nullable=False)
+    # Null for a lifetime purchase.
+    expires_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True,
+    )
+    last_synced_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False,
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(),
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(),
+    )
+
+    def is_active(self, now: datetime | None = None) -> bool:
+        if self.status != "ACTIVE":
+            return False
+        if self.expires_at is None:
+            return True
+        expires_at = self.expires_at
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+        return expires_at > (now or datetime.now(timezone.utc))
 
 
 class Feedback(Base):

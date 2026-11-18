@@ -254,3 +254,31 @@ def test_production_error_does_not_reveal_tokens(
     message = str(error.value)
     assert bgg_token not in message
     assert resend_key not in message
+
+
+def test_revenuecat_secrets_must_be_configured_together(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    production_environment(monkeypatch)
+    monkeypatch.setenv("REVENUECAT_SECRET_API_KEY", "sk_test_not_real")
+
+    with pytest.raises(RuntimeError, match="configured together"):
+        get_settings()
+
+    monkeypatch.setenv("REVENUECAT_WEBHOOK_AUTH", "Bearer test-webhook-secret")
+    settings = get_settings()
+    assert settings.revenuecat_entitlement_id == "pro"
+    assert settings.revenuecat_secret_api_key == "sk_test_not_real"
+
+
+def test_billing_stays_off_without_revenuecat_secrets(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    production_environment(monkeypatch)
+    monkeypatch.delenv("REVENUECAT_SECRET_API_KEY", raising=False)
+    monkeypatch.delenv("REVENUECAT_WEBHOOK_AUTH", raising=False)
+
+    settings = get_settings()
+
+    assert settings.revenuecat_secret_api_key == ""
+    assert settings.revenuecat_webhook_auth == ""

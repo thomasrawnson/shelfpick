@@ -31,6 +31,12 @@ services:
         value: "false"
       - key: GAME_NIGHT_PHONE_VOTING_ENABLED
         value: "true"
+      # Pro purchases (SP-PRO-01): set together in the dashboard, never here.
+      # Billing endpoints answer 503 until both are present.
+      - key: REVENUECAT_SECRET_API_KEY
+        sync: false
+      - key: REVENUECAT_WEBHOOK_AUTH
+        sync: false
       - key: CORS_ORIGINS
         sync: false
       - key: FRONTEND_URL

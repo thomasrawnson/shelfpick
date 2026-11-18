@@ -4,6 +4,7 @@ import type { AuthUser } from "../auth"
 import { APP_PATHS } from "../routes"
 import { rememberSettingsEntry } from "../settings-focus"
 import BrandLogo from "./ui/BrandLogo"
+import ProPurchase from "./pro/ProPurchase"
 
 type AccessTone = "included" | "pro" | "unavailable" | "guest"
 type ComparisonFeature = {
@@ -27,14 +28,29 @@ const freeBenefits = [
 
 const proBenefits = [
   {
+    title: "Deeper stats",
+    summary: "Score records, head-to-head between two players, and filters by date, player, place and player count.",
+    detail: "Trends, the heatmap, your H-index and your weekly streak stay free for everyone.",
+  },
+  {
+    title: "Help my H-index",
+    summary: "Let the Picker favour games that would raise your H-index, and see why in the result.",
+    detail: "A small, bounded nudge. It never changes which games are eligible.",
+  },
+  {
+    title: "Custom scoresheets",
+    summary: "Build a scoresheet for any game, with categories per player and totals worked out for you.",
+    detail: "Built-in scoresheets for popular games are free.",
+  },
+  {
     title: "More personal recommendations",
-    summary: "Get suggestions shaped by how you collect, play and rank games.",
-    detail: "For You uses available recommendation sources. Personal-ranking influence in Picker currently applies to count-based sessions, not named-player groups.",
+    summary: "For You suggests games shaped by how you collect, play and rank.",
+    detail: "Personal-ranking influence in Picker applies to count-based sessions, not named-player groups.",
   },
   {
     title: "Live play timing",
     summary: "Start, pause and finish a play timer without leaving ShelfPick.",
-    detail: "An in-app indicator brings you back to the timer while you move around the app. Lock-screen timers and notifications are not included.",
+    detail: "An in-app indicator brings you back to the timer. Lock-screen timers and notifications are not included.",
   },
 ]
 
@@ -52,7 +68,16 @@ const featureGroups: FeatureGroup[] = [
       { name: "Core Picker", detail: "Recommendations from your shelf", free: included, pro: included },
       { name: "Picker ranking influence", detail: "Count-based sessions only", free: proOnly, pro: included },
       { name: "Discover Hot", detail: "Current popular games", free: included, pro: included },
+      { name: "Help my H-index", detail: "Picker favours games that raise it", free: proOnly, pro: included },
       { name: "Discover For You", detail: "Personalised recommendations", free: proOnly, pro: included },
+    ],
+  },
+  {
+    activity: "See your stats",
+    features: [
+      { name: "Trends and H-index", detail: "Plays per month, heatmap, streak", free: included, pro: included },
+      { name: "Records and head-to-head", detail: "Per-game scores and two-player results", free: proOnly, pro: included },
+      { name: "Stats filters", detail: "Date, player, location and player count", free: proOnly, pro: included },
     ],
   },
   {
@@ -60,6 +85,8 @@ const featureGroups: FeatureGroup[] = [
     features: [
       { name: "Manual play logging", detail: "Duration and optional location", free: included, pro: included },
       { name: "Branded play sharing", detail: "Private-by-default image export", free: included, pro: included },
+      { name: "Built-in scoresheets", detail: "Category scoring for popular games", free: included, pro: included },
+      { name: "Custom scoresheets", detail: "Build and edit your own", free: proOnly, pro: included },
       { name: "Live play timer", detail: "Timer controls and in-app indicator", free: proOnly, pro: included },
     ],
   },
@@ -92,7 +119,7 @@ function BenefitList({ items }: { items: string[] }) {
   </ul>
 }
 
-function ProComparisonView({ user }: { user: AuthUser }) {
+function ProComparisonView({ user, onUserChange }: { user: AuthUser; onUserChange: (user: AuthUser) => void }) {
   const isPro = user.tier === "PRO"
 
   return <section className="screen pro-comparison-screen" aria-labelledby="pro-comparison-heading">
@@ -102,17 +129,15 @@ function ProComparisonView({ user }: { user: AuthUser }) {
       <BrandLogo className="pro-comparison-brand" />
       <p className="eyebrow">Free and Pro</p>
       <h1 id="pro-comparison-heading">Free covers the essentials. Pro makes ShelfPick more personal.</h1>
-      <p>Your collection and everyday play stay free. Pro adds optional tools for choosing and timing.</p>
-      <div className={`pro-account-state${isPro ? " is-pro" : ""}`} role="status">
-        <strong>{isPro ? "Pro is active" : "You’re on Free"}</strong>
-        <span>{isPro ? "All benefits below are available on your account." : "All Free features below are available on your account."}</span>
-      </div>
+      <p>Your collection and everyday play stay free. Pro adds optional tools for stats, choosing and scoring.</p>
     </header>
+
+    <ProPurchase user={user} onUserChange={onUserChange} />
 
     <section className="pro-value-section" aria-labelledby="pro-value-heading">
       <div className="pro-section-heading">
         <h2 id="pro-value-heading">What Pro adds</h2>
-        <p>Two benefits available with Pro access.</p>
+        <p>Five benefits available with Pro access.</p>
       </div>
       <div className="pro-value-grid">
         {proBenefits.map((benefit, index) => <article className="pro-value-card" key={benefit.title}>
@@ -137,17 +162,10 @@ function ProComparisonView({ user }: { user: AuthUser }) {
       <section className={`pro-plan-column pro-plan-column-featured${isPro ? " current" : ""}`} aria-labelledby="pro-plan-heading">
         <div className="pro-plan-title-row">
           <h2 id="pro-plan-heading">Pro</h2>
-          <span className="pro-plan-state">{isPro ? "Your plan" : "One-off unlock"}</span>
+          {isPro && <span className="pro-plan-state">Your plan</span>}
         </div>
-        <p className="pro-plan-intro">Keep everything in Free, then add both Pro benefits above.</p>
-        {isPro ? (
-          <p className="pro-current-note">Your Pro access is active.</p>
-        ) : (
-          <div className="pro-unlock-pending" role="note">
-            <strong>Purchases are not available yet.</strong>
-            <p>Pro is planned as a one-off unlock, not a subscription. No price or Buy action is shown until checkout is configured and working.</p>
-          </div>
-        )}
+        <p className="pro-plan-intro">Keep everything in Free, then add the Pro benefits above.</p>
+        {isPro && <p className="pro-current-note">Your Pro access is active.</p>}
       </section>
     </div>
 

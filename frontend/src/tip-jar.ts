@@ -15,7 +15,7 @@ export type PurchaseResult =
   | { status: "cancelled" }
   | { status: "failed"; message?: string }
 
-// The purchase layer the tip jar uses. SP-PRO-01 supplies the StoreKit one.
+// The purchase layer the tip jar uses. A StoreKit tip layer is not built yet (SP-PRO-01 sells Pro only).
 export type PurchaseLayer = {
   loadProducts: (ids: readonly TipProductId[]) => Promise<TipProduct[]>
   purchase: (id: TipProductId) => Promise<PurchaseResult>

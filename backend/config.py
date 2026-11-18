@@ -70,6 +70,9 @@ class Settings:
     public_registration_enabled: bool
     export_cover_artwork_enabled: bool
     game_night_phone_voting_enabled: bool
+    revenuecat_secret_api_key: str
+    revenuecat_webhook_auth: str
+    revenuecat_entitlement_id: str
 
 
 def get_settings() -> Settings:
@@ -156,6 +159,24 @@ def get_settings() -> Settings:
     game_night_phone_voting_enabled = _get_bool(
         "GAME_NIGHT_PHONE_VOTING_ENABLED", False,
     )
+
+    # Pro purchases are verified against RevenueCat's servers. Both values are
+    # secrets and stay in the environment; billing is off until both are set.
+    revenuecat_secret_api_key = os.getenv(
+        "REVENUECAT_SECRET_API_KEY", "",
+    ).strip()
+    revenuecat_webhook_auth = os.getenv(
+        "REVENUECAT_WEBHOOK_AUTH", "",
+    ).strip()
+    revenuecat_entitlement_id = os.getenv(
+        "REVENUECAT_ENTITLEMENT_ID", "pro",
+    ).strip() or "pro"
+
+    if bool(revenuecat_secret_api_key) != bool(revenuecat_webhook_auth):
+        raise RuntimeError(
+            "REVENUECAT_SECRET_API_KEY and REVENUECAT_WEBHOOK_AUTH "
+            "must be configured together"
+        )
 
     if not database_url:
         raise RuntimeError(
@@ -254,6 +275,9 @@ def get_settings() -> Settings:
             export_cover_artwork_enabled
         ),
         game_night_phone_voting_enabled=game_night_phone_voting_enabled,
+        revenuecat_secret_api_key=revenuecat_secret_api_key,
+        revenuecat_webhook_auth=revenuecat_webhook_auth,
+        revenuecat_entitlement_id=revenuecat_entitlement_id,
     )
 
 
