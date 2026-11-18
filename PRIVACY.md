@@ -52,14 +52,15 @@ The Get ShelfPick link shown to guests is a plain App Store link. It carries no 
 
 The owner enters these; this repository cannot read them.
 
-- Data types declared: TODO (copy from App Store Connect; SP-IOS-21B planned a conservative six-type matrix. Guest nicknames and ballots, added by SP-UNLOCK-01, need to be compared with it.)
-- Linked to identity: TODO
-- Used for tracking: TODO (expected: No)
+- Data types declared (published by the owner 2026-11-18): Name, Email Address, User ID, Other User Content (App Functionality); Device ID and Product Interaction (Analytics, from SP-ANL-001 PostHog); Other Diagnostic Data (App Functionality, not linked).
+- Linked to identity: Yes for every type except Other Diagnostic Data. Device ID and Product Interaction are declared linked as the conservative choice.
+- Used for tracking: No for all types.
+- TODO: compare guest nicknames and ballots (SP-UNLOCK-01) with this list; confirm Other Diagnostic Data should not also list Analytics, because PostHog events carry app version and OS/device model.
 
 ## Privacy manifest (PrivacyInfo.xcprivacy)
 
-- Source: `frontend/ios/App/App/PrivacyInfo.xcprivacy`, part of the App target (draft, owner to review). It declares no tracking and no tracking domains, collected data of Email Address, Name and Other User Content (linked, not for tracking, App Functionality). The manifests inside `@capacitor/ios` declare nothing.
-- Required-reason API declarations: none. No required-reason API use was found in the app or plugin Swift sources (checked 2026-11-17). Owner to confirm the three collected data types match the App Store Connect answers.
+- Source: `frontend/ios/App/App/PrivacyInfo.xcprivacy`, part of the App target (draft, owner to review). It declares no tracking and no tracking domains, collected data of Email Address, Name and Other User Content (linked, not for tracking, App Functionality) and Device ID and Product Interaction (linked, not for tracking, Analytics). The manifests inside `@capacitor/ios` declare nothing.
+- Required-reason API declarations: none. No required-reason API use was found in the app or plugin Swift sources (checked 2026-11-17). The five manifest types match the App Store Connect answers published 2026-11-18; Other Diagnostic Data is declared in App Store Connect but not in the manifest.
 
 ## Google Play Data safety (when shipping to Android)
 
