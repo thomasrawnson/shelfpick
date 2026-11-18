@@ -424,7 +424,7 @@ Environment (Render dashboard, API service; all secrets):
 
 | Variable | Value |
 | --- | --- |
-| `REVENUECAT_SECRET_API_KEY` | RevenueCat **secret** API key (v1) with **read and write** access to customer information. Used for purchase lookups and, when a user deletes their ShelfPick account, to erase their RevenueCat customer. With read-only access purchases still work, but erasure is refused (403) and logged as a warning naming the random account ID, which then has to be deleted by hand in the RevenueCat dashboard. |
+| `REVENUECAT_SECRET_API_KEY` | RevenueCat **secret** API key, **version 1**. Used for purchase lookups and, when a user deletes their ShelfPick account, to erase their RevenueCat customer. A version 1 key has no permission setting in the dashboard (only version 2 keys are scoped), so nothing needs configuring. If erasure is ever refused (403), it is logged as a warning naming the random account ID, which then has to be deleted by hand in the RevenueCat dashboard. Do not switch to a version 2 key without changing the code, which calls the version 1 API. |
 | `REVENUECAT_WEBHOOK_AUTH` | The exact Authorization header value entered in the webhook above. |
 | `REVENUECAT_ENTITLEMENT_ID` | Optional; defaults to `pro`. |
 
