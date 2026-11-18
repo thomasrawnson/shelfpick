@@ -170,6 +170,7 @@ export interface PickerCriteria {
   preferredMechanics?: string[]
   mode?: PickerMode
   mood?: string
+  helpHIndex?: boolean
 }
 
 
@@ -796,6 +797,10 @@ export async function getPickerMatches(
       "mode",
       criteria.mode,
     )
+  }
+
+  if (criteria.helpHIndex) {
+    params.set("help_h_index", "true")
   }
 
   criteria.playerIds?.forEach(
@@ -1964,3 +1969,144 @@ export async function deleteAccount(password: string): Promise<string> {
   const data = await response.json()
   return data.message
 }
+
+
+// ---- Stats 2.0 (SP-STATS-01) ------------------------------------------
+
+export interface StatsFilterValues {
+  dateFrom?: string
+  dateTo?: string
+  playerId?: number
+  location?: string
+  playerCount?: number
+}
+
+export interface PlaysPerMonth {
+  months: Array<{ month: string; plays: number }>
+  total_plays: number
+}
+
+export interface PlayHeatmap {
+  year: number
+  days: Array<{ date: string; plays: number }>
+  total_plays: number
+  active_days: number
+  max_plays_in_day: number
+}
+
+export interface HIndexGame {
+  bgg_id: number
+  name: string
+  plays: number
+  plays_needed?: number
+}
+
+export interface HIndexStats {
+  h_index: number
+  next_target: number
+  games_played: number
+  total_plays: number
+  qualifying_games: HIndexGame[]
+  games_needed: number
+  reachable: boolean
+  plays_needed_total: number
+  raise_list: HIndexGame[]
+}
+
+export interface PlayStreak {
+  current_weeks: number
+  best_weeks: number
+  played_this_week: boolean
+  at_risk: boolean
+  this_week_start: string
+}
+
+export interface ScoreRecord {
+  bgg_id: number
+  name: string
+  scored_plays: number
+  best: number
+  average: number
+  lowest: number
+  highest_losing: number | null
+  best_category: { label: string; points: number } | null
+}
+
+export interface HeadToHead {
+  player_a: number
+  player_b: number
+  plays_together: number
+  versus_plays: number
+  wins_a: number
+  wins_b: number
+  draws: number
+  undecided: number
+  coop_plays: number
+  coop_won: number
+  coop_lost: number
+  same_team_plays: number
+  recent: Array<{
+    play_id: number
+    played_at: string
+    bgg_id: number
+    game: string
+    kind: "versus" | "coop" | "teammates"
+    result: "a" | "b" | "draw" | "undecided" | null
+    coop_result: "won" | "lost" | null
+  }>
+}
+
+export interface StatsFilterOptions {
+  locations: Array<{ name: string; plays: number }>
+  player_counts: number[]
+  first_play: string | null
+  last_play: string | null
+}
+
+export class AdvancedStatsRequiredError extends Error {
+  constructor() { super("Advanced stats require Pro.") }
+}
+
+export function deviceTimezone(): string {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"
+}
+
+async function getStats<T>(
+  path: string,
+  query: Record<string, string | number | undefined>,
+  filters: StatsFilterValues = {},
+  signal?: AbortSignal,
+): Promise<T> {
+  const parameters = new URLSearchParams({ timezone: deviceTimezone() })
+  const all: Record<string, string | number | undefined> = {
+    ...query,
+    date_from: filters.dateFrom,
+    date_to: filters.dateTo,
+    player_id: filters.playerId,
+    location: filters.location,
+    player_count: filters.playerCount,
+  }
+  for (const [key, value] of Object.entries(all)) {
+    if (value !== undefined && value !== "") parameters.set(key, String(value))
+  }
+  const response = await apiFetch(`/stats/${path}?${parameters}`, { signal })
+  if (response.status === 403) throw new AdvancedStatsRequiredError()
+  if (!response.ok) throw new Error(`Stats request failed: ${response.status}`)
+  return response.json()
+}
+
+export const getPlaysPerMonth = (months: 12 | 24, filters?: StatsFilterValues, signal?: AbortSignal) =>
+  getStats<PlaysPerMonth>("plays-per-month", { months }, filters, signal)
+export const getPlayHeatmap = (year: number, filters?: StatsFilterValues, signal?: AbortSignal) =>
+  getStats<PlayHeatmap>("heatmap", { year }, filters, signal)
+export const getHIndex = (filters?: StatsFilterValues, signal?: AbortSignal) =>
+  getStats<HIndexStats>("h-index", {}, filters, signal)
+export const getPlayStreak = (filters?: StatsFilterValues, signal?: AbortSignal) =>
+  getStats<PlayStreak>("streak", {}, filters, signal)
+export const getScoreRecords = (filters?: StatsFilterValues, signal?: AbortSignal) =>
+  getStats<{ games: ScoreRecord[] }>("records", {}, filters, signal)
+export const getHeadToHead = (
+  playerA: number, playerB: number, filters?: StatsFilterValues, signal?: AbortSignal,
+) => getStats<HeadToHead>("head-to-head", { player_a: playerA, player_b: playerB }, filters, signal)
+export const getStatsFilterOptions = (signal?: AbortSignal) =>
+  getStats<StatsFilterOptions>("filter-options", {}, {}, signal)

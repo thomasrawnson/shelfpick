@@ -12,9 +12,9 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", exact: "8.6.0"),
-        .package(name: "AparajitaCapacitorSecureStorage", path: "../../../node_modules/@aparajita/capacitor-secure-storage"),
-        .package(name: "CapacitorCommunityInAppReview", path: "../../../node_modules/@capacitor-community/in-app-review"),
-        .package(name: "CapacitorHaptics", path: "../../../node_modules/@capacitor/haptics")
+        .package(name: "AparajitaCapacitorSecureStorage", path: "../../../../../../../pluto-night-labs/apps/shelfpick/frontend/node_modules/@aparajita/capacitor-secure-storage"),
+        .package(name: "CapacitorCommunityInAppReview", path: "../../../../../../../pluto-night-labs/apps/shelfpick/frontend/node_modules/@capacitor-community/in-app-review"),
+        .package(name: "CapacitorHaptics", path: "../../../../../../../pluto-night-labs/apps/shelfpick/frontend/node_modules/@capacitor/haptics")
     ],
     targets: [
         .target(

@@ -91,6 +91,7 @@ for (const scheme of ["light", "dark"] as const) {
     await expect(page.getByRole("heading", { level: 1, name: "Stats" })).toBeVisible()
 
     await page.waitForLoadState("networkidle")
+    await openSection(page, "Collection")
     await expect(page.getByRole("link", { name: /Sync collection/ })).toBeVisible()
     await expect(page.getByText("Shelf leaders")).toHaveCount(0)
     await page.screenshot({ path: `${SHOTS}/stats-collection-390-${scheme}.png`, fullPage: true })

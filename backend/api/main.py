@@ -26,6 +26,7 @@ from api.routers import (
     plays,
     rankings,
     scoresheets,
+    stats,
     wishlist,
 )
 
@@ -113,6 +114,10 @@ app.include_router(
 
 app.include_router(
     insights.router
+)
+
+app.include_router(
+    stats.router
 )
 
 app.include_router(

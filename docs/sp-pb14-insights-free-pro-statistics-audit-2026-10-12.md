@@ -23,6 +23,30 @@ this audit. Total plays already exists. H-index is difficult to explain, weakly
 connected to ShelfPick's core job of choosing and remembering games, and is not
 a launch priority.
 
+## Owner decision reopened: H-index and advanced stats (18 November 2026)
+
+**SP-STATS-01 supersedes the October H-index and `advanced_stats` conclusions
+below.** The owner reopened that decision. The original reasoning (H-index is
+niche, hard to explain and disconnected from choosing games) is retained as
+history, but it no longer applies because the H-index now feeds the Picker and
+comes with a "play these to raise it" list that turns it into a reason to play
+a specific game.
+
+What changed:
+
+| October 2026 audit said | SP-STATS-01 does |
+| --- | --- |
+| H-index "not recommended" | H-index is a **Free** stat with a list of the closest games to raise it |
+| Do not market or enforce `advanced_stats` | `advanced_stats` is **enforced** on server and client for Pro-only stats |
+| Monthly trends and date ranges are a post-launch Pro research candidate | Plays-per-month chart, calendar heatmap and weekly streak are **Free**; date-range, player, location and player-count filters are **Pro** |
+| Player comparisons deferred until outcome semantics improve | Head-to-head is **Pro** and uses SP-PLAY-01 outcomes; co-op and same-team plays are excluded from the win count and shown separately |
+| No score-level statistics | Per-game score records (best, average, lowest, highest losing score, best category from scoresheet breakdowns) are **Pro** |
+| Picker unchanged | Pro "Help my H-index" Picker option: bounded (+6 or +3 on the 0 to 100 score), deterministic, explained in the result |
+
+Basic totals, personal history, collection usage, monthly and yearly recaps and
+sharing stay Free. Nothing the October audit listed as Free moved behind Pro.
+Evidence: `docs/SP-STATS-01-REPORT.md`.
+
 ## Current implementation
 
 All surfaces below are authenticated and account scoped. None checks the
@@ -119,7 +143,7 @@ yearly recap. No yearly endpoint or export exists.
 | Collection usage | High core-product fit | Shelf explored, still waiting and neglected games already exist. Small refinements only. | Keep Free; no new dashboard required. |
 | Games not played recently | High actionability and already implemented | Current five-item result is bounded; UI could show last-played date. Small. | Optional post-beta polish, Free. |
 | Personal ranking insights | Moderate fit with choosing games | Category summaries exist. Deeper change-over-time or affinity explanations need careful definitions. Medium. | Preserve Free summary; research richer insights post-launch. |
-| Board-game H-index | Low and niche | Derivable from play counts, but unfamiliar, sensitive to imports and requires explanation. Small technically, weak commercially. | Not recommended for beta or launch. |
+| Board-game H-index | Low and niche | Derivable from play counts, but unfamiliar, sensitive to imports and requires explanation. Small technically, weak commercially. | ~~Not recommended for beta or launch.~~ **Reopened 18 November 2026:** shipped Free in SP-STATS-01 with a raise-it list and a Pro Picker boost. |
 
 ## Free and Pro recommendation
 
