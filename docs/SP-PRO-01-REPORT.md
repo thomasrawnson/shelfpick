@@ -142,3 +142,11 @@ Cause: `loadRevenueCat` returned the Capacitor plugin object from an async funct
 Fix: `sdkFromPlugin` hands the store a plain object of calls (`frontend/src/billing/store.ts`), with a test that uses a plugin-like proxy. `npm test` 254 passed, lint and `tsc -b` clean.
 
 Device evidence (physical iPhone 15 Pro Max, debug build 1.2 (99) run from Xcode, **not a TestFlight build**): Yearly and Lifetime plans loaded, a sandbox purchase completed, and the app showed Pro active. Restore, expiry, refund and account-deletion erasure are still untested. No TestFlight build contains this fix yet.
+
+## Follow-up: TestFlight evidence and build 1.2 (18) (19 November 2026)
+
+TestFlight 1.2 (17), installed on the physical iPhone 15 Pro Max, loaded both plans; the account showed PRO and "Plan: ShelfPick Pro" from the earlier sandbox purchase. A Pro account had no route back to the Pro page from Settings, so Restore purchases and Manage subscription were hard to find. PR #48 adds a "ShelfPick Pro" group with "Your Pro plan" for Pro users (Free users keep the "Unlock ShelfPick Pro" card).
+
+Build 1.2 (18) was built from main 36d31c7 (PRs #48 and #49), SHA-256 `159a8ff3dba1b42eeff42954653998e555bdfb862b726b8b6d8cb03ec82ad88d`, 255 tests, lint and `tsc -b` clean, and uploaded to TestFlight by the owner. Local build checks and the owner's visual check of the Settings row and Tonight screen only: Restore purchases, a TestFlight purchase, account deletion, expiry and refund are **not yet tested** on build 18.
+
+The hosted Terms still said Pro was not offered on 19 November 2026, and the Privacy Policy did not mention RevenueCat or feedback. Replacement wording is in the site repository on branch `sp-pro-01-legal-pages` (preview build passes, not merged to the site's `main`, so not published). App Review notes and the App Store Connect checklist are in `docs/SP-PRO-01-APP-REVIEW-NOTES.md`.
