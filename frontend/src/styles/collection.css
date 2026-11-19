@@ -1697,15 +1697,24 @@
   font-size: var(--text-support);
 }
 
+/* Share and Download are the same compact size, side by side. */
 .play-share-actions {
   display: flex;
-  flex-wrap: wrap;
   gap: 10px;
 }
 
 .play-share-actions button {
   width: auto;
-  flex: 1 1 170px;
+  flex: 1 1 0;
+  max-width: 220px;
+  min-height: var(--target-min);
+  margin: 0;
+  padding: 8px 14px;
+  border: 1px solid transparent;
+}
+
+.play-share-actions .secondary-button {
+  border-color: var(--color-brand-primary);
 }
 
 .play-share-error {

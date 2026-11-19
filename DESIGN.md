@@ -449,9 +449,15 @@ empty and populated states retain the selected month. Empty months explain that
 only saved plays count and cannot be shared. Populated months lead with factual
 play/game totals, recorded-duration coverage and a single explicit Share this
 month action. The 1200x1500 recap is an editorial collage rather than a generic
-dashboard: one to four complete, uncropped covers or branded initials tiles lead,
-followed by actual totals, nullable recorded time, deterministic most-played
-copy and the established ShelfPick/BGG footer. Player names, scores and location
+dashboard: a tight collage of one to four tiles leads. Tiles touch with no
+gutters, covers are cropped to fill and centred (no letterboxing), and only the
+collage's outer corners are rounded. Each tile carries its game name and
+that month's play count on a bottom scrim; a failed cover or an export with
+covers off fills the tile with a solid branded colour and initials instead. A
+bordered stat band follows with plays, games, nullable recorded time and the
+deterministic most-played/variety line, then the established ShelfPick/BGG
+footer. The share dialog's Share and Download buttons are one compact size,
+side by side. Player names, scores and location
 never enter the monthly response, preview or image.
 
 SP-BETA-08 keeps these cover-led compositions while making exported artwork a

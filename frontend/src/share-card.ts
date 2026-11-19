@@ -247,6 +247,26 @@ export function containImageRect(
   }
 }
 
+// Source rectangle (in image pixels) that fills `bounds` with a centred crop.
+export function coverCropRect(
+  imageWidth: number,
+  imageHeight: number,
+  bounds: ImageRect,
+): ImageRect {
+  if (imageWidth <= 0 || imageHeight <= 0) {
+    return { x: 0, y: 0, width: Math.max(imageWidth, 0), height: Math.max(imageHeight, 0) }
+  }
+  const scale = Math.max(bounds.width / imageWidth, bounds.height / imageHeight)
+  const width = bounds.width / scale
+  const height = bounds.height / scale
+  return {
+    x: (imageWidth - width) / 2,
+    y: (imageHeight - height) / 2,
+    width,
+    height,
+  }
+}
+
 export function drawShareArtworkFallback(
   context: CanvasRenderingContext2D,
   gameName: string,
