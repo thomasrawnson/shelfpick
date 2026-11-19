@@ -285,10 +285,37 @@ test("store maps cancellation and pending errors and rethrows the rest", async (
   await assert.rejects(storeModule.createProStore({ apiKey: "k", loadSdk: async () => broken }).purchase(yearly), /network/)
 })
 
+test("the SDK handed to the store can be awaited even when the plugin object cannot", async () => {
+  // Like a Capacitor plugin: every property, "then" included, is a native call
+  // that never answers, so resolving a promise with the plugin itself hangs.
+  const plugin = new Proxy({}, { get: (_, name) => name === "isConfigured" ? async () => ({ isConfigured: true }) : () => new Promise(() => {}) })
+  const sdk = await Promise.resolve().then(() => storeModule.sdkFromPlugin(plugin))
+  assert.deepEqual(await sdk.isConfigured(), { isConfigured: true })
+})
+
 test("loading plans gives up after the timeout instead of hanging", async () => {
   const hung = { ...fakeSdk(), getOfferings: () => new Promise(() => {}) }
   const store = storeModule.createProStore({ apiKey: "k", loadSdk: async () => hung, prepareTimeoutMs: 20 })
   await assert.rejects(store.prepare("a"), /taking too long/)
+})
+
+test("a store error is described with its code and what the SDK said", () => {
+  const describe = storeModule.describeStoreError
+  assert.equal(
+    describe({ code: "23", message: "There's a problem with your configuration.", underlyingErrorMessage: "None of the products could be fetched" }),
+    "23: There's a problem with your configuration. – None of the products could be fetched",
+  )
+  assert.equal(describe({ code: 7, message: "Network error" }), "7: Network error")
+  assert.equal(describe(new Error("The App Store is taking too long to respond.")), "The App Store is taking too long to respond.")
+  assert.equal(describe("odd"), "odd")
+  assert.equal(describe(undefined), "Unknown error")
+  assert.equal(describe({ code: "9" }), "9: Unknown error")
+})
+
+test("a very long store error is cut to a short support line", () => {
+  const line = storeModule.describeStoreError({ code: "1", message: "x".repeat(1000) })
+  assert.ok(line.length <= 220)
+  assert.ok(line.endsWith("…"))
 })
 
 test("store reads the subscription management link", async () => {

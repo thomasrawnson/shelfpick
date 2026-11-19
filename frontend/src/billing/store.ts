@@ -34,7 +34,10 @@ type Deps = {
   prepareTimeoutMs?: number
 }
 
-const PREPARE_TIMEOUT_MS = 15_000
+// Long enough for RevenueCat and StoreKit to answer on a slow connection and
+// to report their own error, which a shorter wait hid (1.2 (15) showed only
+// "taking too long"). Still bounded, so the paywall never loads forever.
+const PREPARE_TIMEOUT_MS = 60_000
 
 function withTimeout<T>(work: Promise<T>, ms: number): Promise<T> {
   return new Promise<T>((resolve, reject) => {
@@ -53,6 +56,22 @@ function errorCode(error: unknown): string | null {
   if (typeof error !== "object" || error === null) return null
   const code = (error as { code?: unknown }).code
   return typeof code === "string" || typeof code === "number" ? String(code) : null
+}
+
+const SUPPORT_DETAIL_MAX = 220
+
+// A short, secret-free line for support when the store fails: the SDK error
+// code and what the SDK said. Never includes keys or account details.
+export function describeStoreError(error: unknown): string {
+  const code = errorCode(error)
+  const fields = typeof error === "object" && error !== null
+    ? error as { message?: unknown; underlyingErrorMessage?: unknown }
+    : {}
+  const parts = [fields.message, fields.underlyingErrorMessage]
+    .filter((part): part is string => typeof part === "string" && part.trim() !== "")
+  const text = parts.length > 0 ? parts.join(" – ") : typeof error === "string" ? error : "Unknown error"
+  const line = code === null ? text : `${code}: ${text}`
+  return line.length > SUPPORT_DETAIL_MAX ? `${line.slice(0, SUPPORT_DETAIL_MAX - 1)}…` : line
 }
 
 function userCancelled(error: unknown): boolean {
@@ -111,9 +130,25 @@ export function createProStore({ apiKey, loadSdk, prepareTimeoutMs = PREPARE_TIM
 
 const apiKey = (import.meta.env.VITE_REVENUECAT_IOS_API_KEY ?? "").trim()
 
+// Capacitor plugin objects answer to every property name, including "then",
+// so a promise that resolves with one waits forever for a native method that
+// does not exist. That hung the paywall on TestFlight with no error. Hand the
+// store a plain object of calls instead.
+export function sdkFromPlugin(plugin: Sdk): Sdk {
+  return {
+    configure: options => plugin.configure(options),
+    logIn: options => plugin.logIn(options),
+    getOfferings: () => plugin.getOfferings(),
+    purchasePackage: options => plugin.purchasePackage(options),
+    restorePurchases: () => plugin.restorePurchases(),
+    getCustomerInfo: () => plugin.getCustomerInfo(),
+    isConfigured: () => plugin.isConfigured(),
+  }
+}
+
 async function loadRevenueCat(): Promise<Sdk> {
   const { Purchases } = await import("@revenuecat/purchases-capacitor")
-  return Purchases as unknown as Sdk
+  return sdkFromPlugin(Purchases as unknown as Sdk)
 }
 
 // Local development only: fixed prices so the paywall can be built and tested

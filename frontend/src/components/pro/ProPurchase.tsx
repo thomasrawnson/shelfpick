@@ -5,7 +5,7 @@ import type { AuthUser } from "../../auth"
 import { PUBLIC_LEGAL_LINKS_ENABLED } from "../../public-legal-links"
 import { buyPlan, flowMessage, restorePurchases, type FlowResult } from "../../billing/purchase-flow"
 import type { PlanOffer, ProStatus } from "../../billing/plans"
-import { proStore as defaultStore, type ProStore } from "../../billing/store"
+import { describeStoreError, proStore as defaultStore, type ProStore } from "../../billing/store"
 import PaywallPanel, { type PaywallMessage } from "./PaywallPanel"
 
 type Props = {
@@ -51,10 +51,13 @@ function ProPurchase({ user, onUserChange, store = defaultStore }: Props) {
         if (active) setOffers(loaded)
         const url = await store.managementUrl().catch(() => null)
         if (active) setManagementUrl(url)
-      } catch {
+      } catch (error) {
         if (active) {
           setOffers([])
-          setMessage({ tone: "error", text: "Couldn’t load plans from the App Store. Check your connection and try again." })
+          setMessage({
+            tone: "error",
+            text: `Couldn’t load plans from the App Store. Check your connection and try again. (${describeStoreError(error)})`,
+          })
         }
       }
     }
