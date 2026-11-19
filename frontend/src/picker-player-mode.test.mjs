@@ -70,3 +70,33 @@ test("count-only mode retains the player-count choices and selected count", () =
   assert.doesNotMatch(markup, /named players/)
   assert.doesNotMatch(markup, />Use group size instead</)
 })
+
+test("Tonight drops the player-count hint and shows the group vote as a secondary action", () => {
+  const markup = renderToStaticMarkup(React.createElement(PlayerStep, {
+    players: null,
+    selectedPlayerIds: [],
+    selectedPlayerNames: [],
+    complexityBand: null,
+    preferredCategories: [],
+    preferredMechanics: [],
+    youngestPlayerAge: null,
+    playStyle: "any",
+    mode: "best_match",
+    onSelectCount: () => {},
+    onComplexityChange: () => {},
+    onYoungestPlayerAgeChange: () => {},
+    onPlayStyleChange: () => {},
+    onModeChange: () => {},
+    onChoosePlayers: () => {},
+    onOpenTheme: () => {},
+    onOpenMechanics: () => {},
+    onClearFineTune: () => {},
+    onContinue: () => {},
+    onGroupVote: () => {},
+  }))
+
+  assert.doesNotMatch(markup, /Choose your player count/)
+  assert.doesNotMatch(markup, /aria-describedby/)
+  assert.match(markup, /<button type="button" class="secondary-button">Start a group vote<\/button>/)
+  assert.match(markup, /class="primary-button"[^>]*disabled=""[^>]*>Find a game</)
+})

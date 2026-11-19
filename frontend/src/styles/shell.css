@@ -89,8 +89,9 @@
 .player-step-screen .advanced-filters .ui-disclosure-body { padding-inline: 16px; }
 .player-step-screen .advanced-filters summary strong { font-size: 1rem; }
 .player-step-screen .ui-disclosure-chevron { font-size: 1.5rem; line-height: 1; }
-.player-step-screen .picker-step-actions { margin: 0 !important; display: grid; gap: 4px; }
-.player-step-screen .picker-step-actions .primary-button { min-height: 52px; margin: 0 !important; }
+.player-step-screen .picker-step-actions { margin: 0 !important; display: grid; gap: 12px; }
+.player-step-screen .picker-step-actions .primary-button { min-height: 56px; margin: 0 !important; font-size: 1rem; }
+.player-step-screen .picker-step-actions .secondary-button { min-height: 52px; margin: 0; font-size: 1rem; }
 .tonight-recent { margin-top: 18px; }
 .tonight-recent h2 { margin: 0 0 12px; color: var(--color-text-support); font-family: inherit; font-size: 0.8125rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
 .tonight-recent ul { display: flex; gap: 12px; margin: 0; padding: 0 0 8px; list-style: none; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; }
@@ -110,11 +111,6 @@
   font: inherit; font-weight: 700; cursor: pointer;
 }
 .tonight-choose-players svg { width: 22px; height: 22px; fill: none; stroke: var(--color-brand-primary); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.tonight-vote-button {
-  width: 100%; min-height: 48px; margin: 0; padding: 0;
-  color: var(--color-brand-primary); background: transparent; border: 0;
-  font: inherit; font-weight: 700; text-decoration: none; cursor: pointer;
-}
 /* Lighter floating tab bar, and room so content clears it. */
 .app-nav { box-shadow: 0 2px 8px var(--color-shadow); }
 
