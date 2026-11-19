@@ -134,3 +134,11 @@ secrets and webhook, then the app build.
 ## Follow-up: erasing the RevenueCat customer on account deletion (18 November 2026)
 
 Deleting a ShelfPick account now also asks RevenueCat to erase the customer, using the random account ID, after the database deletion has committed. A failure never undoes the deletion; it is logged as a warning with the random ID so the record can be erased by hand. It uses the existing RevenueCat version 1 secret key, which has no permission setting; a sandbox account deletion should be checked against the RevenueCat dashboard (see the runbook). An earlier version of this note wrongly said the key needed read and write access. Backend: 656 passed, 17 skipped on a disposable PostgreSQL database; `alembic check` clean. Not deployed.
+
+## Follow-up: paywall never loaded plans on TestFlight (19 November 2026)
+
+Cause: `loadRevenueCat` returned the Capacitor plugin object from an async function. A Capacitor plugin answers to every property name, including `then`, so JavaScript treated it as a promise and waited for a native `then` that does not exist. The promise never settled, so the paywall waited until its timeout (15 s, then 60 s) with no error. It was found by running a debug build on a physical iPhone with the console attached, where the log stopped after the first plugin call.
+
+Fix: `sdkFromPlugin` hands the store a plain object of calls (`frontend/src/billing/store.ts`), with a test that uses a plugin-like proxy. `npm test` 254 passed, lint and `tsc -b` clean.
+
+Device evidence (physical iPhone 15 Pro Max, debug build 1.2 (99) run from Xcode, **not a TestFlight build**): Yearly and Lifetime plans loaded, a sandbox purchase completed, and the app showed Pro active. Restore, expiry, refund and account-deletion erasure are still untested. No TestFlight build contains this fix yet.
