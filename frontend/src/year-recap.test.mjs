@@ -88,3 +88,23 @@ test("the Pick banner window runs 1 December to 31 January in the user's timezon
   assert.equal(lib.yearRecapYear(new Date("2027-01-10T12:00:00Z"), "Europe/London"), 2026)
   assert.equal(lib.yearRecapYear(new Date("2026-06-10T12:00:00Z"), "Europe/London"), 2026)
 })
+
+test("entry copy is built only from recap data and short years stay modest", () => {
+  assert.equal(lib.yearEntryHeadline(base), "Your 2026 at the table")
+  assert.equal(lib.yearEntryHeadline({ ...base, total_plays: 2 }), "Your 2026 is just getting started")
+  assert.deepEqual(lib.yearHeroStats(base), [
+    { value: "40", label: "Plays" },
+    { value: "12", label: "Games" },
+    { value: "15h", label: "Recorded" },
+  ])
+  // Without recorded time the third hero is "new to you", and never an invented duration.
+  assert.deepEqual(lib.yearHeroStats({ ...base, total_duration_minutes: null, duration_plays: 0 }).at(-1), { value: "3", label: "New to you" })
+  assert.equal(lib.yearHeroStats({ ...base, total_duration_minutes: null, new_games_count: 0 }).length, 2)
+  assert.deepEqual(lib.yearEntryFacts(base), [
+    "Top game: Clockwork Market · 9 plays",
+    "Busiest month: September · 9 plays",
+  ])
+  assert.deepEqual(lib.yearEntryFacts({ ...base, total_plays: 2 }), ["Top game: Clockwork Market · 9 plays"])
+  const text = JSON.stringify([lib.yearHeroStats(base), lib.yearEntryFacts(base), lib.yearEntryHeadline(base)])
+  assert.doesNotMatch(text, /Ann|streak/i)
+})

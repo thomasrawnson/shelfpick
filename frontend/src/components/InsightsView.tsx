@@ -477,8 +477,8 @@ function InsightsView({
 
       {activeSection === "recaps" && (
         <>
-          <YearRecapEntry autoOpen={openYearRecap} />
           <MonthlyRecapPanel />
+          <YearRecapEntry autoOpen={openYearRecap} />
         </>
       )}
 

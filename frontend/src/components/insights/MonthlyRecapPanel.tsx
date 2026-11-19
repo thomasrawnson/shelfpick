@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react"
 import { getMonthlyRecap, type MonthlyRecap } from "../../api/client"
 import { monthInTimezone, shiftMonth } from "../../monthly-recap-month"
-import { monthlyHighlight } from "../../monthly-recap-card"
+import { resolveExportCoverArtworkPermission } from "../../export-artwork-policy"
+import { monthlyHighlight, renderMonthlyRecapCard } from "../../monthly-recap-card"
 import MonthlyRecapShareDialog from "./MonthlyRecapShareDialog"
+import RecapPreview from "./RecapPreview"
+import { useRecapThumbnail } from "./useRecapThumbnail"
 
 function durationCopy(recap: MonthlyRecap): string {
   if (recap.total_duration_minutes === null) return "Play time was not recorded this month."
@@ -11,6 +14,14 @@ function durationCopy(recap: MonthlyRecap): string {
   const value = [hours ? `${hours}h` : "", minutes ? `${minutes}m` : ""].filter(Boolean).join(" ")
   if (recap.duration_plays >= recap.total_plays) return `${value} recorded.`
   return `${value} recorded across ${recap.duration_plays} of ${recap.total_plays} ${recap.total_plays === 1 ? "play" : "plays"}.`
+}
+
+function Chevron({ direction }: { direction: "left" | "right" }) {
+  return (
+    <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false">
+      <path d={direction === "left" ? "M12.5 4.5 7 10l5.5 5.5" : "M7.5 4.5 13 10l-5.5 5.5"} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
 }
 
 function MonthlyRecapPanel() {
@@ -23,6 +34,12 @@ function MonthlyRecapPanel() {
   const [retryKey, setRetryKey] = useState(0)
   const [sharing, setSharing] = useState(false)
   const highlight = recap ? monthlyHighlight(recap) : null
+  const thumbnailUrl = useRecapThumbnail(
+    () => recap && recap.total_plays > 0
+      ? resolveExportCoverArtworkPermission().then(allowCover => renderMonthlyRecapCard(recap, allowCover))
+      : Promise.reject(new Error("No recap to preview")),
+    recap,
+  )
 
   useEffect(() => {
     let active = true
@@ -55,16 +72,11 @@ function MonthlyRecapPanel() {
 
   return (
     <div className="stats-section-content monthly-recap-section">
-      <div className="stats-section-heading recap-heading-row">
-        <div>
-          <h2>This month in games</h2>
-          <p>Turn your recorded plays into a private, shareable recap.</p>
-        </div>
-        <div className="recap-month-controls" role="group" aria-label="Select recap month">
-          <button type="button" className="recap-month-step" aria-label="Previous month" onClick={() => selectMonth(shiftMonth(month, -1))}><span aria-hidden="true">‹</span></button>
-          <time dateTime={month} aria-live="polite">{recap?.month_label ?? month}</time>
-          <button type="button" className="recap-month-step" aria-label="Next month" disabled={month >= currentMonth} onClick={() => selectMonth(shiftMonth(month, 1))}><span aria-hidden="true">›</span></button>
-        </div>
+      <h2 className="recap-section-title">This month in games</h2>
+      <div className="recap-month-switcher" role="group" aria-label="Select recap month">
+        <button type="button" className="recap-month-step" aria-label="Previous month" onClick={() => selectMonth(shiftMonth(month, -1))}><Chevron direction="left" /></button>
+        <time dateTime={month} aria-live="polite">{recap?.month_label ?? month}</time>
+        <button type="button" className="recap-month-step" aria-label="Next month" disabled={month >= currentMonth} onClick={() => selectMonth(shiftMonth(month, 1))}><Chevron direction="right" /></button>
       </div>
 
       {loading && <article className="monthly-recap-state" aria-busy="true"><p role="status">Loading your recorded plays…</p></article>}
@@ -81,19 +93,21 @@ function MonthlyRecapPanel() {
         </article>
       )}
       {!loading && recap && recap.total_plays > 0 && (
-        <article className="monthly-recap-card">
-          <div className="monthly-recap-summary">
-            <div><strong>{recap.total_plays}</strong><span>{recap.total_plays === 1 ? "Play" : "Plays"}</span></div>
-            <div><strong>{recap.unique_games}</strong><span>{recap.unique_games === 1 ? "Game" : "Games"}</span></div>
-          </div>
-          <div className="monthly-recap-copy">
-            <p>{durationCopy(recap)}</p>
-            {highlight && (highlight.label === "Variety"
-              ? <p>{highlight.value}, one play each.</p>
-              : <p><strong>{highlight.label}:</strong> {highlight.value}</p>)}
-          </div>
-          <button type="button" className="primary-button monthly-recap-share" onClick={() => setSharing(true)}>Share this month</button>
-        </article>
+        <RecapPreview
+          thumbnailUrl={thumbnailUrl}
+          thumbnailLabel={`Preview the ${recap.month_label} recap`}
+          onOpen={() => setSharing(true)}
+        >
+          <p className="recap-preview-kicker">{recap.month_label}</p>
+          <p className="recap-preview-headline">
+            {recap.total_plays} {recap.total_plays === 1 ? "play" : "plays"} · {recap.unique_games} {recap.unique_games === 1 ? "game" : "games"}
+          </p>
+          <p className="recap-preview-detail">{durationCopy(recap)}</p>
+          {highlight && (highlight.label === "Variety"
+            ? <p className="recap-preview-detail">{highlight.value}, one play each.</p>
+            : <p className="recap-preview-detail"><strong>{highlight.label}:</strong> {highlight.value}</p>)}
+          <button type="button" className="primary-button recap-preview-action" onClick={() => setSharing(true)}>Share this month</button>
+        </RecapPreview>
       )}
       {sharing && recap && <MonthlyRecapShareDialog recap={recap} onClose={() => setSharing(false)} />}
     </div>

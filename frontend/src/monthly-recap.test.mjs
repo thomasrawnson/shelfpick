@@ -31,6 +31,20 @@ before(async () => {
 
 after(async () => { await server?.close() })
 
+// A contained cover is the only 5-argument drawImage inside the collage area.
+const isCollageCover = args => args.length === 5 && args[0] instanceof globalThis.Image && args[2] >= 196 && args[2] < 1036
+
+// Each createElement call returns its own canvas, as in a browser: the card
+// canvas and the small offscreen canvases used for blurred backdrops differ.
+function freshCanvas(context) {
+  return {
+    width: 0,
+    height: 0,
+    getContext() { return context },
+    toBlob(callback) { callback(new Blob([`${this.width}x${this.height}`], { type: "image/png" })) },
+  }
+}
+
 const recap = {
   month: "2026-10",
   month_label: "October 2026",
@@ -97,7 +111,7 @@ test("one-game, rights-safe artwork and long-title recaps render a 1200x1500 PNG
     height = 700
     set src(value) { queueMicrotask(() => value.startsWith("http") ? this.onerror?.() : this.onload?.()) }
   }
-  globalThis.document = { createElement: () => canvas }
+  globalThis.document = { createElement: () => freshCanvas(context) }
   globalThis.Image = MockImage
   globalThis.window = { setTimeout, clearTimeout }
   try {
@@ -132,7 +146,7 @@ test("recap covers are loaded through the API proxy only in explicitly permitted
   const drawn = []
   const context = {
     save() {}, restore() {}, clip() {}, createLinearGradient() { return { addColorStop() {} } },
-    beginPath() {}, drawImage(image) { drawn.push(image.src) }, fill() {}, fillRect() {}, fillText() {}, roundRect() {},
+    beginPath() {}, drawImage(image) { drawn.push(image?.src ?? "") }, fill() {}, fillRect() {}, fillText() {}, roundRect() {},
     measureText(value) { return { width: value.length * 18 } },
     set fillStyle(_value) {}, set font(_value) {}, set textAlign(_value) {},
   }
@@ -147,7 +161,7 @@ test("recap covers are loaded through the API proxy only in explicitly permitted
     set src(value) { this._src = value; requested.push(value); queueMicrotask(() => this.onload?.()) }
     get src() { return this._src }
   }
-  globalThis.document = { createElement: () => canvas }
+  globalThis.document = { createElement: () => freshCanvas(context) }
   globalThis.Image = MockImage
   globalThis.window = { setTimeout, clearTimeout }
   globalThis.localStorage = { getItem: () => "token" }
@@ -170,7 +184,8 @@ test("recap covers are loaded through the API proxy only in explicitly permitted
     assert.ok(fetched.some(url => url.includes(encodeURIComponent("/portrait.svg"))))
     // Remote cover URLs are never given to the canvas image directly.
     assert.equal(requested.some(value => value.includes("portrait.svg")), false)
-    assert.equal(drawn.filter(src => src.startsWith("blob:")).length, 3)
+    // Each of the three served covers is drawn twice: blurred backdrop and the whole cover.
+    assert.equal(drawn.filter(src => src.startsWith("blob:")).length, 6)
   } finally {
     globalThis.document = originalDocument
     globalThis.Image = originalImage
@@ -218,7 +233,7 @@ test("recap card carries the unmodified Powered by BGG logo", async () => {
     set src(value) { this._src = value; queueMicrotask(() => this.onload?.()) }
     get src() { return this._src }
   }
-  globalThis.document = { createElement: () => canvas }
+  globalThis.document = { createElement: () => freshCanvas(context) }
   globalThis.Image = MockImage
   globalThis.window = { setTimeout, clearTimeout }
   try {
@@ -244,9 +259,9 @@ test("collage tiles touch, fill the collage exactly and never overlap", () => {
     const top = Math.min(...rects.map(rect => rect.y))
     const right = Math.max(...rects.map(rect => rect.x + rect.width))
     const bottom = Math.max(...rects.map(rect => rect.y + rect.height))
-    assert.deepEqual([left, top, right - left, bottom - top], [72, 244, 1056, 690])
+    assert.deepEqual([left, top, right - left, bottom - top], [72, 196, 1056, 840])
     const area = rects.reduce((total, rect) => total + rect.width * rect.height, 0)
-    assert.equal(area, 1056 * 690)
+    assert.equal(area, 1056 * 840)
     for (const [index, a] of rects.entries()) {
       for (const b of rects.slice(index + 1)) {
         const overlapX = Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x)
@@ -292,7 +307,7 @@ test("every game tile shows its name and monthly play count, with or without art
     height = 400
     set src(_value) { queueMicrotask(() => this.onload?.()) }
   }
-  globalThis.document = { createElement: () => canvas }
+  globalThis.document = { createElement: () => freshCanvas(context) }
   globalThis.Image = MockImage
   globalThis.window = { setTimeout, clearTimeout }
   globalThis.localStorage = { getItem: () => null }
@@ -306,8 +321,8 @@ test("every game tile shows its name and monthly play count, with or without art
     await renderMonthlyRecapCard(twoGames, true)
     assert.ok(texts.includes("Wingspan") && texts.includes("2 plays"))
     assert.ok(texts.includes("Azul") && texts.includes("1 play"))
-    // Only the game with artwork draws an image into the collage, using a cropped 9-argument drawImage.
-    assert.equal(images.filter(args => args.length === 9).length, 1)
+    // Only the game with artwork draws a whole (contained) cover into the collage.
+    assert.equal(images.filter(isCollageCover).length, 1)
     // Initials fill the tile that has no artwork.
     assert.ok(texts.includes("A"))
 
@@ -315,12 +330,71 @@ test("every game tile shows its name and monthly play count, with or without art
     images.length = 0
     await renderMonthlyRecapCard(twoGames, false)
     assert.ok(texts.includes("Wingspan") && texts.includes("2 plays"))
-    assert.equal(images.filter(args => args.length === 9).length, 0)
+    assert.equal(images.filter(isCollageCover).length, 0)
     assert.ok(texts.includes("W") && texts.includes("A"))
     // Month stats and the variety/most-played line remain in the stat band; no player data.
     for (const expected of ["6", "4", "PLAYS", "GAMES", "MOST PLAYED"]) assert.ok(texts.includes(expected), expected)
     assert.equal(monthlyPlayCountLabel(1), "1 play")
     assert.equal(monthlyPlayCountLabel(3), "3 plays")
+  } finally {
+    globalThis.document = originalDocument
+    globalThis.Image = originalImage
+    globalThis.window = originalWindow
+    globalThis.fetch = originalFetch
+    globalThis.localStorage = originalStorage
+  }
+})
+
+test("box art is never cropped or covered: the whole cover fits above the label strip for any shape", async () => {
+  const originalDocument = globalThis.document
+  const originalImage = globalThis.Image
+  const originalWindow = globalThis.window
+  const originalFetch = globalThis.fetch
+  const originalStorage = globalThis.localStorage
+  const covers = []
+  const context = {
+    save() {}, restore() {}, clip() {}, createLinearGradient() { return { addColorStop() {} } },
+    beginPath() {}, fill() {}, fillRect() {}, roundRect() {}, fillText() {},
+    drawImage(...args) { if (isCollageCover(args)) covers.push({ image: args[0], x: args[1], y: args[2], width: args[3], height: args[4] }) },
+    measureText(value) { return { width: value.length * 12 } },
+    set fillStyle(_value) {}, set font(_value) {}, set textAlign(_value) {},
+  }
+  const canvas = { width: 0, height: 0, getContext() { return context }, toBlob(callback) { callback(new Blob(["png"], { type: "image/png" })) } }
+  const shapes = [[900, 900], [600, 800], [1200, 500], [500, 1200]]
+  let loaded = 0
+  class MockImage {
+    set src(value) {
+      if (value.startsWith("blob:")) [this.width, this.height] = shapes[loaded++ % shapes.length]
+      else [this.width, this.height] = [300, 100]
+      queueMicrotask(() => this.onload?.())
+    }
+  }
+  globalThis.document = { createElement: () => freshCanvas(context) }
+  globalThis.Image = MockImage
+  globalThis.window = { setTimeout, clearTimeout }
+  globalThis.localStorage = { getItem: () => null }
+  globalThis.fetch = async () => new Response(new Uint8Array([1]), { status: 200, headers: { "content-type": "image/jpeg" } })
+  try {
+    for (const count of [1, 2, 3, 4]) {
+      covers.length = 0
+      loaded = 0
+      const collage_games = shapes.slice(0, count).map((_, index) => ({ bgg_id: index + 1, name: `Game ${index + 1}`, play_count: 1, image_url: `https://cf.geekdo-images.com/${index}.jpg` }))
+      await renderMonthlyRecapCard({ ...recap, collage_games }, true)
+      assert.equal(covers.length, count)
+      const tiles = collageRects(count)
+      for (const [index, cover] of covers.entries()) {
+        const tile = tiles[index]
+        const strip = tile.height > 600 ? 116 : 92
+        // Entire cover visible: drawn with the image's own aspect ratio, inside the art area.
+        assert.ok(Math.abs(cover.width / cover.height - cover.image.width / cover.image.height) < 1e-6)
+        assert.ok(cover.x >= tile.x - 1e-6 && cover.x + cover.width <= tile.x + tile.width + 1e-6)
+        assert.ok(cover.y >= tile.y - 1e-6 && cover.y + cover.height <= tile.y + tile.height - strip + 1e-6)
+        // And it uses the available room: it touches the art area on at least one axis.
+        const touchesWidth = Math.abs(cover.width - tile.width) < 1e-6
+        const touchesHeight = Math.abs(cover.height - (tile.height - strip)) < 1e-6
+        assert.ok(touchesWidth || touchesHeight)
+      }
+    }
   } finally {
     globalThis.document = originalDocument
     globalThis.Image = originalImage

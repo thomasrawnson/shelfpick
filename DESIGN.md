@@ -450,14 +450,23 @@ only saved plays count and cannot be shared. Populated months lead with factual
 play/game totals, recorded-duration coverage and a single explicit Share this
 month action. The 1200x1500 recap is an editorial collage rather than a generic
 dashboard: a tight collage of one to four tiles leads. Tiles touch with no
-gutters, covers are cropped to fill and centred (no letterboxing), and only the
-collage's outer corners are rounded. Each tile carries its game name and
-that month's play count on a bottom scrim; a failed cover or an export with
-covers off fills the tile with a solid branded colour and initials instead. A
-bordered stat band follows with plays, games, nullable recorded time and the
-deterministic most-played/variety line, then the established ShelfPick/BGG
-footer. The share dialog's Share and Download buttons are one compact size,
-side by side. Player names, scores and location
+gutters and only the collage's outer corners are rounded. Box art is never
+cropped or covered: the whole cover is contained above a reserved label strip,
+over a blurred, darkened copy of itself so the tile stays edge to edge. Each
+tile's strip carries the game name and that month's play count; a failed cover
+or an export with covers off fills the tile with a solid branded colour and
+initials, with the same strip. A bordered stat band follows with plays, games,
+nullable recorded time and the deterministic most-played/variety line, then the
+established ShelfPick/BGG footer. Share dialogs use one compact header row (title and a small Close) with
+no subtitle, and their Share and Download buttons are one compact size, side by
+side.
+
+Stats > Recaps leads with "This month in games" and a compact centred month
+switcher (44px targets, next disabled at the current month), then the year
+recap below. Each recap is a compact preview card: the real share card scaled
+down beside a short summary and a Share action, so what you see is what you
+share. The year card shows hero numbers (plays, games, recorded hours), the top
+game and busiest month, using only fields the year-recap response already has. Player names, scores and location
 never enter the monthly response, preview or image.
 
 SP-BETA-08 keeps these cover-led compositions while making exported artwork a
