@@ -130,9 +130,25 @@ export function createProStore({ apiKey, loadSdk, prepareTimeoutMs = PREPARE_TIM
 
 const apiKey = (import.meta.env.VITE_REVENUECAT_IOS_API_KEY ?? "").trim()
 
+// Capacitor plugin objects answer to every property name, including "then",
+// so a promise that resolves with one waits forever for a native method that
+// does not exist. That hung the paywall on TestFlight with no error. Hand the
+// store a plain object of calls instead.
+export function sdkFromPlugin(plugin: Sdk): Sdk {
+  return {
+    configure: options => plugin.configure(options),
+    logIn: options => plugin.logIn(options),
+    getOfferings: () => plugin.getOfferings(),
+    purchasePackage: options => plugin.purchasePackage(options),
+    restorePurchases: () => plugin.restorePurchases(),
+    getCustomerInfo: () => plugin.getCustomerInfo(),
+    isConfigured: () => plugin.isConfigured(),
+  }
+}
+
 async function loadRevenueCat(): Promise<Sdk> {
   const { Purchases } = await import("@revenuecat/purchases-capacitor")
-  return Purchases as unknown as Sdk
+  return sdkFromPlugin(Purchases as unknown as Sdk)
 }
 
 // Local development only: fixed prices so the paywall can be built and tested

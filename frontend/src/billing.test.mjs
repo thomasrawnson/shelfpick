@@ -285,6 +285,14 @@ test("store maps cancellation and pending errors and rethrows the rest", async (
   await assert.rejects(storeModule.createProStore({ apiKey: "k", loadSdk: async () => broken }).purchase(yearly), /network/)
 })
 
+test("the SDK handed to the store can be awaited even when the plugin object cannot", async () => {
+  // Like a Capacitor plugin: every property, "then" included, is a native call
+  // that never answers, so resolving a promise with the plugin itself hangs.
+  const plugin = new Proxy({}, { get: (_, name) => name === "isConfigured" ? async () => ({ isConfigured: true }) : () => new Promise(() => {}) })
+  const sdk = await Promise.resolve().then(() => storeModule.sdkFromPlugin(plugin))
+  assert.deepEqual(await sdk.isConfigured(), { isConfigured: true })
+})
+
 test("loading plans gives up after the timeout instead of hanging", async () => {
   const hung = { ...fakeSdk(), getOfferings: () => new Promise(() => {}) }
   const store = storeModule.createProStore({ apiKey: "k", loadSdk: async () => hung, prepareTimeoutMs: 20 })
