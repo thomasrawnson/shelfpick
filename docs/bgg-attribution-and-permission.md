@@ -23,7 +23,7 @@ The public runtime uses XML API2 `/collection`, `/thing`, `/search` and `/hot`. 
 ## Owner/external gates
 
 1. Record the approved application/token custodian in the private operations register; never place the token in frontend code or documentation.
-2. Confirm whether in-app display of BGG-hosted cover images is covered. Keep cover artwork out of exported share cards unless separately authorised.
+2. Confirm whether in-app display of BGG-hosted cover images is covered. Exported share cards show covers by owner decision (2026-11-19, `EXPORT_COVER_ARTWORK_ENABLED=true`); record the rights basis here and use the flag to switch them off if BGG objects.
 3. Recheck the official policy immediately before launch because BGG states it may change.
 4. Obtain owner approval before accepting a future BGG fee or changing the Free-only launch model.
 

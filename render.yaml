@@ -26,7 +26,7 @@ services:
       - key: AI_PICKER_ENABLED
         value: "false"
       - key: EXPORT_COVER_ARTWORK_ENABLED
-        value: "false"
+        value: "true"
       - key: RETENTION_CLEANUP_ENABLED
         value: "false"
       - key: GAME_NIGHT_PHONE_VOTING_ENABLED

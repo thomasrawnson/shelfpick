@@ -1,4 +1,4 @@
-import type { Game, GamePlay } from "./api/client"
+import { getExportCover, type Game, type GamePlay } from "./api/client"
 
 export type SharePrivacyOptions = {
   includePlayerNames: boolean
@@ -119,6 +119,16 @@ export function loadShareImage(src: string): Promise<HTMLImageElement> {
     image.onerror = () => { window.clearTimeout(timeout); reject(new Error("Image unavailable")) }
     image.src = src
   })
+}
+
+// Loads an exported cover through the API so the canvas is never tainted.
+export async function loadCoverArtwork(imageUrl: string): Promise<HTMLImageElement> {
+  const objectUrl = URL.createObjectURL(await getExportCover(imageUrl))
+  try {
+    return await loadShareImage(objectUrl)
+  } finally {
+    URL.revokeObjectURL(objectUrl)
+  }
 }
 
 export const POWERED_BY_BGG_SRC = "/branding/powered-by-bgg-rgb.svg"
@@ -313,7 +323,7 @@ export async function renderPlayShareCard(
   let artworkLoaded = false
   if (allowCoverArtwork && game.image_url) {
     try {
-      const artwork = await loadShareImage(game.image_url)
+      const artwork = await loadCoverArtwork(game.image_url)
       const target = containImageRect(artwork.width, artwork.height, artworkBounds)
       context.fillStyle = SHARE_CARD.surface
       fillRoundedRect(context, target.x - 10, target.y - 10, target.width + 20, target.height + 20, 24)

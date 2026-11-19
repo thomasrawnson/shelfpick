@@ -5,6 +5,7 @@ import {
   fillRoundedRect,
   fitShareText,
   drawPoweredByBgg,
+  loadCoverArtwork,
   loadShareImage,
   type ImageRect,
 } from "./share-card"
@@ -140,7 +141,7 @@ async function drawGameTile(
   let loaded = false
   if (allowCoverArtwork && game.image_url) {
     try {
-      const artwork = await loadShareImage(game.image_url)
+      const artwork = await loadCoverArtwork(game.image_url)
       const target = containImageRect(artwork.width, artwork.height, artworkBounds)
       context.fillStyle = SHARE_CARD.surface
       fillRoundedRect(context, target.x - 7, target.y - 7, target.width + 14, target.height + 14, 18)

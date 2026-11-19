@@ -114,13 +114,17 @@ test("one-game, rights-safe artwork and long-title recaps render a 1200x1500 PNG
   }
 })
 
-test("recap covers are loaded only in explicitly permitted export mode", async () => {
+test("recap covers are loaded through the API proxy only in explicitly permitted export mode", async () => {
   const originalDocument = globalThis.document
   const originalImage = globalThis.Image
   const originalWindow = globalThis.window
+  const originalFetch = globalThis.fetch
+  const originalStorage = globalThis.localStorage
   const requested = []
+  const fetched = []
+  const drawn = []
   const context = {
-    beginPath() {}, drawImage() {}, fill() {}, fillRect() {}, fillText() {}, roundRect() {},
+    beginPath() {}, drawImage(image) { drawn.push(image.src) }, fill() {}, fillRect() {}, fillText() {}, roundRect() {},
     measureText(value) { return { width: value.length * 18 } },
     set fillStyle(_value) {}, set font(_value) {}, set textAlign(_value) {},
   }
@@ -132,22 +136,39 @@ test("recap covers are loaded only in explicitly permitted export mode", async (
   class MockImage {
     width = 400
     height = 700
-    set src(value) { requested.push(value); queueMicrotask(() => this.onload?.()) }
+    set src(value) { this._src = value; requested.push(value); queueMicrotask(() => this.onload?.()) }
+    get src() { return this._src }
   }
   globalThis.document = { createElement: () => canvas }
   globalThis.Image = MockImage
   globalThis.window = { setTimeout, clearTimeout }
+  globalThis.localStorage = { getItem: () => "token" }
+  // The fourth game's cover cannot be served; the others can.
+  globalThis.fetch = async url => {
+    fetched.push(String(url))
+    return String(url).includes("missing")
+      ? new Response("{}", { status: 502 })
+      : new Response(new Uint8Array([1, 2, 3]), { status: 200, headers: { "content-type": "image/jpeg" } })
+  }
   try {
     const fallbackBlob = await renderMonthlyRecapCard(recap)
     assert.equal(await fallbackBlob.text(), "1200x1500")
-    assert.equal(requested.some(value => value.includes("portrait.svg")), false)
+    assert.deepEqual(fetched, [])
 
+    drawn.length = 0
     await renderMonthlyRecapCard(recap, true)
-    assert.equal(requested.some(value => value.includes("portrait.svg")), true)
+    assert.equal(fetched.length, 4)
+    assert.ok(fetched.every(url => url.includes("/export-cover?url=")))
+    assert.ok(fetched.some(url => url.includes(encodeURIComponent("/portrait.svg"))))
+    // Remote cover URLs are never given to the canvas image directly.
+    assert.equal(requested.some(value => value.includes("portrait.svg")), false)
+    assert.equal(drawn.filter(src => src.startsWith("blob:")).length, 3)
   } finally {
     globalThis.document = originalDocument
     globalThis.Image = originalImage
     globalThis.window = originalWindow
+    globalThis.fetch = originalFetch
+    globalThis.localStorage = originalStorage
   }
 })
 
