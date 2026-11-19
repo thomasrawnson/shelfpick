@@ -28,7 +28,10 @@ SP-BETA-08 resolves the application-side artwork export gate with a server-only
 (SP-COVERS-01) it defaults to `true` and exported play cards and recaps show
 BoardGameGeek covers; set it to `false` to return exports to branded initials
 artwork. An unreachable or non-boolean policy response still fails closed to
-initials in the browser; normal in-app cover display is separate.
+initials in the browser; normal in-app cover display is separate. Exported
+covers are relayed by the authenticated `GET /export-cover` endpoint (BGG's
+image host sends no CORS headers); it returns 404 while the flag is `false`.
+After deploying, check an export in the app shows covers, not only initials.
 Changing the value is a production configuration change requiring owner review,
 promotion of an exact approved commit and post-deploy play-card/recap checks.
 

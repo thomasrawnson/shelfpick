@@ -47,7 +47,7 @@ Runtime packages from `frontend/package.json` that ship in the web and iOS build
 | One-time verification/reset token hashes, keyed-hash abuse counters, request IDs, server logs | Our server | Security and operations | Render logs 7 days; abuse rows removed on a later write after 24 hours; expired tokens have no scheduled cleanup (per SP-IOS-21B) |
 | Email address and message for verification/reset mail | Resend (processor) | Transactional email | Resend log retention 30 days (per SP-IOS-21B); confirm |
 | BGG username (public collection requests) | Sent to BoardGameGeek | Import a public collection | Per BGG |
-| Game cover images | Loaded by the user's browser or app directly from BGG, including when drawing a play card or monthly recap to export | Show cover art, including on exported images | None held by ShelfPick; BGG may see IP address and request headers |
+| Game cover images | Shown in the app by the user's browser or app loading them directly from BGG. When a play card or monthly recap is exported, the ShelfPick API fetches the cover from BGG and passes it to the user's device; the image is not stored | Show cover art, including on exported images | None held by ShelfPick; BGG may see IP address and request headers for in-app display, and ShelfPick's server address for exports |
 
 Processors and integrations: Render (hosting, database, logs), Resend (email), PostHog (anonymous analytics, EU), RevenueCat (purchase verification; receives the random account ID and App Store purchase data), BoardGameGeek (collection data and images). Contracting roles and UK transfer mechanisms have not been independently verified (see `docs/SP-IOS-21B-LEGAL-PAGES-AND-BUILD-3-PREPARATION.md`).
 

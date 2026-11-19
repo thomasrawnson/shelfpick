@@ -17,6 +17,7 @@ from api.routers import (
     collection,
     discover,
     export_config,
+    export_cover,
     feedback,
     games,
     game_night,
@@ -83,6 +84,10 @@ app.include_router(
 
 app.include_router(
     export_config.router
+)
+
+app.include_router(
+    export_cover.router
 )
 
 app.include_router(

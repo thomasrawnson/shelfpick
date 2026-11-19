@@ -205,9 +205,13 @@ test("cover artwork is loaded only when the server-controlled mode permits it", 
   const originalDocument = globalThis.document
   const originalImage = globalThis.Image
   const originalWindow = globalThis.window
+  const originalFetch = globalThis.fetch
+  const originalStorage = globalThis.localStorage
   const requested = []
+  const fetched = []
+  const drawn = []
   const context = {
-    beginPath() {}, drawImage() {}, fill() {}, fillRect() {}, fillText() {},
+    beginPath() {}, drawImage(image) { drawn.push(image.src) }, fill() {}, fillRect() {}, fillText() {},
     measureText(value) { return { width: value.length * 18 } }, roundRect() {},
     set fillStyle(_value) {}, set font(_value) {}, set textAlign(_value) {},
   }
@@ -218,23 +222,86 @@ test("cover artwork is loaded only when the server-controlled mode permits it", 
   class MockImage {
     width = 400
     height = 700
-    set src(value) { requested.push(value); queueMicrotask(() => this.onload?.()) }
+    set src(value) { this._src = value; requested.push(value); queueMicrotask(() => this.onload?.()) }
+    get src() { return this._src }
   }
   globalThis.document = { createElement: () => canvas }
   globalThis.Image = MockImage
   globalThis.window = { setTimeout, clearTimeout }
+  globalThis.localStorage = { getItem: () => "token" }
+  globalThis.fetch = async (url, options) => {
+    fetched.push({ url: String(url), authorization: new Headers(options.headers).get("Authorization") })
+    return new Response(new Uint8Array([1, 2, 3]), { status: 200, headers: { "content-type": "image/jpeg" } })
+  }
   try {
-    const artwork = "https://example.com/cover.jpg"
+    const artwork = "https://cf.geekdo-images.com/original/img/abc=/0x0/pic1.jpg"
     const fallbackBlob = await renderPlayShareCard({ ...game, image_url: artwork }, play, defaults)
     assert.equal(await fallbackBlob.text(), "1200x1500")
+    assert.deepEqual(fetched, [])
     assert.equal(requested.includes(artwork), false)
 
     await renderPlayShareCard({ ...game, image_url: artwork }, play, defaults, true)
-    assert.equal(requested.includes(artwork), true)
+    // The remote host has no CORS headers, so the canvas only ever sees a
+    // same-origin blob fetched through the authenticated API proxy.
+    assert.equal(fetched.length, 1)
+    assert.ok(fetched[0].url.endsWith(`/export-cover?url=${encodeURIComponent(artwork)}`))
+    assert.equal(fetched[0].authorization, "Bearer token")
+    assert.equal(requested.includes(artwork), false)
+    assert.ok(drawn.some(src => src.startsWith("blob:")))
   } finally {
     globalThis.document = originalDocument
     globalThis.Image = originalImage
     globalThis.window = originalWindow
+    globalThis.fetch = originalFetch
+    globalThis.localStorage = originalStorage
+  }
+})
+
+test("a cover the API cannot serve falls back to initials without breaking the export", async () => {
+  const originalDocument = globalThis.document
+  const originalImage = globalThis.Image
+  const originalWindow = globalThis.window
+  const originalFetch = globalThis.fetch
+  const originalStorage = globalThis.localStorage
+  const drawn = []
+  const texts = []
+  const context = {
+    beginPath() {}, drawImage(image) { drawn.push(image.src) }, fill() {}, fillRect() {},
+    fillText(value) { texts.push(value) },
+    measureText(value) { return { width: value.length * 18 } }, roundRect() {},
+    set fillStyle(_value) {}, set font(_value) {}, set textAlign(_value) {},
+  }
+  const canvas = {
+    getContext() { return context },
+    toBlob(callback) { callback(new Blob(["png"], { type: "image/png" })) },
+  }
+  class MockImage {
+    width = 400
+    height = 700
+    set src(value) { this._src = value; queueMicrotask(() => this.onload?.()) }
+    get src() { return this._src }
+  }
+  globalThis.document = { createElement: () => canvas }
+  globalThis.Image = MockImage
+  globalThis.window = { setTimeout, clearTimeout }
+  globalThis.localStorage = { getItem: () => null }
+  globalThis.fetch = async () => new Response("{}", { status: 502 })
+  try {
+    const blob = await renderPlayShareCard(
+      { ...game, image_url: "https://cf.geekdo-images.com/original/img/abc=/0x0/pic1.jpg" },
+      play,
+      defaults,
+      true,
+    )
+    assert.equal(blob.type, "image/png")
+    assert.equal(drawn.some(src => src.startsWith("blob:")), false)
+    assert.ok(texts.includes("Cover not available"))
+  } finally {
+    globalThis.document = originalDocument
+    globalThis.Image = originalImage
+    globalThis.window = originalWindow
+    globalThis.fetch = originalFetch
+    globalThis.localStorage = originalStorage
   }
 })
 
