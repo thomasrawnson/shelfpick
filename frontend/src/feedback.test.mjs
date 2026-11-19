@@ -8,6 +8,7 @@ let server
 let feedback
 let client
 let FeedbackSheet
+let appLinks
 
 const IPHONE = "Mozilla/5.0 (iPhone; CPU iPhone OS 26_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
 
@@ -24,6 +25,7 @@ before(async () => {
   server = await createServer({ server: { middlewareMode: true, hmr: false }, appType: "custom" })
   feedback = await server.ssrLoadModule("/src/feedback.ts")
   client = await server.ssrLoadModule("/src/api/client.ts")
+  appLinks = await server.ssrLoadModule("/src/app-links.ts")
   FeedbackSheet = (await server.ssrLoadModule("/src/components/FeedbackSheet.tsx")).default
 })
 
@@ -45,7 +47,7 @@ test("app and device info is sent only when the toggle is on", () => {
   })
   assert.deepEqual(feedback.buildFeedback("feature", "Add a lending tracker.", true, true, IPHONE), {
     type: "feature", message: "Add a lending tracker.", wants_reply: true,
-    app_version: "1.1", build: "11", os: "iOS 26.1", device: "iPhone",
+    app_version: appLinks.APP_VERSION, build: appLinks.APP_BUILD, os: "iOS 26.1", device: "iPhone",
   })
   assert.deepEqual(feedback.deviceInfo("Mozilla/5.0 (X11; Linux x86_64)"), { device: "Web" })
 })
