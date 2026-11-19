@@ -17,7 +17,7 @@ function YearRecapShareDialog({ recap, onClose }: Props) {
   const [status, setStatus] = useState("")
   const [attempt, setAttempt] = useState(0)
 
-  useEffect(() => { dialogRef.current?.showModal() }, [])
+  useEffect(() => { dialogRef.current?.showModal(); dialogRef.current?.focus() }, [])
   useEffect(() => {
     let active = true
     void renderYearRecapCard(recap, includeNames).then(nextBlob => {
@@ -97,16 +97,13 @@ function YearRecapShareDialog({ recap, onClose }: Props) {
     <dialog
       ref={dialogRef}
       className="play-share-dialog year-recap-share-dialog"
+      tabIndex={-1}
       aria-labelledby="year-recap-share-title"
-      aria-describedby="year-recap-share-description"
       onCancel={event => { event.preventDefault(); dialogRef.current?.close() }}
       onClose={onClose}
     >
       <div className="play-share-header">
-        <div>
-          <h2 id="year-recap-share-title">Share {recap.year}</h2>
-          <p id="year-recap-share-description">Preview your Year in Review, then share or download it.</p>
-        </div>
+        <h2 id="year-recap-share-title">Share {recap.year}</h2>
         <button type="button" className="ghost-button" onClick={() => dialogRef.current?.close()}>Close</button>
       </div>
       <div className="play-share-layout">

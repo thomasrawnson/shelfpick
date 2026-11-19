@@ -103,14 +103,14 @@ export async function renderYearRecapCard(
   metrics.forEach(([value, caption], index) => {
     const x = MARGIN + index * 316
     context.fillStyle = SHARE_CARD.ink
-    context.font = `600 ${index === 2 ? 52 : 80}px ${SERIF}`
-    context.fillText(fitShareText(context, value, 290), x, 360)
+    context.font = `600 ${index === 2 ? 60 : 108}px ${SERIF}`
+    context.fillText(fitShareText(context, value, 290), x, 396)
     context.fillStyle = SHARE_CARD.inkSecondary
     context.font = `800 22px ${SANS}`
-    context.fillText(caption, x, 402)
+    context.fillText(caption, x, 442)
   })
 
-  let y = drawTopGames(context, recap, 500)
+  let y = drawTopGames(context, recap, 560)
 
   if (recap.busiest_month) {
     y += 48
@@ -136,8 +136,8 @@ export async function renderYearRecapCard(
     context.font = `800 20px ${SANS}`
     context.fillText(caption, x, y)
     context.fillStyle = SHARE_CARD.ink
-    context.font = `600 36px ${SERIF}`
-    context.fillText(fitShareText(context, value, 290), x, y + 50)
+    context.font = `600 42px ${SERIF}`
+    context.fillText(fitShareText(context, value, 290), x, y + 54)
   })
 
   if (includePlayerNames && recap.co_players.length > 0) {

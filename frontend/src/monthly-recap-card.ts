@@ -1,6 +1,7 @@
 import type { MonthlyRecap, MonthlyRecapGame } from "./api/client"
 import {
   SHARE_CARD,
+  containImageRect,
   coverCropRect,
   fillRoundedRect,
   fitShareText,
@@ -49,7 +50,7 @@ export function monthlyRecapAltText(recap: MonthlyRecap): string {
   return `${recap.month_label} ShelfPick recap: ${recap.total_plays} plays, ${recap.unique_games} games, ${duration}.${highlightText}`
 }
 
-const COLLAGE: ImageRect = { x: 72, y: 244, width: 1056, height: 690 }
+const COLLAGE: ImageRect = { x: 72, y: 196, width: 1056, height: 840 }
 const COLLAGE_RADIUS = 30
 // Distinct, dark-enough tones so touching fallback tiles stay readable under white text.
 const FALLBACK_TILE_COLOURS = ["#315C48", "#4D6B5D", "#6E5B2F", "#3F5C6E"] as const
@@ -108,6 +109,42 @@ async function loadTileArtwork(
   }
 }
 
+// A blurred backdrop without canvas `filter` (unsupported in WebKit): draw the
+// cover tiny on an offscreen canvas, then smooth-scale it over the whole tile.
+function drawBlurredBackdrop(
+  context: CanvasRenderingContext2D,
+  artwork: HTMLImageElement,
+  bounds: ImageRect,
+) {
+  const small = document.createElement("canvas")
+  small.width = 40
+  small.height = Math.max(8, Math.round(40 * bounds.height / bounds.width))
+  const smallContext = small.getContext("2d")
+  if (smallContext) {
+    smallContext.imageSmoothingEnabled = true
+    smallContext.imageSmoothingQuality = "high"
+    const source = coverCropRect(artwork.width, artwork.height, { x: 0, y: 0, width: small.width, height: small.height })
+    smallContext.drawImage(
+      artwork,
+      source.x, source.y, source.width, source.height,
+      0, 0, small.width, small.height,
+    )
+    context.imageSmoothingEnabled = true
+    context.imageSmoothingQuality = "high"
+    context.drawImage(small, bounds.x, bounds.y, bounds.width, bounds.height)
+  } else {
+    context.fillStyle = `rgb(${SCRIM_RGB})`
+    context.fillRect(bounds.x, bounds.y, bounds.width, bounds.height)
+  }
+  context.fillStyle = "rgba(10, 18, 14, 0.5)"
+  context.fillRect(bounds.x, bounds.y, bounds.width, bounds.height)
+}
+
+// The label strip is reserved below the artwork so box-art titles are never covered.
+function labelStripHeight(bounds: ImageRect): number {
+  return bounds.height > 600 ? 116 : 92
+}
+
 function drawGameTile(
   context: CanvasRenderingContext2D,
   game: MonthlyRecapGame,
@@ -115,45 +152,44 @@ function drawGameTile(
   index: number,
   artwork: HTMLImageElement | null,
 ) {
+  const strip = labelStripHeight(bounds)
+  const artArea: ImageRect = { ...bounds, height: bounds.height - strip }
   if (artwork) {
-    // Cover-fit: crop the artwork to fill the tile, centred, never letterboxed.
-    const source = coverCropRect(artwork.width, artwork.height, bounds)
-    context.drawImage(
-      artwork,
-      source.x, source.y, source.width, source.height,
-      bounds.x, bounds.y, bounds.width, bounds.height,
-    )
+    // Whole cover, never cropped: contained over a blurred, darkened copy of
+    // itself so the tile is still edge to edge.
+    drawBlurredBackdrop(context, artwork, bounds)
+    const target = containImageRect(artwork.width, artwork.height, artArea)
+    context.drawImage(artwork, target.x, target.y, target.width, target.height)
   } else {
     context.fillStyle = FALLBACK_TILE_COLOURS[index % FALLBACK_TILE_COLOURS.length]
     context.fillRect(bounds.x, bounds.y, bounds.width, bounds.height)
     context.fillStyle = "rgba(246, 243, 235, 0.92)"
     context.textAlign = "center"
-    const initialsSize = Math.min(170, bounds.width * 0.3, bounds.height * 0.4)
+    const initialsSize = Math.min(150, artArea.width * 0.3, artArea.height * 0.42)
     context.font = `600 ${initialsSize}px Lora, Georgia, serif`
     context.fillText(
       recapInitials(game.name),
-      bounds.x + bounds.width / 2,
-      bounds.y + bounds.height * 0.5,
+      artArea.x + artArea.width / 2,
+      artArea.y + artArea.height / 2 + initialsSize * 0.34,
     )
     context.textAlign = "left"
   }
 
-  // Bottom scrim keeps the name and play count legible on any artwork.
-  const scrimHeight = Math.min(bounds.height, Math.max(150, bounds.height * 0.42))
-  const scrimTop = bounds.y + bounds.height - scrimHeight
-  const scrim = context.createLinearGradient(0, scrimTop, 0, bounds.y + bounds.height)
+  // Name and play count sit on their own dark strip under the artwork.
+  const stripTop = bounds.y + bounds.height - strip
+  const scrim = context.createLinearGradient(0, stripTop - 24, 0, bounds.y + bounds.height)
   scrim.addColorStop(0, `rgba(${SCRIM_RGB}, 0)`)
-  scrim.addColorStop(0.4, `rgba(${SCRIM_RGB}, 0.55)`)
-  scrim.addColorStop(1, `rgba(${SCRIM_RGB}, 0.92)`)
+  scrim.addColorStop(0.2, `rgba(${SCRIM_RGB}, 0.72)`)
+  scrim.addColorStop(1, `rgba(${SCRIM_RGB}, 0.94)`)
   context.fillStyle = scrim
-  context.fillRect(bounds.x, scrimTop, bounds.width, scrimHeight)
+  context.fillRect(bounds.x, stripTop - 24, bounds.width, strip + 24)
 
-  const large = bounds.height > 500
+  const large = bounds.height > 600
   const padding = 28
   const textWidth = bounds.width - padding * 2
   const playsSize = large ? 28 : 24
-  const nameSize = large ? 44 : 34
-  const baseline = bounds.y + bounds.height - 26
+  const nameSize = large ? 42 : 32
+  const baseline = bounds.y + bounds.height - (large ? 24 : 20)
   context.textAlign = "left"
   context.fillStyle = "rgba(255, 255, 255, 0.9)"
   context.font = `800 ${playsSize}px 'Nunito Sans', system-ui, sans-serif`
@@ -163,16 +199,16 @@ function drawGameTile(
   context.fillText(
     fitShareText(context, game.name, textWidth),
     bounds.x + padding,
-    baseline - playsSize - 12,
+    baseline - playsSize - 10,
   )
 }
 
 function drawStatBand(context: CanvasRenderingContext2D, recap: MonthlyRecap) {
   const highlight = monthlyHighlight(recap)
   const x = 72
-  const y = 966
+  const y = 1062
   const width = 1056
-  const height = highlight ? 306 : 176
+  const height = highlight ? 226 : 150
   context.fillStyle = SHARE_CARD.line
   fillRoundedRect(context, x, y, width, height, 28)
   context.fillStyle = SHARE_CARD.surface
@@ -191,27 +227,33 @@ function drawStatBand(context: CanvasRenderingContext2D, recap: MonthlyRecap) {
   metrics.forEach(([value, label], index) => {
     const centre = x + columnWidth * index + columnWidth / 2
     context.fillStyle = SHARE_CARD.ink
-    context.font = value.length > 8 ? "600 40px Lora, Georgia, serif" : "600 68px Lora, Georgia, serif"
-    context.fillText(fitShareText(context, value, columnWidth - 48), centre, y + 100)
+    context.font = value.length > 8 ? "600 38px Lora, Georgia, serif" : "600 62px Lora, Georgia, serif"
+    context.fillText(fitShareText(context, value, columnWidth - 48), centre, y + 80)
     context.fillStyle = SHARE_CARD.inkSecondary
     context.font = "800 19px 'Nunito Sans', system-ui, sans-serif"
-    context.fillText(fitShareText(context, label, columnWidth - 40), centre, y + 142)
+    context.fillText(fitShareText(context, label, columnWidth - 40), centre, y + 118)
     if (index > 0) {
       context.fillStyle = SHARE_CARD.line
-      context.fillRect(x + columnWidth * index - 1, y + 34, 2, 114)
+      context.fillRect(x + columnWidth * index - 1, y + 26, 2, 104)
     }
   })
   context.textAlign = "left"
 
   if (highlight) {
     context.fillStyle = SHARE_CARD.line
-    context.fillRect(x + 40, y + 176, width - 80, 2)
+    context.fillRect(x + 40, y + 148, width - 80, 2)
+    const label = highlight.label.toUpperCase()
     context.fillStyle = SHARE_CARD.goldText
     context.font = "800 21px 'Nunito Sans', system-ui, sans-serif"
-    context.fillText(highlight.label.toUpperCase(), x + 40, y + 224)
+    context.fillText(label, x + 40, y + 196)
+    const labelWidth = context.measureText(label).width
     context.fillStyle = SHARE_CARD.ink
-    context.font = "600 38px Lora, Georgia, serif"
-    context.fillText(fitShareText(context, highlight.value, width - 80), x + 40, y + 270)
+    context.font = "600 36px Lora, Georgia, serif"
+    context.fillText(
+      fitShareText(context, highlight.value, width - 80 - labelWidth - 24),
+      x + 40 + labelWidth + 24,
+      y + 198,
+    )
   }
 }
 
@@ -232,10 +274,10 @@ export async function renderMonthlyRecapCard(
   context.fillRect(0, 0, canvas.width, 22)
   context.fillStyle = SHARE_CARD.goldText
   context.font = "800 28px 'Nunito Sans', system-ui, sans-serif"
-  context.fillText(recap.month_label.toUpperCase(), 72, 100)
+  context.fillText(recap.month_label.toUpperCase(), 72, 90)
   context.fillStyle = SHARE_CARD.ink
   context.font = "600 72px Lora, Georgia, serif"
-  context.fillText("My month in games", 72, 190)
+  context.fillText("My month in games", 72, 160)
 
   const games = recap.collage_games.slice(0, 4)
   const rects = collageRects(games.length)
