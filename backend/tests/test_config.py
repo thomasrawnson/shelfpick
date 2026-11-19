@@ -51,20 +51,20 @@ def test_production_settings_are_normalised(
         "test-bgg-token-not-a-real-secret"
     )
     assert settings.beta_invite_emails == frozenset({"invited@example.com"})
-    assert settings.export_cover_artwork_enabled is False
+    assert settings.export_cover_artwork_enabled is True
 
 
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
-        (None, False),
+        (None, True),
         ("false", False),
         ("0", False),
         ("true", True),
         ("1", True),
     ],
 )
-def test_export_cover_artwork_setting_is_explicit_and_defaults_closed(
+def test_export_cover_artwork_setting_defaults_open_and_can_be_disabled(
     monkeypatch: pytest.MonkeyPatch,
     value: str | None,
     expected: bool,

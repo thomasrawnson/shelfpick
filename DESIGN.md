@@ -455,7 +455,9 @@ copy and the established ShelfPick/BGG footer. Player names, scores and location
 never enter the monthly response, preview or image.
 
 SP-BETA-08 keeps these cover-led compositions while making exported artwork a
-server-owned release policy. Unless the API explicitly permits cover artwork,
+server-owned release policy. On 2026-11-19 the owner decided covers are shown
+by default (`EXPORT_COVER_ARTWORK_ENABLED` defaults to `true`); the server flag
+remains a kill switch. Unless the API explicitly permits cover artwork,
 every preview and its matching PNG/native-share file uses the established
 branded initials tile; configuration errors also fall back safely. This export
 rule does not alter ordinary in-app covers. Users are not offered an artwork
