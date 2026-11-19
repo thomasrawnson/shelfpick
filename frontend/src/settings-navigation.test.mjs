@@ -66,12 +66,14 @@ test("Theme is an inline menu with an accessible name and the current value", ()
   assert.match(markup, /<option value="dark" selected="">/)
 })
 
-test("Free users see the Pro upsell card; Pro users see neither the card nor Compare plans", () => {
+test("Free users see the Pro upsell card; Pro users see a plan row, not the upsell or the FREE pill", () => {
   const free = render(SettingsView, { user, purchases: null })
   assert.match(free, /class="settings-upsell" href="\/settings\/pro"[^>]*>.*Unlock ShelfPick Pro/)
   const pro = render(SettingsView, { user: { ...user, tier: "PRO" }, purchases: null })
   assert.match(pro, /aria-label="Plan: ShelfPick Pro">PRO</)
-  assert.doesNotMatch(pro, /Unlock ShelfPick Pro|settings-upsell|href="\/settings\/pro"/)
+  assert.doesNotMatch(pro, /Unlock ShelfPick Pro|settings-upsell|Compare plans/)
+  // The only way to Restore purchases and Manage subscription once Pro is active.
+  assert.match(pro, /href="\/settings\/pro"[^>]*>.*Your Pro plan.*Restore, manage/)
 })
 
 test("External rows come from SOCIAL_LINKS and say they open outside the app", async () => {
