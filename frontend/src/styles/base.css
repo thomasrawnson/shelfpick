@@ -356,7 +356,6 @@ a:hover {
 
 /* Standalone text actions end in a chevron instead of an underline. */
 .picker-view-game::after,
-.tonight-vote-button::after,
 .add-game-import a::after,
 .game-night-get-app a::after {
   content: "\00a0›";

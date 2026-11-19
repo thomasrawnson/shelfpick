@@ -211,7 +211,7 @@ async function mockPicker(page: Page) {
 const STAGE = process.env.SP_UI_02_STAGE ?? "after"
 
 for (const scheme of ["light", "dark"] as const) {
-  test(`Tonight: disabled hint, Time step and pick fit without scrolling (${scheme})`, async ({ page }) => {
+  test(`Tonight: no player-count hint, Time step and pick fit without scrolling (${scheme})`, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })
     await page.emulateMedia({ colorScheme: scheme, reducedMotion: "reduce" })
     await mockPicker(page)
@@ -219,7 +219,7 @@ for (const scheme of ["light", "dark"] as const) {
     const find = page.getByRole("button", { name: "Find a game" })
     await expect(find).toBeDisabled()
     await page.screenshot({ path: `${SHOTS}/${STAGE}/tonight-players-390-${scheme}.png` })
-    if (STAGE === "after") await expect(page.getByText("Choose your player count")).toBeVisible()
+    if (STAGE === "after") await expect(page.getByText("Choose your player count")).toHaveCount(0)
     await page.getByRole("button", { name: "3 players" }).click()
     await find.click()
 
