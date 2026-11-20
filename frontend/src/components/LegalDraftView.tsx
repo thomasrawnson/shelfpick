@@ -63,7 +63,7 @@ function PrivacyDraft() {
     <section>
       <h2>Providers and BoardGameGeek</h2>
       <p>Render is the intended hosting and PostgreSQL provider. Resend sends verification and password-reset email. Their exact contracting entities, roles, regions, subprocessors and transfer safeguards remain under review.</p>
-      <p>A BGG username supplied by a user is sent to BoardGameGeek to retrieve its public collection. BGG game metadata and hosted cover URLs are displayed in ShelfPick; the browser may therefore send ordinary web-request data to BGG. ShelfPick has commercial XML API application approval, but underlying cover-image rights remain separate and cover artwork stays disabled in exported images.</p>
+      <p>A BGG username supplied by a user is sent to BoardGameGeek to retrieve its public collection. BGG game metadata and hosted cover URLs are displayed in ShelfPick; the browser may therefore send ordinary web-request data to BGG. ShelfPick has commercial XML API application approval, but underlying cover-image rights remain separate and cover images may appear in play cards and recaps you export or share; for exports the ShelfPick server fetches the cover from BGG and relays it to your device without storing it.</p>
     </section>
 
     <section>

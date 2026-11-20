@@ -1605,27 +1605,42 @@
   z-index: 2;
   top: 0;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 20px;
-  padding: 20px 24px;
+  gap: 12px;
+  padding: 6px 8px 6px 20px;
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
 }
 
-.play-share-header h2,
-.play-share-header p {
+.play-share-header h2 {
   margin: 0;
+  min-width: 0;
+  font-size: 1.125rem;
+  line-height: 1.25;
 }
 
-.play-share-header p {
-  margin-top: 5px;
-  color: var(--color-text-support);
-}
-
+/* One compact row: title and a small text Close with a 44px touch target. */
 .play-share-header .ghost-button {
   width: auto;
   flex: 0 0 auto;
+  min-height: var(--target-min);
+  margin: 0;
+  padding: 0 14px;
+  color: var(--color-brand-primary);
+  border: 0;
+  font-weight: 800;
+}
+
+.play-share-dialog:focus,
+.play-share-dialog:focus-visible {
+  outline: none;
+}
+
+.play-share-header .ghost-button:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: -4px;
+  border-radius: var(--radius-md);
 }
 
 .play-share-layout {
@@ -1697,15 +1712,24 @@
   font-size: var(--text-support);
 }
 
+/* Share and Download are the same compact size, side by side. */
 .play-share-actions {
   display: flex;
-  flex-wrap: wrap;
   gap: 10px;
 }
 
 .play-share-actions button {
   width: auto;
-  flex: 1 1 170px;
+  flex: 1 1 0;
+  max-width: 220px;
+  min-height: var(--target-min);
+  margin: 0;
+  padding: 8px 14px;
+  border: 1px solid transparent;
+}
+
+.play-share-actions .secondary-button {
+  border-color: var(--color-brand-primary);
 }
 
 .play-share-error {
@@ -1725,17 +1749,18 @@
   }
 
   .play-share-header {
-    padding: 16px 18px;
+    padding: 4px 6px 4px 18px;
   }
 
   .play-share-layout {
     grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 18px 18px calc(24px + env(safe-area-inset-bottom));
+    gap: 14px;
+    padding: 12px 14px calc(16px + env(safe-area-inset-bottom));
   }
 
   .play-share-preview {
     min-height: 240px;
+    padding: 8px;
   }
 }
 
