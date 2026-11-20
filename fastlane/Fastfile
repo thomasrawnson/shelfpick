@@ -55,6 +55,21 @@ def latest_build(api_key)
   latest_testflight_build_number(app_identifier: APP_ID, api_key: api_key, initial_build_number: 0).to_i
 end
 
+APP_LINKS = File.join(FRONTEND, "src", "app-links.ts")
+
+# The app reports APP_VERSION and APP_BUILD in Settings, About and feedback. They once
+# stayed at 1.1 (11) through several builds, so a build only proceeds when they match
+# the version and build being archived.
+def in_app_version_matches!(version, build)
+  source = File.read(APP_LINKS)
+  in_app_version = source[/export const APP_VERSION = "([^"]+)"/, 1]
+  in_app_build = source[/export const APP_BUILD = "([^"]+)"/, 1]
+  UI.user_error!("Could not read APP_VERSION and APP_BUILD from #{APP_LINKS}") if in_app_version.nil? || in_app_build.nil?
+  return if in_app_version == version && in_app_build == build.to_s
+  UI.user_error!("frontend/src/app-links.ts says #{in_app_version} (#{in_app_build}) but this build is #{version} (#{build}). " \
+                 "Set APP_VERSION and APP_BUILD, commit, then run the lane again.")
+end
+
 def valid_version!(version)
   UI.user_error!("version: is required, for example version:1.2") if version.to_s.empty?
   UI.user_error!("version must look like 1.2 or 1.2.1, got #{version.inspect}") unless version.to_s.match?(/\A\d+\.\d+(\.\d+)?\z/)
@@ -114,6 +129,10 @@ platform :ios do
     sha, branch, dirty = git_state
     UI.user_error!("Working tree has uncommitted changes. Commit them, or pass allow_dirty:true for a throwaway build.") if dirty && options[:allow_dirty].to_s != "true"
 
+    build = options[:build] ? options[:build].to_i : latest_build(asc_api_key) + 1
+    UI.user_error!("build must be a positive number") unless build.positive?
+    in_app_version_matches!(version, build)
+
     node_sh("npm", "test")
     node_sh("npm", "run", "lint")
 
@@ -131,8 +150,6 @@ platform :ios do
     project = File.join(staged, "App/App.xcodeproj")
     UI.user_error!("Staging did not produce a project at #{project}") unless File.directory?(project)
 
-    build = options[:build] ? options[:build].to_i : latest_build(asc_api_key) + 1
-    UI.user_error!("build must be a positive number") unless build.positive?
     name = "ShelfPick-#{version}-#{build}"
     out = File.join(BUILD_DIR, name)
     FileUtils.mkdir_p(out)

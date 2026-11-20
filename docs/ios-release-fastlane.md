@@ -41,11 +41,15 @@ Always run through bundler: `bundle exec fastlane ios <lane> ...`
 - **A dirty tree is refused** unless `allow_dirty:true`, and the record says whether it was dirty.
 - **Version is explicit.** There is no default, so a build can't silently reuse an approved version number
   (Apple rejects an upload to a version that is already approved).
+- **The in-app version must match.** Before any tests or archive, the lane reads `APP_VERSION` and `APP_BUILD` from
+  `frontend/src/app-links.ts` and refuses unless they equal the `version:` and the build number being archived. Settings,
+  About, What's new and the feedback payload report these constants, and they once stayed at 1.1 (11) through builds 18
+  to 21. Bump them, commit, then build.
 - **IPA checks** before the record is written: bundle ID, version, build, Apple Distribution signature for team
   `9CDNVY8UKQ`, privacy manifest present, exactly one public RevenueCat key.
 - **Signing:** automatic, team `9CDNVY8UKQ`. If Xcode finds more than one distribution certificate, set
-  `SHELFPICK_SIGNING_CERT` to the certificate's SHA-1 for that run. macOS may show a keychain prompt on export;
-  choose Allow.
+  `SHELFPICK_SIGNING_CERT` to the certificate's SHA-1 for that run. macOS may show a keychain prompt on export, sometimes behind other windows;
+  choose Always Allow. The export step waits (it once waited over two hours) until it is answered.
 
 ## Not covered (still manual or separate)
 
