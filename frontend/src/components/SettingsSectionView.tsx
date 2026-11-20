@@ -134,14 +134,15 @@ function SettingsSectionView({ section, user, onUserChange, onAccountDeleted, on
     {section === "whats-new" && <div className="settings-info-panel">
       <h2>Version {APP_VERSION}</h2>
       <ul className="settings-whats-new">
-        <li>Shelf, Plays and Discover share one cleaner layout with a shorter tab bar.</li>
-        <li>Discover rows are more compact, so you see more games at once.</li>
-        <li>Win rates count only plays with a winner, matching player profiles.</li>
+        <li>ShelfPick Pro, an optional upgrade (Yearly or Lifetime): deeper statistics, custom scoresheets, For You suggestions and the live game timer. Everything that was free stays free.</li>
+        <li>Stats has new Trends, records and head-to-head views.</li>
+        <li>Monthly and yearly recaps, with a cover collage you can share.</li>
+        <li>Tonight puts Find a game and Start a group vote front and centre.</li>
       </ul>
     </div>}
     {section === "help" && <div className="settings-info-panel">
       <h2>Using ShelfPick</h2>
-      <p>Use Picker for a recommendation from your shelf, Collection to manage games, and Stats to review recorded plays.</p>
+      <p>Use Tonight to find a game, Shelf to manage your games, Plays to log what you played, and Stats to look back.</p>
       <a className="secondary-button settings-section-action" href={SUPPORT_EMAIL_URL}>Contact support</a>
     </div>}
     {section === "help" && <div className="settings-info-panel">

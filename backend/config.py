@@ -151,7 +151,7 @@ def get_settings() -> Settings:
     export_cover_artwork_enabled = (
         _get_strict_bool(
             "EXPORT_COVER_ARTWORK_ENABLED",
-            False,
+            True,
         )
     )
 

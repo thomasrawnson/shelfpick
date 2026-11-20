@@ -20,7 +20,7 @@ function MonthlyRecapShareDialog({ recap, onClose }: Props) {
   const [status, setStatus] = useState("")
   const [attempt, setAttempt] = useState(0)
 
-  useEffect(() => { dialogRef.current?.showModal() }, [])
+  useEffect(() => { dialogRef.current?.showModal(); dialogRef.current?.focus() }, [])
   useEffect(() => {
     let active = true
     void resolveExportCoverArtworkPermission()
@@ -97,16 +97,13 @@ function MonthlyRecapShareDialog({ recap, onClose }: Props) {
     <dialog
       ref={dialogRef}
       className="play-share-dialog"
+      tabIndex={-1}
       aria-labelledby="monthly-recap-share-title"
-      aria-describedby="monthly-recap-share-description"
       onCancel={event => { event.preventDefault(); dialogRef.current?.close() }}
       onClose={onClose}
     >
       <div className="play-share-header">
-        <div>
-          <h2 id="monthly-recap-share-title">Share {recap.month_label}</h2>
-          <p id="monthly-recap-share-description">Preview your recap, then share or download it.</p>
-        </div>
+        <h2 id="monthly-recap-share-title">Share {recap.month_label}</h2>
         <button type="button" className="ghost-button" onClick={() => dialogRef.current?.close()}>Close</button>
       </div>
       <div className="play-share-layout">

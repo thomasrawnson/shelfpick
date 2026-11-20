@@ -10,6 +10,7 @@ let server
 let SettingsView
 let SettingsSectionView
 let AppNavigation
+let appLinks
 
 const user = {
   id: 1, email: "morgan@example.com", display_name: "Morgan Account", bgg_username: "morganbgg",
@@ -28,6 +29,7 @@ before(async () => {
   SettingsView = (await server.ssrLoadModule("/src/components/SettingsView.tsx")).default
   SettingsSectionView = (await server.ssrLoadModule("/src/components/SettingsSectionView.tsx")).default
   AppNavigation = (await server.ssrLoadModule("/src/components/AppNavigation.tsx")).default
+  appLinks = await server.ssrLoadModule("/src/app-links.ts")
 })
 
 after(async () => { delete globalThis.window; await server?.close() })
@@ -49,7 +51,7 @@ test("Settings root lists the groups in the agreed order with no avatar header",
   assert.match(markup, /aria-label="Plan: Free. Compare plans"[^>]*>FREE</)
   assert.match(markup, /4 players · 60 min/)
   assert.match(markup, /Import plays<\/span><span class="settings-row-value">BG Stats</)
-  assert.match(markup, /ShelfPick 1\.1 \(11\) · Pluto Night Labs/)
+  assert.ok(markup.includes(`ShelfPick ${appLinks.APP_VERSION} (${appLinks.APP_BUILD}) · Pluto Night Labs`))
   assert.match(markup, /alt="Powered by BoardGameGeek"/)
   assert.doesNotMatch(markup, /Log out<|Play history|settings\/appearance/)
 })
@@ -66,12 +68,14 @@ test("Theme is an inline menu with an accessible name and the current value", ()
   assert.match(markup, /<option value="dark" selected="">/)
 })
 
-test("Free users see the Pro upsell card; Pro users see neither the card nor Compare plans", () => {
+test("Free users see the Pro upsell card; Pro users see a plan row, not the upsell or the FREE pill", () => {
   const free = render(SettingsView, { user, purchases: null })
   assert.match(free, /class="settings-upsell" href="\/settings\/pro"[^>]*>.*Unlock ShelfPick Pro/)
   const pro = render(SettingsView, { user: { ...user, tier: "PRO" }, purchases: null })
   assert.match(pro, /aria-label="Plan: ShelfPick Pro">PRO</)
-  assert.doesNotMatch(pro, /Unlock ShelfPick Pro|settings-upsell|href="\/settings\/pro"/)
+  assert.doesNotMatch(pro, /Unlock ShelfPick Pro|settings-upsell|Compare plans/)
+  // The only way to Restore purchases and Manage subscription once Pro is active.
+  assert.match(pro, /href="\/settings\/pro"[^>]*>.*Your Pro plan.*Restore, manage/)
 })
 
 test("External rows come from SOCIAL_LINKS and say they open outside the app", async () => {
@@ -185,7 +189,7 @@ test("Help links to Pluto Night Labs with an accessible new-tab indication", () 
   const markup = render(SettingsSectionView, { section: "help", user, onUserChange: () => {} }, "/settings/help")
 
   assert.match(markup, /href="https:\/\/plutonightlabs\.com"/)
-  assert.match(markup, /Version 1\.1/)
+  assert.ok(markup.includes(`Version ${appLinks.APP_VERSION}`))
   assert.match(markup, /target="_blank"/)
   assert.match(markup, /rel="noopener noreferrer"/)
   assert.match(markup, /Pluto Night Labs<span class="sr-only"> \(opens in a new tab\)<\/span>/)

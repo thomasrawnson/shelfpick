@@ -49,7 +49,8 @@ and test Pro grants are untouched.
   server to confirm, checking up to four times, 2.5 s apart (the server allows
   one RevenueCat lookup per user every 2 s), for RevenueCat to catch up.
   Pro shows only after the server confirms it. Loading plans times out after
-  15 s with Try again.
+  60 s with Try again (was 15 s; that hid the cause of a TestFlight failure),
+  and the message now ends with the SDK's error code and text.
 
 ## Changed along the way
 
@@ -133,3 +134,19 @@ secrets and webhook, then the app build.
 ## Follow-up: erasing the RevenueCat customer on account deletion (18 November 2026)
 
 Deleting a ShelfPick account now also asks RevenueCat to erase the customer, using the random account ID, after the database deletion has committed. A failure never undoes the deletion; it is logged as a warning with the random ID so the record can be erased by hand. It uses the existing RevenueCat version 1 secret key, which has no permission setting; a sandbox account deletion should be checked against the RevenueCat dashboard (see the runbook). An earlier version of this note wrongly said the key needed read and write access. Backend: 656 passed, 17 skipped on a disposable PostgreSQL database; `alembic check` clean. Not deployed.
+
+## Follow-up: paywall never loaded plans on TestFlight (19 November 2026)
+
+Cause: `loadRevenueCat` returned the Capacitor plugin object from an async function. A Capacitor plugin answers to every property name, including `then`, so JavaScript treated it as a promise and waited for a native `then` that does not exist. The promise never settled, so the paywall waited until its timeout (15 s, then 60 s) with no error. It was found by running a debug build on a physical iPhone with the console attached, where the log stopped after the first plugin call.
+
+Fix: `sdkFromPlugin` hands the store a plain object of calls (`frontend/src/billing/store.ts`), with a test that uses a plugin-like proxy. `npm test` 254 passed, lint and `tsc -b` clean.
+
+Device evidence (physical iPhone 15 Pro Max, debug build 1.2 (99) run from Xcode, **not a TestFlight build**): Yearly and Lifetime plans loaded, a sandbox purchase completed, and the app showed Pro active. Restore, expiry, refund and account-deletion erasure are still untested. No TestFlight build contains this fix yet.
+
+## Follow-up: TestFlight evidence and build 1.2 (18) (19 November 2026)
+
+TestFlight 1.2 (17), installed on the physical iPhone 15 Pro Max, loaded both plans; the account showed PRO and "Plan: ShelfPick Pro" from the earlier sandbox purchase. A Pro account had no route back to the Pro page from Settings, so Restore purchases and Manage subscription were hard to find. PR #48 adds a "ShelfPick Pro" group with "Your Pro plan" for Pro users (Free users keep the "Unlock ShelfPick Pro" card).
+
+Build 1.2 (18) was built from main 36d31c7 (PRs #48 and #49), SHA-256 `159a8ff3dba1b42eeff42954653998e555bdfb862b726b8b6d8cb03ec82ad88d`, 255 tests, lint and `tsc -b` clean, and uploaded to TestFlight by the owner. Local build checks and the owner's visual check of the Settings row and Tonight screen only: Restore purchases, a TestFlight purchase, account deletion, expiry and refund are **not yet tested** on build 18.
+
+The hosted Terms still said Pro was not offered on 19 November 2026, and the Privacy Policy did not mention RevenueCat or feedback. Replacement wording is in the site repository on branch `sp-pro-01-legal-pages` (preview build passes, not merged to the site's `main`, so not published). App Review notes and the App Store Connect checklist are in `docs/SP-PRO-01-APP-REVIEW-NOTES.md`.

@@ -1,4 +1,4 @@
-import type { Game, GamePlay } from "./api/client"
+import { getExportCover, type Game, type GamePlay } from "./api/client"
 
 export type SharePrivacyOptions = {
   includePlayerNames: boolean
@@ -121,6 +121,16 @@ export function loadShareImage(src: string): Promise<HTMLImageElement> {
   })
 }
 
+// Loads an exported cover through the API so the canvas is never tainted.
+export async function loadCoverArtwork(imageUrl: string): Promise<HTMLImageElement> {
+  const objectUrl = URL.createObjectURL(await getExportCover(imageUrl))
+  try {
+    return await loadShareImage(objectUrl)
+  } finally {
+    URL.revokeObjectURL(objectUrl)
+  }
+}
+
 export const POWERED_BY_BGG_SRC = "/branding/powered-by-bgg-rgb.svg"
 // Native size of the supplied logo is 342x76. It is only ever scaled uniformly.
 const POWERED_BY_BGG_ASPECT = 342 / 76
@@ -237,6 +247,26 @@ export function containImageRect(
   }
 }
 
+// Source rectangle (in image pixels) that fills `bounds` with a centred crop.
+export function coverCropRect(
+  imageWidth: number,
+  imageHeight: number,
+  bounds: ImageRect,
+): ImageRect {
+  if (imageWidth <= 0 || imageHeight <= 0) {
+    return { x: 0, y: 0, width: Math.max(imageWidth, 0), height: Math.max(imageHeight, 0) }
+  }
+  const scale = Math.max(bounds.width / imageWidth, bounds.height / imageHeight)
+  const width = bounds.width / scale
+  const height = bounds.height / scale
+  return {
+    x: (imageWidth - width) / 2,
+    y: (imageHeight - height) / 2,
+    width,
+    height,
+  }
+}
+
 export function drawShareArtworkFallback(
   context: CanvasRenderingContext2D,
   gameName: string,
@@ -313,7 +343,7 @@ export async function renderPlayShareCard(
   let artworkLoaded = false
   if (allowCoverArtwork && game.image_url) {
     try {
-      const artwork = await loadShareImage(game.image_url)
+      const artwork = await loadCoverArtwork(game.image_url)
       const target = containImageRect(artwork.width, artwork.height, artworkBounds)
       context.fillStyle = SHARE_CARD.surface
       fillRoundedRect(context, target.x - 10, target.y - 10, target.width + 20, target.height + 20, 24)

@@ -69,14 +69,51 @@ export function storyProgress(kinds: YearSlideKind[], index: number): { segments
   }
 }
 
+// Entry-card copy. Every line comes from the year-recap response; nothing is
+// estimated, and short years skip the lines that need more history.
+export function yearEntryHeadline(recap: YearRecap): string {
+  return recap.total_plays < SHORT_YEAR_PLAY_LIMIT
+    ? `Your ${recap.year} is just getting started`
+    : `Your ${recap.year} at the table`
+}
+
+export type YearHeroStat = { value: string; label: string }
+
+export function yearHeroStats(recap: YearRecap): YearHeroStat[] {
+  const stats: YearHeroStat[] = [
+    { value: String(recap.total_plays), label: recap.total_plays === 1 ? "Play" : "Plays" },
+    { value: String(recap.unique_games), label: recap.unique_games === 1 ? "Game" : "Games" },
+  ]
+  if (recap.total_duration_minutes !== null) {
+    // Whole hours once there are plenty, so the hero number stays on one line.
+    const hours = recap.total_duration_minutes >= 600
+      ? `${Math.floor(recap.total_duration_minutes / 60)}h`
+      : formatHours(recap.total_duration_minutes)
+    stats.push({ value: hours, label: "Recorded" })
+  } else if (recap.new_games_count > 0) {
+    stats.push({ value: String(recap.new_games_count), label: "New to you" })
+  }
+  return stats
+}
+
+export function yearEntryFacts(recap: YearRecap): string[] {
+  const facts: string[] = []
+  const top = recap.top_games[0]
+  if (top) facts.push(`Top game: ${top.name} · ${plural(top.play_count, "play")}`)
+  if (recap.total_plays >= SHORT_YEAR_PLAY_LIMIT && recap.busiest_month) {
+    facts.push(`Busiest month: ${monthName(recap.busiest_month)} · ${plural(recap.plays_by_month[recap.busiest_month - 1], "play")}`)
+  }
+  return facts
+}
+
 export function slideTitle(kind: YearSlideKind, recap: YearRecap): string {
   switch (kind) {
     case "totals": return `Your ${recap.year} in games`
-    case "top-games": return "Your top games"
+    case "top-games": return "Your most played"
     case "new-games": return "New to you"
-    case "months": return "Busiest month"
-    case "weekday": return "Busiest day"
-    case "longest": return "Longest play"
+    case "months": return "Your busiest month"
+    case "weekday": return "Your busiest day"
+    case "longest": return "Your longest play"
     case "co-players": return "Your play partners"
     case "closing": return "That's your year"
   }

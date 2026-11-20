@@ -604,31 +604,27 @@
 
 .monthly-recap-section {
   display: grid;
-  gap: 16px;
+  gap: 12px;
 }
 
-.recap-heading-row {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 18px;
+.recap-section-title {
+  margin: 0;
+  font-size: 1.25rem;
 }
 
-.recap-heading-row p {
-  max-width: 58ch;
-  margin: 6px 0 0;
-  color: var(--color-text-support);
-  font-size: var(--text-support);
-}
-
-.recap-month-controls {
+/* Compact, centred month switcher with 44px touch targets. */
+.recap-month-switcher {
+  justify-self: center;
   display: grid;
   grid-template-columns: var(--target-min) minmax(132px, auto) var(--target-min);
   align-items: center;
-  gap: 4px;
+  padding: 2px;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
 }
 
-.recap-month-controls time {
+.recap-month-switcher time {
   color: var(--color-text-primary);
   font-weight: 800;
   text-align: center;
@@ -644,10 +640,6 @@
   background: transparent;
   border: 0;
   border-radius: 50%;
-  font-family: var(--font-ui);
-  font-size: 32px;
-  font-weight: 700;
-  line-height: 1;
   cursor: pointer;
 }
 
@@ -660,58 +652,145 @@
   cursor: default;
 }
 
-.monthly-recap-state,
-.monthly-recap-card {
-  padding: 22px;
+.monthly-recap-state {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  padding: 20px;
   background: var(--color-surface-raised);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
 }
 
-.monthly-recap-state {
-  display: grid;
-  justify-items: start;
-  gap: 12px;
-}
-
 .monthly-recap-state h3,
 .monthly-recap-state p,
-.monthly-recap-copy p,
 .play-share-options h3 {
   margin: 0;
 }
 
-.monthly-recap-state p,
-.monthly-recap-copy {
+.monthly-recap-state p {
   color: var(--color-text-support);
 }
 
-.monthly-recap-card {
+/* Recap preview: the real share card, scaled down, beside its summary. */
+.recap-preview {
   display: grid;
-  grid-template-columns: minmax(230px, 0.8fr) minmax(260px, 1.4fr) auto;
-  align-items: center;
-  gap: 24px;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 16px;
+  align-items: stretch;
+  padding: 16px;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
 }
 
-.monthly-recap-summary {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
+.recap-preview-year {
+  grid-template-columns: 96px minmax(0, 1fr);
 }
 
-.monthly-recap-summary > div {
-  display: grid;
-  gap: 5px;
+.recap-preview-thumb {
+  display: block;
+  align-self: start;
+  width: 100%;
+  padding: 0;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  aspect-ratio: 4 / 5;
 }
 
-.monthly-recap-summary strong {
+.recap-preview-year .recap-preview-thumb {
+  aspect-ratio: 9 / 16;
+}
+
+.recap-preview-thumb img,
+.recap-preview-skeleton {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.recap-preview-skeleton {
+  background: linear-gradient(110deg, var(--color-surface) 30%, var(--color-brand-primary-soft) 50%, var(--color-surface) 70%);
+  background-size: 200% 100%;
+  animation: recap-preview-shimmer 1.4s linear infinite;
+}
+
+@keyframes recap-preview-shimmer {
+  to { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recap-preview-skeleton { animation: none; }
+}
+
+.recap-preview-body {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 4px;
+}
+
+.recap-preview-body p,
+.recap-preview-body h2 {
+  margin: 0;
+}
+
+.recap-preview-kicker {
+  color: var(--color-accent-text);
+  font-size: var(--text-meta);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.recap-preview-headline {
+  color: var(--color-text-primary);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.recap-preview-detail {
+  text-wrap: balance;
+  color: var(--color-text-support);
+  font-size: var(--text-support);
+  line-height: 1.4;
+}
+
+.recap-preview-detail strong {
+  color: var(--color-text-primary);
+}
+
+.recap-hero-stats {
+  display: flex;
+  gap: 14px;
+  margin: 8px 0 4px;
+}
+
+.recap-hero-stats > div {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+}
+
+.recap-hero-stats dd {
+  margin: 0;
   color: var(--color-accent-text);
   font-family: var(--font-display);
-  font-size: 40px;
+  font-size: 1.5rem;
+  font-weight: 600;
   line-height: 1;
+  white-space: nowrap;
 }
 
-.monthly-recap-summary span {
+.recap-hero-stats dt {
   color: var(--color-text-support);
   font-size: var(--text-meta);
   font-weight: 800;
@@ -719,45 +798,36 @@
   text-transform: uppercase;
 }
 
-.monthly-recap-copy {
-  min-width: 0;
-  display: grid;
-  gap: 7px;
-  font-size: var(--text-support);
-  line-height: 1.45;
-}
-
-.monthly-recap-copy strong {
-  color: var(--color-text-primary);
-}
-
-.monthly-recap-share {
+.recap-preview-action,
+.recap-preview-actions button {
   width: auto;
-  min-width: 168px;
+  min-height: var(--target-min);
+  margin: 0;
+  padding: 8px 14px;
 }
 
-@media (max-width: 760px) {
-  .recap-heading-row,
-  .monthly-recap-card {
-    align-items: stretch;
-    flex-direction: column;
-    grid-template-columns: 1fr;
-  }
-
-  .recap-heading-row {
-    display: flex;
-  }
-
-  .monthly-recap-share {
-    width: 100%;
-  }
+.recap-preview-action {
+  justify-self: start;
+  margin-top: 8px;
 }
 
-@media (max-width: 390px) {
-  .monthly-recap-state,
-  .monthly-recap-card {
-    padding: 18px;
-  }
+.recap-preview-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.recap-preview-actions button {
+  flex: 1 1 0;
+  border: 1px solid transparent;
+}
+
+.recap-preview-actions .primary-button {
+  flex-grow: 1.6;
+}
+
+.recap-preview-actions .secondary-button {
+  border-color: var(--color-brand-primary);
 }
 
 .insights-view-all {
@@ -1337,8 +1407,7 @@
 }
 
 /* SP-YIR-01: Year in Review story, entry card and Pick banner. */
-.year-recap-entry { margin: 0 0 18px; }
-.year-recap-entry .primary-button { margin-top: 14px; }
+.year-recap-entry { margin: 20px 0 0; }
 
 .year-recap-banner {
   display: flex;

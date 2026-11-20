@@ -15,7 +15,7 @@ ShelfPick is a web app for managing a board-game collection, choosing games, rec
 
 BoardGameGeek data and availability are third-party dependencies. ShelfPick is not affiliated with or endorsed by BoardGameGeek. Users are responsible for entering an appropriate public BGG username. Linked BGG attribution and underlying cover-image rights remain separate operational gates.
 
-ShelfPick's commercial XML API application is approved. Linked attribution remains required, and underlying game-cover image rights remain separate. Exported cover artwork stays disabled.
+ShelfPick's commercial XML API application is approved. Linked attribution remains required, and underlying game-cover image rights remain separate. Exported play cards and recaps may include BGG-hosted cover images.
 
 ## Account responsibilities
 

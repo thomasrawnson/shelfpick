@@ -171,6 +171,10 @@ function SettingsView({ user, purchases = defaultPurchaseLayer }: Props) {
       <Chevron />
     </Link>}
 
+    {isPro && <SettingsGroup title="ShelfPick Pro">
+      {linkRow({ id: "pro-plan", label: "Your Pro plan", icon: "crown", tint: "gold", to: APP_PATHS.settingsPro, value: "Restore, manage" })}
+    </SettingsGroup>}
+
     <SettingsGroup title="Appearance">
       <ThemeRow />
     </SettingsGroup>

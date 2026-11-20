@@ -208,7 +208,37 @@ not application build artefacts. This documentation-only closeout commit is a
 sixth administrative PR commit and does not change the validated application.
 Merge, deployment and tester invitations remain explicitly unauthorised.
 
-### SP-BETA-08 safe artwork exports — COMPLETE; PR #4 OPEN (13 October 2026)
+### SP-COVERS-01 exported cover artwork enabled — OWNER DECISION (19 November 2026)
+
+The owner decided on 2026-11-19 to show BoardGameGeek cover images on exported
+play cards and monthly recaps. This supersedes the SP-BETA-08 default-off policy
+below. `EXPORT_COVER_ARTWORK_ENABLED` now defaults to `true` in code, the
+example environment and the Render Blueprint, and production already returned
+`cover_artwork_enabled: true`. The server flag stays as an operational kill
+switch: set it to `false` to return every export to branded initials artwork.
+The client still fails closed to initials when the policy response is
+unavailable or not exactly `true`, and a cover that is missing or slow to load
+is replaced by its initials tile. The year recap remains initials-only. Backend
+config/API tests were updated for the new default.
+
+Covers did not appear after the flag went live because BGG's image host
+(`cf.geekdo-images.com`) sends no `Access-Control-Allow-Origin`: the export
+canvas loads images with anonymous CORS, so every cover silently fell back to
+initials. The fix is an authenticated `GET /export-cover?url=` proxy
+(`backend/api/routers/export_cover.py`, `backend/services/export_cover_service.py`)
+that fetches the image from BGG and returns it same-origin so the browser can
+draw it into the PNG. It fetches only `https://cf.geekdo-images.com/...`
+(exact host, no redirects, no credentials or custom ports), accepts only
+JPEG/PNG/WebP/GIF up to 10 MB within a 6-second deadline, returns 404 when
+`EXPORT_COVER_ARTWORK_ENABLED` is `false`, stores nothing, and answers
+`Cache-Control: private`. The play-card and monthly-recap renderers load covers
+through `getExportCover` and show initials on any failure. PRIVACY.md and the
+Terms/Privacy drafts now say the ShelfPick server relays covers for exports.
+This records the decision and mechanism; it is not legal advice and does not
+change the separate BGG rights follow-up in
+`docs/bgg-attribution-and-permission.md`.
+
+### SP-BETA-08 safe artwork exports — COMPLETE; PR #4 OPEN (13 October 2026) — default superseded by SP-COVERS-01
 
 Saved-play cards and monthly recaps now default to branded initials artwork for
 preview, PNG download and native file sharing. The API owns the explicit

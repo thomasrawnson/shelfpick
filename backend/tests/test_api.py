@@ -28,12 +28,12 @@ from models.play import Play
 client = TestClient(app)
 
 
-def test_export_configuration_defaults_to_branded_fallback():
+def test_export_configuration_permits_cover_artwork_by_default():
     response = client.get("/export-config")
 
     assert response.status_code == 200
     assert response.json() == {
-        "cover_artwork_enabled": False,
+        "cover_artwork_enabled": True,
     }
 
 

@@ -1333,6 +1333,20 @@ export async function getYearRecap(
   return response.json()
 }
 
+// BGG's image host sends no CORS headers, so a canvas cannot read its covers
+// directly. The API serves them same-origin for exported images only.
+export async function getExportCover(imageUrl: string): Promise<Blob> {
+  const response = await apiFetch(
+    `/export-cover?url=${encodeURIComponent(imageUrl)}`,
+    { signal: AbortSignal.timeout(8_000) },
+  )
+  if (!response.ok) {
+    throw new Error(`Export cover request failed: ${response.status}`)
+  }
+  return response.blob()
+}
+
+
 export async function getExportConfiguration(): Promise<ExportConfiguration> {
   const response = await apiFetch("/export-config")
   if (!response.ok) {

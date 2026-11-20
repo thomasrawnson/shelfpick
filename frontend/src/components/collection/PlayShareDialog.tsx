@@ -24,6 +24,7 @@ function PlayShareDialog({ game, play, onClose }: Props) {
 
   useEffect(() => {
     dialogRef.current?.showModal()
+    dialogRef.current?.focus()
   }, [])
 
   useEffect(() => {
@@ -113,16 +114,13 @@ function PlayShareDialog({ game, play, onClose }: Props) {
     <dialog
       ref={dialogRef}
       className="play-share-dialog"
+      tabIndex={-1}
       aria-labelledby="play-share-title"
-      aria-describedby="play-share-description"
       onCancel={event => { event.preventDefault(); close() }}
       onClose={onClose}
     >
       <div className="play-share-header">
-        <div>
-          <h2 id="play-share-title">Share this play</h2>
-          <p id="play-share-description">Preview the image, then choose what to include.</p>
-        </div>
+        <h2 id="play-share-title">Share this play</h2>
         <button type="button" className="ghost-button" onClick={close}>Close</button>
       </div>
 
