@@ -1,0 +1,4 @@
+# ShelfPick (SP-FASTLANE-01). Non-secret identifiers only. The App Store Connect API key is
+# never stored here; see fastlane/Fastfile and fastlane/README.md.
+app_identifier("com.plutonightlabs.shelfpick")
+team_id("9CDNVY8UKQ")

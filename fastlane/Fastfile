@@ -1,0 +1,203 @@
+# ShelfPick iOS release lanes (SP-FASTLANE-01).
+# Shape follows Ripple Links and pluto-standards IOS-RELEASE-PIPELINE:
+#   preflight  read-only: key settings (names only), repo state, TestFlight build numbers
+#   build      tests, web bundle, company staging, signed App Store archive + IPA, local checks.
+#              Never uploads.
+#   upload     internal TestFlight upload of the exact recorded IPA, only with its hash as approval.
+#              Never submits for review, never distributes externally.
+# The App Store Connect API key comes from ~/.config/pluto/asc/shelfpick.env (ASC_KEY_ID,
+# ASC_ISSUER_ID, ASC_KEY_PATH). Values are never printed, copied or committed.
+# Always run through bundler: bundle exec fastlane <lane> ...
+require "digest"
+require "json"
+require "time"
+require "tmpdir"
+require "fileutils"
+
+default_platform(:ios)
+
+ROOT = File.expand_path("..", __dir__)
+FRONTEND = File.join(ROOT, "frontend")
+BUILD_DIR = File.join(ROOT, "build")
+RECORD = File.join(BUILD_DIR, "shelfpick-build-record.json")
+APP_ID = "com.plutonightlabs.shelfpick"
+TEAM_ID = "9CDNVY8UKQ"
+NODE_VERSION = "22.23.3"
+SCHEME = "App"
+ENV_FILE = ENV.fetch("SHELFPICK_ASC_ENV", File.expand_path("~/.config/pluto/asc/shelfpick.env"))
+REQUIRED = %w[ASC_KEY_ID ASC_ISSUER_ID ASC_KEY_PATH].freeze
+
+def asc_settings
+  UI.user_error!("Missing #{ENV_FILE}. Create it with ASC_KEY_ID, ASC_ISSUER_ID and ASC_KEY_PATH.") unless File.file?(ENV_FILE)
+  values = {}
+  File.readlines(ENV_FILE, chomp: true).each do |line|
+    next if line.strip.empty? || line.start_with?("#")
+    name, value = line.split("=", 2)
+    values[name.strip] = value.to_s.strip
+  end
+  missing = REQUIRED.reject { |name| values[name] && !values[name].empty? }
+  UI.user_error!("#{File.basename(ENV_FILE)} is missing: #{missing.join(', ')}") unless missing.empty?
+  UI.user_error!("ASC_KEY_PATH does not point to a file") unless File.file?(File.expand_path(values["ASC_KEY_PATH"]))
+  values
+end
+
+def asc_api_key
+  s = asc_settings
+  app_store_connect_api_key(
+    key_id: s["ASC_KEY_ID"],
+    issuer_id: s["ASC_ISSUER_ID"],
+    key_filepath: File.expand_path(s["ASC_KEY_PATH"]),
+    in_house: false
+  )
+end
+
+def latest_build(api_key)
+  latest_testflight_build_number(app_identifier: APP_ID, api_key: api_key, initial_build_number: 0).to_i
+end
+
+APP_LINKS = File.join(FRONTEND, "src", "app-links.ts")
+
+# The app reports APP_VERSION and APP_BUILD in Settings, About and feedback. They once
+# stayed at 1.1 (11) through several builds, so a build only proceeds when they match
+# the version and build being archived.
+def in_app_version_matches!(version, build)
+  source = File.read(APP_LINKS)
+  in_app_version = source[/export const APP_VERSION = "([^"]+)"/, 1]
+  in_app_build = source[/export const APP_BUILD = "([^"]+)"/, 1]
+  UI.user_error!("Could not read APP_VERSION and APP_BUILD from #{APP_LINKS}") if in_app_version.nil? || in_app_build.nil?
+  return if in_app_version == version && in_app_build == build.to_s
+  UI.user_error!("frontend/src/app-links.ts says #{in_app_version} (#{in_app_build}) but this build is #{version} (#{build}). " \
+                 "Set APP_VERSION and APP_BUILD, commit, then run the lane again.")
+end
+
+def valid_version!(version)
+  UI.user_error!("version: is required, for example version:1.2") if version.to_s.empty?
+  UI.user_error!("version must look like 1.2 or 1.2.1, got #{version.inspect}") unless version.to_s.match?(/\A\d+\.\d+(\.\d+)?\z/)
+  version.to_s
+end
+
+# Runs a Node tool from frontend/ on the pinned Node version.
+def node_sh(*cmd, log: true)
+  Dir.chdir(FRONTEND) { sh("fnm", "exec", "--using=#{NODE_VERSION}", *cmd, log: log) }
+end
+
+def git_state
+  Dir.chdir(ROOT) do
+    [sh("git", "rev-parse", "HEAD", log: false).strip,
+     sh("git", "rev-parse", "--abbrev-ref", "HEAD", log: false).strip,
+     !sh("git", "status", "--porcelain", log: false).strip.empty?]
+  end
+end
+
+# Local checks on the exported IPA. Raises on anything that does not match what was asked for.
+def verify_ipa!(ipa, version:, build:, purchases:)
+  Dir.mktmpdir("shelfpick-ipa") do |dir|
+    sh("unzip", "-q", ipa, "-d", dir, log: false)
+    app = File.join(dir, "Payload/App.app")
+    plist = ->(key) { sh("plutil", "-extract", key, "raw", "-o", "-", File.join(app, "Info.plist"), log: false).strip }
+    UI.user_error!("bundle id is #{plist.call('CFBundleIdentifier')}") unless plist.call("CFBundleIdentifier") == APP_ID
+    UI.user_error!("version is #{plist.call('CFBundleShortVersionString')}") unless plist.call("CFBundleShortVersionString") == version
+    UI.user_error!("build is #{plist.call('CFBundleVersion')}") unless plist.call("CFBundleVersion") == build.to_s
+    sig = `codesign -dvv "#{app}" 2>&1`
+    UI.user_error!("not signed with Apple Distribution for team #{TEAM_ID}") unless sig.include?("Authority=Apple Distribution") && sig.include?("TeamIdentifier=#{TEAM_ID}")
+    UI.user_error!("PrivacyInfo.xcprivacy is missing from the app") unless File.file?(File.join(app, "PrivacyInfo.xcprivacy"))
+    web = Dir[File.join(app, "public/**/*.js")].map { |f| File.read(f) }.join("\n")
+    keys = web.scan(/appl_[A-Za-z0-9]{20,}/).uniq.size
+    # The public SDK key is compiled in from frontend/.env.ios whether or not purchases are switched on.
+    UI.user_error!("expected exactly one public RevenueCat key in the bundle, found #{keys}") unless keys == 1
+    UI.message("Purchases flag requested for this build: #{purchases ? 'ON' : 'OFF'} (recorded in the build record)")
+    UI.success("IPA checks passed: #{APP_ID} #{version} (#{build}), Apple Distribution #{TEAM_ID}, privacy manifest present, one public SDK key")
+  end
+end
+
+platform :ios do
+  desc "Read-only: key settings (names only), repo state, latest TestFlight build and the proposed next one"
+  lane :preflight do |options|
+    asc_settings
+    UI.message("#{File.basename(ENV_FILE)} provides: #{REQUIRED.join(', ')} (values not shown)")
+    sha, branch, dirty = git_state
+    UI.message("Source: #{branch} #{sha[0, 10]}#{dirty ? ' (working tree has uncommitted changes)' : ''}")
+    latest = latest_build(asc_api_key)
+    UI.success("#{APP_ID}: latest TestFlight build #{latest}; proposed next build #{latest + 1}")
+  end
+
+  desc "Tests, web bundle, company staging, signed App Store archive and IPA in build/. No upload. " \
+       "Options: version:1.2 [build:17] [purchases:true] [allow_dirty:true]"
+  lane :build do |options|
+    version = valid_version!(options[:version])
+    purchases = options[:purchases].to_s == "true"
+    sha, branch, dirty = git_state
+    UI.user_error!("Working tree has uncommitted changes. Commit them, or pass allow_dirty:true for a throwaway build.") if dirty && options[:allow_dirty].to_s != "true"
+
+    build = options[:build] ? options[:build].to_i : latest_build(asc_api_key) + 1
+    UI.user_error!("build must be a positive number") unless build.positive?
+    in_app_version_matches!(version, build)
+
+    node_sh("npm", "test")
+    node_sh("npm", "run", "lint")
+
+    if purchases
+      key_line = File.readlines(File.join(FRONTEND, ".env.ios")).grep(/\AVITE_REVENUECAT_IOS_API_KEY=\S+/)
+      UI.user_error!("purchases:true needs VITE_REVENUECAT_IOS_API_KEY set in frontend/.env.ios") if key_line.empty?
+      ENV["VITE_PUBLIC_LEGAL_LINKS_ENABLED"] = "true"
+      UI.important("Purchases are ON: the paywall will offer Pro and link to the live Privacy and Terms pages. Do not submit to App Review until those pages cover purchases.")
+    else
+      ENV.delete("VITE_PUBLIC_LEGAL_LINKS_ENABLED")
+    end
+    node_sh("npm", "run", "build:ios")
+
+    staged = node_sh("node", "scripts/prepare-ios-company.mjs", log: false).to_s.lines.last.to_s.strip
+    project = File.join(staged, "App/App.xcodeproj")
+    UI.user_error!("Staging did not produce a project at #{project}") unless File.directory?(project)
+
+    name = "ShelfPick-#{version}-#{build}"
+    out = File.join(BUILD_DIR, name)
+    FileUtils.mkdir_p(out)
+
+    export_options = { method: "app-store-connect", signingStyle: "automatic", teamID: TEAM_ID, manageAppVersionAndBuildNumber: false }
+    export_options[:signingCertificate] = ENV["SHELFPICK_SIGNING_CERT"] unless ENV["SHELFPICK_SIGNING_CERT"].to_s.empty?
+    ipa = gym(
+      project: project,
+      scheme: SCHEME,
+      configuration: "Release",
+      export_method: "app-store",
+      export_options: export_options,
+      output_directory: out,
+      output_name: name,
+      archive_path: File.join(out, "#{name}.xcarchive"),
+      derived_data_path: File.join(out, "DerivedData"),
+      xcargs: "CURRENT_PROJECT_VERSION=#{build} MARKETING_VERSION=#{version}"
+    )
+
+    verify_ipa!(ipa, version: version, build: build, purchases: purchases)
+    digest = Digest::SHA256.file(ipa).hexdigest
+    FileUtils.mkdir_p(BUILD_DIR)
+    File.write(RECORD, JSON.pretty_generate(
+      app: APP_ID, version: version, build: build, ipa: ipa, sha256: digest, purchases: purchases,
+      source_commit: sha, source_branch: branch, source_dirty: dirty, built_at: Time.now.utc.iso8601
+    ))
+    UI.success("IPA #{ipa}\nSHA-256 #{digest}\nRecord #{RECORD}\nTo upload to internal TestFlight: bundle exec fastlane upload approve:#{digest[0, 8]}")
+  end
+
+  desc "Internal TestFlight upload of the exact recorded IPA. Needs approve:<first 8 of its SHA-256>. " \
+       "No review submission, no external testers."
+  lane :upload do |options|
+    UI.user_error!("No build record; run the build lane first") unless File.file?(RECORD)
+    record = JSON.parse(File.read(RECORD))
+    ipa = record.fetch("ipa")
+    UI.user_error!("Recorded IPA is missing") unless File.file?(ipa)
+    actual = Digest::SHA256.file(ipa).hexdigest
+    UI.user_error!("IPA hash #{actual} differs from the recorded #{record['sha256']}; refusing to upload") unless actual == record["sha256"]
+    UI.user_error!("approve: must be the first 8 characters of the IPA's SHA-256 (#{actual[0, 8]})") unless options[:approve].to_s == actual[0, 8]
+    UI.important("Uploading #{record['version']} (#{record['build']}) to INTERNAL TestFlight. Not submitting for review.")
+    upload_to_testflight(
+      api_key: asc_api_key,
+      app_identifier: APP_ID,
+      ipa: ipa,
+      skip_submission: true,
+      distribute_external: false,
+      skip_waiting_for_build_processing: true
+    )
+    UI.success("Uploaded #{record['version']} (#{record['build']}) sha #{actual[0, 8]}. Processing continues in App Store Connect.")
+  end
+end
