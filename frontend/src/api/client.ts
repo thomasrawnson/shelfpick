@@ -1194,7 +1194,10 @@ export async function getScoresheets(bggId: number): Promise<Scoresheet[]> {
   return readThrough(`sheets.${bggId}`, async () => {
     const response = await apiFetch(`/scoresheets?bgg_id=${encodeURIComponent(bggId)}`)
     if (!response.ok) throw new Error(`Scoresheet request failed: ${response.status}`)
-    return response.json() as Promise<Scoresheet[]>
+    const sheets = await response.json() as Scoresheet[]
+    // Each sheet in the list is a version that was opened, so it can be edited on a play offline too.
+    for (const sheet of sheets) saveCopy(`sheet.${sheet.id}.${sheet.version}`, sheet)
+    return sheets
   })
 }
 

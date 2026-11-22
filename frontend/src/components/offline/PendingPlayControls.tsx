@@ -42,7 +42,7 @@ function PendingPlayControls({ play, withDelete = false, onChanged }: Props) {
         <span className="pending-actions">
           {failed && <button type="button" className="secondary-button" onClick={() => { void retryQueued(clientId) }}>Retry</button>}
           {(failed || withDelete) && (
-            <button type="button" className="delete-play-button" onClick={() => setConfirming(true)}>
+            <button type="button" className="pending-link" onClick={() => setConfirming(true)}>
               {failed ? "Discard" : "Delete"}
             </button>
           )}
