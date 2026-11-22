@@ -79,6 +79,8 @@ export function authForm(page: Page) {
 }
 
 export async function logIn(page: Page, email = ONBOARDING_EMAIL, password = LOCAL_PASSWORD) {
+  // The suite signs in more often than one address may in a window, so each sign-in starts from cleared limits.
+  runLocalAccounts("reset-rate-limits")
   await page.goto("/login")
   await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible()
   const form = authForm(page)

@@ -213,7 +213,8 @@ for (const scheme of ["light", "dark"] as const) {
       await page.getByRole("button", { name: "Log a play" }).click()
       await expect(sheet(page).getByRole("button", { name: "Use scoresheet" })).toBeVisible()
       await sheet(page).getByRole("button", { name: "Cancel" }).click()
-      const state = { refuse: true }
+      // A route answers even while the context is offline, so the refusal starts only when the connection returns.
+      const state = { refuse: false }
       await page.route("**/plays", async (route) => {
         if (route.request().method() === "POST" && state.refuse) {
           await route.fulfill({ status: 400, contentType: "application/json", body: JSON.stringify({ detail: "That play can't be saved." }) })
@@ -224,6 +225,7 @@ for (const scheme of ["light", "dark"] as const) {
       await sheet(page).getByRole("button", { name: "Save play" }).click()
       await expect(sheet(page).getByText("Saved on this device")).toBeVisible()
       await sheet(page).getByRole("button", { name: "Done" }).click()
+      state.refuse = true
       await context.setOffline(false)
       await expect(page.getByText("1 play couldn't be saved")).toBeVisible()
       await expect(playWith(page, ana).getByText("Couldn't sync")).toBeVisible()
