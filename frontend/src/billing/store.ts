@@ -1,6 +1,7 @@
 import { Capacitor } from "@capacitor/core"
-import type { PurchasesPackage } from "@revenuecat/purchases-capacitor"
+import type { PurchasesPackage, PurchasesStoreProduct } from "@revenuecat/purchases-capacitor"
 
+import { TIP_PRODUCT_IDS } from "../tip-jar"
 import type { PlanOffer } from "./plans"
 
 // The App Store side of buying Pro, through RevenueCat. It only completes the
@@ -8,6 +9,9 @@ import type { PlanOffer } from "./plans"
 // after it checks the purchase with RevenueCat.
 
 export type PurchaseOutcome = "purchased" | "cancelled" | "pending"
+
+// A tip product from the store: its price as the store formats it, and the handle to buy it.
+export type StoreTip = { id: string; priceString: string; handle: unknown }
 
 export type ProStore = {
   // Signs the SDK in as this ShelfPick account. Restore only opens once this has succeeded.
@@ -18,6 +22,9 @@ export type ProStore = {
   // account first if it is not already, so neither can run against a previous account's identity.
   purchase: (plan: PlanOffer, appUserId: string) => Promise<PurchaseOutcome>
   restore: (appUserId: string) => Promise<void>
+  // Tip jar: one-time products that unlock nothing. Both sign the SDK in as the account first.
+  loadTipProducts: (ids: readonly string[], appUserId: string) => Promise<StoreTip[]>
+  purchaseTip: (tip: StoreTip, appUserId: string) => Promise<PurchaseOutcome>
   managementUrl: () => Promise<string | null>
 }
 
@@ -26,6 +33,8 @@ type Sdk = {
   logIn: (options: { appUserID: string }) => Promise<unknown>
   getOfferings: () => Promise<{ current: { lifetime: PurchasesPackage | null; annual: PurchasesPackage | null } | null }>
   purchasePackage: (options: { aPackage: PurchasesPackage }) => Promise<unknown>
+  getProducts: (options: { productIdentifiers: string[]; type?: "NON_SUBSCRIPTION" }) => Promise<{ products: PurchasesStoreProduct[] }>
+  purchaseStoreProduct: (options: { product: PurchasesStoreProduct }) => Promise<unknown>
   restorePurchases: () => Promise<unknown>
   getCustomerInfo: () => Promise<{ customerInfo: { managementURL: string | null } }>
   isConfigured: () => Promise<{ isConfigured: boolean }>
@@ -83,6 +92,18 @@ function userCancelled(error: unknown): boolean {
     || (typeof error === "object" && error !== null && (error as { userCancelled?: unknown }).userCancelled === true)
 }
 
+// Runs a store purchase and maps the SDK's cancel and pending codes. Anything else is an error.
+async function outcomeOf(purchase: () => Promise<unknown>): Promise<PurchaseOutcome> {
+  try {
+    await purchase()
+    return "purchased"
+  } catch (error) {
+    if (userCancelled(error)) return "cancelled"
+    if (errorCode(error) === PAYMENT_PENDING) return "pending"
+    throw error
+  }
+}
+
 export function createProStore({ apiKey, loadSdk, prepareTimeoutMs = PREPARE_TIMEOUT_MS }: Deps): ProStore {
   let configuredFor: string | null = null
   // Changing the SDK's identity and the calls that depend on it run one at a time, in order,
@@ -124,14 +145,24 @@ export function createProStore({ apiKey, loadSdk, prepareTimeoutMs = PREPARE_TIM
     purchase(plan, appUserId) {
       return inOrder(async () => {
         const sdk = await sdkFor(appUserId)
-        try {
-          await sdk.purchasePackage({ aPackage: plan.handle as PurchasesPackage })
-          return "purchased"
-        } catch (error) {
-          if (userCancelled(error)) return "cancelled"
-          if (errorCode(error) === PAYMENT_PENDING) return "pending"
-          throw error
-        }
+        return outcomeOf(() => sdk.purchasePackage({ aPackage: plan.handle as PurchasesPackage }))
+      })
+    },
+
+    loadTipProducts(ids, appUserId) {
+      return withTimeout(inOrder(async () => {
+        const sdk = await sdkFor(appUserId)
+        const { products } = await sdk.getProducts({ productIdentifiers: [...ids], type: "NON_SUBSCRIPTION" })
+        return products
+          .filter(product => ids.includes(product.identifier))
+          .map(product => ({ id: product.identifier, priceString: product.priceString, handle: product }))
+      }), prepareTimeoutMs)
+    },
+
+    purchaseTip(tip, appUserId) {
+      return inOrder(async () => {
+        const sdk = await sdkFor(appUserId)
+        return outcomeOf(() => sdk.purchaseStoreProduct({ product: tip.handle as PurchasesStoreProduct }))
       })
     },
 
@@ -161,6 +192,8 @@ export function sdkFromPlugin(plugin: Sdk): Sdk {
     logIn: options => plugin.logIn(options),
     getOfferings: () => plugin.getOfferings(),
     purchasePackage: options => plugin.purchasePackage(options),
+    getProducts: options => plugin.getProducts(options),
+    purchaseStoreProduct: options => plugin.purchaseStoreProduct(options),
     restorePurchases: () => plugin.restorePurchases(),
     getCustomerInfo: () => plugin.getCustomerInfo(),
     isConfigured: () => plugin.isConfigured(),
@@ -175,6 +208,12 @@ async function loadRevenueCat(): Promise<Sdk> {
 // Local development only: fixed prices so the paywall can be built and tested
 // in a browser. A "purchase" here still has to be confirmed by the server,
 // which only trusts RevenueCat, so it never unlocks Pro by itself.
+const DEV_TIP_PRICES: Record<(typeof TIP_PRODUCT_IDS)[number], string> = {
+  "com.plutonightlabs.shelfpick.tip.coffee": "£1.99",
+  "com.plutonightlabs.shelfpick.tip.pint": "£4.99",
+  "com.plutonightlabs.shelfpick.tip.gamenight": "£9.99",
+}
+
 const developmentStore: ProStore = {
   bind: async () => {},
   loadOffers: async () => [
@@ -183,6 +222,11 @@ const developmentStore: ProStore = {
   ],
   purchase: async () => "purchased",
   restore: async () => {},
+  // The tip prices are the only hard-coded ones; the real store returns its own localised strings.
+  loadTipProducts: async ids => TIP_PRODUCT_IDS
+    .filter(id => ids.includes(id))
+    .map(id => ({ id, priceString: DEV_TIP_PRICES[id], handle: null })),
+  purchaseTip: () => new Promise(resolve => setTimeout(() => resolve("purchased"), 600)),
   managementUrl: async () => null,
 }
 

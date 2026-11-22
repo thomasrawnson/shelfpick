@@ -20,6 +20,15 @@ logger = logging.getLogger(__name__)
 REVENUECAT_API_URL = "https://api.revenuecat.com/v1"
 REVENUECAT_TIMEOUT_SECONDS = 8.0
 
+# Tip jar products: one-time purchases that unlock nothing. They have no expiry, the same shape as Pro
+# Lifetime, so they are ignored by name. Keep in step with TIP_PRODUCTS in frontend/src/tip-jar.ts
+# (tests/test_billing_service.py fails if they differ).
+TIP_PRODUCT_IDS = frozenset({
+    "com.plutonightlabs.shelfpick.tip.coffee",
+    "com.plutonightlabs.shelfpick.tip.pint",
+    "com.plutonightlabs.shelfpick.tip.gamenight",
+})
+
 # Webhook events that mean "this purchase may have been reversed".
 REVERSAL_CANCEL_REASONS = frozenset({"CUSTOMER_SUPPORT"})
 
@@ -138,6 +147,9 @@ def verified_purchase_from_subscriber(
 
     product_id = str(entitlement.get("product_identifier") or "")
     if not product_id:
+        return None
+    # A tip never grants Pro, even if RevenueCat were misconfigured to attach one to the entitlement.
+    if product_id in TIP_PRODUCT_IDS:
         return None
 
     subscription = (subscriber.get("subscriptions") or {}).get(product_id)

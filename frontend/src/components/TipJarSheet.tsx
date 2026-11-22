@@ -1,6 +1,6 @@
 import { useEffect, useId, useState } from "react"
 
-import { purchaseTip, TIP_PRODUCTS, type PurchaseLayer, type TipProduct, type TipProductId } from "../tip-jar"
+import { purchaseTip, TIP_PRODUCT_IDS, type PurchaseLayer, type TipProduct, type TipProductId } from "../tip-jar"
 import SettingsIcon, { type SettingsIconName } from "./ui/SettingsIcon"
 import Sheet from "./ui/Sheet"
 
@@ -12,7 +12,11 @@ export type TipJarPhase =
   | { kind: "pending" }
   | { kind: "thanks"; count: number }
 
-const TIP_ICONS: Record<TipProductId, SettingsIconName> = { "tip.coffee": "coffee", "tip.pint": "pint", "tip.gamenight": "dice" }
+const TIP_ICONS: Record<TipProductId, SettingsIconName> = {
+  "com.plutonightlabs.shelfpick.tip.coffee": "coffee",
+  "com.plutonightlabs.shelfpick.tip.pint": "pint",
+  "com.plutonightlabs.shelfpick.tip.gamenight": "dice",
+}
 
 export function TipJarContent({ phase, products, onBuy, onRetry }: {
   phase: TipJarPhase
@@ -67,7 +71,7 @@ function TipJarSheet({ layer, onClose, onTipped }: {
 
   useEffect(() => {
     let active = true
-    layer.loadProducts(TIP_PRODUCTS.map((product) => product.id)).then((loaded) => {
+    layer.loadProducts(TIP_PRODUCT_IDS).then((loaded) => {
       if (!active) return
       setProducts(loaded)
       setPhase(loaded.length ? { kind: "ready" } : { kind: "load-failed" })

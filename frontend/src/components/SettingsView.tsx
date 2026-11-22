@@ -11,7 +11,8 @@ import { APP_PATHS } from "../routes"
 import { rememberSettingsEntry, takeRememberedSettingsEntry } from "../settings-focus"
 import { pickerDefaultsSummary } from "../settings-summary"
 import { getThemePreference, setThemePreference, type ThemePreference } from "../theme"
-import { purchaseLayer as defaultPurchaseLayer, tipCount, type PurchaseLayer } from "../tip-jar"
+import { tipCount, type PurchaseLayer } from "../tip-jar"
+import { useTipLayer } from "../use-tip-layer"
 import FeedbackSheet from "./FeedbackSheet"
 import TipJarSheet from "./TipJarSheet"
 import BggAttribution from "./ui/BggAttribution"
@@ -68,11 +69,13 @@ function ThemeRow() {
 
 type Props = {
   user: AuthUser
-  // Tests pass a stand-in; release builds have none until StoreKit lands.
+  // Tests pass a stand-in (or null for "nothing to buy"); the app uses the RevenueCat layer for this account.
   purchases?: PurchaseLayer | null
 }
 
-function SettingsView({ user, purchases = defaultPurchaseLayer }: Props) {
+function SettingsView({ user, purchases: injected }: Props) {
+  const detected = useTipLayer(user.id)
+  const purchases = injected === undefined ? detected : injected
   const location = useLocation()
   const [tips, setTips] = useState(tipCount)
   const [sheet, setSheet] = useState<"tips" | FeedbackType | null>(null)

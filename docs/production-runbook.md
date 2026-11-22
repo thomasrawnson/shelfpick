@@ -424,6 +424,23 @@ Owner setup, in this order (the repository cannot do any of it):
    Authorization header value to a long random string, and send both
    sandbox and production events.
 
+#### Tip jar products (SP-SETTINGS-01b)
+
+The Tip jar sells three **consumable** products through the same RevenueCat project:
+`com.plutonightlabs.shelfpick.tip.coffee`, `.tip.pint` and `.tip.gamenight`.
+Owner setup: create them in App Store Connect (consumable, price, localisation,
+review screenshot), add them in RevenueCat as products, and **do not attach them
+to the `pro` entitlement or to any offering the app reads** (the app fetches them
+by ID). The server ignores these IDs in `/billing/sync` and the webhook, so a tip
+can never grant Pro even if one is attached to the entitlement by mistake
+(`TIP_PRODUCT_IDS` in `backend/services/billing_service.py`, matched to
+`TIP_PRODUCTS` in `frontend/src/tip-jar.ts` by a test). Nothing is stored on
+the server for a tip, and the tip count stays on the device. The row shows only
+in builds with `VITE_PURCHASES_ENABLED=true` and a native store, after the tips
+load; with purchases off, or on the PWA, it is hidden. Verify with a sandbox
+purchase on a TestFlight build: thank-you screen, Supporter badge, and the
+account still Free.
+
 Environment (Render dashboard, API service; all secrets):
 
 | Variable | Value |

@@ -6,6 +6,7 @@ import pytest
 
 from database.models import PurchaseEntitlement
 from services.billing_service import (
+    TIP_PRODUCT_IDS,
     RevenueCatClient,
     RevenueCatUnavailableError,
     verified_purchase_from_subscriber,
@@ -353,3 +354,67 @@ def test_a_network_failure_on_delete_is_reported(monkeypatch):
 
     with pytest.raises(RevenueCatUnavailableError):
         RevenueCatClient("sk").delete_customer("abc")
+
+
+# --- Tips never grant Pro ---------------------------------------------------------
+
+TIP_COFFEE = "com.plutonightlabs.shelfpick.tip.coffee"
+
+
+def test_tip_product_ids_match_the_app():
+    import re
+    from pathlib import Path
+
+    source = (Path(__file__).resolve().parents[2] / "frontend/src/tip-jar.ts").read_text()
+    app_ids = set(re.findall(r'id: "(com\.plutonightlabs\.shelfpick\.tip\.[a-z]+)"', source))
+    assert app_ids == set(TIP_PRODUCT_IDS) and len(app_ids) == 3
+
+
+@pytest.mark.parametrize("product", sorted(TIP_PRODUCT_IDS))
+def test_a_tip_attached_to_the_entitlement_is_ignored_despite_having_no_expiry(product):
+    # Same shape as Pro Lifetime: a one-time product with an explicit null expiry.
+    assert verified_purchase_from_subscriber(
+        subscriber(
+            entitlement_with(product, None),
+            non_subscriptions={product: [{"store": "app_store", "is_sandbox": False}]},
+        ),
+        "pro",
+    ) is None
+
+
+def test_an_unreadable_tip_expiry_is_ignored_not_an_unavailable_check():
+    assert verified_purchase_from_subscriber(
+        subscriber(entitlement_with(TIP_COFFEE, "garbage")), "pro",
+    ) is None
+
+
+def test_tips_alongside_a_real_pro_purchase_leave_the_pro_result_unchanged():
+    expiry = NOW + timedelta(days=30)
+    with_tips = verified_purchase_from_subscriber(
+        subscriber(
+            entitlement_with(YEARLY_PRODUCT, iso(expiry)),
+            subscriptions={YEARLY_PRODUCT: {"store": "app_store"}},
+            non_subscriptions={product: [{"store": "app_store"}] for product in TIP_PRODUCT_IDS},
+        ),
+        "pro",
+    )
+    without = verified_purchase_from_subscriber(
+        subscriber(
+            entitlement_with(YEARLY_PRODUCT, iso(expiry)),
+            subscriptions={YEARLY_PRODUCT: {"store": "app_store"}},
+        ),
+        "pro",
+    )
+    assert with_tips == without and with_tips.plan == "YEARLY"
+
+    lifetime = verified_purchase_from_subscriber(
+        subscriber(
+            entitlement_with(LIFETIME_PRODUCT, None),
+            non_subscriptions={
+                LIFETIME_PRODUCT: [{"store": "app_store"}],
+                TIP_COFFEE: [{"store": "app_store"}, {"store": "app_store"}],
+            },
+        ),
+        "pro",
+    )
+    assert lifetime.plan == "LIFETIME" and lifetime.product_id == LIFETIME_PRODUCT

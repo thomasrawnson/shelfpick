@@ -504,6 +504,97 @@ def test_malformed_expiry_never_becomes_a_lifetime_grant(billing_api):
     assert api.pro_gate_open() is False
 
 
+TIP_PRODUCTS = [
+    "com.plutonightlabs.shelfpick.tip.coffee",
+    "com.plutonightlabs.shelfpick.tip.pint",
+    "com.plutonightlabs.shelfpick.tip.gamenight",
+]
+
+
+def tips_only(api, me, *, on_entitlement=None):
+    """RevenueCat's record for someone who has only bought tips (twice each)."""
+    api.revenuecat.subscribers[me] = {
+        "entitlements": {} if on_entitlement is None else {"pro": {
+            "product_identifier": on_entitlement, "expires_date": None,
+        }},
+        "non_subscriptions": {
+            product: [{"store": "app_store", "is_sandbox": False}] * 2
+            for product in TIP_PRODUCTS
+        },
+    }
+
+
+def test_sync_with_only_tips_grants_nothing(billing_api):
+    api = billing_api
+    me = api.app_user_id(1)
+    tips_only(api, me)
+
+    body = sync(api).json()
+
+    assert body["pro"] is False and body["plan"] is None
+    assert api.entitlement(1) is None
+    assert api.pro_gate_open() is False
+
+
+@pytest.mark.parametrize("product", TIP_PRODUCTS)
+def test_a_tip_wrongly_attached_to_the_pro_entitlement_still_grants_nothing(billing_api, product):
+    api = billing_api
+    me = api.app_user_id(1)
+    tips_only(api, me, on_entitlement=product)
+
+    assert sync(api).json()["pro"] is False
+    assert api.entitlement(1) is None
+    assert api.pro_gate_open() is False
+
+
+@pytest.mark.parametrize("product", TIP_PRODUCTS)
+def test_a_tip_webhook_is_ignored_without_a_lookup(billing_api, product):
+    api = billing_api
+    me = api.app_user_id(1)
+    tips_only(api, me, on_entitlement=product)
+
+    response = api.webhook({"type": "NON_RENEWING_PURCHASE", "app_user_id": me, "product_id": product})
+
+    assert response.status_code == 200 and response.json() == {"ok": True, "checked": 0}
+    assert api.revenuecat.lookups == []
+    assert api.entitlement(1) is None
+    # A tip refund is just as inert.
+    api.webhook({"type": "CANCELLATION", "cancel_reason": "CUSTOMER_SUPPORT", "app_user_id": me, "product_id": product})
+    assert api.revenuecat.lookups == []
+
+
+def test_tips_alongside_a_real_pro_purchase_leave_pro_unchanged(billing_api):
+    api = billing_api
+    me = api.app_user_id(1)
+    api.revenuecat.lifetime(me)
+    assert sync(api).json()["plan"] == "LIFETIME"
+    before = api.entitlement(1)
+    expected = (before.status, before.plan, before.product_id, before.expires_at)
+
+    # The person then buys tips: the subscriber record gains them, the entitlement is unchanged.
+    for product in TIP_PRODUCTS:
+        api.revenuecat.subscribers[me]["non_subscriptions"][product] = [{"store": "app_store", "is_sandbox": True}]
+    tip_event = {"type": "NON_RENEWING_PURCHASE", "app_user_id": me, "product_id": TIP_PRODUCTS[0]}
+    assert api.webhook(tip_event).json() == {"ok": True, "checked": 0}
+    body = sync(api).json()
+
+    after = api.entitlement(1)
+    assert (after.status, after.plan, after.product_id, after.expires_at) == expected
+    assert body["pro"] is True and body["plan"] == "LIFETIME"
+    assert api.pro_gate_open() is True
+
+
+def test_a_pro_webhook_still_triggers_its_lookup(billing_api):
+    api = billing_api
+    me = api.app_user_id(1)
+    api.revenuecat.lifetime(me)
+
+    response = api.webhook({"type": "NON_RENEWING_PURCHASE", "app_user_id": me, "product_id": LIFETIME})
+
+    assert response.json() == {"ok": True, "checked": 1}
+    assert api.entitlement(1).plan == "LIFETIME"
+
+
 def test_manual_pro_grant_keeps_working_and_is_never_overwritten(billing_api):
     api = billing_api
     api.current["id"] = 3

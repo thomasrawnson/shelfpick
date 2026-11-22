@@ -42,7 +42,7 @@ Runtime packages from `frontend/package.json` that ship in the web and iOS build
 | Year in Review banner dismissal (one flag per year) | Device only (local storage) | Stop showing the Pick banner after it is dismissed | Until app data is cleared |
 | In-app feedback: type, message, "email me back" choice; optionally app version, build, OS version and device type (only when "Include app and device info" is on) | Our server (`feedback` table, linked to the account) and emailed to hello@plutonightlabs.com through Resend. The account email is included in that email only when the user asks for a reply | Feature ideas and problem reports (SP-SETTINGS-01) | Until account deletion (rows are deleted with the account); the inbox copy follows the mailbox's own retention. Owner to confirm a retention period |
 | Feedback written while offline | Device only (local storage outbox, per account) until it is sent | Avoid losing a message with no connection | Removed once sent, or when the account is deleted on this device |
-| Tip count (Supporter badge) | Device only (local storage) | Thank users who tipped | Until app data is cleared. The tip jar is hidden in release builds until a StoreKit purchase layer exists |
+| Tip count (Supporter badge) | Device only (local storage) | Thank users who tipped | Until app data is cleared. The count is never sent to our server and does not sync between devices. A tip itself is a one-time App Store purchase processed by Apple and RevenueCat (see Purchase History) and unlocks nothing |
 | Shelf layout choice (grid or list) | Device only (local storage) | Remember how the Shelf is shown | Until app data is cleared |
 | One-time verification/reset token hashes, keyed-hash abuse counters, request IDs, server logs | Our server | Security and operations | Render logs 7 days; abuse rows removed on a later write after 24 hours; expired tokens have no scheduled cleanup (per SP-IOS-21B) |
 | Email address and message for verification/reset mail | Resend (processor) | Transactional email | Resend log retention 30 days (per SP-IOS-21B); confirm |
@@ -79,7 +79,7 @@ The owner enters these; this repository cannot read them.
 3. **App Store Connect answers** need checking against the guest data above before the build that enables phone voting ships.
 4. **App-level privacy manifest** was added on 2026-11-17 and is not yet in a released build; confirm it matches the App Store Connect answers.
 5. **Feedback (SP-SETTINGS-01).** The feedback message is user content linked to the account, and device details are optional. The App Store Connect answers and `PrivacyInfo.xcprivacy` already declare Other User Content (linked, App Functionality); the owner should confirm that covers feedback and decide whether optional device details need declaring. Add feedback to the hosted privacy policy before the build that ships it.
-6. **Tip jar.** Still hidden in release builds. Purchase History is now declared for Pro (SP-PRO-01); tips would use the same type.
+6. **Tip jar (SP-SETTINGS-01b).** Three consumable tips go through the same RevenueCat SDK and the same random account ID as Pro, in builds that sell. Purchase History already covers them (declared for Pro); no new data type, SDK or processor. Our server ignores tip products and stores nothing about them; the tip count stays on the device. Add tips to the hosted privacy policy and Terms with the Pro changes.
 8. **RevenueCat (SP-PRO-01).** New processor. Add it, the purchase data above and the account ID to the hosted privacy policy, record the processing agreement and data location. Account deletion now erases the RevenueCat customer through its API with the existing version 1 secret key (no permission setting exists for it); confirm with a sandbox account deletion that the customer disappears from the RevenueCat dashboard. Required before the build that sells Pro ships.
 7. This repository's `privacy-check.sh` reads only a root `package.json`; ShelfPick's dependencies are in `frontend/package.json`, so the dependency table above is maintained by hand.
 
@@ -87,6 +87,7 @@ The owner enters these; this repository cannot read them.
 
 | Date | Change | By |
 |------|--------|----|
+| 2026-11-22 | Tip jar goes live through the existing RevenueCat layer; count stays on the device (SP-SETTINGS-01b) | Claude Code, for owner review |
 | 2026-11-18 | In-app feedback (server table, Resend notification, offline outbox) and device-only tip count added (SP-SETTINGS-01) | Claude Code, for owner review |
 | 2026-11-17 | App privacy manifest added; manifest section updated | Claude Code, for owner review |
 | 2026-11-17 | Initial privacy inventory (SP-POLISH-02), including SP-UNLOCK-01 additions: guest nicknames and ballots, haptics and in-app review plugins | Claude Code, for owner review |

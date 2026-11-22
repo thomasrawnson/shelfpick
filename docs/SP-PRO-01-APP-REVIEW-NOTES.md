@@ -21,6 +21,14 @@ Paste, then replace the two bracketed lines with a real reviewer account. Delete
 >
 > Pro unlocks: deeper play statistics (records, head-to-head, filters), Help my H-index in the Picker, custom scoresheets, For You suggestions and the live game timer.
 
+### 1b. Added for the Tip jar build (SP-SETTINGS-01b)
+
+Add this paragraph to the same Notes field when the build with the Tip jar is submitted:
+
+> Settings > Support ShelfPick > Tip jar offers three optional one-time tips (Coffee, Pint, Game night) as consumable in-app purchases, with the price from the App Store. A tip unlocks nothing and is separate from ShelfPick Pro; the account stays on its current plan. The row appears once the tips have loaded from the App Store. To test: open Settings > Tip jar, choose a tip and confirm with a sandbox Apple Account; a thank-you screen and a "Supporter" badge appear on this device. The tip count is stored only on the device.
+
+Also: each tip needs its own review screenshot in App Store Connect (the Tip jar sheet), and the tips are submitted with the version like the Pro products.
+
 ## 2. App Store Connect checklist (owner)
 
 1. **In-App Purchases.** Confirm both products exist and are "Ready to Submit": `com.plutonightlabs.shelfpick.pro.yearly` (auto-renewing subscription, 1 year) and `com.plutonightlabs.shelfpick.pro.lifetime` (one-time purchase, check the type in App Store Connect). For each: display name, description, price, availability, and the **review screenshot** (a screenshot of the Pro page showing both plans is enough).

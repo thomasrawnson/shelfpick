@@ -64,6 +64,19 @@ Not tested: a real sandbox purchase (needs the RevenueCat project, keys and an
 App Store sandbox tester). Evidence, owner gates and rollback:
 `docs/SP-PRO-01-REPORT.md`.
 
+### SP-SETTINGS-01b Tip jar goes live — LOCAL CANDIDATE, 22 November 2026
+
+Branch `sp-settings-01b` from `origin/main` 506de60 (SP-HOTFIX-01 merged); draft
+PR for owner review, not merged, deployed or submitted. The Settings Tip jar now
+sells three consumable tips (`com.plutonightlabs.shelfpick.tip.coffee`, `.pint`,
+`.gamenight`) through the existing RevenueCat layer: the sheet shows the store's
+localised prices, purchases run for the signed-in account only, and the row shows
+when purchases are on, a native store exists and the tips have loaded. Tips unlock
+nothing: the server ignores tip product IDs in `/billing/sync` and the webhook.
+The count and Supporter badge stay on the device. iOS build number is 24. Not
+tested: a real sandbox tip (needs the three products in App Store Connect and
+RevenueCat). Evidence and owner gates: `docs/SP-SETTINGS-01b-REPORT.md`.
+
 ### SP-STATS-01 Stats 2.0 — LOCAL CANDIDATE, 18 November 2026
 
 Branch `sp-stats-01` from `origin/main` 601dea0 (SP-PLAY-01 and SP-SCORE-01
