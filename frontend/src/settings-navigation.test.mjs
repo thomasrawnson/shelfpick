@@ -196,7 +196,10 @@ test("Help links to Pluto Night Labs with an accessible new-tab indication", () 
   assert.match(markup, /src="\/branding\/powered-by-bgg-rgb\.svg"/)
   assert.match(markup, /href="https:\/\/boardgamegeek\.com\/"/)
   assert.match(markup, /alt="Powered by BoardGameGeek"/)
-  assert.doesNotMatch(markup, /shelfpick\/privacy|shelfpick\/terms|Privacy Policy draft/)
+  // The approved public pages show in every build; only the unapproved drafts stay out.
+  assert.match(markup, /href="https:\/\/plutonightlabs\.com\/shelfpick\/privacy\/"/)
+  assert.match(markup, /href="https:\/\/plutonightlabs\.com\/shelfpick\/terms\/"/)
+  assert.doesNotMatch(markup, /Privacy Policy draft|Terms of Use draft/)
 })
 
 test("Help exposes support contact without publishing legal drafts", () => {

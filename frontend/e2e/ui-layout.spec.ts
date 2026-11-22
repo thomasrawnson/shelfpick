@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test"
 
-import { logIn } from "./support"
+import { logIn, ANALYTICS_ANSWERED } from "./support"
 import { avatarCollisions, mockDiscover, mockShelf } from "./ui-fixtures"
 
 // SP-UI-02 shared layout: the avatar never meets a control, and each tab's
@@ -11,7 +11,7 @@ test.use({ storageState: AUTH_STATE })
 
 test.beforeAll(async ({ browser }, testInfo) => {
   if (testInfo.project.name !== "iPhone 15") return
-  const context = await browser.newContext({ storageState: undefined })
+  const context = await browser.newContext({ storageState: ANALYTICS_ANSWERED })
   const page = await context.newPage()
   await logIn(page, "local-free@shelfpick.app")
   await expect(page).toHaveURL(/\/tonight/)

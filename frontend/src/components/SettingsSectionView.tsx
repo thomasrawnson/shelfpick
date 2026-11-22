@@ -11,7 +11,7 @@ import BggAttribution from "./ui/BggAttribution"
 import { deleteAccount } from "../api/client"
 import { APP_VERSION, SOCIAL_LINKS } from "../app-links"
 import { LEGAL_DRAFTS_ENABLED } from "../legal-drafts"
-import { PUBLIC_LEGAL_LINKS_ENABLED, PRIVACY_POLICY_URL, TERMS_URL, SUPPORT_EMAIL_URL } from "../public-legal-links"
+import { PRIVACY_POLICY_URL, TERMS_URL, SUPPORT_EMAIL_URL } from "../public-legal-links"
 import { deleteAccountAndClearSession } from "../account-deletion-session"
 
 type Section = "profile" | "preferences" | "collection-data" | "import" | "whats-new" | "help"
@@ -150,16 +150,16 @@ function SettingsSectionView({ section, user, onUserChange, onAccountDeleted, on
       <p>A calm way to choose from your collection and keep track of what reaches the table.</p>
       <p className="settings-row-detail">Version {APP_VERSION} · Made by Pluto Night Labs</p>
       <AnalyticsSetting />
-      <p className="settings-row-detail">Anonymous counts of which features are used help improve ShelfPick. No account details, search text or notes are included.</p>
+      <p className="settings-row-detail">Off unless you choose to share. Anonymous counts of which features are used help improve ShelfPick. No account details, search text or notes are included. Turning this off stops anything more being sent.</p>
       <BggAttribution />
       {LEGAL_DRAFTS_ENABLED && <nav className="settings-legal-links" aria-label="Draft legal documents">
         <Link to={APP_PATHS.privacyDraft}>Privacy Policy draft</Link>
         <Link to={APP_PATHS.termsDraft}>Terms of Use draft</Link>
       </nav>}
-      {PUBLIC_LEGAL_LINKS_ENABLED && <nav className="settings-legal-links" aria-label="Legal information">
+      <nav className="settings-legal-links" aria-label="Legal information">
         <a href={PRIVACY_POLICY_URL} target="_blank" rel="noopener noreferrer">Privacy Policy<span className="sr-only"> (opens in a new tab)</span></a>
         <a href={TERMS_URL} target="_blank" rel="noopener noreferrer">Terms of Use<span className="sr-only"> (opens in a new tab)</span></a>
-      </nav>}
+      </nav>
       <a className="secondary-button settings-section-action" href={SOCIAL_LINKS.website.url}
         target="_blank" rel="noopener noreferrer">
         Pluto Night Labs<span className="sr-only"> (opens in a new tab)</span>

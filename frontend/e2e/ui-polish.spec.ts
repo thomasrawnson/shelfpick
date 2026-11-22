@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from "@playwright/test"
 
-import { logIn } from "./support"
+import { logIn, ANALYTICS_ANSWERED } from "./support"
 import { GAMES, avatarCollisions, mockShelf } from "./ui-fixtures"
 
 // SP-UI-02: compact Log play sheet and Tonight's pick at 390x844, light and dark.
@@ -10,7 +10,7 @@ test.use({ storageState: AUTH_STATE })
 
 test.beforeAll(async ({ browser }, testInfo) => {
   if (testInfo.project.name !== "iPhone 15") return
-  const context = await browser.newContext({ storageState: undefined })
+  const context = await browser.newContext({ storageState: ANALYTICS_ANSWERED })
   const page = await context.newPage()
   await logIn(page, "local-free@shelfpick.app")
   await expect(page).toHaveURL(/\/tonight/)

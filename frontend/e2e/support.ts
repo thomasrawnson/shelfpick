@@ -16,6 +16,13 @@ export const WEB_PORT = process.env.E2E_WEB_PORT ?? "5173"
 export const API_ORIGIN = `http://127.0.0.1:${API_PORT}`
 export const WEB_ORIGIN = `http://127.0.0.1:${WEB_PORT}`
 
+// A recorded answer to the first-launch analytics choice, so its sheet does not cover the screen under test.
+// Specs that exercise the choice itself start from { cookies: [], origins: [] } instead.
+export const ANALYTICS_ANSWERED = {
+  cookies: [],
+  origins: [{ origin: WEB_ORIGIN, localStorage: [{ name: "shelfpick.analytics.enabled", value: "off" }] }],
+}
+
 // Local-only fixture credentials, documented in docs/local-free-pro-testing.md.
 export const ONBOARDING_EMAIL = "local-onboarding@shelfpick.app"
 export const LOCAL_PASSWORD = process.env.SHELFPICK_LOCAL_TEST_PASSWORD ?? "ShelfPickLocal123!"

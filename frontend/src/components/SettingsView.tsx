@@ -6,7 +6,7 @@ import { Analytics } from "../analytics"
 import { APP_BUILD, APP_VERSION, CONTACT_URL, REVIEW_URL, SOCIAL_LINKS } from "../app-links"
 import { lastBggSync, relativeSyncTime } from "../bgg-sync-time"
 import type { FeedbackType } from "../feedback"
-import { PRIVACY_POLICY_URL, PUBLIC_LEGAL_LINKS_ENABLED } from "../public-legal-links"
+import { PRIVACY_POLICY_URL } from "../public-legal-links"
 import { APP_PATHS } from "../routes"
 import { rememberSettingsEntry, takeRememberedSettingsEntry } from "../settings-focus"
 import { pickerDefaultsSummary } from "../settings-summary"
@@ -222,7 +222,7 @@ function SettingsView({ user, purchases = defaultPurchaseLayer }: Props) {
     <SettingsGroup title="About">
       {linkRow({ id: "help", label: "Help", icon: "help", tint: "blue", to: APP_PATHS.settingsHelp })}
       {externalRow({ id: "contact", label: "Contact", icon: "mail", tint: "blue", href: CONTACT_URL, value: "Email us", opensIn: "opens your email app" })}
-      {PUBLIC_LEGAL_LINKS_ENABLED && externalRow({ id: "privacy", label: "Privacy policy", icon: "shield", tint: "neutral", href: PRIVACY_POLICY_URL })}
+      {externalRow({ id: "privacy", label: "Privacy policy", icon: "shield", tint: "neutral", href: PRIVACY_POLICY_URL })}
     </SettingsGroup>
 
     <footer className="settings-footer">

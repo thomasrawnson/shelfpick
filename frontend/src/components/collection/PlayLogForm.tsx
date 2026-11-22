@@ -211,6 +211,10 @@ function PlayLogForm({
   const [sheets, setSheets] = useState<Scoresheet[]>([])
   const [sheet, setSheet] = useState<Scoresheet | null>(null)
   const [sheetLoading, setSheetLoading] = useState(editingSheetId !== null)
+  const [sheetAttempt, setSheetAttempt] = useState(0)
+  // An edited play stays pinned to its saved scoresheet unless the person converts it to plain scores.
+  const [converted, setConverted] = useState(false)
+  const [confirmingConvert, setConfirmingConvert] = useState(false)
   const [chosenSheetId, setChosenSheetId] = useState<number | null>(null)
   const [breakdowns, setBreakdowns] = useState<Breakdown[]>(() => (
     editingSheetId !== null && editingPlay
@@ -268,14 +272,18 @@ function PlayLogForm({
 
   useEffect(() => {
     if (editingSheetId === null) return
+    let cancelled = false
     getScoresheet(editingSheetId, editingPlay?.scoresheet_version)
-      .then(setSheet)
-      .catch((err) => {
-        console.error(err)
-        setError("Couldn't load this play's scoresheet.")
-      })
-      .finally(() => setSheetLoading(false))
-  }, [editingSheetId, editingPlay?.scoresheet_version])
+      .then((loaded) => { if (!cancelled) setSheet(loaded) })
+      .catch((err) => console.error(err))
+      .finally(() => { if (!cancelled) setSheetLoading(false) })
+    return () => { cancelled = true }
+  }, [editingSheetId, editingPlay?.scoresheet_version, sheetAttempt])
+
+  // The saved scoresheet could not be loaded. Saving then would send plain scores and detach the play
+  // from its sheet, so Save stays off until it loads or the person converts the play to plain scores.
+  const pinnedUnavailable = editingSheetId !== null && !converted && sheet === null && !sheetLoading
+  const saveBlocked = sheetLoading || pinnedUnavailable
 
   const schema = sheet?.schema ?? null
   const cooperativeSheet = schema?.win_condition === "cooperative"
@@ -390,6 +398,33 @@ function PlayLogForm({
     setError("")
   }
 
+  function retrySheet() {
+    setError("")
+    setConfirmingConvert(false)
+    setSheetLoading(true)
+    setSheetAttempt((attempt) => attempt + 1)
+  }
+
+  // Detaching a saved play from its scoresheet loses the breakdown, so it needs an explicit confirmation.
+  function convertToPlainScores() {
+    if (sheet) switchToPlainScores()
+    setConverted(true)
+    setConfirmingConvert(false)
+  }
+
+  const convertPrompt = confirmingConvert && (
+    <div className="scoresheet-convert" role="group" aria-label="Convert to plain scores">
+      <p className="scoresheet-meta">
+        Convert this play to plain scores? Each player keeps their total, but the round-by-round breakdown and the link to
+        this scoresheet are removed when you save.
+      </p>
+      <div className="scoresheet-picker">
+        <button type="button" className="secondary-button" onClick={convertToPlainScores}>Convert to plain scores</button>
+        <button type="button" className="sheet-text-button" onClick={() => setConfirmingConvert(false)}>Keep scoresheet</button>
+      </div>
+    </div>
+  )
+
   function updateBreakdown(column: number, breakdown: Breakdown) {
     if (cooperativeSheet) setTeamBreakdown(breakdown)
     else setBreakdowns((current) => players.map((_, index) => (index === column ? breakdown : current[index] ?? {})))
@@ -423,7 +458,7 @@ function PlayLogForm({
 
   async function savePlay() {
     if (savePending.current) return
-    if (sheetLoading) return
+    if (saveBlocked) return
     const drafts = competitive || schema ? shown : players
     const names = drafts.map((player) => player.name.trim())
     if (drafts.length === 0) {
@@ -616,7 +651,7 @@ function PlayLogForm({
               type="submit"
               form={formId}
               className="sheet-save-button"
-              disabled={saving}
+              disabled={saving || saveBlocked}
               aria-busy={saving}
               aria-label={isEditing ? "Save changes" : "Save play"}
             >
@@ -869,8 +904,11 @@ function PlayLogForm({
                 {sheet.kind === "custom" && canBuildSheets && sheet.version === sheet.current_version && (
                   <button type="button" className="sheet-text-button" onClick={() => setBuilder({ editing: sheet })}>Edit sheet</button>
                 )}
-                <button type="button" className="sheet-text-button" onClick={switchToPlainScores}>Plain scores</button>
+                {editingSheetId !== null
+                  ? <button type="button" className="sheet-text-button" onClick={() => setConfirmingConvert(true)}>Convert to plain scores</button>
+                  : <button type="button" className="sheet-text-button" onClick={switchToPlainScores}>Plain scores</button>}
               </div>
+              {convertPrompt}
               {sheet.version < sheet.current_version && (
                 <p className="scoresheet-meta">Logged on version {sheet.version} of this sheet. Newer plays use version {sheet.current_version}.</p>
               )}
@@ -900,6 +938,17 @@ function PlayLogForm({
             </section>
           ) : sheetLoading ? (
             <p className="scoresheet-meta" role="status">Loading scoresheet…</p>
+          ) : pinnedUnavailable ? (
+            <section className="scoresheet-section" aria-label="Scoresheet unavailable">
+              <p className="error-message" role="alert">
+                Couldn’t load this play’s scoresheet. Saving is paused so its scores and breakdown aren’t lost.
+              </p>
+              <div className="scoresheet-picker">
+                <button type="button" className="secondary-button" onClick={retrySheet}>Retry</button>
+                <button type="button" className="sheet-text-button" onClick={() => setConfirmingConvert(true)}>Convert to plain scores</button>
+              </div>
+              {convertPrompt}
+            </section>
           ) : (sheets.length > 0 || canBuildSheets) && (
             <div className="scoresheet-picker">
               {sheets.length > 1 && (

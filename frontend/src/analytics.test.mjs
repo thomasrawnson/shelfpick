@@ -13,34 +13,92 @@ before(async () => {
 })
 after(async () => { await server?.close() })
 
-function harness(initial = {}) {
+function harness(initial = {}, { unreadable = false, unwritable = false } = {}) {
   const store = new Map(Object.entries(initial))
   const calls = []
   const sdk = {
-    init: opts => calls.push(["init", opts.startOptedOut]),
+    init: () => calls.push(["init"]),
     capture: (name, properties) => calls.push(["capture", name, properties]),
     optIn: () => calls.push(["optIn"]),
     optOut: () => calls.push(["optOut"]),
   }
   const analytics = core.createAnalytics({
     sdk,
-    storage: { getItem: k => store.get(k) ?? null, setItem: (k, v) => store.set(k, v) },
+    storage: {
+      getItem: k => { if (unreadable) throw new Error("storage unreadable"); return store.get(k) ?? null },
+      setItem: (k, v) => { if (unwritable) throw new Error("storage unwritable"); store.set(k, v) },
+    },
     appVersion: "abc1234",
     common: { environment: "dev", platform: "web" },
   })
   return { analytics, calls, store }
 }
 const captured = calls => calls.filter(c => c[0] === "capture")
+const optedIn = () => ({ "shelfpick.analytics.enabled": "on" })
 
-test("with analytics switched off the wrapper sends nothing and the SDK starts opted out", () => {
-  const { analytics, calls } = harness({ [core.ANALYTICS_PREF_KEY]: "off" })
+test("a fresh install loads no SDK and sends nothing until the user chooses", () => {
+  const { analytics, calls } = harness()
   analytics.start()
-  analytics.track("picker_completed", { source: "pick", player_count: 3, time_band: "any", result_count: 2 })
-  assert.deepEqual(calls, [["init", true]])
+  analytics.track("discover_opened", { tab: "hot" })
+  assert.deepEqual(calls, [])
+  assert.equal(analytics.isEnabled(), false)
+  assert.equal(analytics.hasChoice(), false)
 })
 
-test("turning the toggle off opts the SDK out, persists, and silences every later event", () => {
+test("an unreadable preference means off: no SDK, no events", () => {
+  const { analytics, calls } = harness(optedIn(), { unreadable: true })
+  analytics.start()
+  analytics.track("discover_opened", { tab: "hot" })
+  assert.deepEqual(calls, [])
+  assert.equal(analytics.isEnabled(), false)
+  assert.equal(analytics.hasChoice(), false)
+})
+
+test("an unrecognised stored value is not consent", () => {
+  const { analytics, calls } = harness({ [core.ANALYTICS_PREF_KEY]: "yes" })
+  analytics.start()
+  assert.deepEqual(calls, [])
+  assert.equal(analytics.hasChoice(), false)
+})
+
+test("choosing Not now stores the answer, starts nothing and is not asked again", () => {
   const { analytics, calls, store } = harness()
+  analytics.setEnabled(false)
+  analytics.start()
+  analytics.track("picker_completed", { source: "pick", player_count: 3, time_band: "any", result_count: 2 })
+  assert.deepEqual(calls, [])
+  assert.equal(store.get(core.ANALYTICS_PREF_KEY), "off")
+  assert.equal(analytics.hasChoice(), true)
+})
+
+test("accepting stores the choice, starts the SDK and records the first launch", () => {
+  const { analytics, calls, store } = harness()
+  analytics.start()
+  assert.deepEqual(calls, [])
+  analytics.setEnabled(true)
+  assert.equal(store.get(core.ANALYTICS_PREF_KEY), "on")
+  assert.deepEqual(calls[0], ["init"])
+  assert.deepEqual(captured(calls).map(c => c[1]), ["app_installed", "app_opened", "settings_changed"])
+  analytics.track("discover_opened", { tab: "hot" })
+  assert.deepEqual(captured(calls).at(-1), ["capture", "discover_opened", { tab: "hot" }])
+})
+
+test("an opt-in that cannot be stored starts nothing", () => {
+  const { analytics, calls } = harness({}, { unwritable: true })
+  analytics.setEnabled(true)
+  analytics.track("discover_opened", { tab: "hot" })
+  assert.deepEqual(calls, [])
+})
+
+test("a stored opt-in starts the SDK at launch", () => {
+  const { analytics, calls } = harness(optedIn())
+  analytics.start()
+  assert.deepEqual(calls[0], ["init"])
+  assert.equal(captured(calls).length, 2)
+})
+
+test("withdrawing opts the SDK out, persists, and silences every later event", () => {
+  const { analytics, calls, store } = harness(optedIn())
   analytics.start()
   const before = captured(calls).length
   analytics.setEnabled(false)
@@ -55,19 +113,19 @@ test("turning the toggle off opts the SDK out, persists, and silences every late
 })
 
 test("lifecycle: install on first launch, update when the build changes, opened every launch", () => {
-  const first = harness()
+  const first = harness(optedIn())
   first.analytics.start()
   assert.deepEqual(captured(first.calls).map(c => c[1]), ["app_installed", "app_opened"])
-  const updated = harness({ "shelfpick.analytics.installed-version": "old" })
+  const updated = harness({ ...optedIn(), "shelfpick.analytics.installed-version": "old" })
   updated.analytics.start()
   assert.deepEqual(captured(updated.calls).map(c => c[1]), ["app_updated", "app_opened"])
-  const same = harness({ "shelfpick.analytics.installed-version": "abc1234" })
+  const same = harness({ ...optedIn(), "shelfpick.analytics.installed-version": "abc1234" })
   same.analytics.start()
   assert.deepEqual(captured(same.calls).map(c => c[1]), ["app_opened"])
 })
 
 test("the guard drops unknown events and properties that are emails, free text or IDs", () => {
-  const { analytics, calls } = harness()
+  const { analytics, calls } = harness(optedIn())
   analytics.start()
   const n = captured(calls).length
   analytics.track("not_in_the_plan", {})

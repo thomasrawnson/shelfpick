@@ -151,6 +151,103 @@ for (const scheme of ["light", "dark"] as const) {
       await deletePlayWith(page, ana)
     })
 
+    // SP-SCORE-R01: a failed fetch of the pinned sheet must not let Save detach the play from it.
+    test("editing a pinned play whose scoresheet fails to load blocks Save until Retry, then keeps the breakdown", async ({ page }) => {
+      await logIn(page, FREE_EMAIL, LOCAL_PASSWORD)
+      await expect(page).not.toHaveURL(/\/login/)
+      const stamp = Date.now().toString(36)
+      const ana = `Ana ${stamp}`
+      const ben = `Ben ${stamp}`
+      await openGame(page, "Wingspan")
+      await page.getByRole("button", { name: "Log a play" }).click()
+      const form = sheet(page)
+      await addPlayers(page, [ana, ben])
+      await form.getByRole("button", { name: "Use scoresheet" }).click()
+      await enter(page, "Birds", ana, "52")
+      await enter(page, "Birds", ben, "48")
+      await form.getByRole("button", { name: "Save play" }).click()
+      await expect(form.getByText("Play saved")).toBeVisible()
+      await form.getByRole("button", { name: "Done" }).click()
+
+      // Fetching the saved sheet fails until Retry.
+      // Loads fail until Retry is pressed (React's dev double-mount sends the load twice, so "once" is not countable).
+      let failing = true
+      await page.route(/\/scoresheets\/\d+/, async (route) => {
+        if (route.request().method() === "GET" && failing) await route.abort()
+        else await route.continue()
+      })
+      const patches: Record<string, unknown>[] = []
+      await page.route(/\/plays\/\d+$/, async (route) => {
+        if (route.request().method() === "PATCH") patches.push(route.request().postDataJSON())
+        await route.continue()
+      })
+
+      await playWith(page, ana).getByRole("button", { name: "Edit" }).click()
+      const edit = sheet(page)
+      await expect(edit.getByRole("alert")).toContainText("Couldn’t load this play’s scoresheet")
+      await expect(edit.getByRole("button", { name: "Save changes" })).toBeDisabled()
+      await expect(edit.getByRole("button", { name: "Use scoresheet" })).toHaveCount(0)
+      expect(patches).toHaveLength(0)
+
+      failing = false
+      await edit.getByRole("button", { name: "Retry" }).click()
+      await expect(edit.getByRole("button", { name: new RegExp(`^Birds, ${ana}: 52$`) })).toBeVisible()
+      await expect(edit.getByRole("button", { name: "Save changes" })).toBeEnabled()
+
+      // An unrelated edit (the location) keeps the sheet and the breakdown.
+      await edit.getByRole("button", { name: /Date, place and time/ }).click()
+      await edit.getByLabel("Location").fill("The Dice Cup")
+      await edit.getByRole("button", { name: "Save changes" }).click()
+      await expect(edit).toBeHidden()
+      expect(patches).toHaveLength(1)
+      const body = patches[0] as { scoresheet_id: number | null; scoresheet_version: number | null; participants: { name: string; score_breakdown: Record<string, unknown> | null }[] }
+      expect(body.scoresheet_id).not.toBeNull()
+      expect(body.scoresheet_version).not.toBeNull()
+      expect(body.participants.find((p) => p.name === ana)?.score_breakdown).toBeTruthy()
+      await deletePlayWith(page, ana)
+    })
+
+    test("converting a pinned play to plain scores needs confirmation and then detaches it", async ({ page }) => {
+      await logIn(page, FREE_EMAIL, LOCAL_PASSWORD)
+      const stamp = Date.now().toString(36)
+      const ana = `Ana ${stamp}`
+      const ben = `Ben ${stamp}`
+      await openGame(page, "Wingspan")
+      await page.getByRole("button", { name: "Log a play" }).click()
+      const form = sheet(page)
+      await addPlayers(page, [ana, ben])
+      await form.getByRole("button", { name: "Use scoresheet" }).click()
+      await enter(page, "Birds", ana, "52")
+      await enter(page, "Birds", ben, "48")
+      await form.getByRole("button", { name: "Save play" }).click()
+      await form.getByRole("button", { name: "Done" }).click()
+
+      const patches: Record<string, unknown>[] = []
+      await page.route(/\/plays\/\d+$/, async (route) => {
+        if (route.request().method() === "PATCH") patches.push(route.request().postDataJSON())
+        await route.continue()
+      })
+      await playWith(page, ana).getByRole("button", { name: "Edit" }).click()
+      const edit = sheet(page)
+      await expect(edit.getByRole("table")).toBeVisible()
+      // Asking to convert does nothing until it is confirmed; keeping the sheet cancels it.
+      await edit.getByRole("button", { name: "Convert to plain scores" }).click()
+      await expect(edit.getByRole("group", { name: "Convert to plain scores" })).toBeVisible()
+      await expect(edit.getByRole("table")).toBeVisible()
+      await edit.getByRole("button", { name: "Keep scoresheet" }).click()
+      await expect(edit.getByRole("group", { name: "Convert to plain scores" })).toHaveCount(0)
+      await expect(edit.getByRole("table")).toBeVisible()
+
+      await edit.getByRole("button", { name: "Convert to plain scores" }).click()
+      await edit.getByRole("group", { name: "Convert to plain scores" }).getByRole("button", { name: "Convert to plain scores" }).click()
+      await expect(edit.getByRole("table")).toHaveCount(0)
+      await edit.getByRole("button", { name: "Save changes" }).click()
+      await expect(edit).toBeHidden()
+      expect(patches).toHaveLength(1)
+      expect(patches[0]).toMatchObject({ scoresheet_id: null, scoresheet_version: null })
+      await deletePlayWith(page, ana)
+    })
+
     test("log a lowest-wins Skyjo play with open-ended rounds", async ({ page }) => {
       await logIn(page, FREE_EMAIL, LOCAL_PASSWORD)
       const stamp = Date.now().toString(36)

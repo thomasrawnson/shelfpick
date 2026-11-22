@@ -473,6 +473,37 @@ def test_failed_check_grants_nothing_and_removes_nothing(billing_api):
     assert api.entitlement(1).status == "ACTIVE"
 
 
+def test_malformed_expiry_keeps_the_verified_row_and_grants_nothing_new(billing_api):
+    api = billing_api
+    me = api.app_user_id(1)
+    expiry = datetime.now(timezone.utc) + timedelta(days=90)
+    api.revenuecat.yearly(me, expiry)
+    assert sync(api).status_code == 200
+    before = api.entitlement(1)
+    assert (before.status, before.plan) == ("ACTIVE", "YEARLY")
+    verified_expiry, synced_at = before.expires_at, before.last_synced_at
+
+    # RevenueCat now sends an expiry that cannot be read: the check is unavailable.
+    api.revenuecat.subscribers[me]["entitlements"]["pro"]["expires_date"] = "garbage"
+    assert sync(api).status_code == 502
+    assert api.webhook({"type": "RENEWAL", "app_user_id": me}).status_code == 502
+    after = api.entitlement(1)
+    assert (after.status, after.plan, after.expires_at) == ("ACTIVE", "YEARLY", verified_expiry)
+    assert after.last_synced_at == synced_at
+    assert api.pro_gate_open() is True
+
+
+def test_malformed_expiry_never_becomes_a_lifetime_grant(billing_api):
+    api = billing_api
+    me = api.app_user_id(1)
+    api.revenuecat.yearly(me, datetime.now(timezone.utc) + timedelta(days=90))
+    api.revenuecat.subscribers[me]["entitlements"]["pro"]["expires_date"] = "garbage"
+
+    assert sync(api).status_code == 502
+    assert api.entitlement(1) is None
+    assert api.pro_gate_open() is False
+
+
 def test_manual_pro_grant_keeps_working_and_is_never_overwritten(billing_api):
     api = billing_api
     api.current["id"] = 3

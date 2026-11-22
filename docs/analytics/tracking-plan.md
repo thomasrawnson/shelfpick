@@ -7,7 +7,7 @@ Anonymous product analytics through PostHog EU Cloud (`https://eu.i.posthog.com`
 - Anonymous only: no `identify`, no email, name or account ID, no person profiles (`person_profiles: "never"`). PostHog assigns a random device ID stored in `localStorage` (no cookies).
 - No free text, ever. Every property is an enumerated value, a whole-number count (0 to 999) or a boolean. The wrapper drops the whole event if a property is unknown, out of range or looks like an email.
 - No game IDs or names are sent today. Public-catalogue IDs may be added later by editing `EVENT_SPECS` and this plan together.
-- Switched off in Settings > About ("Share anonymous usage analytics", on by default): the SDK is opted out and nothing is sent.
+- Off until the person chooses. The one-time first-launch choice ("Share usage data" / "Not now") stores the answer; nothing is initialised or sent without a stored "on", and a missing or unreadable preference counts as off. Settings > Help > About ("Share anonymous usage analytics") withdraws it: the SDK is opted out and nothing more is sent. (SP-HOTFIX-01)
 - Disabled in the SDK: session replay, autocapture, rage/dead clicks, heatmaps, pageviews, exception capture, performance capture, feature flags, surveys, web experiments. `before_send` also drops anything not listed below and strips URL/path/referrer properties (reset-password links carry tokens).
 - Every event also carries `environment` (`dev` or `production`), `platform` (`ios` or `web`) and `app_version` (build commit SHA). `environment` is `production` only for a production build made with `VITE_ANALYTICS_ENV=production`; every other build is tagged `dev`. Filter dev out in PostHog (`environment = production`).
 

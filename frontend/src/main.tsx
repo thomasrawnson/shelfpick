@@ -18,6 +18,7 @@ import { Capacitor } from "@capacitor/core"
 
 import App
   from "./App.tsx"
+import AnalyticsChoice from "./components/AnalyticsChoice.tsx"
 import AppErrorBoundary from "./components/AppErrorBoundary.tsx"
 
 import { startAnalytics } from "./analytics"
@@ -78,6 +79,7 @@ createRoot(
   )!,
 ).render(
   <StrictMode>
+    <AnalyticsChoice />
     <AppErrorBoundary>
       <BrowserRouter>
         <App />

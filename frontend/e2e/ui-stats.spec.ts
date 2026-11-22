@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test"
 
-import { logIn } from "./support"
+import { logIn, ANALYTICS_ANSWERED } from "./support"
 
 // SP-UI-02: Stats tab sections and the Year in Review story at 390x844, light and dark.
 // Every Stats request is mocked so the screens are deterministic.
@@ -10,7 +10,7 @@ test.use({ storageState: AUTH_STATE, viewport: { width: 390, height: 844 } })
 
 test.beforeAll(async ({ browser }, testInfo) => {
   if (testInfo.project.name !== "iPhone 15") return
-  const context = await browser.newContext({ storageState: undefined })
+  const context = await browser.newContext({ storageState: ANALYTICS_ANSWERED })
   const page = await context.newPage()
   await logIn(page, "local-free@shelfpick.app")
   await expect(page).toHaveURL(/\/tonight/)

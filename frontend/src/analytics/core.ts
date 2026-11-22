@@ -51,7 +51,7 @@ export type CommonProperties = {
 }
 
 export type AnalyticsSdk = {
-  init: (opts: { startOptedOut: boolean; common: CommonProperties }) => void
+  init: (opts: { common: CommonProperties }) => void
   capture: (name: string, properties: Record<string, unknown>) => void
   optIn: () => void
   optOut: () => void
@@ -95,7 +95,9 @@ export type AnalyticsDeps = {
 export function createAnalytics(deps: AnalyticsDeps) {
   const read = (key: string) => { try { return deps.storage.getItem(key) } catch { return null } }
   const write = (key: string, value: string) => { try { deps.storage.setItem(key, value) } catch { /* ignore */ } }
-  const isEnabled = () => read(ANALYTICS_PREF_KEY) !== "off"
+  // Optional analytics need an affirmative stored choice. A missing or unreadable preference is off.
+  const isEnabled = () => read(ANALYTICS_PREF_KEY) === "on"
+  const hasChoice = () => { const value = read(ANALYTICS_PREF_KEY); return value === "on" || value === "off" }
   let started = false
 
   function track<N extends EventName>(name: N, properties?: EventProperties<N>): void {
@@ -109,32 +111,40 @@ export function createAnalytics(deps: AnalyticsDeps) {
     }
   }
 
+  // Initializes the SDK and records the launch. Only ever called once the user has opted in.
+  function begin(): void {
+    if (started) return
+    try {
+      deps.sdk.init({ common: { ...deps.common, app_version: deps.appVersion } })
+      started = true
+    } catch { return }
+    const previous = read(INSTALLED_VERSION_KEY)
+    write(INSTALLED_VERSION_KEY, deps.appVersion)
+    if (previous === null) track("app_installed")
+    else if (previous !== deps.appVersion) track("app_updated")
+    track("app_opened")
+  }
+
   return {
     isEnabled,
-    /** Call once at launch. Starts opted out when the user has switched analytics off. */
+    /** False until the user has answered the first-launch choice (Share usage data / Not now). */
+    hasChoice,
+    /** Call once at launch. Does nothing, not even loading the SDK, without a stored opt-in. */
     start(): void {
-      if (started) return
-      try {
-        deps.sdk.init({
-          startOptedOut: !isEnabled(),
-          common: { ...deps.common, app_version: deps.appVersion },
-        })
-        started = true
-      } catch { return }
-      const previous = read(INSTALLED_VERSION_KEY)
-      write(INSTALLED_VERSION_KEY, deps.appVersion)
-      if (previous === null) track("app_installed")
-      else if (previous !== deps.appVersion) track("app_updated")
-      track("app_opened")
+      if (isEnabled()) begin()
     },
-    /** Settings toggle. OFF: the SDK is opted out and nothing is sent, not even a final event. */
+    /** First-launch choice and Settings toggle. OFF: nothing more is sent, not even a final event. */
     setEnabled(enabled: boolean): void {
       write(ANALYTICS_PREF_KEY, enabled ? "on" : "off")
       try {
-        if (enabled) {
-          deps.sdk.optIn()
+        if (!enabled) {
+          if (started) deps.sdk.optOut()
+        } else if (isEnabled()) {
+          // Only a choice that was actually stored starts collection.
+          if (started) deps.sdk.optIn()
+          else begin()
           track("settings_changed", { setting: "analytics", value: "on" })
-        } else deps.sdk.optOut()
+        }
       } catch { /* ignore */ }
     },
     track,

@@ -18,10 +18,14 @@ export type PaywallProps = {
   offers: PlanOffer[] | null
   // False where purchases can't happen (the PWA, or a build without a store).
   storeAvailable: boolean
-  // Purchases open only once the public Privacy Policy and Terms links are
-  // approved for this build (VITE_PUBLIC_LEGAL_LINKS_ENABLED), because App
-  // Review requires both beside the price.
-  legalLinksEnabled: boolean
+  // True once the store is signed in as the current account. Restore waits for it, and not for the
+  // plans, so a store that cannot list plans still lets someone restore.
+  restoreReady: boolean
+  // Whether this build sells Pro (VITE_PURCHASES_ENABLED). The Privacy Policy and
+  // Terms links below show either way, because App Review requires both beside a price.
+  purchasesEnabled: boolean
+  // Compiled-in state read back from the archived IPA by the release lane.
+  buildMarker: string
   busy: "restore" | PlanId | null
   message: PaywallMessage | null
   managementUrl: string | null
@@ -53,13 +57,15 @@ function PlanCard({ offer, busy, disabled, onBuy }: {
 }
 
 function PaywallPanel(props: PaywallProps) {
-  const { status, offers, storeAvailable, legalLinksEnabled, busy, message, managementUrl, onBuy, onRestore, onReload } = props
-  const purchasable = storeAvailable && legalLinksEnabled
+  const { status, offers, storeAvailable, restoreReady, purchasesEnabled, buildMarker, busy, message, managementUrl, onBuy, onRestore, onReload } = props
+  const purchasable = storeAvailable && purchasesEnabled
   const shown = describeProStatus(status)
   const sortedOffers = offers ? [...offers].sort((a, b) => ORDER.indexOf(a.id) - ORDER.indexOf(b.id)) : []
   const idle = busy === null
+  // The plans block already offers Try again when it has nothing to sell.
+  const retryShown = !status.pro && purchasable && offers !== null && sortedOffers.length === 0
 
-  return <section className="paywall" aria-labelledby="paywall-heading">
+  return <section className="paywall" aria-labelledby="paywall-heading" data-purchases-build={buildMarker}>
     <h2 id="paywall-heading">{status.pro ? "Your plan" : "Get ShelfPick Pro"}</h2>
 
     <div className={`pro-account-state${status.pro ? " is-pro" : ""}`} role="status">
@@ -88,15 +94,18 @@ function PaywallPanel(props: PaywallProps) {
         Pro is bought in the ShelfPick iPhone app. If you already have Pro, it applies here when you sign in.</p>
     )}
 
-    {!status.pro && storeAvailable && !legalLinksEnabled && (
+    {!status.pro && storeAvailable && !purchasesEnabled && (
       <p className="paywall-message paywall-message-info" role="note">
         Pro purchases aren’t open yet. Free features stay available.</p>
     )}
 
     {storeAvailable && <div className="paywall-actions">
-      <button type="button" className="secondary-button" disabled={!idle} onClick={onRestore}>
+      <button type="button" className="secondary-button" disabled={!idle || !restoreReady} onClick={onRestore}>
         {busy === "restore" ? "Restoring…" : "Restore purchases"}
       </button>
+      {offers !== null && !restoreReady && !retryShown && (
+        <button type="button" className="secondary-button" disabled={!idle} onClick={onReload}>Reconnect to the App Store</button>
+      )}
       {status.pro && status.plan === "YEARLY" && (
         <a className="paywall-link" href={managementUrl ?? APPLE_SUBSCRIPTIONS_URL}
           target="_blank" rel="noopener noreferrer">Manage subscription</a>
@@ -106,10 +115,10 @@ function PaywallPanel(props: PaywallProps) {
     <div className="paywall-terms">
       <p>{SUBSCRIPTION_TERMS}</p>
       <p>{LAPSE_NOTE}</p>
-      {legalLinksEnabled && <p className="paywall-legal-links">
+      <p className="paywall-legal-links">
         <a href={PRIVACY_POLICY_URL} target="_blank" rel="noopener noreferrer">Privacy Policy</a>
         <a href={TERMS_URL} target="_blank" rel="noopener noreferrer">Terms of Use</a>
-      </p>}
+      </p>
     </div>
   </section>
 }

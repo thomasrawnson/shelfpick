@@ -11,10 +11,17 @@ export type FlowResult =
   | { kind: "pending" }
   | { kind: "unconfirmed" }
   | { kind: "nothing-to-restore" }
+  // The signed-in account changed while this was running: nothing more is done for it.
+  | { kind: "superseded" }
   | { kind: "error"; message: string }
 
 export type FlowDeps = {
   store: ProStore
+  // The account this flow is for, as the store knows it (the billing account's app user ID).
+  appUserId: string
+  // False once the signed-in account has changed. Checked before the store is used and before every
+  // server confirmation, so nothing runs for, or is credited to, a different account.
+  isCurrent: () => boolean
   syncBilling: () => Promise<BillingAccount>
   // Re-reads the signed-in user so the whole app sees the new plan.
   refreshUser: () => Promise<void>
@@ -32,10 +39,12 @@ function messageOf(error: unknown, fallback: string): string {
 }
 
 // RevenueCat can take a moment to reflect a purchase, so check a few times.
-async function confirmWithServer(deps: FlowDeps): Promise<BillingAccount | null> {
+async function confirmWithServer(deps: FlowDeps): Promise<BillingAccount | "superseded" | null> {
   const wait = deps.wait ?? pause
   for (let attempt = 0; attempt < CONFIRM_ATTEMPTS; attempt += 1) {
+    if (!deps.isCurrent()) return "superseded"
     const account = await deps.syncBilling()
+    if (!deps.isCurrent()) return "superseded"
     if (account.pro) {
       await deps.refreshUser()
       return account
@@ -45,32 +54,37 @@ async function confirmWithServer(deps: FlowDeps): Promise<BillingAccount | null>
   return null
 }
 
+function confirmed(account: BillingAccount | "superseded" | null, otherwise: FlowResult): FlowResult {
+  if (account === "superseded") return { kind: "superseded" }
+  return account ? { kind: "pro", account } : otherwise
+}
+
 export async function buyPlan(deps: FlowDeps, plan: PlanOffer): Promise<FlowResult> {
+  if (!deps.isCurrent()) return { kind: "superseded" }
   let outcome
   try {
-    outcome = await deps.store.purchase(plan)
+    outcome = await deps.store.purchase(plan, deps.appUserId)
   } catch (error) {
     return { kind: "error", message: messageOf(error, "The App Store couldn’t complete the purchase. You haven’t been charged.") }
   }
   if (outcome === "cancelled") return { kind: "cancelled" }
   if (outcome === "pending") return { kind: "pending" }
   try {
-    const account = await confirmWithServer(deps)
-    return account ? { kind: "pro", account } : { kind: "unconfirmed" }
+    return confirmed(await confirmWithServer(deps), { kind: "unconfirmed" })
   } catch (error) {
     return { kind: "error", message: messageOf(error, "Your purchase went through but ShelfPick couldn’t confirm it. Try Restore purchases.") }
   }
 }
 
 export async function restorePurchases(deps: FlowDeps): Promise<FlowResult> {
+  if (!deps.isCurrent()) return { kind: "superseded" }
   try {
-    await deps.store.restore()
+    await deps.store.restore(deps.appUserId)
   } catch (error) {
     return { kind: "error", message: messageOf(error, "The App Store couldn’t restore your purchases. Try again.") }
   }
   try {
-    const account = await confirmWithServer(deps)
-    return account ? { kind: "pro", account } : { kind: "nothing-to-restore" }
+    return confirmed(await confirmWithServer(deps), { kind: "nothing-to-restore" })
   } catch (error) {
     return { kind: "error", message: messageOf(error, "Couldn’t confirm your purchases. Try again.") }
   }
@@ -79,7 +93,8 @@ export async function restorePurchases(deps: FlowDeps): Promise<FlowResult> {
 export function flowMessage(result: FlowResult): { tone: "success" | "info" | "error"; text: string } | null {
   switch (result.kind) {
     case "pro": return { tone: "success", text: "Pro is active on your account. Thank you for supporting ShelfPick." }
-    case "cancelled": return null
+    case "cancelled":
+    case "superseded": return null
     case "pending": return { tone: "info", text: "Your purchase is waiting for approval. Pro turns on once it is approved." }
     case "unconfirmed": return { tone: "info", text: "Your purchase went through, but ShelfPick hasn’t confirmed it yet. Wait a moment, then choose Restore purchases." }
     case "nothing-to-restore": return { tone: "info", text: "No Pro purchase was found for this Apple Account." }
