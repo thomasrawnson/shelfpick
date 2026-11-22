@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import {
   deletePlay,
+  historyCacheName,
   type Game,
   type GamePlay,
   type GameHistory as GameHistoryData,
@@ -9,6 +10,10 @@ import {
 
 import { createBGStatsHistoryUrl } from "../../utils/bgstats";
 import { outcomeLabel } from "../../play-results";
+import { usePlaySync } from "../../offline/play-sync-context";
+import { historyWithQueued } from "../../offline/queued-plays";
+import PendingPlayControls from "../offline/PendingPlayControls";
+import SavedCopyNotice from "../offline/SavedCopyNotice";
 
 import LoadingMessage from "../ui/LoadingMessage";
 import PlayLogForm from "./PlayLogForm";
@@ -32,12 +37,15 @@ const OUTCOME_TYPE_LABELS = {
 
 function GameHistory({
   game,
-  history,
+  history: serverHistory,
   loading,
   onPlayDeleted,
   onPlayEdited,
   onRematch,
 }: Props) {
+  const { items, discardQueued } = usePlaySync();
+  // Plays logged on this device that have not synced yet appear with the ones the server knows.
+  const history = historyWithQueued(serverHistory, items, game.bgg_id);
   const [editingPlayId, setEditingPlayId] = useState<number | null>(null);
   const editingPlay = history?.recent_plays.find((play) => play.id === editingPlayId) ?? null;
   const [confirmingPlayId, setConfirmingPlayId] = useState<number | null>(null);
@@ -85,7 +93,14 @@ function GameHistory({
     setDeleteError("");
 
     try {
-      await deletePlay(playId);
+      const queued = history?.recent_plays.find((play) => play.id === playId);
+      if (queued?.pending && queued.client_id) {
+        // Not on the server yet: removing it from the queue is the whole delete.
+        const removed = await discardQueued(queued.client_id);
+        if (!removed.ok) throw new Error("This play just synced. Delete it again.");
+      } else {
+        await deletePlay(playId);
+      }
 
       await onPlayDeleted();
     } catch (err) {
@@ -101,6 +116,7 @@ function GameHistory({
   return (
     <div className="detail-section game-history">
       <p className="preference-label">Your history</p>
+      <SavedCopyNotice names={[historyCacheName(game.bgg_id)]} what="history" />
 
       {loading ? (
         <p className="history-empty">
@@ -192,6 +208,8 @@ function GameHistory({
                     <p className="recent-play-location">At {play.location}</p>
                   )}
 
+                  <PendingPlayControls play={play} />
+
                   {OUTCOME_TYPE_LABELS[play.outcome_type] && (
                     <p className="recent-play-type">
                       {OUTCOME_TYPE_LABELS[play.outcome_type]}
@@ -230,17 +248,19 @@ function GameHistory({
                   )}
 
                   <div className="recent-play-actions">
-                    <button
-                      ref={(element) => {
-                        if (element) shareButtons.current.set(play.id, element);
-                        else shareButtons.current.delete(play.id);
-                      }}
-                      type="button"
-                      className="secondary-button"
-                      onClick={() => openShare(play)}
-                    >
-                      Share play
-                    </button>
+                    {!play.pending && (
+                      <button
+                        ref={(element) => {
+                          if (element) shareButtons.current.set(play.id, element);
+                          else shareButtons.current.delete(play.id);
+                        }}
+                        type="button"
+                        className="secondary-button"
+                        onClick={() => openShare(play)}
+                      >
+                        Share play
+                      </button>
+                    )}
                     <button
                       type="button"
                       className="secondary-button"
@@ -255,7 +275,7 @@ function GameHistory({
                     >
                       Rematch
                     </button>
-                    {play.source !== "bgstats" && (
+                    {play.source !== "bgstats" && !play.pending && (
                       <a
                         className="bgstats-history-link"
                         href={createBGStatsHistoryUrl(game, play)}
@@ -315,7 +335,7 @@ function GameHistory({
           )}
         </>
       ) : (
-        <p className="history-empty">Play history unavailable.</p>
+        <p className="history-empty">Play history unavailable. It loads when you're back online.</p>
       )}
       {sharingPlay && (
         <PlayShareDialog game={game} play={sharingPlay} onClose={closeShare} />

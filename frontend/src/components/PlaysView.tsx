@@ -13,13 +13,18 @@ import {
   NO_FILTERS,
   playSummary,
   feedEntries,
+  sortFeed,
   winnersLabel,
   type DateRange,
   type FeedEntry,
   type FeedFilters,
 } from "../plays-feed"
 import { rematchPrefill, type PlayPrefill } from "../play-results"
+import { usePlaySync } from "../offline/play-sync-context"
+import { queuedGamePlay } from "../offline/queued-plays"
 import PlayLogForm from "./collection/PlayLogForm"
+import PendingPlayControls from "./offline/PendingPlayControls"
+import SavedCopyNotice from "./offline/SavedCopyNotice"
 import ResilientGameArtwork from "./ResilientGameArtwork"
 import PullIndicator from "./ui/PullIndicator"
 import Skeleton from "./ui/Skeleton"
@@ -51,7 +56,8 @@ async function loadFeed(): Promise<{ games: Game[]; entries: FeedEntry[] }> {
 function PlaysView({ onOpenGame }: Props) {
   const [screen, setScreen] = useState<Screen>({ kind: "list" })
   const [games, setGames] = useState<Game[]>([])
-  const [entries, setEntries] = useState<FeedEntry[]>([])
+  const [serverEntries, setEntries] = useState<FeedEntry[]>([])
+  const { items: queued, syncedVersion } = usePlaySync()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [filters, setFilters] = useState<FeedFilters>(NO_FILTERS)
@@ -72,7 +78,16 @@ function PlaysView({ onOpenGame }: Props) {
       if (active) setLoading(false)
     })
     return () => { active = false }
-  }, [reloadKey])
+  }, [reloadKey, syncedVersion])
+
+  // Plays logged on this device count here straight away, labelled pending until they sync.
+  const entries = useMemo(() => {
+    const pending: FeedEntry[] = queued.flatMap(item => {
+      const game = games.find(candidate => candidate.bgg_id === item.payload.bgg_id)
+      return game ? [{ game, play: queuedGamePlay(item), onShelf: true }] : []
+    })
+    return pending.length === 0 ? serverEntries : sortFeed([...pending, ...serverEntries])
+  }, [queued, games, serverEntries])
 
   // Reloads in place; the pull indicator stays up briefly so the refresh is visible.
   const refresh = useCallback(() => {
@@ -149,6 +164,8 @@ function PlaysView({ onOpenGame }: Props) {
         {!loading && entries.length > 0 && <p className="subtitle">{entries.length} {entries.length === 1 ? "play" : "plays"}</p>}
       </header>
 
+      <SavedCopyNotice names={["games", "plays"]} what="your plays" />
+
       <button type="button" className="primary-button plays-log-button" onClick={() => { setSearch(""); setScreen({ kind: "choose" }) }}>
         Log play
       </button>
@@ -217,7 +234,7 @@ function PlaysView({ onOpenGame }: Props) {
                   const date = new Date(play.played_at).toLocaleDateString(undefined, { day: "numeric", month: "short" })
                   const result = winnersLabel(play)
                   return (
-                    <li key={play.id} className={entry.onShelf ? "plays-card" : "plays-card off-shelf"}>
+                    <li key={play.id} className={`${entry.onShelf ? "plays-card" : "plays-card off-shelf"}${play.pending ? " has-pending" : ""}`}>
                       {entry.onShelf ? (
                         <>
                           <button type="button" className="plays-cover" onClick={() => onOpenGame(game.bgg_id)} aria-label={`Open ${game.name}`}>
@@ -230,6 +247,7 @@ function PlaysView({ onOpenGame }: Props) {
                           <button type="button" className="plays-rematch" onClick={() => setScreen({ kind: "log", game, prefill: rematchPrefill(play), key: Date.now() })} aria-label={`Rematch ${game.name}`}>
                             Rematch
                           </button>
+                          <PendingPlayControls play={play} withDelete onChanged={() => setReloadKey(current => current + 1)} />
                         </>
                       ) : (
                         <>

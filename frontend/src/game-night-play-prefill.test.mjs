@@ -6,6 +6,7 @@ import { createServer } from "vite"
 
 let server
 let GameNightPlayLog
+let PlaySyncProvider
 let selectedPlayerNamesInOrder
 
 before(async () => {
@@ -13,6 +14,7 @@ before(async () => {
   GameNightPlayLog = (
     await server.ssrLoadModule("/src/components/GameNightView.tsx")
   ).GameNightPlayLog
+  PlaySyncProvider = (await server.ssrLoadModule("/src/offline/PlaySyncProvider.tsx")).PlaySyncProvider
   selectedPlayerNamesInOrder = (
     await server.ssrLoadModule("/src/player-selection.ts")
   ).selectedPlayerNamesInOrder
@@ -40,12 +42,12 @@ const game = {
 }
 
 function renderPlayLog(selectedPlayerIds, selectedPlayerNames) {
-  return renderToStaticMarkup(React.createElement(GameNightPlayLog, {
+  return renderToStaticMarkup(React.createElement(PlaySyncProvider, { userId: 1 }, React.createElement(GameNightPlayLog, {
     game,
     selectedPlayerIds,
     selectedPlayerNames,
     defaultOpen: true,
-  }))
+  })))
 }
 
 test("Game Night play logging prepopulates exact named participants in selection order", () => {
