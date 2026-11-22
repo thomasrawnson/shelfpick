@@ -1,4 +1,4 @@
-import { reportReachable, reportUnreachable, RequestTimeoutError } from "../offline/connectivity.ts"
+import { isNativeTransportError, reportReachable, reportUnreachable, RequestTimeoutError } from "../offline/connectivity.ts"
 
 export class SessionExpiredError extends Error {
   constructor() { super("Your session has expired. Please log in again.") }
@@ -44,7 +44,7 @@ export async function request(
       }),
     ])
   } catch (error) {
-    if (error instanceof TypeError) {
+    if (error instanceof TypeError || isNativeTransportError(error)) {
       reportUnreachable()
       throw new Error("Couldn't connect to ShelfPick. Check your connection and try again.", { cause: error })
     }

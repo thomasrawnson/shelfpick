@@ -207,6 +207,72 @@ for (const scheme of ["light", "dark"] as const) {
       expect(await serverPlaysNamed(page, ana)).toBe(0)
     })
 
+    // A play the server will not accept is kept, not lost or retried forever: Retry and a confirmed Discard.
+    async function failedPlay(page: Page, context: import("@playwright/test").BrowserContext, ana: string, ben: string, cy: string) {
+      await openWingspan(page)
+      await page.getByRole("button", { name: "Log a play" }).click()
+      await expect(sheet(page).getByRole("button", { name: "Use scoresheet" })).toBeVisible()
+      await sheet(page).getByRole("button", { name: "Cancel" }).click()
+      const state = { refuse: true }
+      await page.route("**/plays", async (route) => {
+        if (route.request().method() === "POST" && state.refuse) {
+          await route.fulfill({ status: 400, contentType: "application/json", body: JSON.stringify({ detail: "That play can't be saved." }) })
+        } else await route.continue()
+      })
+      await context.setOffline(true)
+      await logThreePlayerSheetPlay(page, ana, ben, cy)
+      await sheet(page).getByRole("button", { name: "Save play" }).click()
+      await expect(sheet(page).getByText("Saved on this device")).toBeVisible()
+      await sheet(page).getByRole("button", { name: "Done" }).click()
+      await context.setOffline(false)
+      await expect(page.getByText("1 play couldn't be saved")).toBeVisible()
+      await expect(playWith(page, ana).getByText("Couldn't sync")).toBeVisible()
+      await expect(playWith(page, ana).getByText("That play can't be saved.")).toBeVisible()
+      return state
+    }
+
+    test("a play the server refuses stays as failed; Discard asks first and Retry sends it once the server accepts", async ({ page, context }) => {
+      await logIn(page, EMAIL, LOCAL_PASSWORD)
+      await expect(page).not.toHaveURL(/\/login/)
+      const stamp = Date.now().toString(36)
+      const [ana, ben, cy] = [`Ana ${stamp}`, `Ben ${stamp}`, `Cy ${stamp}`]
+      const state = await failedPlay(page, context, ana, ben, cy)
+      await page.screenshot({ path: `${SHOTS}/failed-banner-${scheme}.png` })
+      expect(await serverPlaysNamed(page, ana)).toBe(0)
+
+      await playWith(page, ana).getByRole("button", { name: "Discard", exact: true }).click()
+      await expect(playWith(page, ana).getByText("Discard this play? It was never saved.")).toBeVisible()
+      await playWith(page, ana).getByRole("button", { name: "Cancel" }).click()
+      await expect(playWith(page, ana).getByText("Couldn't sync")).toBeVisible()
+
+      state.refuse = false
+      await playWith(page, ana).getByRole("button", { name: "Retry" }).click()
+      await expect(page.getByText(/couldn't be saved/)).toHaveCount(0)
+      await expect.poll(() => serverPlaysNamed(page, ana)).toBe(1)
+      await expect(playWith(page, ana).getByText("Couldn't sync")).toHaveCount(0)
+      await deletePlayWith(page, ana)
+    })
+
+    test("discarding a failed play removes it for good and it never reaches the server", async ({ page, context }) => {
+      await logIn(page, EMAIL, LOCAL_PASSWORD)
+      await expect(page).not.toHaveURL(/\/login/)
+      const stamp = Date.now().toString(36)
+      const [ana, ben, cy] = [`Ana ${stamp}`, `Ben ${stamp}`, `Cy ${stamp}`]
+      await failedPlay(page, context, ana, ben, cy)
+
+      await playWith(page, ana).getByRole("button", { name: "Discard", exact: true }).click()
+      await playWith(page, ana).getByRole("button", { name: "Discard play" }).click()
+      await expect(playWith(page, ana)).toHaveCount(0)
+      await expect(page.getByText(/couldn't be saved/)).toHaveCount(0)
+      expect(await serverPlaysNamed(page, ana)).toBe(0)
+
+      // Nothing comes back after the app is opened afresh.
+      await page.reload()
+      await expect(page).not.toHaveURL(/\/login/)
+      await openWingspan(page)
+      await expect(playWith(page, ana)).toHaveCount(0)
+    })
+
     test("a reply lost after the server saved the play still ends with one play", async ({ page }) => {
       await logIn(page, EMAIL, LOCAL_PASSWORD)
       await expect(page).not.toHaveURL(/\/login/)

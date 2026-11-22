@@ -1,7 +1,7 @@
 import type { Breakdown, ScoresheetSchema } from "../scoresheets/engine"
 import { request, responseError, SessionExpiredError } from "./request"
 import { FeedbackOfflineError, type FeedbackPayload } from "../feedback"
-import { isUnreachableError } from "../offline/connectivity"
+import { isConnectionFailure, isUnreachableError } from "../offline/connectivity"
 import { readThrough, saveCopy } from "../offline/cache"
 import type { PlayPayload } from "../offline/play-queue"
 import { resetConfirmationBody } from "../reset-link"
@@ -1104,7 +1104,7 @@ export async function sendFeedback(payload: FeedbackPayload): Promise<void> {
       body: JSON.stringify(payload),
     })
   } catch (error) {
-    if (error instanceof Error && error.cause instanceof TypeError) throw new FeedbackOfflineError()
+    if (isConnectionFailure(error)) throw new FeedbackOfflineError()
     throw error
   }
   if (!response.ok) throw await responseError(response, "Couldn't send your message. Try again.")

@@ -90,3 +90,16 @@ test("age labels", () => {
   assert.equal(agoLabel(now - 3 * 3_600_000, now), "3 h ago")
   assert.equal(agoLabel(now - 72 * 3_600_000, now), "3 days ago")
 })
+
+test("connection failures are recognised however the platform reports them", async () => {
+  const { isConnectionFailure } = await import("./connectivity.ts")
+  const native = Object.assign(new Error("The Internet connection appears to be offline."), { code: "NSURLErrorDomain" })
+  assert.equal(isConnectionFailure(new TypeError("Load failed")), true)
+  assert.equal(isConnectionFailure(native), true)
+  assert.equal(isConnectionFailure(new Error("wrapped", { cause: native })), true)
+  assert.equal(isConnectionFailure(new Error("wrapped", { cause: new TypeError("x") })), true)
+  assert.equal(isConnectionFailure(new Error("Plays request failed: 500")), false)
+  assert.equal(isConnectionFailure(new RequestTimeoutError("slow")), false, "a timeout is unreachable but not a failed connection")
+  assert.equal(isUnreachableError(Object.assign(new Error("x"), { code: "OTHER" })), false)
+  assert.equal(isUnreachableError(native), true)
+})
