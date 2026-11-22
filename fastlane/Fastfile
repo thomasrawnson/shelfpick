@@ -13,6 +13,7 @@ require "json"
 require "time"
 require "tmpdir"
 require "fileutils"
+require_relative "bundle_flags"
 
 default_platform(:ios)
 
@@ -101,12 +102,16 @@ def verify_ipa!(ipa, version:, build:, purchases:)
     sig = `codesign -dvv "#{app}" 2>&1`
     UI.user_error!("not signed with Apple Distribution for team #{TEAM_ID}") unless sig.include?("Authority=Apple Distribution") && sig.include?("TeamIdentifier=#{TEAM_ID}")
     UI.user_error!("PrivacyInfo.xcprivacy is missing from the app") unless File.file?(File.join(app, "PrivacyInfo.xcprivacy"))
-    web = Dir[File.join(app, "public/**/*.js")].map { |f| File.read(f) }.join("\n")
+    web = BundleFlags.web_js(File.join(app, "public"))
     keys = web.scan(/appl_[A-Za-z0-9]{20,}/).uniq.size
     # The public SDK key is compiled in from frontend/.env.ios whether or not purchases are switched on.
     UI.user_error!("expected exactly one public RevenueCat key in the bundle, found #{keys}") unless keys == 1
-    UI.message("Purchases flag requested for this build: #{purchases ? 'ON' : 'OFF'} (recorded in the build record)")
-    UI.success("IPA checks passed: #{APP_ID} #{version} (#{build}), Apple Distribution #{TEAM_ID}, privacy manifest present, one public SDK key")
+    # The effective purchase state and the legal links are read back out of the archived web bundle,
+    # not trusted from the flag that was requested (SP-STORE-R02).
+    flag_problems = BundleFlags.problems(web, purchases: purchases)
+    UI.user_error!("IPA web bundle check failed: #{flag_problems.join('; ')}") unless flag_problems.empty?
+    UI.success("IPA checks passed: #{APP_ID} #{version} (#{build}), Apple Distribution #{TEAM_ID}, privacy manifest present, one public SDK key, " \
+               "purchases #{purchases ? 'ON' : 'OFF'} in the archive, Privacy Policy and Terms links present")
   end
 end
 
@@ -139,10 +144,10 @@ platform :ios do
     if purchases
       key_line = File.readlines(File.join(FRONTEND, ".env.ios")).grep(/\AVITE_REVENUECAT_IOS_API_KEY=\S+/)
       UI.user_error!("purchases:true needs VITE_REVENUECAT_IOS_API_KEY set in frontend/.env.ios") if key_line.empty?
-      ENV["VITE_PUBLIC_LEGAL_LINKS_ENABLED"] = "true"
-      UI.important("Purchases are ON: the paywall will offer Pro and link to the live Privacy and Terms pages. Do not submit to App Review until those pages cover purchases.")
+      ENV["VITE_PURCHASES_ENABLED"] = "true"
+      UI.important("Purchases are ON: the paywall will offer Pro beside the live Privacy and Terms links. Do not submit to App Review until those pages cover purchases.")
     else
-      ENV.delete("VITE_PUBLIC_LEGAL_LINKS_ENABLED")
+      ENV.delete("VITE_PURCHASES_ENABLED")
     end
     node_sh("npm", "run", "build:ios")
 

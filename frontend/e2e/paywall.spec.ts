@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright"
 import { expect, test, type Page } from "@playwright/test"
 
-import { logIn } from "./support"
+import { logIn, ANALYTICS_ANSWERED } from "./support"
 
 // SP-PRO-01: the Pro screen (paywall) for a Free and a Pro account at 390x844
 // and 1440x900, light and dark. Sign-in and entitlements are real local
@@ -20,7 +20,7 @@ const ACCOUNTS = {
 test.beforeAll(async ({ browser }, testInfo) => {
   if (testInfo.project.name !== "iPhone 15") return
   for (const account of Object.values(ACCOUNTS)) {
-    const context = await browser.newContext({ storageState: undefined })
+    const context = await browser.newContext({ storageState: ANALYTICS_ANSWERED })
     const page = await context.newPage()
     await logIn(page, account.email)
     await expect(page).toHaveURL(/\/tonight/)

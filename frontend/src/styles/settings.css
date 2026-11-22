@@ -573,3 +573,24 @@ button.settings-row {
   .feedback-toggle input,
   .feedback-toggle input::after { transition: none; }
 }
+
+/* One-time analytics choice (SP-HOTFIX-01) */
+.analytics-choice {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-block: auto;
+  padding: var(--space-6) var(--space-4) calc(var(--space-6) + env(safe-area-inset-bottom));
+}
+
+.analytics-choice h2,
+.analytics-choice p {
+  margin: 0;
+}
+
+.analytics-choice-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}

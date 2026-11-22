@@ -132,7 +132,7 @@ function ProComparisonView({ user, onUserChange }: { user: AuthUser; onUserChang
       <p>Your collection and everyday play stay free. Pro adds optional tools for stats, choosing and scoring.</p>
     </header>
 
-    <ProPurchase user={user} onUserChange={onUserChange} />
+    <ProPurchase key={user.id} user={user} onUserChange={onUserChange} />
 
     <section className="pro-value-section" aria-labelledby="pro-value-heading">
       <div className="pro-section-heading">

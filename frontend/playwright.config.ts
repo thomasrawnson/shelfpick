@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test"
 
-import { API_ORIGIN, API_PORT, BACKEND_DIR, WEB_ORIGIN, WEB_PORT, backendEnv, backendPython } from "./e2e/support"
+import { ANALYTICS_ANSWERED, API_ORIGIN, API_PORT, BACKEND_DIR, WEB_ORIGIN, WEB_PORT, backendEnv, backendPython } from "./e2e/support"
 
 const reuseExistingServer = process.env.E2E_REUSE_SERVERS === "true"
 
@@ -17,6 +17,8 @@ export default defineConfig({
   reporter: [["list"], ["html", { open: "never", outputFolder: "playwright-report" }]],
   use: {
     baseURL: WEB_ORIGIN,
+    // A recorded answer to the first-launch analytics choice (see ANALYTICS_ANSWERED in e2e/support.ts).
+    storageState: ANALYTICS_ANSWERED,
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },
@@ -37,7 +39,7 @@ export default defineConfig({
     },
     {
       command: `npm run dev -- --host 127.0.0.1 --port ${WEB_PORT} --strictPort`,
-      env: { VITE_API_BASE_URL: API_ORIGIN, VITE_PUBLIC_LEGAL_LINKS_ENABLED: "true" },
+      env: { VITE_API_BASE_URL: API_ORIGIN, VITE_PURCHASES_ENABLED: "true" },
       url: WEB_ORIGIN,
       reuseExistingServer,
       timeout: 60_000,

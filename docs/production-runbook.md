@@ -435,9 +435,9 @@ Environment (Render dashboard, API service; all secrets):
 Set the first two together: the API refuses to start with only one. Until both
 are set, `/billing/*` answers 503 and nothing can be sold. The iOS build also
 needs `VITE_REVENUECAT_IOS_API_KEY` (the public `appl_` SDK key, safe to ship)
-in `frontend/.env.ios`, and `VITE_PUBLIC_LEGAL_LINKS_ENABLED=true`: the paywall
-refuses to offer a purchase until the approved Privacy Policy and Terms links
-can be shown beside the price.
+in `frontend/.env.ios`, and `VITE_PURCHASES_ENABLED=true` (the release lane sets
+it for `purchases:true`). The Privacy Policy and Terms links show in every build,
+beside the price when purchases are on.
 
 Deploy order: the migration (`c4e7a9b2d6f1`, part of the pre-deploy command) is
 additive and keeps the previous release working, because `users.public_id` has

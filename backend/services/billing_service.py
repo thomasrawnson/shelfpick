@@ -5,6 +5,7 @@ Every change starts from RevenueCat's own subscriber record, fetched with the
 server-side secret key, so a forged request can at most cause a lookup.
 """
 
+import logging
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
@@ -13,6 +14,8 @@ import httpx
 from database.models import PurchaseEntitlement, User
 from repositories.billing_repository import BillingRepository
 
+
+logger = logging.getLogger(__name__)
 
 REVENUECAT_API_URL = "https://api.revenuecat.com/v1"
 REVENUECAT_TIMEOUT_SECONDS = 8.0
@@ -102,13 +105,26 @@ class RevenueCatClient:
             )
 
 
-def _parse_time(value) -> datetime | None:
-    if not value or not isinstance(value, str):
+def _unreadable(product_id: str, field: str) -> RevenueCatUnavailableError:
+    # The check is treated as unavailable: the caller's existing verified record stays as it is
+    # and nothing new is granted. Only the product ID is logged, never the account.
+    logger.warning(
+        "RevenueCat sent an unreadable %s for product %s; purchase check treated as unavailable",
+        field, product_id,
+    )
+    return RevenueCatUnavailableError(f"RevenueCat sent an unreadable {field}")
+
+
+def _parse_time(value, product_id: str, field: str) -> datetime | None:
+    """None only for an explicit null. Any other value that is not a timestamp makes the check unavailable."""
+    if value is None:
         return None
+    if not isinstance(value, str):
+        raise _unreadable(product_id, field)
     try:
         parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError:
-        return None
+        raise _unreadable(product_id, field) from None
     return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
 
 
@@ -124,13 +140,22 @@ def verified_purchase_from_subscriber(
     if not product_id:
         return None
 
-    expires_at = _parse_time(entitlement.get("expires_date"))
-    grace_until = _parse_time(entitlement.get("grace_period_expires_date"))
+    subscription = (subscriber.get("subscriptions") or {}).get(product_id)
+    purchases = (subscriber.get("non_subscriptions") or {}).get(product_id)
+
+    # Lifetime means an explicit null expiry on the one-time product. A missing, unreadable or
+    # null expiry on anything else must not turn into perpetual access.
+    if "expires_date" not in entitlement:
+        raise _unreadable(product_id, "expiry")
+    expires_at = _parse_time(entitlement["expires_date"], product_id, "expiry")
+    grace_until = _parse_time(
+        entitlement.get("grace_period_expires_date"), product_id, "grace period expiry",
+    )
+    if expires_at is None and (subscription is not None or purchases is None):
+        raise _unreadable(product_id, "expiry")
     if expires_at is not None and grace_until is not None:
         expires_at = max(expires_at, grace_until)
 
-    subscription = (subscriber.get("subscriptions") or {}).get(product_id)
-    purchases = (subscriber.get("non_subscriptions") or {}).get(product_id)
     detail = subscription if isinstance(subscription, dict) else (
         purchases[-1] if isinstance(purchases, list) and purchases
         and isinstance(purchases[-1], dict) else {}

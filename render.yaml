@@ -71,7 +71,7 @@ services:
         sync: false
       - key: VITE_LEGAL_DRAFTS_ENABLED
         value: "false"
-      - key: VITE_PUBLIC_LEGAL_LINKS_ENABLED
+      - key: VITE_PURCHASES_ENABLED
         value: "false"
     routes:
       - type: rewrite

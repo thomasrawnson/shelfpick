@@ -10,10 +10,14 @@ import type { PlanOffer } from "./plans"
 export type PurchaseOutcome = "purchased" | "cancelled" | "pending"
 
 export type ProStore = {
-  // Signs the SDK in as this account and loads the store's plans and prices.
-  prepare: (appUserId: string) => Promise<PlanOffer[]>
-  purchase: (plan: PlanOffer) => Promise<PurchaseOutcome>
-  restore: () => Promise<void>
+  // Signs the SDK in as this ShelfPick account. Restore only opens once this has succeeded.
+  bind: (appUserId: string) => Promise<void>
+  // The store's plans and prices. Needs no sign-in of its own, so Restore never waits on it.
+  loadOffers: () => Promise<PlanOffer[]>
+  // Purchases and restores name the account they are for. The store signs the SDK in as that
+  // account first if it is not already, so neither can run against a previous account's identity.
+  purchase: (plan: PlanOffer, appUserId: string) => Promise<PurchaseOutcome>
+  restore: (appUserId: string) => Promise<void>
   managementUrl: () => Promise<string | null>
 }
 
@@ -81,6 +85,15 @@ function userCancelled(error: unknown): boolean {
 
 export function createProStore({ apiKey, loadSdk, prepareTimeoutMs = PREPARE_TIMEOUT_MS }: Deps): ProStore {
   let configuredFor: string | null = null
+  // Changing the SDK's identity and the calls that depend on it run one at a time, in order,
+  // so a slow sign-in for one account can never land after a later account's. A call that never
+  // answers holds the line for at most the prepare timeout, so Restore cannot wait forever behind it.
+  let queue: Promise<unknown> = Promise.resolve()
+  function inOrder<T>(work: () => Promise<T>): Promise<T> {
+    const run = queue.then(work, work)
+    queue = withTimeout(run, prepareTimeoutMs).catch(() => undefined)
+    return run
+  }
 
   async function sdkFor(appUserId: string): Promise<Sdk> {
     const sdk = await loadSdk()
@@ -93,9 +106,13 @@ export function createProStore({ apiKey, loadSdk, prepareTimeoutMs = PREPARE_TIM
   }
 
   return {
-    prepare(appUserId) {
+    bind(appUserId) {
+      return withTimeout(inOrder(async () => { await sdkFor(appUserId) }), prepareTimeoutMs)
+    },
+
+    loadOffers() {
       return withTimeout((async () => {
-        const sdk = await sdkFor(appUserId)
+        const sdk = await loadSdk()
         const offering = (await sdk.getOfferings()).current
         const offers: PlanOffer[] = []
         if (offering?.annual) offers.push({ id: "yearly", price: offering.annual.product.priceString, handle: offering.annual })
@@ -104,21 +121,25 @@ export function createProStore({ apiKey, loadSdk, prepareTimeoutMs = PREPARE_TIM
       })(), prepareTimeoutMs)
     },
 
-    async purchase(plan) {
-      const sdk = await loadSdk()
-      try {
-        await sdk.purchasePackage({ aPackage: plan.handle as PurchasesPackage })
-        return "purchased"
-      } catch (error) {
-        if (userCancelled(error)) return "cancelled"
-        if (errorCode(error) === PAYMENT_PENDING) return "pending"
-        throw error
-      }
+    purchase(plan, appUserId) {
+      return inOrder(async () => {
+        const sdk = await sdkFor(appUserId)
+        try {
+          await sdk.purchasePackage({ aPackage: plan.handle as PurchasesPackage })
+          return "purchased"
+        } catch (error) {
+          if (userCancelled(error)) return "cancelled"
+          if (errorCode(error) === PAYMENT_PENDING) return "pending"
+          throw error
+        }
+      })
     },
 
-    async restore() {
-      const sdk = await loadSdk()
-      await sdk.restorePurchases()
+    restore(appUserId) {
+      return inOrder(async () => {
+        const sdk = await sdkFor(appUserId)
+        await sdk.restorePurchases()
+      })
     },
 
     async managementUrl() {
@@ -155,7 +176,8 @@ async function loadRevenueCat(): Promise<Sdk> {
 // in a browser. A "purchase" here still has to be confirmed by the server,
 // which only trusts RevenueCat, so it never unlocks Pro by itself.
 const developmentStore: ProStore = {
-  prepare: async () => [
+  bind: async () => {},
+  loadOffers: async () => [
     { id: "yearly", price: "£3.99", handle: null },
     { id: "lifetime", price: "£9.99", handle: null },
   ],

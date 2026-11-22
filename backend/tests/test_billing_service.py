@@ -95,6 +95,104 @@ def test_refunded_subscription_is_not_active_even_before_its_expiry():
     assert not purchase.is_active(NOW)
 
 
+YEARLY_PRODUCT = "com.plutonightlabs.shelfpick.pro.yearly"
+LIFETIME_PRODUCT = "com.plutonightlabs.shelfpick.pro.lifetime"
+
+
+def entitlement_with(product, expires, **extra):
+    return {"product_identifier": product, "expires_date": expires, **extra}
+
+
+@pytest.mark.parametrize("expires", [
+    "not-a-date", "", "2026-13-45T99:99:99Z", 1790000000, True, ["2027-01-01T00:00:00Z"],
+])
+def test_subscription_with_a_present_but_unreadable_expiry_is_an_unavailable_check(expires):
+    with pytest.raises(RevenueCatUnavailableError):
+        verified_purchase_from_subscriber(
+            subscriber(
+                entitlement_with(YEARLY_PRODUCT, expires),
+                subscriptions={YEARLY_PRODUCT: {"store": "app_store"}},
+            ),
+            "pro",
+        )
+
+
+@pytest.mark.parametrize("expires", ["not-a-date", "", 1790000000])
+def test_unreadable_expiry_on_the_lifetime_product_does_not_grant_lifetime(expires):
+    with pytest.raises(RevenueCatUnavailableError):
+        verified_purchase_from_subscriber(
+            subscriber(
+                entitlement_with(LIFETIME_PRODUCT, expires),
+                non_subscriptions={LIFETIME_PRODUCT: [{"store": "app_store"}]},
+            ),
+            "pro",
+        )
+
+
+def test_a_missing_expiry_is_not_an_explicit_null():
+    with pytest.raises(RevenueCatUnavailableError):
+        verified_purchase_from_subscriber(
+            subscriber(
+                {"product_identifier": LIFETIME_PRODUCT},
+                non_subscriptions={LIFETIME_PRODUCT: [{"store": "app_store"}]},
+            ),
+            "pro",
+        )
+
+
+def test_null_expiry_only_means_lifetime_for_the_one_time_product():
+    # A subscription, or a product RevenueCat lists as neither, never becomes perpetual.
+    with pytest.raises(RevenueCatUnavailableError):
+        verified_purchase_from_subscriber(
+            subscriber(
+                entitlement_with(YEARLY_PRODUCT, None),
+                subscriptions={YEARLY_PRODUCT: {"store": "app_store"}},
+            ),
+            "pro",
+        )
+    with pytest.raises(RevenueCatUnavailableError):
+        verified_purchase_from_subscriber(
+            subscriber(entitlement_with("com.example.unknown", None)), "pro",
+        )
+
+
+def test_unreadable_grace_period_is_an_unavailable_check_not_a_silent_downgrade():
+    with pytest.raises(RevenueCatUnavailableError):
+        verified_purchase_from_subscriber(
+            subscriber(entitlement_with(
+                YEARLY_PRODUCT, iso(NOW - timedelta(days=1)),
+                grace_period_expires_date="soon",
+            )),
+            "pro",
+        )
+
+
+def test_unreadable_expiry_is_logged_without_the_account(caplog):
+    with caplog.at_level("WARNING", logger="services.billing_service"):
+        with pytest.raises(RevenueCatUnavailableError):
+            verified_purchase_from_subscriber(
+                subscriber(entitlement_with(YEARLY_PRODUCT, "garbage")), "pro",
+            )
+    assert YEARLY_PRODUCT in caplog.text
+    assert "unreadable expiry" in caplog.text
+
+
+def test_valid_expiry_and_explicit_null_lifetime_are_unchanged():
+    expiry = NOW + timedelta(days=30)
+    yearly = verified_purchase_from_subscriber(
+        subscriber(entitlement_with(YEARLY_PRODUCT, iso(expiry)),
+                   subscriptions={YEARLY_PRODUCT: {"store": "app_store"}}),
+        "pro",
+    )
+    assert yearly.plan == "YEARLY" and yearly.expires_at == expiry
+    lifetime = verified_purchase_from_subscriber(
+        subscriber(entitlement_with(LIFETIME_PRODUCT, None),
+                   non_subscriptions={LIFETIME_PRODUCT: [{"store": "app_store"}]}),
+        "pro",
+    )
+    assert lifetime.plan == "LIFETIME" and lifetime.expires_at is None
+
+
 @pytest.mark.parametrize("payload", [
     {},
     {"entitlements": None},

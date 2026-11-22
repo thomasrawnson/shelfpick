@@ -24,7 +24,7 @@ const withClient = (run: (posthog: PostHog) => void) => {
 }
 
 const sdk: AnalyticsSdk = {
-  init({ startOptedOut, common }) {
+  init({ common }) {
     commonProperties = common
     if (!POSTHOG_PROJECT_KEY) throw new Error("analytics key not configured")
     client = import("posthog-js").then(({ default: posthog }) => {
@@ -48,7 +48,6 @@ const sdk: AnalyticsSdk = {
         persistence: "localStorage",
         // Capacitor's native HTTP layer cannot send the SDK's gzip (Blob) body, so events never left the iOS app.
         disable_compression: true,
-        opt_out_capturing_by_default: startOptedOut,
         // Only events in the tracking plan leave the device, with URL-bearing properties removed
         // (reset-password links carry tokens).
         before_send: (event) => {
@@ -63,6 +62,8 @@ const sdk: AnalyticsSdk = {
           return event
         },
       })
+      // init only runs after the user opted in, so a withdrawal remembered by the SDK from an earlier session no longer applies.
+      if (posthog.has_opted_out_capturing()) posthog.opt_in_capturing({ captureEventName: false })
       return posthog
     }).catch(() => null)
   },

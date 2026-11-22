@@ -32,8 +32,8 @@ export default defineConfig({
         process.env.VITE_LEGAL_DRAFTS_ENABLED
         === "true",
       ),
-    __SHELFPICK_PUBLIC_LEGAL_LINKS__:
-      JSON.stringify(process.env.VITE_PUBLIC_LEGAL_LINKS_ENABLED === "true"),
+    __SHELFPICK_PURCHASES__:
+      JSON.stringify(process.env.VITE_PURCHASES_ENABLED === "true"),
   },
 
   plugins: [
