@@ -702,6 +702,13 @@ class Play(Base):
                 "uq_plays_user_source_play_id"
             ),
         ),
+        # A play logged on the device carries a random id, so a retry after a
+        # lost response finds the play it already created (SP-NATIVE-01c).
+        UniqueConstraint(
+            "user_id",
+            "client_id",
+            name="uq_plays_user_client_id",
+        ),
         Index(
             "ix_plays_user_id_played_at",
             "user_id",
@@ -762,6 +769,10 @@ class Play(Base):
 
     timer_session_id: Mapped[str | None] = mapped_column(
         String(36), nullable=True, unique=True,
+    )
+
+    client_id: Mapped[str | None] = mapped_column(
+        String(36), nullable=True,
     )
 
     source: Mapped[str] = mapped_column(

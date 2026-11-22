@@ -26,6 +26,7 @@ class FakePlayRepository:
         scoresheet_id: int | None = None,
         scoresheet_version: int | None = None,
         result_overridden: bool = False,
+        client_id: str | None = None,
     ) -> Play:
         self.created = {
             "bgg_id": bgg_id,
@@ -38,6 +39,7 @@ class FakePlayRepository:
             "timer_session_id": timer_session_id,
             "outcome_type": outcome_type,
             "coop_result": coop_result,
+            "client_id": client_id,
         }
 
         return Play(
@@ -94,7 +96,22 @@ def test_record_play_uses_repository():
         "timer_session_id": None,
         "outcome_type": "competitive",
         "coop_result": None,
+        "client_id": None,
     }
 
     assert play.bgg_id == 167791
     assert play.player_count == 2
+
+
+def test_record_play_passes_the_client_id_to_the_repository():
+    repository = FakePlayRepository()
+    service = PlayService(repository, scoresheets=None)
+    client_id = "6f1c1f0e-8a49-4f3c-9d3e-0c6f6d3a2b11"
+
+    service.record_play(
+        bgg_id=1, played_at=None, duration_minutes=None,
+        participants=[{"name": "Tom", "score": 1, "is_winner": True}],
+        client_id=client_id,
+    )
+
+    assert repository.created["client_id"] == client_id

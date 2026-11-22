@@ -43,6 +43,7 @@ class PlayService:
         scoresheet_id: int | None = None,
         scoresheet_version: int | None = None,
         result_override: bool = False,
+        client_id: str | None = None,
     ) -> Play | None:
         self._reject_duplicate_players(participants)
         state = self._score(
@@ -76,6 +77,7 @@ class PlayService:
             scoresheet_id=state["scoresheet_id"],
             scoresheet_version=state["scoresheet_version"],
             result_overridden=state["result_override"],
+            client_id=client_id,
         )
 
     def update_play(
