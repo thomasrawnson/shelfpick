@@ -1,7 +1,7 @@
 import type { ReactNode } from "react"
 
-import FilterTabs
-  from "../ui/FilterTabs"
+import ChoiceGroup
+  from "../ui/ChoiceGroup"
 
 export type SortOption =
   | "name"
@@ -44,77 +44,44 @@ function CollectionFilters({
   trailing,
 }: Props) {
   return (
-    <div className="collection-tools">
-      <div className="collection-search-sort-row">
-        <label
-          className="collection-search-wrap"
-          htmlFor="collection-search"
-        >
-          <span className="sr-only">
-            Search your games
-          </span>
-
+    <div className="shelf-tools">
+      <div className="shelf-toolbar">
+        <label className="shelf-search" htmlFor="collection-search">
+          <span className="sr-only">Search your games</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="11" cy="11" r="6.5" />
+            <path d="m16 16 4.5 4.5" />
+          </svg>
           <input
             id="collection-search"
             name="collection_search"
-            className="collection-search"
             type="search"
             value={search}
             placeholder="Search"
-            onChange={(event) =>
-              onSearchChange(
-                event.target.value
-              )
-            }
+            onChange={(event) => onSearchChange(event.target.value)}
           />
         </label>
 
-        <label
-          className="collection-sort-wrap"
-          htmlFor="collection-sort"
-        >
-          <span className="sr-only">
-            Sort games
-          </span>
-
+        <div className="select-field shelf-sort">
           <select
             id="collection-sort"
             name="collection_sort"
-            className="collection-sort"
             value={sort}
             aria-label="Sort games"
-            onChange={(event) =>
-              onSortChange(
-                event.target
-                  .value as SortOption
-              )
-            }
+            onChange={(event) => onSortChange(event.target.value as SortOption)}
           >
-            <option value="name">
-              A–Z
-            </option>
-
-            <option value="recent">
-              Recent
-            </option>
-
-            <option value="most-played">
-              Most played
-            </option>
-
-            <option value="rating">
-              Rating
-            </option>
-
-            <option value="complexity">
-              Complexity
-            </option>
+            <option value="name">A–Z</option>
+            <option value="recent">Recent</option>
+            <option value="most-played">Most played</option>
+            <option value="rating">Rating</option>
+            <option value="complexity">Complexity</option>
           </select>
-        </label>
+        </div>
         {trailing}
       </div>
 
-      <FilterTabs
+      <ChoiceGroup
+        variant="chips"
         value={playFilter}
         ariaLabel="Filter collection"
         options={[
@@ -122,9 +89,7 @@ function CollectionFilters({
           { value: "played", label: "Played" },
           { value: "never", label: "Unplayed" },
         ]}
-        onChange={
-          onPlayFilterChange
-        }
+        onChange={onPlayFilterChange}
       />
     </div>
   )

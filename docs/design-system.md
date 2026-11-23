@@ -125,9 +125,13 @@ Keep existing shared buttons, `SegmentedControl`, `FilterTabs`, `Disclosure`,
 - Secondary: transparent/surface fill, primary text and border.
 - Accent: accent fill, on-accent text, accent-hover fill; reserve for emphasis.
 - Destructive: danger fill plus on-danger text, or danger text on a soft tint.
-- Selected controls/navigation: primary text and primary-soft fill or primary indicator. Option controls (counts,
-  segments) also draw a check and keep `aria-pressed`, so selection is never colour-only (SP-UI-03, Tonight).
-- One accent per screen: where a screen says so (Tonight), gold is not used and Forest is the only interactive accent.
+- Selected controls/navigation: primary text and primary-soft fill with a 2px primary edge. Every segmented control and chip row is
+  the shared `ChoiceGroup` (SP-UI-04) and exposes `aria-pressed`; Tonight's count buttons also draw a check (SP-UI-03), so
+  selection is never colour-only. Unselected options have no fill and supporting text.
+- One accent: on Tonight, Shelf, Plays, Discover and Stats gold is not used and Forest is the only interactive accent. The
+  account avatar is neutral, the Pro tag is a neutral outline, play counts and Stats numbers are plain text.
+- Menus and toasts: `OverflowMenu` holds secondary actions behind a "…" button (44pt items, destructive in the danger colour);
+  `UndoToast` offers Undo after a hide. `.select-field` is the compact 40pt menu.
 - Disabled: secondary text on a raised surface; preserve existing disabled interaction.
 - Forms: theme-aware surfaces, borders and focus rings; danger for invalid fields.
 - Cards/dialogs: surface or surface-raised; scrims use overlay rather than a surface.

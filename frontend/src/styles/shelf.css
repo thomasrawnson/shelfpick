@@ -1,0 +1,81 @@
+/* Shelf (SP-UI-04): a count row, one 40pt toolbar (search, sort, layout) and a row of play-filter chips. */
+.shelf-count-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-1);
+}
+.shelf-count-row > * { white-space: nowrap; }
+.shelf-count {
+  margin: 0;
+  color: var(--color-text-support);
+  font-size: var(--text-support);
+}
+
+.shelf-tools { display: grid; gap: 10px; margin-bottom: var(--space-3); }
+.shelf-toolbar { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; }
+
+.shelf-search,
+.shelf-sort,
+.shelf-layout-toggle { box-sizing: border-box; min-height: 40px; }
+
+.shelf-search { position: relative; display: block; flex: 1 1 min(9rem, 100%); min-width: 0; }
+.shelf-search svg {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  width: 18px;
+  height: 18px;
+  color: var(--color-text-support);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.shelf-toolbar .shelf-search input[type="search"] {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-height: 40px;
+  padding-block: 0.4em;
+  color: var(--color-text-primary);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-size: 1rem;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.shelf-toolbar .shelf-search input[type="search"] { padding-inline: 38px 12px; }
+.shelf-search input::placeholder { color: var(--color-text-support); opacity: 1; }
+.shelf-search input::-webkit-search-cancel-button { -webkit-appearance: none; }
+
+.shelf-sort { flex: 0 0 auto; }
+.shelf-sort select { min-width: min(7.5rem, 100%); }
+
+/* One button switches layout; it shows the layout it will switch to. */
+.shelf-layout-toggle {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 40px;
+  padding: 0;
+  color: var(--color-brand-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+/* 40pt control, 44pt target. */
+.shelf-layout-toggle::before { position: absolute; inset: -2px; content: ""; }
+.shelf-layout-toggle svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Play counts are plain secondary text, not pills. */
+.collection-plays { color: var(--color-text-support); font-size: var(--text-support); white-space: nowrap; }
+.collection-tile .collection-plays { margin-top: -4px; }

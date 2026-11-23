@@ -1,82 +1,6 @@
 /* ShelfPick shared UI primitives and V7 simplification pass */
 
-.segmented-control {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px;
-  padding: 4px;
-  border: 0;
-  border-radius: var(--radius-md);
-  background: var(--color-surface-raised);
-}
-
-.segmented-control button {
-  min-height: var(--target-min);
-  border: 0;
-  border-radius: 9px;
-  background: transparent;
-  color: var(--sp-muted);
-  font: inherit;
-  font-weight: 700;
-}
-
-.segmented-control button.active {
-  background: var(--color-brand-primary-soft);
-  color: var(--color-brand-primary);
-}
-
-.filter-tabs {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  align-items: end;
-  gap: var(--space-2);
-  padding: 0 4px;
-}
-
-.filter-tabs button {
-  position: relative;
-  padding: 8px 4px 10px;
-  border: 0;
-  background: transparent;
-  color: var(--sp-muted);
-  font: inherit;
-  font-weight: 700;
-  text-align: center;
-}
-
-.filter-tabs button.active {
-  color: var(--color-brand-primary);
-}
-
-.filter-tabs button.active::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: 2px;
-  width: 18px;
-  height: 2px;
-  border-radius: 99px;
-  transform: translateX(-50%);
-  background: var(--color-brand-primary);
-}
-
 /* Enabled choices must remain clearly legible against dark raised surfaces. */
-:is(:root[data-theme="dark"], :root[data-theme="black"])
-  :is(
-    .segmented-control button:not(.active),
-    .filter-tabs button:not(.active),
-    .picker-mode-option:not(.selected),
-    .preference-chip:not(.selected),
-    .collection-section-tabs button:not(.active),
-    .collection-filter-tabs button:not(.active),
-    .collection-sort,
-    .collection-back,
-    .discover-tab:not(.active),
-    .ranking-view-tabs button:not(.active),
-    .stats-section-tab:not(.active)
-  ):not(:disabled) {
-  color: var(--color-text-primary);
-}
 
 .ui-disclosure {
   border: 0;
@@ -220,18 +144,6 @@
 }
 
 /* Collection now uses the same primitives as the picker. */
-.collection-section-tabs {
-  margin-bottom: 10px;
-}
-
-.collection-tools .filter-tabs {
-  margin-bottom: 10px;
-}
-
-.collection-tools .filter-tabs button {
-  min-height: var(--target-min);
-  white-space: nowrap;
-}
 
 /* Rankings remain discoverable from Insight without owning a permanent nav slot. */
 .rank-section-title-row {
@@ -394,13 +306,6 @@
 }
 
 /* Collection search/sort stays available while scrolling a long shelf. */
-.collection-search-sort-row {
-  position: sticky;
-  top: 0;
-  z-index: 6;
-  padding: 6px 0;
-  background: linear-gradient(180deg, var(--sp-bg) 72%, transparent);
-}
 
 /* V9.1 regression guard: picker actions keep the shared button treatment. */
 .fine-tune-screen .picker-step-actions {

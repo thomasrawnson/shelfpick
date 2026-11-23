@@ -77,9 +77,9 @@ function CollectionGameList({
                     alt=""
                     gameName={game.name}
                   />
-                  {playLabel && <span className="collection-tile-plays" aria-hidden="true">{playLabel}</span>}
                 </span>
                 <strong>{game.name}</strong>
+                {playLabel && <span className="collection-plays" aria-hidden="true">{playLabel}</span>}
               </button>
             </li>
           )
@@ -127,7 +127,7 @@ function CollectionGameList({
             </div>
 
             {playCount > 0 && (
-              <span className="collection-play-count">
+              <span className="collection-plays">
                 {`${playCount} ${
                     playCount === 1
                       ? "play"

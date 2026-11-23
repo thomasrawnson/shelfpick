@@ -16,10 +16,6 @@
   margin-bottom: 0;
 }
 
-.trends-panel .stats-section-heading {
-  margin-bottom: 0;
-}
-
 .stats-subheading {
   margin: 10px 2px 0;
   color: var(--text-primary);
@@ -176,34 +172,51 @@
   font-weight: 600;
 }
 
-/* H-index list */
+/* H-index list: flat rows between hairlines with a trailing chevron, inside the one card. */
 
 .stats-raise-list {
   display: grid;
-  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
+  border-top: 1px solid var(--color-border);
 }
+
+.stats-raise-list li + li { border-top: 1px solid var(--color-border); }
 
 .stats-raise-game {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   width: 100%;
-  min-height: 44px;
-  padding: 10px 12px;
+  min-height: 56px;
+  padding: 8px 0;
   color: var(--color-text-primary);
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
+  background: transparent;
+  border: 0;
   text-align: left;
   cursor: pointer;
 }
 
+.stats-raise-text { display: grid; gap: 2px; min-width: 0; }
+.stats-raise-text > span { font-weight: 600; overflow-wrap: anywhere; }
+
 .stats-raise-game small {
   color: var(--color-text-support);
   font-size: var(--text-meta);
+}
+
+.stats-row-chevron {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--color-text-support);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 /* Filters */
@@ -291,7 +304,7 @@
 
 .stats-h2h-score strong {
   display: block;
-  color: var(--color-accent-text);
+  color: var(--color-text-primary);
   font-family: var(--font-display);
   font-size: 34px;
   line-height: 1.1;
@@ -357,8 +370,8 @@
   display: inline-block;
   margin: 0 0 6px;
   padding: 2px 8px;
-  color: var(--color-accent-text);
-  border: 1px solid var(--color-accent-text);
+  color: var(--color-text-support);
+  border: 1px solid var(--color-border);
   border-radius: 999px;
   font-size: var(--text-meta);
   font-weight: 600;
@@ -376,7 +389,6 @@
     align-items: start;
   }
 
-  .trends-panel > .stats-section-heading,
   .trends-panel > .stats-subheading,
   .trends-panel > .stats-filters,
   .trends-panel > .stats-locked,

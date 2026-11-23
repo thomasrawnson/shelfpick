@@ -78,3 +78,79 @@ export function avatarCollisions(page: Page) {
       .map((element) => `${element.tagName.toLowerCase()}.${element.className} "${(element.textContent ?? "").trim().slice(0, 30)}"`)
   })
 }
+
+// Stats tab data (overview and Trends) so the screen is deterministic.
+export async function mockStatsFeed(page: Page, apiOrigin: string) {
+  const months = (count: number) => {
+    const now = new Date()
+    return Array.from({ length: count }, (_, index) => {
+      const date = new Date(Date.UTC(now.getFullYear(), now.getMonth() - (count - 1 - index), 1))
+      return { month: date.toISOString().slice(0, 7), plays: [3, 5, 2, 8, 11, 6, 0, 4, 9, 12, 7, 5][index % 12] }
+    })
+  }
+  const heatmap = (year: number) => {
+    const days = []
+    for (let day = 0; day < 365; day += 3) {
+      const date = new Date(Date.UTC(year, 0, 1 + day))
+      if (date.getUTCFullYear() !== year) break
+      days.push({ date: date.toISOString().slice(0, 10), plays: 1 + (day % 4) })
+    }
+    return { year, days, total_plays: days.reduce((sum, day) => sum + day.plays, 0), active_days: days.length, max_plays_in_day: 4 }
+  }
+  const insights = {
+    total_games: 64, total_plays: 839, played_games_count: 41, historical_played_games_count: 58,
+    collection_played_percentage: 64, total_duration_minutes: 41_220, duration_plays: 612, average_duration_minutes: 67,
+    most_played: { bgg_id: 1, name: "Clockwork Market", play_count: 61 },
+    last_played: { bgg_id: 2, name: "Lantern Grove", played_at: "2026-11-14T19:00:00Z" },
+    never_played_count: 23,
+    frequent_players: [
+      { id: 1, name: "Tom", play_count: 802, win_count: 301, decided_count: 790 },
+      { id: 2, name: "Wales", play_count: 512, win_count: 190, decided_count: 505 },
+      { id: 3, name: "Sister", play_count: 140, win_count: 0, decided_count: 0 },
+    ],
+    monthly_activity: { plays: 12, unique_games: 7, new_games: 1, repeat_plays: 5, recent_plays: [] },
+    neglected_games: [
+      { bgg_id: 7, name: "Ember Vale", play_count: 0, last_played_at: null },
+      { bgg_id: 8, name: "Quiet Archive", play_count: 0, last_played_at: null },
+    ],
+    top_games_by_player: [
+      { player_id: 1, player_name: "Tom", bgg_id: 1, game_name: "Clockwork Market", play_count: 58 },
+      { player_id: 2, player_name: "Wales", bgg_id: 2, game_name: "Lantern Grove", play_count: 31 },
+    ],
+    common_groups: [
+      { player_ids: [1, 2], player_names: ["Tom", "Wales"], play_count: 402 },
+      { player_ids: [1, 2, 3], player_names: ["Tom", "Wales", "Sister"], play_count: 96 },
+    ],
+  }
+  await page.route("**/insights/monthly-recap**", route => route.fulfill({ json: {
+    month: "2026-11", month_label: "November 2026", total_plays: 3, unique_games: 3, total_duration_minutes: 150, duration_plays: 2,
+    most_played: { bgg_id: 1, name: "Clockwork Market", play_count: 1, image_url: null }, collage_games: [],
+  } }))
+  await page.route("**/insights/year-recap**", route => route.fulfill({ json: {
+    year: 2026, total_plays: 87, unique_games: 23, total_duration_minutes: 4310, duration_plays: 87,
+    top_games: [{ bgg_id: 1, name: "Clockwork Market", play_count: 14 }, { bgg_id: 2, name: "Lantern Grove", play_count: 11 }],
+    new_games_count: 9, new_games: [{ bgg_id: 4, name: "Tiny Orchard", play_count: 7 }],
+    plays_by_month: [4, 5, 6, 7, 9, 8, 6, 5, 12, 11, 8, 6], busiest_month: 9,
+    plays_by_weekday: [3, 4, 5, 6, 12, 40, 17], busiest_weekday: 6,
+    longest_play: { bgg_id: 1, name: "Clockwork Market", duration_minutes: 195, played_on: "2026-03-14" },
+    co_players: [{ name: "Ann", play_count: 41 }],
+  } }))
+  await page.route(/\/insights(\?.*)?$/, route => route.fulfill({ json: insights }))
+  await page.route(/\/rankings\?/, route => route.fulfill({ json: { rankings: [], unplayed: [], summary: { games_count: 64, designers: [], publishers: [], mechanics: [], categories: [] } } }))
+  await page.route(/\/players(\?.*)?$/, route => route.fulfill({ json: [{ id: 1, name: "Ann", avatar_key: "forest" }, { id: 2, name: "Bob", avatar_key: "forest" }, { id: 3, name: "Cleo", avatar_key: "forest" }] }))
+  // Only the API origin: the dev server also serves /src/components/stats/*.
+  await page.route(`${apiOrigin}/stats/**`, route => {
+    const url = new URL(route.request().url())
+    const count = Number(url.searchParams.get("months") ?? 12)
+    const json: Record<string, unknown> = {
+      "plays-per-month": { months: months(count), total_plays: months(count).reduce((sum, month) => sum + month.plays, 0) },
+      heatmap: heatmap(Number(url.searchParams.get("year"))),
+      "h-index": {
+        h_index: 7, next_target: 8, games_played: 22, total_plays: 190, qualifying_games: [], games_needed: 2, reachable: true, plays_needed_total: 3,
+        raise_list: [{ bgg_id: 11, name: "Clockwork Market", plays: 7, plays_needed: 1 }, { bgg_id: 12, name: "Lantern Grove", plays: 6, plays_needed: 2 }],
+      },
+      streak: { current_weeks: 5, best_weeks: 9, played_this_week: false, at_risk: true, this_week_start: "2026-11-16" },
+    }
+    return route.fulfill({ json: json[url.pathname.split("/").pop()!] })
+  })
+}

@@ -22,4 +22,6 @@
 @import "./styles/legal.css";
 @import "./styles/native-dynamic-type.css";
 @import "./styles/shell.css";
+@import "./styles/controls.css";
+@import "./styles/shelf.css";
 @import "./styles/tonight.css";

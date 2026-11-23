@@ -2,7 +2,7 @@ import assert from "node:assert/strict"
 import test from "node:test"
 
 import {
-  feedGames, feedPlayers, filterFeed, groupFeedByMonth, NO_FILTERS, sortFeed, winnersLabel,
+  feedGames, feedPlayers, filterFeed, groupFeedByMonth, NO_FILTERS, playRowMeta, sortFeed, winnersLabel,
 } from "./plays-feed.ts"
 
 const game = (bgg_id, name) => ({ bgg_id, name })
@@ -38,6 +38,15 @@ test("winner labels cover competitive, co-op and unscored plays", () => {
   assert.equal(winnersLabel(play(1, "2026-01-01", ["Ann"], { participants: [{ id: 1, name: "Ann", outcome: "win" }] })), "Won by Ann")
   assert.equal(winnersLabel(play(2, "2026-01-01", [], { outcome_type: "cooperative", coop_result: "won" })), "Won together")
   assert.equal(winnersLabel(play(3, "2026-01-01", ["Ann"])), null)
+})
+
+test("a Plays row always states the result: a winner, a co-op result or No result logged", () => {
+  const won = play(1, "2026-01-01", ["Ann"], { duration_minutes: 40, participants: [{ id: 1, name: "Ann", outcome: "win" }] })
+  assert.equal(playRowMeta(won, "Nov 16"), "Nov 16 · 1 player · 40 min · Won by Ann")
+  // No duration and no winner: the time is left out, the missing result is named.
+  assert.equal(playRowMeta(play(2, "2026-01-01", ["Ann", "Bob"]), "Nov 13"), "Nov 13 · 2 players · No result logged")
+  assert.equal(playRowMeta(play(3, "2026-01-01", [], { outcome_type: "cooperative", coop_result: "lost", player_count: 3 }), "Nov 9"), "Nov 9 · 3 players · Lost together")
+  assert.equal(playRowMeta(play(4, "2026-01-01", [], { outcome_type: "cooperative", coop_result: null, player_count: 3 }), "Nov 9"), "Nov 9 · 3 players · No result logged")
 })
 
 test("SP-UI-02 counting rule: every play counts, off-shelf plays keep their game summary", async () => {

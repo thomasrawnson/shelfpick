@@ -267,6 +267,42 @@ one ballot but cannot guarantee one real person across multiple browsers or
 devices. Invalid and expired links explain that the session is unavailable;
 closed links show final results.
 
+## SP-UI-04 Cross-tab consistency — 23 November 2026
+
+Every tab now uses one selected state and one accent. This section is the reference; where it disagrees with an older
+section below (for example "Filter tabs use a Forest label and short underline" or gold as a metadata colour), this wins.
+
+- **One accent colour.** Forest is the only interactive accent on all five tabs (Tonight, Shelf, Plays, Discover, Stats) and
+  in the tab bar and avatar. Gold is not used for text, numbers, fills, borders or badges there: the account avatar takes a
+  neutral `surface-raised` fill on every tab; the Pro tag is a quiet neutral outline; Shelf play counts and Stats numbers are
+  plain secondary and primary text. (The Year in Review story, the paywall and Pro screens keep their own treatment.)
+- **One selected-state pattern, one component.** `ChoiceGroup` (`components/ui/ChoiceGroup.tsx`, `styles/controls.css`) is
+  the only segmented control and chip row: variants `segmented` (a track of equal options) and `chips`, with an optional
+  `scroll` for a long row. Selected = Forest text on a Forest-soft fill with a 2px Forest edge and bold weight; unselected =
+  no fill and supporting text. The state is exposed as `aria-pressed` inside a labelled `role="group"`, so it is never
+  colour alone. Measured contrast (WCAG): the selected edge against the unselected surface is at least 3:1 (4.9 to 6.9) and
+  the selected text on its fill at least 4.5:1 (6.28 light, 4.53 dark; do not lighten the dark fill). A standalone toggle
+  (Discover's Want to Play) is `.choice.pill`, the same look.
+  Used by: Shelf (Owned / Want to Play / Ranking; All / Played / Unplayed), Discover (Hot / For You), Stats (the section row,
+  which scrolls sideways at large text, and the 12 / 24 month toggle), Plays (date range) and the Feedback sheet. Tonight's
+  count and complexity buttons (SP-UI-03) share the look and add a check; they are not yet on the component.
+- **Calm lists.** Discover cards: cover, title, facts, one labelled Want to Play button (44pt), and a "…" overflow menu
+  (`OverflowMenu`) that holds Why it's trending, View on BGG and Hide. Hide is the danger colour and shows an undo toast
+  (`UndoToast`). There is no "Hot now" badge; the header pill is a text link under the lists. Stats "Play these to reach N" is
+  flat rows between hairlines with a chevron, not boxes inside a card; stat tiles are left-aligned. A tab's title is never
+  repeated by a heading under the tab row.
+- **Shelf.** The count ("182 games", secondary text) and an "Add game" text button share one row; search (border, magnifier,
+  name), sort and layout are one 40pt row (`.select-field` is the shared compact menu, also used for the Plays filters);
+  thumbnails are one square cover-fit crop with the `ResilientGameArtwork` fallback. This supersedes "covers stay contained"
+  for Shelf thumbnails only; game detail, Discover and shared cards still contain the box art.
+- **Plays.** Game and Player menus share one row, date chips sit beneath, and every row ends with its result (a winner, a
+  co-op result or "No result logged").
+- **One title row.** The five tab screens (`.tab-screen`) share the same top, a 56px title row that centres the 1.5rem heading
+  on the avatar (a 44pt target at a fixed top-right spot), so the title baseline does not move between tabs. Tonight's small
+  label sits on the same top line.
+- **Targets.** 44pt effective targets everywhere; the Shelf search row is 40pt as specified, with a 44pt hit area on the layout
+  toggle, and the Shelf filter chips are 36pt with a 44pt hit area.
+
 ## SP-UI-03 Tonight: less templated, clearer hierarchy — 23 November 2026
 
 Tonight (`PlayerStep`, class `tonight-screen`, rules in `styles/tonight.css`, loaded last) is the first screen on the
@@ -317,7 +353,7 @@ redirect (`legacyRedirect` in `routes.ts`); guest voting links never change.
 
 **The Forest Means Action Rule.** Use Forest Green for primary actions, selected controls, active navigation, focus rings and interactive affordances that move the user forward.
 
-**The Gold Earns Attention Rule.** Reserve Warm Gold for restrained emphasis such as rankings, selected metadata and occasional supporting links; it is not the default action color. Tonight uses none (see SP-UI-03).
+**The Gold Earns Attention Rule.** Warm Gold is brand colour for the logo, artwork and share cards. It is not an interface colour: none of the five tabs uses it (see SP-UI-03 and SP-UI-04), and it is never a button, link or selected state.
 
 **The Semantic Color Rule.** Success, warning, danger and info retain their functional hues and labels. Never substitute Forest or Gold where the user needs to understand status or risk.
 
@@ -367,9 +403,9 @@ Borders are one pixel and use the semantic line token. Circular shapes belong to
 
 Inputs and search fields sit on `surface-raised`, use primary text and readable supporting placeholders, and switch their border to the active semantic color on focus. Error and retry states use danger text, border and a danger-soft surface; success states use the equivalent success tokens.
 
-Cards use tonal separation and a border before elevation. Recommendation cards give the cover, game title and fit explanation the clearest hierarchy. Compact badges and chips may use Forest-soft for selection or Gold-soft for earned emphasis, with text colors chosen for contrast.
+Cards use tonal separation and a border before elevation. Recommendation cards give the cover, game title and fit explanation the clearest hierarchy. Compact badges and chips may use Forest-soft for selection or a neutral outline for a quiet tag, with text colors chosen for contrast.
 
-Filter tabs use a Forest label and short underline for the active state. Segmented controls place the selected option on Forest-soft. The bottom navigation currently uses five equal targets with 24px icons, short labels and a Forest-soft active tile, including the usable host-led Game Night flow. Dialogs use the surface color, the established 16px–18px radius range, a clear close action and the stronger overlay shadow.
+Segmented controls and chip rows are one component (`ChoiceGroup`; see SP-UI-04): the selected option is Forest on Forest-soft with a 2px Forest edge. The bottom navigation currently uses five equal targets with 24px icons, short labels and a Forest-soft active tile, including the usable host-led Game Night flow. Dialogs use the surface color, the established 16px–18px radius range, a clear close action and the stronger overlay shadow.
 
 ### Picker participant modes — 28 September 2026
 
@@ -527,7 +563,7 @@ denominator and uses an unavailable state when no outcome is determinable.
 
 ### Don't:
 
-- **Don't** turn Warm Gold into a general-purpose button or selected-state color.
+- **Don't** use Warm Gold as an interface colour (buttons, links, selected states, numbers or badges).
 - **Don't** add ornamental gradients, shadows or glass effects to ordinary cards and controls.
 - **Don't** let branding compete with cover artwork or recommendation content.
 - **Don't** communicate success, warning, danger or info through brand color alone.
