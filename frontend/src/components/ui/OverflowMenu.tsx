@@ -113,8 +113,8 @@ function OverflowMenu({ label, items }: Props) {
               className={item.destructive ? "overflow-item destructive" : "overflow-item"}
               onClick={() => {
                 item.onSelect()
-                // A destructive item removes what the button belongs to, so there is nothing to return focus to.
-                close(!item.destructive)
+                // Focus goes back to the button first, so a confirmation sheet opened by the item returns it there.
+                close(true)
               }}
             >
               {item.label}

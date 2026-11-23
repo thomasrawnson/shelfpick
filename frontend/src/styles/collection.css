@@ -494,77 +494,6 @@
 
 /* Play history (game detail) */
 
-.game-history {
-  padding-top: 18px;
-
-  border-top: 1px solid
-    var(--color-border);
-}
-
-.history-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-
-  gap: 8px;
-
-  margin: 12px 0 14px;
-}
-
-.history-stats div {
-  padding: 10px 6px;
-
-  background: var(--color-surface-raised);
-
-  border: 1px solid var(--line);
-  border-radius: 10px;
-
-  text-align: center;
-}
-
-.history-stats strong {
-  display: block;
-
-  color: var(--color-accent-text);
-
-  font-family: var(--font-display);
-  font-size: 16px;
-}
-
-.history-stats span {
-  display: block;
-  margin-top: 2px;
-
-  color: var(--text-muted);
-
-  font-size: var(--text-meta);
-  text-transform: uppercase;
-}
-
-.history-last-played {
-  margin: 0 0 14px;
-
-  color: var(--text-secondary);
-
-  font-size: var(--text-meta);
-}
-
-.history-empty {
-  margin: 8px 0 0;
-
-  color: var(--text-muted);
-
-  font-size: var(--text-support);
-  font-style: italic;
-}
-
-.recent-plays {
-  margin-top: 16px;
-  padding-top: 14px;
-
-  border-top: 1px solid
-    var(--color-border);
-}
-
 /* =========================================================
    Collection browser
    ========================================================= */
@@ -686,279 +615,12 @@
   background: var(--color-brand-accent-soft);
 }
 
-.recent-play-detail {
-  padding: 11px 0;
-
-  border-bottom: 1px solid
-    var(--color-border);
-}
-
-.recent-play-detail:last-child {
-  border-bottom: 0;
-}
-
-.recent-play-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.recent-play-header > div {
-  display: flex;
-  flex-direction: column;
-
-  gap: 2px;
-}
-
-.recent-play-header strong {
-  color: var(--color-text-primary);
-
-  font-size: var(--text-support);
-}
-
-.recent-play-header span {
-  color: var(--text-secondary);
-
-  font-size: var(--text-meta);
-}
-
-.play-participants {
-  display: flex;
-  flex-direction: column;
-
-  gap: 4px;
-
-  margin-top: 9px;
-}
-
-.history-player {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  padding: 6px 8px;
-
-  background: var(--color-surface-raised);
-
-  border-radius: 7px;
-}
-
-.history-player span {
-  color: var(--text-secondary);
-
-  font-size: var(--text-meta);
-}
-
-.history-player strong {
-  color: var(--color-text-primary);
-
-  font-size: var(--text-meta);
-}
-
-.history-player.winner {
-  background: var(--color-brand-accent-soft);
-
-  border: 1px solid
-    var(--color-brand-accent);
-}
-
-.history-player.winner span,
-.history-player.winner strong {
-  color: var(--color-accent-text);
-}
-
-.bgstats-history-link {
-  display: inline-block;
-  margin-top: 8px;
-
-  color: var(--color-accent-text);
-
-  border-bottom: 1px solid
-    var(--color-brand-accent);
-
-  font-size: var(--text-support);
-  font-weight: 700;
-
-  letter-spacing: 0.04em;
-  text-decoration: none;
-  text-transform: uppercase;
-
-  transition: border-color 160ms ease;
-}
-
-.bgstats-history-link:hover {
-  border-bottom-color: var(--gold);
-}
-
-.collection-danger-zone {
-  margin-top: 22px;
-  padding-top: 18px;
-
-  border-top: 1px solid
-    var(--color-danger);
-}
-
-.remove-collection-button {
-  width: 100%;
-
-  padding: 11px 14px;
-
-  color: var(--color-danger);
-  background: transparent;
-
-  border: 1px solid
-    var(--color-danger);
-
-  border-radius: 10px;
-
-  font-size: var(--text-support);
-  font-weight: 600;
-
-  cursor: pointer;
-}
-
-.remove-collection-button:hover {
-  background: var(--color-danger-soft);
-
-  border-color: var(--color-danger);
-}
-
-.remove-collection-confirm {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
-  padding: 12px 14px;
-
-  background: var(--color-danger-soft);
-
-  border: 1px solid
-    var(--color-danger);
-  border-radius: 10px;
-
-  color: var(--text-secondary);
-
-  font-size: var(--text-support);
-}
-
-.remove-collection-confirm-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.remove-collection-confirm-actions
-  .ghost-button {
-  flex: 1;
-}
-
-.remove-collection-confirm-actions
-  .remove-collection-button {
-  flex: 1;
-  width: auto;
-}
-
-.remove-collection-button:disabled,
-.remove-collection-confirm-actions
-  .ghost-button:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-
 .collection-play-meta {
   display: block;
 
   margin-top: 4px;
 
   color: var(--color-accent-text) !important;
-}
-
-.delete-play-button {
-  min-height: 44px;
-
-  display: inline-flex;
-  align-items: center;
-
-  margin-top: 6px;
-  padding: 8px 10px;
-
-  color: var(--color-danger);
-  background: var(--color-danger-soft);
-
-  border: 1px solid
-    var(--color-danger);
-
-  border-radius: 8px;
-
-  font: inherit;
-  font-size: var(--text-support);
-
-  cursor: pointer;
-}
-
-.delete-play-button:hover {
-  text-decoration: none;
-}
-
-.delete-play-confirm {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-
-  margin-top: 10px;
-  padding: 8px 10px;
-
-  background: var(--color-danger-soft);
-
-  border: 1px solid var(--color-danger);
-  border-radius: 8px;
-
-  color: var(--text-secondary);
-
-  font-size: var(--text-support);
-}
-
-.delete-play-confirm-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.delete-play-confirm-actions
-  .ghost-button {
-  width: auto;
-  padding: 6px 12px;
-
-  font-size: var(--text-support);
-}
-
-.delete-play-confirm-button {
-  padding: 6px 12px;
-
-  color: var(--color-on-danger);
-  background: var(--color-danger);
-
-  border: 0;
-  border-radius: 6px;
-
-  font: inherit;
-  font-size: var(--text-support);
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition: background 160ms ease;
-}
-
-.delete-play-confirm-button:hover {
-  background: var(--color-danger-hover);
-}
-
-.delete-play-confirm-button:disabled,
-.delete-play-confirm-actions
-  .ghost-button:disabled {
-  opacity: 0.6;
-  cursor: default;
 }
 
 .collection-toolbar-row {
@@ -1008,29 +670,12 @@
 }
 
 .add-player-button,
-.delete-play-button,
-.remove-collection-button,
-.bgstats-history-link,
 .bgstats-button {
   min-height: 44px;
 }
 
-.add-player-button,
-.delete-play-button,
-.remove-collection-button {
+.add-player-button {
   touch-action: manipulation;
-}
-
-.recent-play-detail {
-  min-width: 0;
-}
-
-.recent-play-header {
-  gap: 10px;
-}
-
-.play-participants {
-  min-width: 0;
 }
 
 
@@ -1098,52 +743,8 @@
 
   /* History */
 
-  .history-stats {
-    gap: 5px;
-  }
-
-  .history-stats div {
-    padding:
-      9px 3px;
-  }
-
-  .recent-play-detail {
-    padding:
-      12px;
-  }
-
-  .recent-play-header {
-    align-items:
-      flex-start;
-  }
-
-  .history-player {
-    gap: 8px;
-  }
-
-  .delete-play-button {
-    padding:
-      10px 0;
-  }
-
 
   /* Removal confirmation */
-
-  .remove-collection-confirm-actions {
-    display: flex;
-    flex-direction: column;
-
-    gap: 8px;
-  }
-
-  .remove-collection-confirm-actions
-    .ghost-button {
-    margin-top: 0;
-  }
-
-  .remove-collection-button {
-    width: 100%;
-  }
 }
 
 /* =========================================================
@@ -1171,29 +772,12 @@
 }
 
 .add-player-button,
-.delete-play-button,
-.remove-collection-button,
-.bgstats-history-link,
 .bgstats-button {
   min-height: 44px;
 }
 
-.add-player-button,
-.delete-play-button,
-.remove-collection-button {
+.add-player-button {
   touch-action: manipulation;
-}
-
-.recent-play-detail {
-  min-width: 0;
-}
-
-.recent-play-header {
-  gap: 10px;
-}
-
-.play-participants {
-  min-width: 0;
 }
 
 /* Mobile game detail */
@@ -1290,12 +874,6 @@
   gap: 10px;
 }
 
-.recent-play-location {
-  margin: 8px 0 0;
-  color: var(--color-text-support);
-  font-size: var(--text-support);
-}
-
 .live-timer-screen {
   display: grid;
   gap: 20px;
@@ -1359,24 +937,6 @@
   background: var(--color-success-soft);
   border-radius: var(--radius-md);
   font-weight: 800;
-}
-
-.recent-play-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.recent-play-actions .secondary-button {
-  width: auto;
-  min-height: var(--target-min);
-  padding: 8px 14px;
-}
-
-.recent-play-actions .bgstats-history-link {
-  margin-top: 0;
 }
 
 .play-share-dialog {
@@ -1560,14 +1120,6 @@
 }
 
 /* SP-PLAY-01 play results */
-
-
-.recent-play-type {
-  margin: 4px 0 0;
-  color: var(--color-text-support);
-  font-size: var(--text-support);
-  font-weight: 700;
-}
 
 /* SP-UI-01: Shelf cover grid and layout toggle. */
 .collection-screen { display: flex; flex-direction: column; }

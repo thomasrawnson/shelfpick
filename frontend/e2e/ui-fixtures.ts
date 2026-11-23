@@ -154,3 +154,33 @@ export async function mockStatsFeed(page: Page, apiOrigin: string) {
     return route.fulfill({ json: json[url.pathname.split("/").pop()!] })
   })
 }
+
+// A game detail page: many mechanics (and an import artefact, "Tags"), a rated game, and a history with a won play whose
+// winner is listed last, a play with no duration and no result, and a single-play variant.
+export const DETAIL_GAME_ID = 1000
+export const MECHANICS = ["Tags", "Engine Building", "Worker Placement", "Set Collection", "Hand Management", "Drafting", "Area Control", "Variable Player Powers", "Tile Placement"]
+
+export async function mockGameDetail(page: Page, options: { onePlay?: boolean; noAverages?: boolean } = {}) {
+  const games = GAMES.map((game, index) => index === 0
+    ? { ...game, rating: 8.13, complexity: 2.2, max_play_time: 30, min_players: 2, max_players: 2, categories: ["Economic", "Medieval"], mechanics: MECHANICS }
+    : game)
+  await page.route(/\/games(\?.*)?$/, route => route.fulfill({ json: games }))
+  const participant = (id: number, name: string, outcome: string, score: number | null) => ({
+    id, name, score, is_winner: outcome === "win", outcome, team: null, rank: null, role: null,
+  })
+  const base = { source: "app", location: null, outcome_type: "competitive", coop_result: null }
+  const plays = options.onePlay ? [
+    { ...base, id: 1, played_at: "2026-11-16T18:00:00Z", player_count: 2, duration_minutes: 45, participants: [participant(1, "Bob", "loss", 51), participant(2, "Ann", "win", 63)] },
+  ] : [
+    { ...base, id: 1, played_at: "2026-11-16T18:00:00Z", player_count: 3, duration_minutes: 40, location: "Home", participants: [participant(1, "Bob", "loss", 51), participant(2, "Cleo", "loss", 47), participant(3, "Ann", "win", 63)] },
+    { ...base, id: 2, played_at: "2026-11-10T18:00:00Z", player_count: 3, duration_minutes: null, participants: [participant(4, "Ann", "unknown", null), participant(5, "Bob", "unknown", null), participant(6, "Cleo", "unknown", null)] },
+    { ...base, id: 3, played_at: "2026-10-30T18:00:00Z", player_count: 2, duration_minutes: 55, participants: [participant(7, "Dev", "win", 70), participant(8, "Ann", "loss", 66)] },
+  ]
+  await page.route(/\/games\/1000\/plays/, route => route.fulfill({ json: {
+    bgg_id: 1000, play_count: plays.length, last_played_at: "2026-11-16", average_players: options.noAverages ? null : 2.7,
+    average_duration_minutes: options.noAverages ? null : 47, recent_plays: plays,
+  } }))
+  await page.route("**/collection/stats**", route => route.fulfill({
+    json: games.map((game, index) => ({ bgg_id: game.bgg_id, play_count: index === 0 ? plays.length : 0, last_played_at: index === 0 ? "2026-11-16" : null })),
+  }))
+}

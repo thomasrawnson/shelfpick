@@ -130,6 +130,8 @@ Keep existing shared buttons, `SegmentedControl`, `FilterTabs`, `Disclosure`,
   selection is never colour-only. Unselected options have no fill and supporting text.
 - One accent: on Tonight, Shelf, Plays, Discover and Stats gold is not used and Forest is the only interactive accent. The
   account avatar is neutral, the Pro tag is a neutral outline, play counts and Stats numbers are plain text.
+- Destructive actions (SP-UI-05): never a visible button; they sit in a "…" menu and open `ConfirmSheet` (alertdialog, names the
+  thing, Cancel focused, danger confirm). `.section-label` is the one small uppercase heading style.
 - Menus and toasts: `OverflowMenu` holds secondary actions behind a "…" button (44pt items, destructive in the danger colour);
   `UndoToast` offers Undo after a hide. `.select-field` is the compact 40pt menu.
 - Disabled: secondary text on a raised surface; preserve existing disabled interaction.
