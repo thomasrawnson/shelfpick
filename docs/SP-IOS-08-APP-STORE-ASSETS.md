@@ -2,6 +2,8 @@
 
 **State (updated 22 November 2026):** ShelfPick **1.2 (build 22) is live on the App Store**, released by the owner on 20 November 2026 after Apple approved it. 1.0 was released earlier and 1.1 (build 10) was released on 19 November 2026. This document began as the SP-IOS-08 local review-candidate record; the sections below keep that history where it is still true and replace it where it is not. App Store Connect, not this file, is the source of truth for the live listing: re-read it before relying on any field.
 
+**1.2.1 (23, 23 November 2026):** version 1.2.1 was created in App Store Connect with release type **Manual**, build 23, the 1.2 listing text carried over and a new What's New, and **submitted to App Review the same day** (state Waiting for Review). Its screenshot set is described under Screenshots below. Whether Apple approves it, and the owner's release, are not recorded here.
+
 The 1.2 additions are the optional ShelfPick Pro in-app purchases, redesigned recaps and share cards, Stats 2.0 and a new Tonight screen. See `docs/SP-PRO-01-REPORT.md` and `docs/SP-PRO-01-APP-REVIEW-NOTES.md`.
 
 ## Native assets and isolation
@@ -56,6 +58,10 @@ Apple permits 1 to 10 screenshots per display class, PNG or JPEG without alpha. 
 - **Pro page:** a Pro comparison screenshot is attached to each in-app purchase as its App Review screenshot, not to the product page. Its prices (£3.99 Yearly, £9.99 Lifetime) come from the development stand-in. In App Store Connect, Pro Lifetime is £9.99 and Pro Yearly shows $3.99 in USD; the UK Yearly price was not checked.
 - **Rights:** no BoardGameGeek artwork appears in any screenshot. A real-covers set was not produced because the cover-rights decision for the App Store listing is the owner's. Exported share cards in the app do use real BoardGameGeek covers (`EXPORT_COVER_ARTWORK_ENABLED` is true in production, set by the owner on 19 November 2026).
 - **Optional:** a Simulator recapture would add a clean 9:41 status bar. The original SP-IOS-08 login captures remain review evidence only.
+
+### 1.2.1 set (uploaded 23 November 2026)
+
+Eight screenshots in the same iPhone 6.3-inch slot (1206 x 2622, RGB, no alpha): Tonight, Shelf, **Game detail** (new), Plays and Stats Trends were recaptured for SP-UI-03/04/05; Stats Recaps, the monthly share card and Pro stats records are the **1.2 images, unchanged**, so those three still show the earlier styling (gold numerals, old selected state). Recapture them when next convenient. The new five come from `frontend/e2e/app-store-screenshots.spec.ts` (`APP_STORE_SHOTS=1 npx playwright test e2e/app-store-screenshots.spec.ts --project="iPhone 15"`, output `docs/screenshots/app-store-1.2.1/`): browser captures (Playwright WebKit, 402 x 874 at 3x) of the web build of main at `9a890bd`, with mocked synthetic data, generated cover art and no BoardGameGeek artwork, converted to RGB with `ffmpeg -pix_fmt rgb24`. They are **not Simulator or device captures** and have no iOS status bar. The same four Tonight, Shelf, Plays and Stats images (resized to 736 x 1600) went live on plutonightlabs.com/shelfpick on 23 November 2026 (site commit `976752d`).
 
 ## Submission gates
 
