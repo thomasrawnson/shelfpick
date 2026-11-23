@@ -17,7 +17,7 @@ import {
   raiseHIndexNeed,
   streakCopy,
 } from "../../stats-model"
-import SegmentedControl from "../ui/SegmentedControl"
+import ChoiceGroup from "../ui/ChoiceGroup"
 import RetryNotice from "../ui/RetryNotice"
 import Skeleton from "../ui/Skeleton"
 import BarChart from "./BarChart"
@@ -97,7 +97,7 @@ function MonthsChart({ filters }: { filters: StatsFilterValues }) {
     <section className="stats-card" aria-labelledby="stats-months-title" aria-busy={months.loading}>
       <div className="stats-card-head">
         <h3 id="stats-months-title">Plays per month</h3>
-        <SegmentedControl
+        <ChoiceGroup
           value={range}
           onChange={setRange}
           ariaLabel="Months shown"

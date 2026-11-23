@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import { formatPlayerCount } from "../player-count"
 
-import { lightImpact } from "../haptics"
 import {
   addToWishlist,
   getDiscoverRecommendations,
@@ -12,6 +11,9 @@ import {
   type DiscoverPersonalisationStatus,
   type DiscoverRecommendation,
 } from "../api/client"
+import ChoiceGroup from "./ui/ChoiceGroup"
+import OverflowMenu from "./ui/OverflowMenu"
+import UndoToast from "./ui/UndoToast"
 import RetryNotice from "./ui/RetryNotice"
 import PullIndicator from "./ui/PullIndicator"
 import Skeleton from "./ui/Skeleton"
@@ -37,7 +39,7 @@ function recommendationLabel(
   recommendation: DiscoverRecommendation,
   index: number,
 ) {
-  if (mode === "hot") return "Hot now"
+  if (mode === "hot") return null
   if (mode === "top100" && recommendation.source_rank) {
     return `#${recommendation.source_rank}`
   }
@@ -77,6 +79,7 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
   const [actionError, setActionError] = useState("")
   const [reloadKey, setReloadKey] = useState(0)
   const [dismissedCount, setDismissedCount] = useState(0)
+  const [hidden, setHidden] = useState<{ recommendation: DiscoverRecommendation; index: number } | null>(null)
   const [openReasons, setOpenReasons] = useState<Set<number>>(new Set())
   const [personalisationStatus, setPersonalisationStatus] =
     useState<DiscoverPersonalisationStatus>("unknown")
@@ -125,6 +128,7 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
 
   function selectMode(nextMode: DiscoverMode) {
     if (nextMode === mode) return
+    setHidden(null)
     setMode(nextMode)
     setRecommendations([])
     setError("")
@@ -181,12 +185,28 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
     }
   }
 
-  function dismissRecommendation(bggId: number) {
+  function dismissRecommendation(recommendation: DiscoverRecommendation) {
+    const index = recommendations.findIndex((item) => item.game.bgg_id === recommendation.game.bgg_id)
     setRecommendations((current) => current.filter(
-      (item) => item.game.bgg_id !== bggId,
+      (item) => item.game.bgg_id !== recommendation.game.bgg_id,
     ))
     setDismissedCount((current) => current + 1)
+    setHidden({ recommendation, index })
   }
+
+  function undoHide() {
+    if (!hidden) return
+    const { recommendation, index } = hidden
+    setRecommendations((current) => {
+      const next = [...current]
+      next.splice(Math.min(index, next.length), 0, recommendation)
+      return next
+    })
+    setDismissedCount((current) => Math.max(0, current - 1))
+    setHidden(null)
+  }
+
+  const expireHide = useCallback(() => setHidden(null), [])
 
   const groupedRecommendations = recommendations.reduce<Map<string, DiscoverRecommendation[]>>(
     (groups, recommendation) => {
@@ -205,10 +225,13 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
   function renderCard(recommendation: DiscoverRecommendation, index: number) {
     const { game, reasons, wishlisted } = recommendation
     const meta = [
+      recommendationLabel(mode, recommendation, index),
       formatPlayerCount(game.min_players, game.max_players),
       game.max_play_time ? `${game.max_play_time} min` : null,
       complexityLabel(game.complexity),
     ].filter(Boolean).join(" · ")
+    const reasonsOpen = openReasons.has(game.bgg_id)
+    const reasonsLabel = mode === "hot" ? "Why it’s trending" : "Why this match?"
 
     return (
       <article key={game.bgg_id} className="discover-card">
@@ -223,65 +246,43 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
         <div className="discover-copy">
           <h2>{game.name}</h2>
           {meta && <p className="discover-meta">{meta}</p>}
-          <div className="discover-tags">
-            <span className="discover-match-pill">
-              {recommendationLabel(mode, recommendation, index)}
-            </span>
-            <button
-              type="button"
-              className={wishlisted ? "discover-save-button saved" : "discover-save-button"}
-              aria-label={wishlisted
-                ? `Remove ${game.name} from Want to Play`
-                : `Save ${game.name} to Want to Play`}
-              aria-pressed={wishlisted}
-              disabled={updatingIds.has(game.bgg_id)}
-              onClick={() => { void toggleWishlist(recommendation) }}
-            >
-              <BookmarkIcon filled={wishlisted} />
-              <span>{wishlisted ? "Saved" : "Want to Play"}</span>
-            </button>
-          </div>
-          <div className="discover-actions">
-            {reasons.length > 0 && (
-              <button
-                type="button"
-                className="discover-reasons-toggle"
-                aria-expanded={openReasons.has(game.bgg_id)}
-                aria-controls={`discover-reasons-${game.bgg_id}`}
-                onClick={() => setOpenReasons((current) => {
-                  const next = new Set(current)
-                  if (next.has(game.bgg_id)) next.delete(game.bgg_id)
-                  else next.add(game.bgg_id)
-                  return next
-                })}
-              >
-                {mode === "hot" ? "Why it’s trending" : "Why this match?"}
-              </button>
-            )}
-            <a
-              className="discover-bgg-link"
-              href={`https://boardgamegeek.com/boardgame/${game.bgg_id}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              BGG ›
-            </a>
-            <button
-              type="button"
-              className="discover-dismiss-button"
-              aria-label={`Not interested in ${game.name}`}
-              title="Not interested"
-              onClick={() => dismissRecommendation(game.bgg_id)}
-            >
-              Hide
-            </button>
-          </div>
-          {reasons.length > 0 && openReasons.has(game.bgg_id) && (
+          <button
+            type="button"
+            className={wishlisted ? "choice pill selected" : "choice pill"}
+            aria-label={wishlisted
+              ? `Remove ${game.name} from Want to Play`
+              : `Save ${game.name} to Want to Play`}
+            aria-pressed={wishlisted}
+            disabled={updatingIds.has(game.bgg_id)}
+            onClick={() => { void toggleWishlist(recommendation) }}
+          >
+            <BookmarkIcon filled={wishlisted} />
+            <span>{wishlisted ? "Saved" : "Want to Play"}</span>
+          </button>
+          {reasons.length > 0 && reasonsOpen && (
             <ul className="discover-reasons" id={`discover-reasons-${game.bgg_id}`}>
               {reasons.map((reason) => <li key={reason}>{reason}</li>)}
             </ul>
           )}
         </div>
+
+        <OverflowMenu
+          label={`More options for ${game.name}`}
+          items={[
+            ...(reasons.length > 0 ? [{
+              key: "reasons",
+              label: reasonsOpen ? "Close explanation" : reasonsLabel,
+              onSelect: () => setOpenReasons((current) => {
+                const next = new Set(current)
+                if (next.has(game.bgg_id)) next.delete(game.bgg_id)
+                else next.add(game.bgg_id)
+                return next
+              }),
+            }] : []),
+            { key: "bgg", label: "View on BGG", href: `https://boardgamegeek.com/boardgame/${game.bgg_id}` },
+            { key: "hide", label: "Hide", destructive: true, onSelect: () => dismissRecommendation(recommendation) },
+          ]}
+        />
       </article>
     )
   }
@@ -290,34 +291,25 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
     <section className="screen discover-screen">
       <PullIndicator {...pull} />
       <header className="discover-header">
-        <div>
-          <h1>Discover</h1>
-        </div>
-        <button type="button" className="discover-wishlist-link" onClick={onViewWishlist}>
-          Want to Play <span aria-hidden="true">→</span>
-        </button>
+        <h1>Discover</h1>
       </header>
 
-      <div className="discover-tabs" role="tablist" aria-label="Discover lists">
-        {tabs.map((tab) => (
-          <button
-            key={tab.mode}
-            type="button"
-            role="tab"
-            aria-selected={mode === tab.mode}
-            className={mode === tab.mode ? "discover-tab active" : "discover-tab"}
-            onClick={() => {
-              if (mode !== tab.mode) void lightImpact()
-              selectMode(tab.mode)
-            }}
-          >
-            {tab.label}
-            {tab.mode === "for_you" && !personalized && (
-              <span className="discover-pro-badge">Pro</span>
-            )}
-          </button>
-        ))}
-      </div>
+      <ChoiceGroup
+        value={mode}
+        ariaLabel="Discover lists"
+        className="discover-modes"
+        options={tabs.map((tab) => ({
+          value: tab.mode,
+          label: tab.label,
+          trailing: tab.mode === "for_you" && !personalized
+            ? <span className="pro-tag">Pro</span>
+            : undefined,
+        }))}
+        onChange={selectMode}
+      />
+      <button type="button" className="text-action discover-wishlist" onClick={onViewWishlist}>
+        Want to Play <span aria-hidden="true">›</span>
+      </button>
 
       {mode === "for_you" && !personalized ? (
         <div className="discover-locked">
@@ -396,6 +388,13 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
             </div>
           )}
         </>
+      )}
+      {hidden && (
+        <UndoToast
+          message={`Hidden ${hidden.recommendation.game.name}`}
+          onUndo={undoHide}
+          onExpire={expireHide}
+        />
       )}
     </section>
   )

@@ -501,7 +501,6 @@ button.settings-row {
 .tip-jar-error { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); }
 
 /* Three types on one row; at the largest text sizes they stack. */
-.feedback-form .segmented-control { grid-template-columns: repeat(auto-fit, minmax(min(100%, 96px), 1fr)); }
 
 .feedback-field { display: flex; flex-direction: column; gap: 6px; }
 .feedback-field label { font-weight: 700; }

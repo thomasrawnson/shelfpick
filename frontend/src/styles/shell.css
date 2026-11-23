@@ -15,47 +15,19 @@
 }
 .app-phone { position: relative; }
 /* One fixed avatar spot: every screen's title row keeps 56px clear on the right. */
-.page-transition > .screen > header,
-.page-transition > .screen > .collection-heading-row > header { padding-right: 56px; }
+.page-transition > .screen > header { padding-right: 56px; }
 /* Centred step titles keep the same clearance on both sides so they stay centred. */
 .app-content .picker-step-screen:not(.player-step-screen) > header { padding-inline: 56px; }
 .app-content { padding-top: calc(4px + env(safe-area-inset-top)); }
 
 /* Keep titles and primary controls clear of the avatar in the title row. */
-.segmented-control.tonight-modes {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin: 4px 56px 12px 0;
-}
-.segmented-control.tonight-modes button { min-width: 0; padding-inline: 4px; white-space: nowrap; font-size: 0.875rem; }
-.app-content .collection-heading-row { padding-right: 56px; }
 
 /* Tonight: left-aligned title row shared with the avatar, one-row group size. */
 .app-content > .screen > header { min-height: 56px; display: flex; flex-direction: column; justify-content: center; text-align: left; }
 
 /* Compact screen titles and Shelf controls. */
-.app-content > .screen > header h1,
-.app-content > .screen > .collection-heading-row > header h1 { font-size: 1.5rem; line-height: 1.15; margin: 0; }
-.collection-heading-row { align-items: center; gap: 10px; margin-bottom: 8px; }
-.collection-heading-row header .subtitle { margin: 2px 0 0; font-size: 0.8125rem; }
-.collection-heading-row .collection-add-button { min-height: 36px; padding: 0 14px; font-size: 0.875rem; border-radius: 999px; }
-.collection-section-tabs button { min-height: 40px; font-size: 0.9375rem; }
-.collection-section-tabs { margin-bottom: 8px; }
-.collection-tools { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; margin-bottom: 8px; padding: 2px 0 4px; background: var(--color-bg); }
-.collection-search-sort-row { display: grid; grid-template-columns: minmax(0, 1fr) 72px var(--target-min); align-items: center; gap: 6px; }
+.app-content > .screen > header h1 { font-size: 1.5rem; line-height: 1.15; margin: 0; }
 /* One button switches layout; it shows the layout it will switch to. */
-.shelf-view-toggle { display: grid; place-items: center; width: var(--target-min); height: var(--target-min); padding: 0; color: var(--color-brand-primary); background: transparent; border: 1px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; }
-.shelf-view-toggle svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.collection-search-wrap { flex: 1 1 0; min-width: 0; }
-.collection-sort-wrap { width: 72px; min-width: 0; display: block; }
-.collection-sort { width: 100%; max-width: none; padding-inline: 10px 4px; background-color: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: var(--radius-md); }
-.collection-search-sort-row .collection-search { min-height: 40px; }
-.collection-sort { min-height: 40px; }
-.collection-tools .filter-tabs { display: flex; gap: 6px; padding: 0; background: transparent; border: 0; }
-.collection-tools .filter-tabs button {
-  flex: none; min-height: 32px; padding: 0 14px; border: 1px solid var(--color-border);
-  border-radius: 999px; background: transparent; color: var(--color-text-support); font-size: 0.8125rem; font-weight: 700;
-}
-.collection-tools .filter-tabs button.active { color: var(--color-text-inverse); background: var(--color-brand-primary); border-color: var(--color-brand-primary); }
 
 /* Tonight: one spacing rhythm (16px between groups), full-width tappable rows. */
 
@@ -135,8 +107,6 @@
 
 /* Dynamic Type: keep my compact controls from splitting words at the AX sizes. */
 @supports (font: -apple-system-body) {
-  :root[data-native-ios] .collection-section-tabs { grid-template-columns: repeat(auto-fit, minmax(min(100%, 6em), 1fr)) !important; }
-  :root[data-native-ios] .collection-section-tabs button { font-size: var(--text-support); overflow-wrap: normal; word-break: keep-all; }
   
   
   
@@ -149,16 +119,17 @@
 }
 
 /* Shelf grid refinement: whole cover visible, two-line titles that line up, readable plays badge. */
-.collection-tile-cover { background: color-mix(in srgb, var(--color-brand-primary) 8%, var(--color-surface-raised)); }
-.collection-tile-cover img { object-fit: contain; }
-.collection-tile strong { min-height: 2.5em; }
-.collection-tile-plays {
-  color: #fff; background: rgb(20 24 22 / 90%); border: 1px solid rgb(255 255 255 / 40%);
-  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-}
 .plays-off-shelf { flex: none; color: var(--color-text-support); font-size: 0.75rem; font-weight: 700; }
 .plays-card.off-shelf .plays-card-main { cursor: default; }
 /* Missing artwork in a 44px play cover: the mark only, no caption. */
 .plays-cover .game-artwork-placeholder { display: grid; place-items: center; padding: 0; }
 .plays-cover .game-artwork-placeholder-copy { display: none; }
 .plays-cover .game-artwork-placeholder-mark { transform: scale(0.6); }
+
+/* The account avatar on every tab: a 44pt target with a neutral fill (gold is not an interface colour; SP-UI-04). */
+.app-top-bar .dice-menu-button { width: var(--target-min); height: var(--target-min); }
+.app-top-bar .player-avatar {
+  color: var(--color-text-primary);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+}

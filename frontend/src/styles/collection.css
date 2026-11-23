@@ -13,35 +13,6 @@
 
 /* Collection browser */
 
-.collection-section-tabs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-  margin: 14px 0;
-  padding: 4px;
-  background: var(--color-surface-raised);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-}
-
-.collection-section-tabs button {
-  min-height: var(--target-min);
-  color: var(--text-secondary);
-  background: transparent;
-  border: 0;
-  border-radius: 9px;
-  font: inherit;
-  font-size: var(--text-support);
-  font-weight: 700;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-.collection-section-tabs button.active {
-  color: var(--color-brand-primary);
-  background: var(--color-brand-primary-soft);
-}
-
 .wishlist-list {
   display: grid;
   gap: 0;
@@ -190,40 +161,6 @@
   min-height: 0;
 }
 
-.collection-tools {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.collection-search,
-.collection-sort {
-  min-width: 0;
-  padding: 11px 12px;
-
-  color: var(--color-text-primary);
-  background: var(--color-surface-raised);
-
-  border: 1px solid var(--line);
-  border-radius: 12px;
-
-  font: inherit;
-  font-size: var(--text-support);
-}
-
-.collection-search::placeholder {
-  color: var(--color-text-support);
-}
-
-.collection-sort {
-  max-width: 110px;
-}
-
-.collection-sort option {
-  color: var(--ink);
-}
-
 .collection-count {
   margin: 0 0 10px;
 
@@ -258,9 +195,6 @@
 .collection-thumb img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-
-  background: var(--color-surface-raised);
 }
 
 .collection-chevron {
@@ -300,19 +234,6 @@
   align-items: center;
   justify-content: center;
   text-decoration: none;
-}
-
-@media (max-width: 380px) {
-  .collection-heading-row {
-    align-items: stretch;
-    flex-direction: column;
-    gap: var(--space-3);
-  }
-
-  .collection-add-button {
-    align-self: flex-start;
-    margin-top: 0;
-  }
 }
 
 .collection-back {
@@ -655,45 +576,7 @@
 
 /* Sticky search / sort controls */
 
-.collection-tools {
-  position: sticky;
-  top: 0;
-  z-index: 5;
-
-  padding: 4px 0 10px;
-
-  background: linear-gradient(
-      180deg,
-      var(--color-surface) 0%,
-      var(--color-surface) 80%,
-      transparent 100%
-    );
-}
-
 /* Search and sort readability */
-
-.collection-search,
-.collection-sort {
-  color: var(--text-primary);
-
-  background: var(--color-surface-raised);
-
-  border-color: var(--color-border);
-}
-
-.collection-search::placeholder {
-  color: var(--text-muted);
-}
-
-.collection-search:focus,
-.collection-sort:focus {
-  border-color: var(--color-brand-accent);
-}
-
-.collection-sort option {
-  color: var(--ink);
-  background: var(--color-surface);
-}
 
 /* Collection count */
 
@@ -981,39 +864,6 @@
   cursor: default;
 }
 
-.collection-filter-tabs {
-  display: grid;
-  grid-template-columns:
-    repeat(3, 1fr);
-
-  gap: 6px;
-
-  margin: 10px 0;
-}
-
-.collection-filter-tabs button {
-  padding: 8px 6px;
-
-  color: var(--text-secondary);
-  background: var(--color-surface-raised);
-
-  border: 1px solid
-    var(--color-border);
-
-  border-radius: 999px;
-
-  font-size: var(--text-support);
-  font-weight: 600;
-
-  cursor: pointer;
-}
-
-.collection-filter-tabs button.active {
-  color: var(--color-brand-primary);
-  background: var(--color-brand-primary-soft);
-  border-color: var(--color-brand-primary);
-}
-
 .collection-play-meta {
   display: block;
 
@@ -1111,32 +961,6 @@
   cursor: default;
 }
 
-.collection-tools {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.collection-filter-tabs {
-  display: grid;
-  grid-template-columns:
-    repeat(3, 1fr);
-
-  gap: 6px;
-}
-
-.collection-filter-tabs button {
-  min-height: var(--target-min);
-}
-
-.collection-search-wrap {
-  display: block;
-}
-
-.collection-search {
-  width: 100%;
-}
-
 .collection-toolbar-row {
   display: flex;
   align-items: center;
@@ -1153,36 +977,10 @@
   font-size: var(--text-meta);
 }
 
-.collection-sort-wrap {
-  flex-shrink: 0;
-}
-
-.collection-sort {
-  min-height: var(--target-min);
-  max-width: 150px;
-}
-
 @media (max-width: 480px) {
-  .collection-tools {
-    gap: 10px;
-  }
-
-  .collection-filter-tabs {
-    gap: 5px;
-  }
-
-  .collection-filter-tabs button {
-    padding: 9px 6px;
-
-    font-size: var(--text-support);
-  }
 
   .collection-toolbar-row {
     margin-bottom: 2px;
-  }
-
-  .collection-sort {
-    max-width: 135px;
   }
 }
 /* =========================================================
@@ -1480,9 +1278,6 @@
 }
 
 /* Collection ranking tab v2 */
-.collection-section-tabs {
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-}
 
 .live-timer-clock,
 .live-timer-indicator-time {
@@ -1812,17 +1607,6 @@
   display: block;
 }
 .collection-tile-cover .game-artwork-placeholder { width: 100%; height: 100%; }
-.collection-tile-plays {
-  position: absolute;
-  left: 8px;
-  bottom: 8px;
-  padding: 3px 9px;
-  color: #fff;
-  background: rgb(0 0 0 / 68%);
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 700;
-}
 .collection-tile strong {
   font-size: 0.9375rem;
   line-height: 1.25;

@@ -9,7 +9,7 @@ import {
   queueFeedback,
   type FeedbackType,
 } from "../feedback"
-import SegmentedControl from "./ui/SegmentedControl"
+import ChoiceGroup from "./ui/ChoiceGroup"
 import Sheet from "./ui/Sheet"
 
 const TYPE_OPTIONS: Array<{ value: FeedbackType; label: string }> = [
@@ -88,7 +88,7 @@ function FeedbackSheet({ userId, initialType, onClose }: {
         ? wantsReply ? "We read every message and will email you back." : "We read every message."
         : "You're offline. Your message is saved on this phone and will send automatically when you're back online."}</p>
     </div> : <form id={formId} className="feedback-form" noValidate onSubmit={(event) => { void submit(event) }}>
-      <SegmentedControl ariaLabel="Feedback type" value={type} options={TYPE_OPTIONS} onChange={setType} />
+      <ChoiceGroup ariaLabel="Feedback type" value={type} options={TYPE_OPTIONS} onChange={setType} />
       <div className="feedback-field">
         <label htmlFor={messageId}>Message</label>
         <textarea id={messageId} value={message} rows={6} maxLength={FEEDBACK_MAX + 200}

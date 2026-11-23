@@ -1,3 +1,4 @@
+import ChoiceGroup from "./ui/ChoiceGroup"
 import {
   useEffect,
   useState,
@@ -250,37 +251,14 @@ function InsightsView({
       </header>
 
 
-      <div
-        className="stats-section-tabs"
-        role="group"
-        aria-label="Stats sections"
-      >
-        {statsSections.map(
-          (section) => (
-            <button
-              type="button"
-              aria-pressed={
-                activeSection
-                === section.id
-              }
-              className={
-                activeSection
-                === section.id
-                  ? "stats-section-tab active"
-                  : "stats-section-tab"
-              }
-              key={section.id}
-              onClick={() =>
-                setActiveSection(
-                  section.id
-                )
-              }
-            >
-              {section.label}
-            </button>
-          ),
-        )}
-      </div>
+      <ChoiceGroup
+        value={activeSection}
+        ariaLabel="Stats sections"
+        className="stats-sections"
+        scroll
+        options={statsSections.map((section) => ({ value: section.id, label: section.label }))}
+        onChange={setActiveSection}
+      />
 
 
       {activeSection === "trends" && (

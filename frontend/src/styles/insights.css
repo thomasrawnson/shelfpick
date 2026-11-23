@@ -4,42 +4,6 @@
   overflow-y: auto;
 }
 
-.stats-section-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin: -10px 0 20px;
-  padding: 4px;
-  background: var(--color-surface-raised);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-}
-
-.stats-section-tab {
-  flex: 1 1 auto;
-  min-height: var(--target-min);
-  padding: 8px 8px;
-  color: var(--text-muted);
-  background: transparent;
-  border: 0;
-  border-radius: 10px;
-  font: inherit;
-  font-size: var(--text-support);
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-.stats-section-tab:hover {
-  color: var(--text-primary);
-}
-
-.stats-section-tab.active {
-  color: var(--color-brand-primary);
-  background: var(--color-brand-primary-soft);
-}
-
 .stats-section-heading {
   margin: 0 2px 14px;
 }

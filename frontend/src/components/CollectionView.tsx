@@ -42,8 +42,8 @@ import WishlistView
 import RankGamesView
   from "./RankGamesView"
 
-import SegmentedControl
-  from "./ui/SegmentedControl"
+import ChoiceGroup
+  from "./ui/ChoiceGroup"
 import { mergeGameIntoCollection } from "../collection-state"
 import PullIndicator from "./ui/PullIndicator"
 import Skeleton from "./ui/Skeleton"
@@ -335,10 +335,10 @@ function CollectionView({
   }
 
   const sectionTabs = (
-    <SegmentedControl
+    <ChoiceGroup
       value={section}
       ariaLabel="Collection section"
-      className="collection-section-tabs"
+      className="shelf-sections"
       options={[
         { value: "owned", label: "Owned" },
         { value: "wishlist", label: "Want to Play" },
@@ -930,9 +930,7 @@ function CollectionView({
   if (loading && games.length === 0 && !error) {
     return (
       <section className="screen collection-screen" aria-busy="true">
-        <div className="collection-heading-row">
-          <header><h1>Shelf</h1></header>
-        </div>
+        <header><h1>Shelf</h1></header>
         <Skeleton variant="tile" rows={6} label="Opening your shelf" />
       </section>
     )
@@ -984,27 +982,25 @@ function CollectionView({
   return (
     <section className="screen collection-screen">
       <PullIndicator {...pull} />
-      <div className="collection-heading-row">
-        <header>
-          <h1>
-            Shelf
-          </h1>
+      <header>
+        <h1>Shelf</h1>
+      </header>
 
-          <p className="subtitle">
-            {games.length} {games.length === 1 ? "game" : "games"}
-          </p>
-        </header>
+      <div className="shelf-count-row">
+        <p className="shelf-count">
+          {games.length} {games.length === 1 ? "game" : "games"}
+        </p>
 
         {games.length > 0 && !addingGame && <button
           ref={addGameButtonRef}
           type="button"
-          className="primary-button collection-add-button"
+          className="text-action"
           aria-expanded="false"
           aria-controls="add-game-panel"
           data-add-game-trigger
           onClick={openAddGame}
         >
-          + Add
+          Add game
         </button>}
       </div>
 
@@ -1025,7 +1021,7 @@ function CollectionView({
         trailing={
           <button
             type="button"
-            className="shelf-view-toggle"
+            className="shelf-layout-toggle"
             aria-label={layout === "grid" ? "Show as list" : "Show as grid"}
             onClick={() => changeLayout(layout === "grid" ? "list" : "grid")}
           >

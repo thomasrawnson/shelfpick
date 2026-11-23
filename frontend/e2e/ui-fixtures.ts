@@ -78,3 +78,49 @@ export function avatarCollisions(page: Page) {
       .map((element) => `${element.tagName.toLowerCase()}.${element.className} "${(element.textContent ?? "").trim().slice(0, 30)}"`)
   })
 }
+
+// Stats tab data (overview and Trends) so the screen is deterministic.
+export async function mockStatsFeed(page: Page, apiOrigin: string) {
+  const months = (count: number) => {
+    const now = new Date()
+    return Array.from({ length: count }, (_, index) => {
+      const date = new Date(Date.UTC(now.getFullYear(), now.getMonth() - (count - 1 - index), 1))
+      return { month: date.toISOString().slice(0, 7), plays: [3, 5, 2, 8, 11, 6, 0, 4, 9, 12, 7, 5][index % 12] }
+    })
+  }
+  const heatmap = (year: number) => {
+    const days = []
+    for (let day = 0; day < 365; day += 3) {
+      const date = new Date(Date.UTC(year, 0, 1 + day))
+      if (date.getUTCFullYear() !== year) break
+      days.push({ date: date.toISOString().slice(0, 10), plays: 1 + (day % 4) })
+    }
+    return { year, days, total_plays: days.reduce((sum, day) => sum + day.plays, 0), active_days: days.length, max_plays_in_day: 4 }
+  }
+  const insights = {
+    total_games: 64, total_plays: 839, played_games_count: 41, historical_played_games_count: 58,
+    collection_played_percentage: 64, total_duration_minutes: 41_220, duration_plays: 612, average_duration_minutes: 67,
+    most_played: { bgg_id: 1, name: "Clockwork Market", play_count: 61 },
+    last_played: { bgg_id: 2, name: "Lantern Grove", played_at: "2026-11-14T19:00:00Z" },
+    never_played_count: 23, frequent_players: [], monthly_activity: { plays: 12, unique_games: 7, new_games: 1, repeat_plays: 5, recent_plays: [] },
+    neglected_games: [], top_games_by_player: [], common_groups: [],
+  }
+  await page.route(/\/insights(\?.*)?$/, route => route.fulfill({ json: insights }))
+  await page.route(/\/rankings\?/, route => route.fulfill({ json: { rankings: [], unplayed: [], summary: { games_count: 64, designers: [], publishers: [], mechanics: [], categories: [] } } }))
+  await page.route(/\/players(\?.*)?$/, route => route.fulfill({ json: [{ id: 1, name: "Ann", avatar_key: "forest" }, { id: 2, name: "Bob", avatar_key: "forest" }, { id: 3, name: "Cleo", avatar_key: "forest" }] }))
+  // Only the API origin: the dev server also serves /src/components/stats/*.
+  await page.route(`${apiOrigin}/stats/**`, route => {
+    const url = new URL(route.request().url())
+    const count = Number(url.searchParams.get("months") ?? 12)
+    const json: Record<string, unknown> = {
+      "plays-per-month": { months: months(count), total_plays: months(count).reduce((sum, month) => sum + month.plays, 0) },
+      heatmap: heatmap(Number(url.searchParams.get("year"))),
+      "h-index": {
+        h_index: 7, next_target: 8, games_played: 22, total_plays: 190, qualifying_games: [], games_needed: 2, reachable: true, plays_needed_total: 3,
+        raise_list: [{ bgg_id: 11, name: "Clockwork Market", plays: 7, plays_needed: 1 }, { bgg_id: 12, name: "Lantern Grove", plays: 6, plays_needed: 2 }],
+      },
+      streak: { current_weeks: 5, best_weeks: 9, played_this_week: false, at_risk: true, this_week_start: "2026-11-16" },
+    }
+    return route.fulfill({ json: json[url.pathname.split("/").pop()!] })
+  })
+}
