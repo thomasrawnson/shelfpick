@@ -30,6 +30,14 @@ and validate the work before asking Tom to resume beta. Internal testing
 continues. This instruction supersedes older immediate-beta and post-launch
 timing below; existing completed slices remain historical implementation facts.
 
+### SP-UI-05 Game detail: calmer layout, safer destructive actions — LOCAL CANDIDATE, 23 November 2026
+
+Branch `sp-ui-05` from `main` 71ddd7c; draft PR for owner review, not deployed or submitted. Game detail only: cover, title, one
+meta line and Log a play on the first screen; flat facts with scales; six Mechanics with Show all; collapsible Recent plays with
+winners first (check plus "Won"); Rematch as the main action; Delete play and Remove from collection behind a "…" menu and a
+confirmation sheet that names the game. No backend change. Owner gate: a physical-phone check of the detail page in light and
+dark. Report: `docs/SP-UI-05-REPORT.md`.
+
 ### SP-UI-04 Cross-tab consistency — LOCAL CANDIDATE, 23 November 2026
 
 Branch `sp-ui-04`, stacked on `sp-ui-03` (PR #60, still a draft); draft PR for owner review, not merged, deployed or

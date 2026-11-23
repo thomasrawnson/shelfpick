@@ -212,49 +212,5 @@
 
 /* History */
 
-.history-stats {
-  gap: 5px;
-}
-
-.history-stats div {
-  padding:
-    9px 3px;
-}
-
-.recent-play-detail {
-  padding:
-    12px;
-}
-
-.recent-play-header {
-  align-items:
-    flex-start;
-}
-
-.history-player {
-  gap: 8px;
-}
-
-.delete-play-button {
-  padding:
-    10px 0;
-}
-
 
 /* Removal confirmation */
-
-.remove-collection-confirm-actions {
-  display: flex;
-  flex-direction: column;
-
-  gap: 8px;
-}
-
-.remove-collection-confirm-actions
-  .ghost-button {
-  margin-top: 0;
-}
-
-.remove-collection-button {
-  width: 100%;
-}

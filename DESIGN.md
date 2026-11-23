@@ -267,6 +267,29 @@ one ballot but cannot guarantee one real person across multiple browsers or
 devices. Invalid and expired links explain that the session is unavailable;
 closed links show final results.
 
+## SP-UI-05 Game detail: calmer layout, safer destructive actions — 23 November 2026
+
+- **First screen.** Back to shelf, a "…" menu and the avatar share one 44px nav row (one centre line). Under it: a capped
+  120px cover beside the year, the title and one meta line ("2 players · 30 min"; there is no separate Players section), then
+  Log a play, then flat facts. Everything is left-aligned. The cover keeps its cover-derived tint (`use-cover-accent`) and the
+  year takes the AA-adjusted cover accent; nothing else on the page is tinted and there is no gold.
+- **Flat facts.** Rating "8.1 / 10", Weight "2.2 / 5", Minutes and the history tiles are left-aligned primary-colour numbers
+  between hairlines, not boxes. A missing or zero duration is "—", never 0; one play reads "1 play".
+- **Mechanics and Categories** are plain secondary text, the first six, with "Show all N" (`aria-expanded`) beyond that. A literal
+  "Tags" entry from a BoardGameGeek import is hidden in the display layer only (`detail-terms.ts`); stored data is unchanged.
+- **Destructive-action pattern: overflow menu plus confirmation sheet.** A destructive action is never a visible button. It lives
+  in a "…" menu (`OverflowMenu`, danger colour) and always opens a confirmation sheet (`ConfirmSheet`, `role="alertdialog"`):
+  a title and one sentence that name what will go, Cancel first (and focused), and a danger-coloured confirm button. Escape and
+  a tap outside cancel; the page behind is inert; focus returns to the "…" button. Used by **Delete play** (in each Recent plays
+  entry) and **Remove from collection** (in the nav-row menu). Discover's **Hide** uses the same menu with an undo toast instead of
+  a sheet, because it is reversible.
+- **Recent plays.** Each entry has the date and facts with a 44pt chevron (`aria-expanded`, named "Collapse play on <date>")
+  that folds the entry. Players list winners first; a winner is marked by a Forest check and the word "Won", with no outline.
+  Rematch is the main action (a Forest outline pill with room around its label), Share play and Edit are quiet text, and
+  "Send to BG Stats" and Delete play sit in the "…" menu.
+- **Section labels** ("Categories", "Mechanics", "Your history", "Recent plays") use `.section-label` (small, uppercase, tracked,
+  secondary), the same spec as Tonight's `.tonight-label`.
+
 ## SP-UI-04 Cross-tab consistency — 23 November 2026
 
 Every tab now uses one selected state and one accent. This section is the reference; where it disagrees with an older

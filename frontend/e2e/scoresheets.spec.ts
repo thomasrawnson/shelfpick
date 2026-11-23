@@ -70,8 +70,9 @@ function playWith(page: Page, name: string) {
 
 async function deletePlayWith(page: Page, name: string) {
   const play = playWith(page, name)
-  await play.getByRole("button", { name: "Delete play" }).click()
-  await play.getByRole("button", { name: "Delete play" }).last().click()
+  await play.getByRole("button", { name: /More options for the .* play/ }).click()
+  await page.getByRole("menuitem", { name: "Delete play" }).click()
+  await page.getByRole("alertdialog", { name: "Delete this play?" }).getByRole("button", { name: "Delete play" }).click()
   await expect(page.getByText("Delete this play?")).toHaveCount(0)
 }
 

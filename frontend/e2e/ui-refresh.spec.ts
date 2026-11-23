@@ -140,12 +140,12 @@ test("game detail gets a cover-derived accent that stays readable in both themes
   for (const scheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme: scheme, reducedMotion: "reduce" })
     await page.goto("/shelf/owned/1000")
-    const article = page.locator(".collection-detail.has-cover-accent")
+    const article = page.locator(".game-detail.has-cover-accent")
     await expect(article).toBeVisible()
     await expect.poll(() => article.evaluate(el => el.style.getPropertyValue("--cover-accent"))).toMatch(/^#[0-9A-F]{6}$/)
     const result = await page.evaluate(async () => {
       const lib = await import(/* @vite-ignore */ "/src/cover-accent.ts")
-      const el = document.querySelector(".collection-detail .eyebrow") as HTMLElement
+      const el = document.querySelector(".game-detail .detail-year") as HTMLElement
       const text = getComputedStyle(el).color.match(/\d+/g)!.slice(0, 3).map(Number) as [number, number, number]
       const surfaces = document.documentElement.dataset.theme === "dark" ? lib.DARK_SURFACES : lib.LIGHT_SURFACES
       return Math.min(...surfaces.map((surface: string) => lib.contrastRatio(lib.rgbToHex(text), surface)))
