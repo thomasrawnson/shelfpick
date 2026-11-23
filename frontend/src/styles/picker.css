@@ -32,82 +32,6 @@
 
 /* Player selection */
 
-.player-grid {
-  display: grid;
-
-  grid-template-columns: repeat(3, 1fr);
-
-  gap: 12px;
-
-  margin-bottom: auto;
-}
-
-.player-chip {
-  aspect-ratio: 1;
-
-  display: flex;
-  flex-direction: column;
-
-  justify-content: center;
-  align-items: center;
-
-  gap: 4px;
-
-  padding: 0;
-
-  color: var(--color-text-primary);
-
-  background: var(--color-surface-raised);
-
-  border: 1px solid var(--line);
-  border-radius: 16px;
-
-  cursor: pointer;
-
-  transition:
-    background 180ms ease,
-    border-color 180ms ease,
-    color 180ms ease,
-    transform 120ms ease;
-}
-
-.player-chip:hover {
-  border-color: var(--color-brand-accent);
-}
-
-.player-chip:active {
-  transform: scale(0.96);
-}
-
-.player-chip strong {
-  font-family: var(--font-display);
-
-  font-size: 27px;
-  font-weight: 600;
-}
-
-.player-chip span {
-  color: var(--color-text-support);
-
-  font-size: var(--text-support);
-
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-}
-
-.player-chip.selected {
-  color: var(--color-brand-primary);
-
-  background: var(--color-brand-primary-soft);
-  border-color: var(--color-brand-primary);
-
-  box-shadow: 0 8px 24px var(--color-shadow);
-}
-
-.player-chip.selected span {
-  color: var(--color-brand-primary);
-}
-
 /* Time selection */
 
 .time-list {
@@ -462,54 +386,6 @@
   padding-inline: 8px;
 }
 
-.advanced-filters {
-  margin-bottom: 10px;
-  padding: 0 12px 12px;
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-}
-
-.advanced-filters summary {
-  padding: 12px 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: var(--cream);
-  cursor: pointer;
-  list-style: none;
-}
-
-.advanced-filters summary::-webkit-details-marker {
-  display: none;
-}
-
-.advanced-filters summary::after {
-  content: "+";
-  color: var(--color-accent-text);
-  font-size: 20px;
-}
-
-.advanced-filters[open] summary::after {
-  content: "−";
-}
-
-.advanced-filters summary span {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.advanced-filters summary small {
-  color: var(--text-muted);
-  font-size: var(--text-support);
-  font-weight: 400;
-}
-
-.advanced-filters .preference-link-list {
-  margin-top: 2px;
-}
-
 .advanced-age-filter {
   margin-top: 14px;
 }
@@ -582,44 +458,6 @@
 }
 
 .picker-mode-option.selected strong {
-  color: var(--color-brand-primary);
-}
-
-.complexity-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 7px;
-}
-
-.complexity-option {
-  padding: 10px 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  color: var(--text-secondary);
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-.complexity-option strong {
-  color: var(--cream);
-  font-size: var(--text-support);
-}
-
-.complexity-option span {
-  font-size: var(--text-support);
-  color: var(--text-muted);
-}
-
-.complexity-option.selected {
-  background: var(--color-brand-primary-soft);
-  border-color: var(--color-brand-primary);
-}
-
-.complexity-option.selected strong,
-.complexity-option.selected span {
   color: var(--color-brand-primary);
 }
 
@@ -769,7 +607,6 @@
 }
 
 /* Dedicated Picker play entry */
-
 
 .picker-play-entry-missing {
   display: grid;
@@ -1168,10 +1005,8 @@
 
 /* Picker accessibility */
 
-.player-chip,
 .time-option,
 .picker-mode-option,
-.complexity-option,
 .picker-navigation-card,
 .picker-selection-row {
   min-height: 44px;
@@ -1896,82 +1731,22 @@
 }
 
 /* Player step: use the reclaimed space for a quick complexity choice. */
-.player-step-screen .player-grid {
-  margin-bottom: 0;
-}
-
-.player-chip.solo strong {
-  font-family: var(--font-ui);
-  font-size: 16px !important;
-  font-weight: 800;
-}
-
-.player-complexity-section {
-  width: 100%;
-  max-width: 330px;
-  margin: 28px auto 0 !important;
-}
-
-.player-complexity-section .preference-label {
-  margin-bottom: 8px !important;
-  color: var(--sp-secondary) !important;
-  font-size: var(--text-support) !important;
-  letter-spacing: 0 !important;
-  text-transform: none !important;
-}
-
-.player-complexity-section .complexity-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 6px;
-}
-
-.player-complexity-section .complexity-option {
-  min-height: var(--target-min);
-  padding: 7px 4px;
-}
-
-.player-complexity-section .complexity-option strong {
-  font-size: var(--text-support);
-}
-
-@media (max-width: 360px) {
-  .player-complexity-section .complexity-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
 
 /* =========================================================
    Guided picker polish: compact steps + clearer selections
    ========================================================= */
 
-.player-step-screen .subtitle,
 .time-step-screen .subtitle,
 .fine-tune-screen .subtitle {
   margin-bottom: 18px;
 }
 
-.player-step-screen .picker-navigation-card {
-  margin-bottom: 12px;
-}
-
-.player-step-screen .player-or {
-  margin: 10px 0 10px;
-}
-
-.player-step-screen .player-grid {
-  gap: 9px;
-}
-
-.player-step-screen .player-chip,
-.player-step-screen .complexity-option,
 .time-tile,
 .fine-tune-screen .picker-mode-option,
 .fine-tune-screen .preference-chip {
   color: var(--sp-secondary);
 }
 
-.player-step-screen .player-chip.selected,
-.player-step-screen .complexity-option.selected,
 .time-tile.selected,
 .fine-tune-screen .picker-mode-option.selected,
 .fine-tune-screen .preference-chip.selected {
@@ -1982,17 +1757,11 @@
   font-weight: 800;
 }
 
-.player-step-screen .player-chip.selected strong,
-.player-step-screen .complexity-option.selected strong,
 .time-tile.selected strong,
 .time-tile.selected span,
 .fine-tune-screen .picker-mode-option.selected,
 .fine-tune-screen .preference-chip.selected {
   color: var(--color-brand-primary) !important;
-}
-
-.player-step-screen .picker-step-actions {
-  margin-top: 18px !important;
 }
 
 /* Time step uses the phone width instead of a long vertical list. */
@@ -2054,9 +1823,6 @@
 }
 
 /* Fine tune is deliberately optional and compact. */
-.fine-tune-screen .advanced-filters {
-  margin-top: 6px !important;
-}
 
 .fine-tune-screen .picker-step-actions {
   margin-top: 18px !important;
@@ -3076,7 +2842,6 @@
   }
 }
 
-
 .picker-add-player,
 .picker-add-player-button {
   margin-bottom: 10px;
@@ -3105,7 +2870,6 @@
   color: var(--color-danger);
   font-size: var(--text-support);
 }
-
 
 /* SP-UI-02: Tonight hints, selected time and the fit scale. */
 .picker-action-hint {

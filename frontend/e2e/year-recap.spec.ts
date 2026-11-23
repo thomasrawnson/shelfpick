@@ -65,8 +65,8 @@ for (const scheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme: scheme, reducedMotion: "reduce" })
     await mockRecap(page, FULL)
     await openStory(page)
-    const titles = ["Your 2026 in games", "Your top games", "New to you", "Busiest month",
-      "Busiest day", "Longest play", "Your play partners", "That's your year"]
+    const titles = ["Your 2026 in games", "Your most played", "New to you", "Your busiest month",
+      "Your busiest day", "Your longest play", "Your play partners", "That's your year"]
     for (const [index, title] of titles.entries()) {
       await expect(slide(page)).toHaveAttribute("aria-label", new RegExp(`^Slide ${index + 1} of 8: ${title}\\.`))
       await page.screenshot({ path: `${SHOTS}/story-${scheme}-${index + 1}.png` })

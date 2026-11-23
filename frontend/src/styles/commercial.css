@@ -93,36 +93,6 @@ h1 {
   text-transform: none;
 }
 
-.player-grid {
-  margin-bottom: 0;
-}
-
-.player-chip {
-  background: var(--color-surface-raised);
-  border-color: var(--sp-line);
-}
-
-.player-chip:hover {
-  border-color: var(--color-border);
-}
-
-.player-chip span {
-  color: var(--sp-muted);
-  letter-spacing: 0;
-  text-transform: none;
-}
-
-.player-chip.selected {
-  color: var(--color-brand-primary);
-  background: var(--color-brand-primary-soft);
-  border-color: var(--color-border);
-  box-shadow: none;
-}
-
-.player-chip.selected span {
-  color: var(--color-brand-primary);
-}
-
 /* Picker result */
 .picker-result-stage {
   display: flex;
@@ -683,7 +653,6 @@ h1 {
   .app-phone-wide .ranking-game-image { aspect-ratio: auto; height: 260px; }
 }
 
-
 @media (max-width: 480px) {
   .phone.app-phone {
     width: 100%;
@@ -856,7 +825,6 @@ h1 {
   margin-top: 6px;
 }
 
-
 /* Shared visual refinements */
 h1,
 h2,
@@ -867,30 +835,7 @@ h3,
   font-family: var(--font-display);
 }
 
-
 /* More compact player count picker: 1–5 plus a single 6+ option. */
-.player-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  max-width: 330px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.player-chip {
-  min-height: 78px !important;
-  padding: 10px 8px !important;
-  border-radius: 12px;
-}
-
-.player-chip strong {
-  font-size: 24px !important;
-}
-
-.player-chip span {
-  margin-top: 2px;
-  font-size: var(--text-support) !important;
-}
 
 /* Fine-tune: compact choices, one visual level, advanced options tucked away. */
 .preference-section {
@@ -928,13 +873,11 @@ h3,
   box-shadow: none;
 }
 
-.play-style-grid,
-.complexity-grid {
+.play-style-grid {
   gap: 7px;
 }
 
-.play-style-grid .preference-chip,
-.complexity-grid .complexity-option {
+.play-style-grid .preference-chip {
   min-height: var(--target-min);
   padding: 8px 6px;
   border-color: transparent;
@@ -942,34 +885,10 @@ h3,
   border-radius: 9px;
 }
 
-.play-style-grid .preference-chip.selected,
-.complexity-grid .complexity-option.selected {
+.play-style-grid .preference-chip.selected {
   color: var(--color-brand-primary);
   background: var(--color-brand-primary-soft);
   border-color: transparent;
-}
-
-.complexity-grid .complexity-option span {
-  display: none;
-}
-
-.advanced-filters {
-  margin-top: 16px !important;
-  border: 0 !important;
-  background: var(--color-surface-raised) !important;
-  border-radius: 10px !important;
-}
-
-.advanced-filters summary {
-  padding: 11px 12px !important;
-}
-
-.advanced-filters summary strong {
-  color: var(--sp-text);
-}
-
-.advanced-filters summary small {
-  color: var(--sp-muted);
 }
 
 .picker-step-actions {
@@ -1154,10 +1073,6 @@ h3,
   min-height: auto !important;
 }
 
-.picker-step-screen .player-grid {
-  margin-bottom: 0 !important;
-}
-
 .picker-step-screen .picker-step-actions {
   margin-top: 22px !important;
 }
@@ -1173,18 +1088,6 @@ h3,
 }
 
 /* Solo is a subtly distinct play mode. */
-.player-chip.solo {
-  border-color: var(--color-brand-primary);
-}
-
-.player-chip.solo span {
-  color: var(--color-text-support);
-}
-
-.player-chip.solo.selected {
-  border-color: var(--color-brand-primary);
-  background: var(--color-brand-primary-soft);
-}
 
 /* Fine tune: tighter rhythm and fewer visually competing blocks. */
 .fine-tune-screen .subtitle {
@@ -1200,20 +1103,14 @@ h3,
 }
 
 .fine-tune-screen .picker-mode-list.compact,
-.fine-tune-screen .play-style-grid,
-.fine-tune-screen .complexity-grid {
+.fine-tune-screen .play-style-grid {
   gap: 5px;
 }
 
 .fine-tune-screen .picker-mode-list.compact .picker-mode-option,
-.fine-tune-screen .play-style-grid .preference-chip,
-.fine-tune-screen .complexity-grid .complexity-option {
+.fine-tune-screen .play-style-grid .preference-chip {
   min-height: var(--target-min);
   padding: 7px 5px;
-}
-
-.fine-tune-screen .advanced-filters {
-  margin-top: 13px !important;
 }
 
 .fine-tune-screen .picker-step-actions {
