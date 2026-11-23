@@ -868,7 +868,7 @@ function CollectionView({
 
   if (section === "ranking") {
     return (
-      <section className="screen collection-screen">
+      <section className="screen tab-screen collection-screen">
         <header>
           <h1>Rank your games</h1>
           <p className="subtitle">
@@ -892,7 +892,7 @@ function CollectionView({
 
   if (section === "wishlist") {
     return (
-      <section className="screen collection-screen">
+      <section className="screen tab-screen collection-screen">
         <header>
           <h1>Shelf</h1>
         </header>
@@ -929,7 +929,7 @@ function CollectionView({
 
   if (loading && games.length === 0 && !error) {
     return (
-      <section className="screen collection-screen" aria-busy="true">
+      <section className="screen tab-screen collection-screen" aria-busy="true">
         <header><h1>Shelf</h1></header>
         <Skeleton variant="tile" rows={6} label="Opening your shelf" />
       </section>
@@ -939,7 +939,7 @@ function CollectionView({
 
   if (error && games.length === 0) {
     return (
-      <section className="screen collection-screen">
+      <section className="screen tab-screen collection-screen">
         <header><h1>Shelf</h1></header>
 
         {sectionTabs}
@@ -980,7 +980,7 @@ function CollectionView({
 
 
   return (
-    <section className="screen collection-screen">
+    <section className="screen tab-screen collection-screen">
       <PullIndicator {...pull} />
       <header>
         <h1>Shelf</h1>

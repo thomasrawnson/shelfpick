@@ -30,6 +30,17 @@ and validate the work before asking Tom to resume beta. Internal testing
 continues. This instruction supersedes older immediate-beta and post-launch
 timing below; existing completed slices remain historical implementation facts.
 
+### SP-UI-04 Cross-tab consistency — LOCAL CANDIDATE, 23 November 2026
+
+Branch `sp-ui-04`, stacked on `sp-ui-03` (PR #60, still a draft); draft PR for owner review, not merged, deployed or
+submitted. One shared selected state (`ChoiceGroup`, replacing `SegmentedControl` and `FilterTabs`) and one accent (no
+gold on any tab) across Tonight, Shelf, Plays, Discover and Stats. Discover is a calm list (one Want to Play button, a "…"
+menu with Hide and an undo toast, no "Hot now" badge); Shelf has a count row with "Add game", one 40pt search/sort/layout
+row and square cover-fit thumbnails; Stats drops the duplicate heading, scrolls its tab row, and uses flat rows and left-aligned
+tiles; Plays has a compact filter row and "No result logged"; the five tabs share one title row. Owner gates: a
+physical-phone check of all five tabs in light and dark, and the decision on rolling Fraunces and DM Sans out to these tabs.
+Report: `docs/SP-UI-04-REPORT.md`.
+
 ### SP-UI-03 Tonight: less templated, clearer hierarchy — LOCAL CANDIDATE, 23 November 2026
 
 Branch `sp-ui-03` from `origin/main` 506de60; draft PR for owner review, not merged, deployed or submitted. Tonight only:

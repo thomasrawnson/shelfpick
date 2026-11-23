@@ -7,7 +7,6 @@
    All sizes are rem/em so the screen follows Dynamic Type; the choice grids reflow by container width in em. */
 
 .tonight-screen {
-  padding-top: 12px;
   font-family: var(--font-tonight-body);
 }
 

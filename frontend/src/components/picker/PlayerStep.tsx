@@ -164,7 +164,7 @@ function PlayerStep({
     : undefined
 
   return (
-    <section className="screen picker-step-screen player-step-screen tonight-screen">
+    <section className="screen tab-screen picker-step-screen player-step-screen tonight-screen">
       <header className="tonight-header">
         <p className="tonight-label">Tonight</p>
         <h1>What should we play?</h1>

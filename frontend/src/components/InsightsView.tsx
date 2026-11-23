@@ -203,7 +203,7 @@ function InsightsView({
 
   if (loading) {
     return (
-      <section className="screen insights-screen">
+      <section className="screen tab-screen insights-screen">
         <h1>Stats</h1>
         <p className="subtitle" role="status">Crunching the numbers...</p>
       </section>
@@ -216,7 +216,7 @@ function InsightsView({
     || !insights
   ) {
     return (
-      <section className="screen insights-screen">
+      <section className="screen tab-screen insights-screen">
         <h1>Stats</h1>
 
         <p className="error-message">
@@ -245,7 +245,7 @@ function InsightsView({
 
 
   return (
-    <section className="screen insights-screen">
+    <section className="screen tab-screen insights-screen">
       <header>
         <h1>Stats</h1>
       </header>

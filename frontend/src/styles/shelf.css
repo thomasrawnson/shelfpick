@@ -1,11 +1,13 @@
 /* Shelf (SP-UI-04): a count row, one 40pt toolbar (search, sort, layout) and a row of play-filter chips. */
 .shelf-count-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
   margin-bottom: var(--space-1);
 }
+.shelf-count-row > * { white-space: nowrap; }
 .shelf-count {
   margin: 0;
   color: var(--color-text-support);
@@ -19,7 +21,7 @@
 .shelf-sort,
 .shelf-layout-toggle { box-sizing: border-box; min-height: 40px; }
 
-.shelf-search { position: relative; display: block; flex: 1 1 9rem; min-width: 0; }
+.shelf-search { position: relative; display: block; flex: 1 1 min(9rem, 100%); min-width: 0; }
 .shelf-search svg {
   position: absolute;
   top: 50%;
@@ -34,8 +36,7 @@
   transform: translateY(-50%);
   pointer-events: none;
 }
-.shelf-toolbar .shelf-search input[type="search"],
-.shelf-toolbar .shelf-sort select {
+.shelf-toolbar .shelf-search input[type="search"] {
   box-sizing: border-box;
   width: 100%;
   height: 100%;
@@ -54,21 +55,8 @@
 .shelf-search input::placeholder { color: var(--color-text-support); opacity: 1; }
 .shelf-search input::-webkit-search-cancel-button { -webkit-appearance: none; }
 
-.shelf-sort { position: relative; flex: 0 0 auto; }
-.shelf-toolbar .shelf-sort select { min-width: 7.5rem; padding-inline: 12px 32px; text-overflow: ellipsis; cursor: pointer; }
-.shelf-sort::after {
-  position: absolute;
-  top: 50%;
-  right: 14px;
-  width: 7px;
-  height: 7px;
-  color: var(--color-text-support);
-  border-right: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
-  content: "";
-  transform: translateY(-70%) rotate(45deg);
-  pointer-events: none;
-}
+.shelf-sort { flex: 0 0 auto; }
+.shelf-sort select { min-width: min(7.5rem, 100%); }
 
 /* One button switches layout; it shows the layout it will switch to. */
 .shelf-layout-toggle {

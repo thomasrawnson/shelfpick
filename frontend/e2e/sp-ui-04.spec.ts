@@ -1,8 +1,8 @@
 import { expect, test, type Page } from "@playwright/test"
 
 import { contrast, goldOffenders, paint, surfaceBehind } from "./colour"
-import { ANALYTICS_ANSWERED, logIn } from "./support"
-import { avatarCollisions, mockDiscover, mockShelf } from "./ui-fixtures"
+import { ANALYTICS_ANSWERED, API_ORIGIN, logIn } from "./support"
+import { avatarCollisions, mockDiscover, mockShelf, mockStatsFeed } from "./ui-fixtures"
 
 // SP-UI-04: the shared selected state, Discover and Shelf at 390x844, light and dark, against the real local backend
 // with the shelf and Discover feeds mocked (the account and sign-in are real).
@@ -34,6 +34,7 @@ async function open(page: Page, path: string, scheme: "light" | "dark") {
   await mockAccount(page)
   await mockShelf(page)
   await mockDiscover(page)
+  await mockStatsFeed(page, API_ORIGIN)
   await page.goto(path)
   await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible()
   await page.waitForLoadState("networkidle")
@@ -203,19 +204,26 @@ for (const scheme of ["light", "dark"] as const) {
       }
     })
 
-    test("no gold on Shelf, and the avatar is neutral and covers nothing", async ({ page }) => {
+    test("no gold on Shelf (Owned, Want to Play and Ranking), and the avatar is neutral and covers nothing", async ({ page }) => {
       await open(page, "/shelf", scheme)
       expect(await goldOffenders(page, [".collection-screen", ".app-top-bar", ".app-nav"])).toEqual([])
       expect(await avatarCollisions(page)).toEqual([])
+      const sections = page.getByRole("group", { name: "Collection section" })
+      for (const name of ["Want to Play", "Ranking"]) {
+        await sections.getByRole("button", { name, exact: true }).click()
+        await page.waitForLoadState("networkidle")
+        expect(await goldOffenders(page, [".collection-screen", ".app-top-bar"]), `${name}: gold`).toEqual([])
+        expect(await avatarCollisions(page), `${name}: avatar overlap`).toEqual([])
+      }
     })
   })
 
   test(`every segmented control and chip row is the shared component, with a clear selected state (${scheme})`, async ({ page }, testInfo) => {
     const report: string[] = []
-    for (const path of ["/shelf", "/discover"]) {
+    for (const path of ["/shelf", "/discover", "/stats", "/plays"]) {
       await open(page, path, scheme)
       // No hand-made segmented controls or chip rows beside the shared one.
-      expect(await page.locator(".app-content").evaluate((root) => Array.from(root.querySelectorAll("[role=tablist], [role=tab], .segmented-control, .filter-tabs, .discover-tab, .stats-section-tab")).length)).toBe(0)
+      expect(await page.locator(".app-content").evaluate((root) => Array.from(root.querySelectorAll("[role=tablist], [role=tab], .segmented-control, .filter-tabs, .discover-tab, .stats-section-tab, .plays-range button")).length)).toBe(0)
       const groups = page.locator(".choice-group")
       expect(await groups.count()).toBeGreaterThan(0)
       for (const group of await groups.all()) {
@@ -268,3 +276,263 @@ for (const scheme of ["light", "dark"] as const) {
     testInfo.annotations.push({ type: "contrast", description: `${scheme}: ${report.join("; ")}` })
   })
 }
+
+// ---- Stats ----
+const STATS_SECTIONS = ["Trends", "Collection", "Play", "Players", "Recaps"] as const
+
+async function openSection(page: Page, name: string) {
+  const tab = page.getByRole("group", { name: "Stats sections" }).getByRole("button", { name, exact: true })
+  await tab.click()
+  await expect(tab).toHaveAttribute("aria-pressed", "true")
+  await page.waitForLoadState("networkidle")
+  await page.waitForFunction(() => !document.querySelector('[aria-busy="true"]'))
+}
+
+// Bordered boxes (all four sides) that sit inside another bordered box.
+function nestedCards(page: Page) {
+  return page.evaluate(() => {
+    const boxed = (element: Element) => {
+      const style = getComputedStyle(element)
+      return ["Top", "Right", "Bottom", "Left"].every((side) => parseFloat(style[`border${side}Width` as "borderTopWidth"]) > 0 && style[`border${side}Style` as "borderTopStyle"] !== "none")
+        && !["INPUT", "SELECT", "BUTTON", "SUMMARY", "TEXTAREA"].includes(element.tagName)
+        // A small tag (Pro) is not a card.
+        && element.getBoundingClientRect().height > 40
+    }
+    const found: string[] = []
+    for (const element of document.querySelectorAll(".insights-screen *")) {
+      if (!boxed(element)) continue
+      for (let parent = element.parentElement; parent && !parent.matches(".insights-screen"); parent = parent.parentElement) {
+        if (boxed(parent)) { found.push(`${element.tagName.toLowerCase()}.${element.className} inside ${parent.tagName.toLowerCase()}.${parent.className}`); break }
+      }
+    }
+    return found
+  })
+}
+
+for (const scheme of ["light", "dark"] as const) {
+  test.describe(`Stats (${scheme})`, () => {
+    test("no duplicate Trends heading, left-aligned tiles with primary-text numbers, flat rows with chevrons", async ({ page }) => {
+      await open(page, "/stats", scheme)
+      await expect(page.getByRole("heading", { name: "Trends" })).toHaveCount(0)
+      await expect(page.getByRole("group", { name: "Stats sections" }).getByRole("button", { name: "Trends", exact: true })).toHaveAttribute("aria-pressed", "true")
+      await expect(page.getByRole("region", { name: "Trends" })).toBeVisible()
+
+      const tile = page.locator(".stat-card").first()
+      const tileBox = (await tile.boundingBox())!
+      const number = (await tile.locator("strong").boundingBox())!
+      const label = (await tile.locator("span").boundingBox())!
+      expect(number.x - tileBox.x, "number sits at the tile's left padding").toBeLessThanOrEqual(20)
+      expect(Math.abs(number.x - label.x), "number and label share a left edge").toBeLessThanOrEqual(1)
+      expect(await tile.locator("small").evaluate((element) => getComputedStyle(element).textAlign)).toMatch(/left|start/)
+      const primary = await page.evaluate(() => {
+        const probe = document.createElement("i")
+        probe.style.color = "var(--color-text-primary)"
+        document.body.append(probe)
+        const value = getComputedStyle(probe).color
+        probe.remove()
+        return value
+      })
+      for (const element of await page.locator(".stat-card strong").all()) {
+        expect(await element.evaluate((node) => getComputedStyle(node).color)).toBe(primary)
+      }
+
+      // "Play these to reach N": flat rows between hairlines, a chevron each, nothing boxed inside the card.
+      const rows = page.locator(".stats-raise-game")
+      await expect(rows).toHaveCount(2)
+      for (const row of await rows.all()) {
+        expect((await row.evaluate((node) => { const style = getComputedStyle(node); return [style.backgroundColor, style.borderTopWidth, style.borderBottomWidth] }))).toEqual(["rgba(0, 0, 0, 0)", "0px", "0px"])
+        await expect(row.locator("svg.stats-row-chevron")).toBeVisible()
+      }
+      expect(await page.locator(".stats-raise-list li + li").first().evaluate((node) => getComputedStyle(node).borderTopWidth)).toBe("1px")
+      expect(await nestedCards(page)).toEqual([])
+    })
+
+    test("every section has no nested cards, no gold, and the avatar covers nothing", async ({ page }) => {
+      await open(page, "/stats", scheme)
+      for (const name of STATS_SECTIONS) {
+        await openSection(page, name)
+        expect(await nestedCards(page), `${name}: nested cards`).toEqual([])
+        expect(await goldOffenders(page, [".insights-screen", ".app-top-bar", ".app-nav"]), `${name}: gold`).toEqual([])
+        expect(await avatarCollisions(page), `${name}: avatar overlap`).toEqual([])
+      }
+    })
+
+    test("the 12 / 24 month toggle is the shared control", async ({ page }) => {
+      await open(page, "/stats", scheme)
+      const toggle = page.getByRole("group", { name: "Months shown" })
+      await expect(toggle.locator(".choice")).toHaveCount(2)
+      await expect(toggle.getByRole("button", { name: "12 months" })).toHaveAttribute("aria-pressed", "true")
+      await toggle.getByRole("button", { name: "24 months" }).click()
+      await expect(toggle.getByRole("button", { name: "24 months" })).toHaveAttribute("aria-pressed", "true")
+    })
+  })
+
+  // ---- Plays ----
+  test.describe(`Plays (${scheme})`, () => {
+    test("at least four rows are visible on the first screen; filters are one row of menus with chips beneath", async ({ page }) => {
+      await open(page, "/plays", scheme)
+      await expect(page.locator(".plays-card").first()).toBeVisible()
+      const navTop = (await page.getByRole("navigation", { name: "Primary" }).boundingBox())!.y
+      const visible = await page.locator(".plays-card").evaluateAll((cards, floor) => cards.filter((card) => {
+        const box = card.getBoundingClientRect()
+        return box.top >= 0 && box.bottom <= floor
+      }).length, navTop)
+      expect(visible, "plays rows fully visible above the tab bar").toBeGreaterThanOrEqual(4)
+
+      const game = (await page.getByLabel("Game", { exact: true }).boundingBox())!
+      const player = (await page.getByLabel("Player", { exact: true }).boundingBox())!
+      const chips = (await page.getByRole("group", { name: "Date range" }).boundingBox())!
+      expect(Math.abs(game.y - player.y)).toBeLessThanOrEqual(1)
+      expect(Math.abs(game.height - 40)).toBeLessThanOrEqual(1)
+      expect(Math.abs(game.height - player.height)).toBeLessThanOrEqual(1)
+      expect(chips.y).toBeGreaterThanOrEqual(game.y + game.height)
+      expect(await avatarCollisions(page)).toEqual([])
+    })
+
+    test("date chips are the shared control", async ({ page }) => {
+      await open(page, "/plays", scheme)
+      const range = page.getByRole("group", { name: "Date range" })
+      await expect(range.locator(".choice")).toHaveCount(3)
+      await expect(range.getByRole("button", { name: "All time" })).toHaveAttribute("aria-pressed", "true")
+      await range.getByRole("button", { name: "30 days" }).click()
+      await expect(range.getByRole("button", { name: "30 days" })).toHaveAttribute("aria-pressed", "true")
+      await expect(range.getByRole("button", { name: "All time" })).toHaveAttribute("aria-pressed", "false")
+    })
+
+    test("every play row states its result, or says No result logged", async ({ page }) => {
+      await open(page, "/plays", scheme)
+      const lines = await page.locator(".plays-card-main span").allTextContents()
+      expect(lines.length).toBeGreaterThan(5)
+      for (const line of lines) expect(line).toMatch(/ · (Won by .+|Won together|Lost together|No result logged)$/)
+      expect(lines.some((line) => line.endsWith("No result logged"))).toBe(true)
+      expect(await goldOffenders(page, [".plays-screen", ".app-top-bar", ".app-nav"])).toEqual([])
+    })
+  })
+
+  test(`every tab keeps the same title row, and the avatar covers no control (${scheme})`, async ({ page }) => {
+    const rows: Record<string, { top: number; height: number; baseline: number }> = {}
+    for (const [tab, path] of [["Shelf", "/shelf"], ["Plays", "/plays"], ["Discover", "/discover"], ["Stats", "/stats"], ["Tonight", "/tonight"]] as const) {
+      await open(page, path, scheme)
+      await page.waitForTimeout(200)
+      expect(await avatarCollisions(page), `${tab}: avatar overlap`).toEqual([])
+      expect(await goldOffenders(page, [".app-top-bar", ".app-nav"]), `${tab}: gold in the chrome`).toEqual([])
+      rows[tab] = await page.evaluate(() => {
+        const header = document.querySelector(".screen > header")!.getBoundingClientRect()
+        // First line of the title row: the heading, or Tonight's label above its headline.
+        const title = document.querySelector(".screen > header .tonight-label, .screen > header h1")!
+        const range = document.createRange()
+        range.selectNodeContents(title)
+        const text = range.getBoundingClientRect()
+        return { top: header.top, height: header.height, baseline: text.bottom }
+      })
+    }
+    const four = ["Shelf", "Plays", "Discover", "Stats"].map((tab) => rows[tab])
+    for (const row of four) {
+      expect(Math.abs(row.top - four[0].top), `title row top ${JSON.stringify(rows)}`).toBeLessThanOrEqual(1)
+      expect(Math.abs(row.height - four[0].height), `title row height ${JSON.stringify(rows)}`).toBeLessThanOrEqual(1)
+      expect(Math.abs(row.baseline - four[0].baseline), `title baseline ${JSON.stringify(rows)}`).toBeLessThanOrEqual(1)
+    }
+    expect(Math.abs(rows.Tonight.top - four[0].top), "Tonight's header starts on the same line").toBeLessThanOrEqual(1)
+  })
+}
+
+// ---- Dynamic Type: all five tabs ----
+const AX = [{ name: "AX1", px: 28 }, { name: "AX3", px: 40 }, { name: "AX5", px: 53 }]
+
+for (const size of AX) {
+  test(`Dynamic Type ${size.name}: all five tabs keep labels whole, the title clear and controls inside the screen`, async ({ page }) => {
+    await page.addInitScript((px) => {
+      document.addEventListener("DOMContentLoaded", () => {
+        document.documentElement.dataset.nativeIos = "true"
+        const style = document.createElement("style")
+        style.textContent = `:root[data-native-ios] { font-size: ${px}px !important; }`
+        document.head.append(style)
+      })
+    }, size.px)
+    for (const [tab, path] of [["Tonight", "/tonight"], ["Shelf", "/shelf"], ["Plays", "/plays"], ["Discover", "/discover"], ["Stats", "/stats"]] as const) {
+      await open(page, path, "light")
+      await page.waitForTimeout(250)
+      const report = await page.evaluate(() => {
+        const problems: string[] = []
+        const clipped = (element: Element) => element.scrollWidth > element.clientWidth + 1 || element.scrollHeight > element.clientHeight + 1
+        const overflow = document.documentElement.scrollWidth - document.documentElement.clientWidth
+        if (overflow > 0) problems.push(`page scrolls sideways by ${overflow}px`)
+        // The title is never clipped, whatever it wraps to.
+        for (const heading of document.querySelectorAll(".app-content h1")) {
+          const box = heading.getBoundingClientRect()
+          if (clipped(heading) || box.right > window.innerWidth + 1) problems.push(`heading clipped: ${heading.textContent}`)
+        }
+        // Every option of a choice group shows its whole label.
+        for (const choice of document.querySelectorAll(".choice")) {
+          if (choice.scrollWidth > choice.clientWidth + 1) problems.push(`choice clipped: ${choice.textContent}`)
+          const range = document.createRange()
+          range.selectNodeContents(choice)
+          const lines = new Set(Array.from(range.getClientRects()).filter((rect) => rect.width > 0).map((rect) => Math.round(rect.top)))
+          for (const word of (choice.textContent ?? "").split(/\s+/).filter(Boolean)) {
+            const walker = document.createTreeWalker(choice, NodeFilter.SHOW_TEXT)
+            while (walker.nextNode()) {
+              const node = walker.currentNode as Text
+              const at = node.data.indexOf(word)
+              if (at < 0) continue
+              const wordRange = document.createRange()
+              wordRange.setStart(node, at)
+              wordRange.setEnd(node, at + word.length)
+              if (new Set(Array.from(wordRange.getClientRects()).map((rect) => Math.round(rect.top))).size > 1) problems.push(`word broken: ${word}`)
+            }
+          }
+          void lines
+        }
+        // The Shelf count and Add game each stay on one line (they wrap as units, not word by word).
+        for (const unit of document.querySelectorAll(".shelf-count-row > *")) {
+          const range = document.createRange()
+          range.selectNodeContents(unit)
+          if (new Set(Array.from(range.getClientRects()).map((rect) => Math.round(rect.top))).size > 1) problems.push(`wrapped: ${unit.textContent}`)
+        }
+        // Controls in the toolbar and filters stay inside the screen (a scrolling tab row may extend, not its container).
+        for (const control of document.querySelectorAll(".shelf-toolbar > *, .plays-filters > *, .shelf-count-row > *, .discover-card .choice, .stat-card")) {
+          const box = control.getBoundingClientRect()
+          if (box.width > 0 && (box.left < -1 || box.right > window.innerWidth + 1)) problems.push(`outside screen: ${control.className}`)
+        }
+        return problems
+      })
+      expect(report, `${tab} at ${size.name}`).toEqual([])
+      expect(await avatarCollisions(page), `${tab} at ${size.name}: avatar overlap`).toEqual([])
+    }
+  })
+}
+
+test("Dynamic Type AX5: the Stats tab row scrolls sideways instead of clipping, and reaches the last tab", async ({ page }) => {
+  await page.addInitScript(() => {
+    document.addEventListener("DOMContentLoaded", () => {
+      document.documentElement.dataset.nativeIos = "true"
+      const style = document.createElement("style")
+      style.textContent = ":root[data-native-ios] { font-size: 53px !important; }"
+      document.head.append(style)
+    })
+  })
+  await open(page, "/stats", "light")
+  const row = page.getByRole("group", { name: "Stats sections" })
+  const scrolls = await row.evaluate((element) => ({ overflowX: getComputedStyle(element).overflowX, wider: element.scrollWidth > element.clientWidth }))
+  expect(scrolls).toEqual({ overflowX: "auto", wider: true })
+  const last = row.getByRole("button", { name: "Recaps", exact: true })
+  await last.scrollIntoViewIfNeeded()
+  await last.click()
+  await expect(last).toHaveAttribute("aria-pressed", "true")
+  // The chosen tab is brought into view and its label is whole.
+  const inside = await last.evaluate((element) => {
+    const box = element.getBoundingClientRect()
+    const parent = element.parentElement!.getBoundingClientRect()
+    return box.left >= parent.left - 1 && box.right <= parent.right + 1 && element.scrollWidth <= element.clientWidth + 1
+  })
+  expect(inside).toBe(true)
+})
+
+test("at the default text size all five Stats tabs fit without scrolling", async ({ page }) => {
+  await open(page, "/stats", "light")
+  const row = page.getByRole("group", { name: "Stats sections" })
+  expect(await row.evaluate((element) => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(0)
+  for (const name of STATS_SECTIONS) {
+    const box = (await row.getByRole("button", { name, exact: true }).boundingBox())!
+    expect(box.x + box.width, `${name} is inside the screen`).toBeLessThanOrEqual(390)
+  }
+})

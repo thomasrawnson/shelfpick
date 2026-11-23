@@ -77,8 +77,11 @@ function StreakAndHIndex({ filters, onOpenGame }: { filters: StatsFilterValues; 
             {hIndex.data.raise_list.map(game => (
               <li key={game.bgg_id}>
                 <button type="button" className="stats-raise-game" onClick={() => onOpenGame(game.bgg_id)}>
-                  <span>{game.name}</span>
-                  <small>{game.plays === 1 ? "1 play" : `${game.plays} plays`} · {raiseHIndexNeed(game)}</small>
+                  <span className="stats-raise-text">
+                    <span>{game.name}</span>
+                    <small>{game.plays === 1 ? "1 play" : `${game.plays} plays`} · {raiseHIndexNeed(game)}</small>
+                  </span>
+                  <svg className="stats-row-chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7" /></svg>
                 </button>
               </li>
             ))}
@@ -167,10 +170,7 @@ export default function TrendsPanel({ onOpenGame }: Props) {
   const active = isPro ? filters : {}
 
   return (
-    <div className="stats-section-content trends-panel">
-      <div className="stats-section-heading">
-        <h2>Trends</h2>
-      </div>
+    <div className="stats-section-content trends-panel" role="region" aria-label="Trends">
       {isPro && <StatsFilters filters={filters} onChange={setFilters} />}
       <StreakAndHIndex filters={active} onOpenGame={onOpenGame} />
       <MonthsChart filters={active} />

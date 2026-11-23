@@ -250,9 +250,6 @@ h1 {
 }
 
 /* Collection */
-.collection-screen {
-  padding-top: 22px;
-}
 
 .collection-toolbar-row {
   display: flex;
@@ -618,9 +615,6 @@ h1 {
 }
 
 /* Insight: remove duplicate wayfinding and excess vertical gaps. */
-.insights-screen {
-  padding-top: 22px;
-}
 
 .insights-screen > header .subtitle {
   margin-bottom: 14px;

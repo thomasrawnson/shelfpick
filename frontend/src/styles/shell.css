@@ -22,11 +22,11 @@
 
 /* Keep titles and primary controls clear of the avatar in the title row. */
 
-/* Tonight: left-aligned title row shared with the avatar, one-row group size. */
-.app-content > .screen > header { min-height: 56px; display: flex; flex-direction: column; justify-content: center; text-align: left; }
-
-/* Compact screen titles and Shelf controls. */
-.app-content > .screen > header h1 { font-size: 1.5rem; line-height: 1.15; margin: 0; }
+/* The five tab screens share one title row (SP-UI-04): the same top, a 56px row that centres the title on the avatar,
+   and the same 1.5rem heading, so the title baseline does not move between tabs. */
+.tab-screen { padding-top: 22px; }
+.tab-screen > header { min-height: 56px; display: flex; flex-direction: column; justify-content: center; text-align: left; }
+.tab-screen > header h1 { margin: 0; font-size: 1.5rem; line-height: 1.15; }
 /* One button switches layout; it shows the layout it will switch to. */
 
 /* Tonight: one spacing rhythm (16px between groups), full-width tappable rows. */
@@ -48,11 +48,10 @@
 
 /* Plays tab. */
 .plays-log-button { width: 100%; min-height: 48px; margin: 2px 0 10px; }
-.plays-filters { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-.plays-filters select, .plays-search { min-height: 44px; width: 100%; padding: 0 12px; color: var(--color-text-primary); background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: var(--radius-md); font: inherit; }
-.plays-range { display: flex; gap: 6px; margin-bottom: 8px; }
-.plays-range button { min-height: 32px; padding: 0 14px; color: var(--color-text-support); background: transparent; border: 1px solid var(--color-border); border-radius: 999px; font: inherit; font-size: 0.8125rem; font-weight: 700; }
-.plays-range button.active { color: var(--color-text-inverse); background: var(--color-brand-primary); border-color: var(--color-brand-primary); }
+.plays-filters { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.plays-search { min-height: 44px; width: 100%; padding: 0 12px; color: var(--color-text-primary); background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: var(--radius-md); font: inherit; }
+.plays-range-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 12px; margin-bottom: 4px; }
+.plays-count { margin: 0; color: var(--color-text-support); font-size: var(--text-support); }
 .plays-month h2 { margin: 18px 0 8px; color: var(--color-text-support); font-family: inherit; font-size: 0.8125rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
 .plays-month ul, .plays-game-picker { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
 /* Compact play rows (SP-UI-02): cover opens the game, the row edits the play, Rematch is a small action. */
@@ -64,7 +63,7 @@
 .plays-cover .game-artwork-placeholder { width: 100%; height: 100%; }
 .plays-card-main { flex: 1 1 auto; display: grid; gap: 1px; min-width: 0; min-height: var(--target-min); padding: 0; text-align: left; color: var(--color-text-primary); background: transparent; border: 0; font: inherit; cursor: pointer; }
 .plays-card-main strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.plays-card-main span { overflow: hidden; color: var(--color-text-support); font-size: 0.8125rem; text-overflow: ellipsis; white-space: nowrap; }
+.plays-card-main span { display: -webkit-box; overflow: hidden; color: var(--color-text-support); font-size: 0.8125rem; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .plays-rematch { flex: none; min-height: var(--target-min); padding: 0 4px; color: var(--color-brand-primary); background: transparent; border: 0; font: inherit; font-size: 0.875rem; font-weight: 800; cursor: pointer; }
 .plays-state { display: grid; gap: 8px; justify-items: start; padding: 20px 4px; color: var(--color-text-support); }
 .plays-empty-note { margin: 16px 0 0; color: var(--color-text-support); font-size: 0.8125rem; }
@@ -113,7 +112,6 @@
   
   
   
-  :root[data-native-ios] .plays-range { flex-wrap: wrap; }
   :root[data-native-ios] .plays-filters { grid-template-columns: 1fr; }
   :root[data-native-ios] .plays-card-main strong, :root[data-native-ios] .plays-card-main span { white-space: normal; }
 }

@@ -68,6 +68,9 @@ export function goldOffenders(page: Page, roots: string[]) {
         for (const element of [root, ...root.querySelectorAll("*")]) {
           const style = getComputedStyle(element)
           for (const prop of ["color", "backgroundColor", "borderTopColor", "borderBottomColor", "fill", "stroke"] as const) {
+            // A border colour only counts when the border is drawn (otherwise it just mirrors the text colour).
+            if (prop === "borderTopColor" && (style.borderTopStyle === "none" || parseFloat(style.borderTopWidth) === 0)) continue
+            if (prop === "borderBottomColor" && (style.borderBottomStyle === "none" || parseFloat(style.borderBottomWidth) === 0)) continue
             if (values.includes(style[prop])) found.push(`${element.tagName.toLowerCase()}.${element.className} ${prop}`)
           }
         }

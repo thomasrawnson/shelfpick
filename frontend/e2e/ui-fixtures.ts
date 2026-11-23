@@ -102,9 +102,39 @@ export async function mockStatsFeed(page: Page, apiOrigin: string) {
     collection_played_percentage: 64, total_duration_minutes: 41_220, duration_plays: 612, average_duration_minutes: 67,
     most_played: { bgg_id: 1, name: "Clockwork Market", play_count: 61 },
     last_played: { bgg_id: 2, name: "Lantern Grove", played_at: "2026-11-14T19:00:00Z" },
-    never_played_count: 23, frequent_players: [], monthly_activity: { plays: 12, unique_games: 7, new_games: 1, repeat_plays: 5, recent_plays: [] },
-    neglected_games: [], top_games_by_player: [], common_groups: [],
+    never_played_count: 23,
+    frequent_players: [
+      { id: 1, name: "Tom", play_count: 802, win_count: 301, decided_count: 790 },
+      { id: 2, name: "Wales", play_count: 512, win_count: 190, decided_count: 505 },
+      { id: 3, name: "Sister", play_count: 140, win_count: 0, decided_count: 0 },
+    ],
+    monthly_activity: { plays: 12, unique_games: 7, new_games: 1, repeat_plays: 5, recent_plays: [] },
+    neglected_games: [
+      { bgg_id: 7, name: "Ember Vale", play_count: 0, last_played_at: null },
+      { bgg_id: 8, name: "Quiet Archive", play_count: 0, last_played_at: null },
+    ],
+    top_games_by_player: [
+      { player_id: 1, player_name: "Tom", bgg_id: 1, game_name: "Clockwork Market", play_count: 58 },
+      { player_id: 2, player_name: "Wales", bgg_id: 2, game_name: "Lantern Grove", play_count: 31 },
+    ],
+    common_groups: [
+      { player_ids: [1, 2], player_names: ["Tom", "Wales"], play_count: 402 },
+      { player_ids: [1, 2, 3], player_names: ["Tom", "Wales", "Sister"], play_count: 96 },
+    ],
   }
+  await page.route("**/insights/monthly-recap**", route => route.fulfill({ json: {
+    month: "2026-11", month_label: "November 2026", total_plays: 3, unique_games: 3, total_duration_minutes: 150, duration_plays: 2,
+    most_played: { bgg_id: 1, name: "Clockwork Market", play_count: 1, image_url: null }, collage_games: [],
+  } }))
+  await page.route("**/insights/year-recap**", route => route.fulfill({ json: {
+    year: 2026, total_plays: 87, unique_games: 23, total_duration_minutes: 4310, duration_plays: 87,
+    top_games: [{ bgg_id: 1, name: "Clockwork Market", play_count: 14 }, { bgg_id: 2, name: "Lantern Grove", play_count: 11 }],
+    new_games_count: 9, new_games: [{ bgg_id: 4, name: "Tiny Orchard", play_count: 7 }],
+    plays_by_month: [4, 5, 6, 7, 9, 8, 6, 5, 12, 11, 8, 6], busiest_month: 9,
+    plays_by_weekday: [3, 4, 5, 6, 12, 40, 17], busiest_weekday: 6,
+    longest_play: { bgg_id: 1, name: "Clockwork Market", duration_minutes: 195, played_on: "2026-03-14" },
+    co_players: [{ name: "Ann", play_count: 41 }],
+  } }))
   await page.route(/\/insights(\?.*)?$/, route => route.fulfill({ json: insights }))
   await page.route(/\/rankings\?/, route => route.fulfill({ json: { rankings: [], unplayed: [], summary: { games_count: 64, designers: [], publishers: [], mechanics: [], categories: [] } } }))
   await page.route(/\/players(\?.*)?$/, route => route.fulfill({ json: [{ id: 1, name: "Ann", avatar_key: "forest" }, { id: 2, name: "Bob", avatar_key: "forest" }, { id: 3, name: "Cleo", avatar_key: "forest" }] }))

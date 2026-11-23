@@ -62,7 +62,7 @@ function CollectionFilters({
           />
         </label>
 
-        <div className="shelf-sort">
+        <div className="select-field shelf-sort">
           <select
             id="collection-sort"
             name="collection_sort"

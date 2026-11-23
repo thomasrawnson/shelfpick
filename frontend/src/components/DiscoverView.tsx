@@ -288,7 +288,7 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
   }
 
   return (
-    <section className="screen discover-screen">
+    <section className="screen tab-screen discover-screen">
       <PullIndicator {...pull} />
       <header className="discover-header">
         <h1>Discover</h1>
