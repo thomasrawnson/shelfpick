@@ -267,6 +267,33 @@ one ballot but cannot guarantee one real person across multiple browsers or
 devices. Invalid and expired links explain that the session is unavailable;
 closed links show final results.
 
+## SP-UI-03 Tonight: less templated, clearer hierarchy — 23 November 2026
+
+Tonight (`PlayerStep`, class `tonight-screen`, rules in `styles/tonight.css`, loaded last) is the first screen on the
+new pattern. The rules below apply to it now and are the reference when other screens adopt them.
+
+- **One accent.** Forest is the only interactive accent on Tonight. Gold is not used for the eyebrow, the avatar or the
+  Fine-tune control, and the account avatar takes a neutral fill (`surface-raised`) on this screen only.
+- **Selected-state pattern.** A chosen option is never colour-only: `primary-soft` fill, a 2px Forest edge, Forest text
+  and a drawn check in the top-right corner (`.tonight-choice.selected` plus `.tonight-check`), with `aria-pressed`
+  on the button and the options inside a labelled `role="group"`. The player count and complexity use the same control.
+- **One primary action.** "Find a game" is the only filled button. "Start a group vote" is a quiet Forest text action
+  with a trailing chevron. When Find a game is off, "Choose how many are playing" sits under it and is linked with
+  `aria-describedby`; it goes once a count is chosen.
+- **Fewer boxes.** Only tappable options (choices, the primary button) keep a fill. "Choose players by name" and
+  Fine-tune are plain list rows between hairlines with the same trailing chevron (Fine-tune turns it down when open).
+- **One section label.** `.tonight-label`: 0.75rem, weight 700, 0.08em tracking, uppercase, `--color-text-support`. It is
+  used for Tonight, Who is playing, Complexity and Recently played.
+- **Dynamic Type.** Sizes are rem and em. The choice grids reflow by container width in em: six across, then two rows of
+  three (and complexity two by two, then one per row) at the accessibility sizes. The avatar is a 44pt target.
+- **Recently played** fades its right edge (a mask), so a cut-off title reads as "more", not as a fault.
+- **Typefaces (Tonight only).** `--font-tonight-display` is Fraunces (weight 600, the headline "What should we play?") and
+  `--font-tonight-body` is DM Sans (everything else on the screen). Both are variable Latin woff2 files in
+  `src/assets/fonts/`, bundled and precached, `font-display: swap`, with a system-font fallback stack, and no request
+  goes to a font host for them. The SIL OFL licence texts sit beside the files. The rest of the app still uses Lora and
+  Nunito Sans (loaded from Google Fonts); rolling the pair out repoints `--font-display` and `--font-ui` at these values
+  and removes the two Tonight tokens, and is an owner decision.
+
 ## Five-tab shell — SP-UI-01 (17 November 2026)
 
 Tabs are **Tonight · Shelf · Plays · Discover · Stats** (single words, one row).
@@ -290,7 +317,7 @@ redirect (`legacyRedirect` in `routes.ts`); guest voting links never change.
 
 **The Forest Means Action Rule.** Use Forest Green for primary actions, selected controls, active navigation, focus rings and interactive affordances that move the user forward.
 
-**The Gold Earns Attention Rule.** Reserve Warm Gold for restrained emphasis such as eyebrows, rankings, selected metadata and occasional supporting links; it is not the default action color.
+**The Gold Earns Attention Rule.** Reserve Warm Gold for restrained emphasis such as rankings, selected metadata and occasional supporting links; it is not the default action color. Tonight uses none (see SP-UI-03).
 
 **The Semantic Color Rule.** Success, warning, danger and info retain their functional hues and labels. Never substitute Forest or Gold where the user needs to understand status or risk.
 
@@ -308,7 +335,7 @@ and entitlement review. It does not change Black's current Free-and-Pro access.
 
 ## Typography
 
-**The Two-Voice Type Rule.** Lora provides a considered editorial voice for page headings, section titles, game names and meaningful numeric highlights; Nunito Sans carries controls, body copy, metadata and navigation.
+**The Two-Voice Type Rule.** (Tonight alone uses Fraunces and DM Sans through `--font-tonight-display` and `--font-tonight-body`; see SP-UI-03.) Lora provides a considered editorial voice for page headings, section titles, game names and meaningful numeric highlights; Nunito Sans carries controls, body copy, metadata and navigation.
 
 Keep the scale compact. The default page heading is 31px, screen headings commonly settle between 24px and 28px, and card titles sit near 18px. Body text is 16px; supporting text is 14px; metadata is 12px; overlines are 11px with generous tracking. Use weight and spacing before introducing a new size. Keep long titles to readable line lengths and allow wrapping instead of shrinking them into illegibility.
 

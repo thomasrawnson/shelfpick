@@ -24,23 +24,26 @@ function RecentlyPlayed({ onOpenGame }: Props) {
 
   return (
     <section className="tonight-recent" aria-labelledby="tonight-recent-title">
-      <h2 id="tonight-recent-title">Recently played</h2>
-      <ul>
-        {games.map(game => (
-          <li key={game.bgg_id}>
-            <button type="button" onClick={() => onOpenGame(game.bgg_id)} aria-label={game.name}>
-              <span className="tonight-recent-cover">
-                <ResilientGameArtwork
-                  src={game.image_url ?? game.thumbnail_url}
-                  alt=""
-                  gameName={game.name}
-                />
-              </span>
-              <span className="tonight-recent-name">{game.name}</span>
-            </button>
-          </li>
-        ))}
-      </ul>
+      <h2 className="tonight-label" id="tonight-recent-title">Recently played</h2>
+      {/* The row scrolls sideways; its right edge fades so a cut-off title reads as "more" rather than a bug. */}
+      <div className="tonight-recent-scroll">
+        <ul>
+          {games.map(game => (
+            <li key={game.bgg_id}>
+              <button type="button" onClick={() => onOpenGame(game.bgg_id)} aria-label={game.name}>
+                <span className="tonight-recent-cover">
+                  <ResilientGameArtwork
+                    src={game.image_url ?? game.thumbnail_url}
+                    alt=""
+                    gameName={game.name}
+                  />
+                </span>
+                <span className="tonight-recent-name">{game.name}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
     </section>
   )
 }

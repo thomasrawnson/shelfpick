@@ -99,11 +99,13 @@ type CollectionRouteProps = {
 type AppHeaderProps = {
   onOpenSettings: () => void;
   user: AuthUser;
+  // Tonight shows the account avatar in a neutral fill so the screen keeps one accent colour.
+  neutralAvatar?: boolean;
 };
 
-function AppHeader({ onOpenSettings, user }: AppHeaderProps) {
+function AppHeader({ onOpenSettings, user, neutralAvatar = false }: AppHeaderProps) {
   return (
-    <header className="app-top-bar">
+    <header className={neutralAvatar ? "app-top-bar neutral-avatar" : "app-top-bar"}>
       <button
         type="button"
         className="dice-menu-button"
@@ -544,6 +546,7 @@ function App() {
       <section className={`phone app-phone${["shelf", "plays", "discover", "stats"].includes(view) || location.pathname === APP_PATHS.settingsPro ? " app-phone-wide" : ""}`} ref={appScrollRef}>
         {location.pathname !== APP_PATHS.settings && <AppHeader
           user={user}
+          neutralAvatar={view === "tonight"}
           onOpenSettings={() => {
             navigate(APP_PATHS.settings);
           }}

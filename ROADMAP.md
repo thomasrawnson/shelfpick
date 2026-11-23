@@ -30,6 +30,16 @@ and validate the work before asking Tom to resume beta. Internal testing
 continues. This instruction supersedes older immediate-beta and post-launch
 timing below; existing completed slices remain historical implementation facts.
 
+### SP-UI-03 Tonight: less templated, clearer hierarchy — LOCAL CANDIDATE, 23 November 2026
+
+Branch `sp-ui-03` from `origin/main` 506de60; draft PR for owner review, not merged, deployed or submitted. Tonight only:
+a hint under the disabled Find a game, a check on the chosen count and complexity (`aria-pressed`), one filled primary
+button with the group vote as a quiet text action, Forest as the only accent (no gold, neutral avatar), plain list rows
+for "Choose players by name" and Fine-tune, one section-label style, a 44pt avatar, a fading Recently played edge, choice
+grids that reflow at accessibility text sizes, and Fraunces (headline) with DM Sans (body), self-hosted. The old Tonight
+rules in five stylesheets were replaced by `styles/tonight.css`. No backend or logic change. Owner decision pending:
+roll the fonts out to the other tabs. Report: `docs/SP-UI-03-REPORT.md`.
+
 ### SP-SCORE-01 Scoresheets in the app — IMPLEMENTED; DRAFT PR (18 November 2026)
 
 Branch `codex/sp-score-01`; not merged, deployed or submitted. The Log play and

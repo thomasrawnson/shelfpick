@@ -29,23 +29,8 @@
 .segmented-control.tonight-modes button { min-width: 0; padding-inline: 4px; white-space: nowrap; font-size: 0.875rem; }
 .app-content .collection-heading-row { padding-right: 56px; }
 
-
 /* Tonight: left-aligned title row shared with the avatar, one-row group size. */
 .app-content > .screen > header { min-height: 56px; display: flex; flex-direction: column; justify-content: center; text-align: left; }
-.player-step-screen .tonight-header { text-align: left; margin: 0 0 12px; }
-.player-step-screen .tonight-header h1 { margin: 0; font-size: 1.5rem; line-height: 1.15; text-align: left; }
-.tonight-eyebrow { margin: 0 0 2px; color: var(--color-accent-text); font-size: 0.75rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
-.player-step-screen .picker-step-centered { align-items: stretch; text-align: left; }
-.player-step-screen .picker-essential-label { text-align: left; margin: 8px 0; }
-.player-step-screen .player-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
-.player-step-screen .player-chip { min-height: 52px; padding: 0; }
-.player-step-screen .player-chip strong { font-size: 1.125rem; }
-.player-step-screen .player-chip.solo strong { font-size: 0.8125rem; }
-
-.player-step-screen .player-grid,
-.player-step-screen .player-complexity-section,
-.player-step-screen .advanced-filters { width: 100%; max-width: none; margin-inline: 0; padding-inline: 0; box-sizing: border-box; }
-.player-step-screen .preference-label { margin-left: 0; }
 
 /* Compact screen titles and Shelf controls. */
 .app-content > .screen > header h1,
@@ -73,44 +58,9 @@
 .collection-tools .filter-tabs button.active { color: var(--color-text-inverse); background: var(--color-brand-primary); border-color: var(--color-brand-primary); }
 
 /* Tonight: one spacing rhythm (16px between groups), full-width tappable rows. */
-.player-step-screen { padding-top: 12px; }
-.player-step-screen .tonight-header { margin: 0 0 20px; }
-.player-step-screen .picker-step-centered { display: flex; flex-direction: column; gap: 16px; }
-.player-step-screen .picker-essential-label { margin: 0 0 -6px; }
-.player-step-screen .player-chip { min-height: 52px; }
-.player-step-screen .picker-step-centered > .player-complexity-section,
-.player-step-screen .picker-step-centered > .advanced-filters { margin: 0 !important; }
-.player-step-screen .player-complexity-section .preference-label { margin: 0 0 8px; font-size: 0.9375rem; }
-.player-step-screen .complexity-option { min-height: 48px; color: var(--color-text-primary); }
-.player-step-screen .complexity-option strong { font-size: 1rem; }
-.player-step-screen .complexity-option.selected { color: var(--color-brand-primary); }
-.player-step-screen .advanced-filters summary { padding-inline: 16px; min-height: 52px; }
-/* The open Fine-tune body keeps the same 16px inset as its header. */
-.player-step-screen .advanced-filters .ui-disclosure-body { padding-inline: 16px; }
-.player-step-screen .advanced-filters summary strong { font-size: 1rem; }
-.player-step-screen .ui-disclosure-chevron { font-size: 1.5rem; line-height: 1; }
-.player-step-screen .picker-step-actions { margin: 0 !important; display: grid; gap: 12px; }
-.player-step-screen .picker-step-actions .primary-button { min-height: 56px; margin: 0 !important; font-size: 1rem; }
-.player-step-screen .picker-step-actions .secondary-button { min-height: 52px; margin: 0; font-size: 1rem; }
-.tonight-recent { margin-top: 18px; }
-.tonight-recent h2 { margin: 0 0 12px; color: var(--color-text-support); font-family: inherit; font-size: 0.8125rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
-.tonight-recent ul { display: flex; gap: 12px; margin: 0; padding: 0 0 8px; list-style: none; overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none; }
-.tonight-recent ul::-webkit-scrollbar { display: none; }
-.tonight-recent li { flex: none; width: 96px; scroll-snap-align: start; }
-.tonight-recent button { display: grid; gap: 6px; width: 100%; padding: 0; text-align: left; color: var(--color-text-primary); background: transparent; border: 0; cursor: pointer; }
-.tonight-recent-cover { display: block; width: 96px; aspect-ratio: 1; overflow: hidden; background: var(--color-surface-raised); border: 1px solid var(--color-border); border-radius: 14px; }
-.tonight-recent-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.tonight-recent-cover .game-artwork-placeholder { width: 100%; height: 100%; }
-.tonight-recent-name { font-size: 0.8125rem; font-weight: 700; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; overflow-wrap: normal; word-break: normal; hyphens: none; }
 
-.tonight-choose-players {
-  display: flex; align-items: center; justify-content: space-between;
-  width: 100%; min-height: 52px; margin: 0; padding: 0 16px;
-  color: var(--color-text-primary); background: var(--color-surface-raised);
-  border: 1px solid var(--color-border); border-radius: var(--radius-md);
-  font: inherit; font-weight: 700; cursor: pointer;
-}
-.tonight-choose-players svg { width: 22px; height: 22px; fill: none; stroke: var(--color-brand-primary); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+/* The open Fine-tune body keeps the same 16px inset as its header. */
+
 /* Lighter floating tab bar, and room so content clears it. */
 .app-nav { box-shadow: 0 2px 8px var(--color-shadow); }
 
@@ -187,12 +137,12 @@
 @supports (font: -apple-system-body) {
   :root[data-native-ios] .collection-section-tabs { grid-template-columns: repeat(auto-fit, minmax(min(100%, 6em), 1fr)) !important; }
   :root[data-native-ios] .collection-section-tabs button { font-size: var(--text-support); overflow-wrap: normal; word-break: keep-all; }
-  :root[data-native-ios] .player-step-screen .player-complexity-section .complexity-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 6em), 1fr)); }
-  :root[data-native-ios] .player-step-screen .complexity-option strong { font-size: var(--text-support); }
-  :root[data-native-ios] .player-step-screen .complexity-option { overflow-wrap: normal; word-break: keep-all; }
-  :root[data-native-ios] .player-step-screen .player-chip strong { font-size: 1.25rem; }
-  :root[data-native-ios] .player-step-screen .player-chip.solo strong { font-size: var(--text-support); }
-  :root[data-native-ios] .player-step-screen .player-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 3.5em), 1fr)); }
+  
+  
+  
+  
+  
+  
   :root[data-native-ios] .plays-range { flex-wrap: wrap; }
   :root[data-native-ios] .plays-filters { grid-template-columns: 1fr; }
   :root[data-native-ios] .plays-card-main strong, :root[data-native-ios] .plays-card-main span { white-space: normal; }

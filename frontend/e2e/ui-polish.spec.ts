@@ -153,14 +153,15 @@ test("Log play: score boxes line up with and without a record; date and minutes 
   await page.screenshot({ path: `${SHOTS}/after/log-play-aligned-390-dark.png` })
 })
 
-test("Tonight Fine-tune content is inset like its header", async ({ page }) => {
+test("Tonight Fine-tune content lines up with its header", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await mockPicker(page)
   await page.goto("/tonight")
   await page.getByText("Fine-tune").click()
-  const panel = await page.locator(".advanced-filters").boundingBox()
+  // SP-UI-03: Fine-tune is a plain row, so its body lines up with the row's own label.
+  const header = await page.getByText("Fine-tune", { exact: true }).boundingBox()
   const label = await page.getByText("Pick style").boundingBox()
-  expect(label!.x - panel!.x).toBeGreaterThanOrEqual(12)
+  expect(Math.abs(label!.x - header!.x)).toBeLessThanOrEqual(2)
   await page.getByText("Pick style").scrollIntoViewIfNeeded()
   await page.screenshot({ path: `${SHOTS}/after/tonight-fine-tune-390-light.png` })
 })
@@ -211,7 +212,7 @@ async function mockPicker(page: Page) {
 const STAGE = process.env.SP_UI_02_STAGE ?? "after"
 
 for (const scheme of ["light", "dark"] as const) {
-  test(`Tonight: no player-count hint, Time step and pick fit without scrolling (${scheme})`, async ({ page }) => {
+  test(`Tonight: Find a game explains itself, Time step and pick fit without scrolling (${scheme})`, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })
     await page.emulateMedia({ colorScheme: scheme, reducedMotion: "reduce" })
     await mockPicker(page)
@@ -219,7 +220,11 @@ for (const scheme of ["light", "dark"] as const) {
     const find = page.getByRole("button", { name: "Find a game" })
     await expect(find).toBeDisabled()
     await page.screenshot({ path: `${SHOTS}/${STAGE}/tonight-players-390-${scheme}.png` })
-    if (STAGE === "after") await expect(page.getByText("Choose your player count")).toHaveCount(0)
+    // SP-UI-03: the reason Find a game is off sits under the button, and goes once a count is chosen.
+    if (STAGE === "after") {
+      await expect(page.getByText("Choose how many are playing")).toBeVisible()
+      await expect(page.getByText("Choose your player count")).toHaveCount(0)
+    }
     await page.getByRole("button", { name: "3 players" }).click()
     await find.click()
 

@@ -22,7 +22,7 @@ test.beforeAll(async ({ browser }, testInfo) => {
 test.beforeEach(({ browserName }, testInfo) => { test.skip(browserName !== "webkit" || testInfo.project.name !== "iPhone 15") })
 
 const TABS = [
-  { name: "Tonight", path: "/tonight", last: ".tonight-recent li:last-child, .picker-step-actions" },
+  { name: "Tonight", path: "/tonight", last: ".tonight-recent li:last-child" },
   { name: "Shelf", path: "/shelf", last: ".collection-tile, .collection-list > *" },
   { name: "Plays", path: "/plays", last: ".plays-card:last-of-type" },
   { name: "Discover", path: "/discover", last: ".discover-card:last-of-type, .discover-list > *:last-child" },

@@ -21,7 +21,7 @@
   :root[data-native-ios] :is(.primary-button, .secondary-button, .ghost-button) {
     font-size: var(--text-support);
   }
-  :root[data-native-ios] .player-chip strong { font-size: 1.588235rem; }
+  
   :root[data-native-ios] .time-option strong { font-size: 1rem; }
   :root[data-native-ios] :is(.wishlist-card-body strong, .collection-game-info strong) {
     font-size: 1.058824rem;
@@ -56,13 +56,8 @@
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 7.5rem), 1fr));
   }
 
-  :root[data-native-ios] .player-complexity-section .complexity-grid {
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 3em), 1fr));
-  }
-  :root[data-native-ios] .player-complexity-section .complexity-option {
-    min-width: 0;
-    overflow-wrap: anywhere;
-  }
+  
+  
   :root[data-native-ios] .avatar-choice-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -105,8 +100,7 @@
     scroll-padding-bottom: calc(max(128px, 8rem) + env(safe-area-inset-bottom));
   }
 
-  :root[data-native-ios] :is(.auth-tabs, .collection-section-tabs, .collection-filter-tabs, .filter-tabs),
-  :root[data-native-ios] .player-grid {
+  :root[data-native-ios] :is(.auth-tabs, .collection-section-tabs, .collection-filter-tabs, .filter-tabs) {
     min-width: 0;
   }
   :root[data-native-ios] :is(.collection-section-tabs button, .collection-filter-tabs button, .filter-tabs button) {
@@ -126,11 +120,7 @@
     overflow-wrap: break-word;
     word-break: keep-all;
   }
-  :root[data-native-ios] .player-chip {
-    min-height: max(70px, 4.5rem);
-    aspect-ratio: auto;
-    overflow-wrap: anywhere;
-  }
+  
   :root[data-native-ios] :is(.time-option, .wishlist-card-main, .collection-game) {
     min-width: 0;
     overflow-wrap: anywhere;

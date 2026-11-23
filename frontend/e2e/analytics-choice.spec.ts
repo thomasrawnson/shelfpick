@@ -17,7 +17,9 @@ async function watchPostHog(page: Page) {
   return sent
 }
 
-test.beforeEach((_fixtures, testInfo) => { test.skip(testInfo.project.name !== "iPhone 15", "one phone-size project is enough") })
+// Playwright needs an object pattern as the first argument, even when no fixture is used.
+// eslint-disable-next-line no-empty-pattern
+test.beforeEach(({}, testInfo) => { test.skip(testInfo.project.name !== "iPhone 15", "one phone-size project is enough") })
 
 test("a fresh install asks once, collects nothing before the answer, and Not now stays off", async ({ page }) => {
   const sent = await watchPostHog(page)
