@@ -48,7 +48,9 @@ import { mergeGameIntoCollection } from "../collection-state"
 import PullIndicator from "./ui/PullIndicator"
 import Skeleton from "./ui/Skeleton"
 import { usePullToRefresh } from "../use-pull-to-refresh"
+import { useOnline } from "../offline/connectivity"
 import { usePlaySync } from "../offline/play-sync-context"
+import NotSavedYet from "./offline/NotSavedYet"
 import SavedCopyNotice from "./offline/SavedCopyNotice"
 import { readShelfLayout, saveShelfLayout } from "../shelf-layout"
 
@@ -121,6 +123,7 @@ function CollectionView({
   onSectionChange,
   onBrowseDiscover,
 }: Props) {
+  const online = useOnline()
   const [layout, setLayout] = useState<ShelfLayout>(readShelfLayout)
 
   const {
@@ -948,7 +951,9 @@ function CollectionView({
         <header><h1>Shelf</h1></header>
 
         {sectionTabs}
-        <RetryNotice message={error} busy={loading} onRetry={retryCollection} />
+        {online
+          ? <RetryNotice message={error} busy={loading} onRetry={retryCollection} />
+          : <NotSavedYet what="your shelf" busy={loading} onRetry={retryCollection} />}
       </section>
     )
   }

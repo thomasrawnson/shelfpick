@@ -275,6 +275,26 @@ for (const scheme of ["light", "dark"] as const) {
       await expect(playWith(page, ana)).toHaveCount(0)
     })
 
+    test("with nothing saved yet, Shelf and Log a play say so instead of showing an error", async ({ page, context }) => {
+      await logIn(page, EMAIL, LOCAL_PASSWORD)
+      // A first launch of a new build: signed in, but no copy has been saved for this account yet.
+      await page.evaluate(() => {
+        for (const key of Object.keys(localStorage)) if (key.startsWith("shelfpick.cache.")) localStorage.removeItem(key)
+      })
+      await context.setOffline(true)
+      await page.evaluate(() => window.dispatchEvent(new Event("offline")))
+
+      await tab(page, "Shelf").click()
+      await expect(page.getByText("isn't saved on this device yet")).toBeVisible()
+      await expect(page.getByText("Couldn't connect to ShelfPick")).toHaveCount(0)
+
+      await tab(page, "Plays").click()
+      await page.getByRole("button", { name: "Log play" }).click()
+      await expect(page.getByText("isn't saved on this device yet")).toBeVisible()
+      await expect(page.getByText("No games match.")).toHaveCount(0)
+      await context.setOffline(false)
+    })
+
     test("a reply lost after the server saved the play still ends with one play", async ({ page }) => {
       await logIn(page, EMAIL, LOCAL_PASSWORD)
       await expect(page).not.toHaveURL(/\/login/)
