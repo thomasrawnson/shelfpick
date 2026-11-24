@@ -1,10 +1,13 @@
 import logging
 
+from dataclasses import asdict
+
 from fastapi import (
     APIRouter,
     Depends,
     HTTPException,
     Query,
+    Response,
 )
 
 from api.dependencies import (
@@ -50,6 +53,7 @@ def list_plays(
 )
 def record_play(
     play_data: PlayCreate,
+    response: Response,
     service: PlayService = Depends(
         get_play_service
     ),
@@ -76,6 +80,7 @@ def record_play(
             scoresheet_id=play_data.scoresheet_id,
             scoresheet_version=play_data.scoresheet_version,
             result_override=play_data.result_override,
+            client_id=play_data.client_id,
         )
     except ValueError as exc:
         raise HTTPException(
@@ -88,6 +93,11 @@ def record_play(
             status_code=404,
             detail="Game not found",
         )
+
+    if not play.created:
+        # The device already sent this play: report it, do nothing else.
+        response.status_code = 200
+        return {k: v for k, v in asdict(play).items() if k != "created"}
 
     if play_data.picker_session_id:
         try:
@@ -103,7 +113,7 @@ def record_play(
                 "picker_play_analytics_failed"
             )
 
-    return play
+    return {k: v for k, v in asdict(play).items() if k != "created"}
 
 
 @router.patch("/plays/{play_id}")

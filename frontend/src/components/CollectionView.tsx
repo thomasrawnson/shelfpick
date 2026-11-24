@@ -48,6 +48,8 @@ import { mergeGameIntoCollection } from "../collection-state"
 import PullIndicator from "./ui/PullIndicator"
 import Skeleton from "./ui/Skeleton"
 import { usePullToRefresh } from "../use-pull-to-refresh"
+import { usePlaySync } from "../offline/play-sync-context"
+import SavedCopyNotice from "./offline/SavedCopyNotice"
 import { readShelfLayout, saveShelfLayout } from "../shelf-layout"
 
 export type CollectionSection =
@@ -352,6 +354,8 @@ function CollectionView({
 
 
   const [reloadKey, setReloadKey] = useState(0)
+  // Bumps when plays logged offline reach the server, so counts and history are refreshed.
+  const { syncedVersion } = usePlaySync()
   function retryCollection() { setLoading(true); setReloadKey(current => current + 1) }
   const pull = usePullToRefresh(() => { setReloadKey(current => current + 1) }, section === "owned" && !selectedGame)
   useEffect(() => {
@@ -389,7 +393,7 @@ function CollectionView({
 
     void loadGames()
     return () => { active = false }
-  }, [reloadKey])
+  }, [reloadKey, syncedVersion])
 
 
   useLayoutEffect(() => {
@@ -594,6 +598,7 @@ function CollectionView({
     }
   }, [
     selectedGame,
+    syncedVersion,
   ])
 
 
@@ -1005,6 +1010,7 @@ function CollectionView({
       </div>
 
       {sectionTabs}
+      <SavedCopyNotice names={["games", "collection-stats"]} what="your shelf" />
       {error && <RetryNotice message={error} busy={loading} onRetry={retryCollection} />}
 
       {addingGame && (

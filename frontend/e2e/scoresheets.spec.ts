@@ -174,7 +174,8 @@ for (const scheme of ["light", "dark"] as const) {
       // Loads fail until Retry is pressed (React's dev double-mount sends the load twice, so "once" is not countable).
       let failing = true
       await page.route(/\/scoresheets\/\d+/, async (route) => {
-        if (route.request().method() === "GET" && failing) await route.abort()
+        // A server error, not a dropped connection: with no connection the saved copy of that sheet version is used (SP-NATIVE-01c).
+        if (route.request().method() === "GET" && failing) await route.fulfill({ status: 503, contentType: "application/json", body: "{\"detail\":\"unavailable\"}" })
         else await route.continue()
       })
       const patches: Record<string, unknown>[] = []

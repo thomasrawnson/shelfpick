@@ -1,10 +1,12 @@
 from datetime import datetime
 from typing import Any, Literal
+from uuid import UUID
 
 from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    field_validator,
 )
 
 
@@ -52,6 +54,9 @@ class PlayCreate(BaseModel):
 
     timer_session_id: str | None = Field(default=None, min_length=36, max_length=36)
 
+    # Random id the app makes for each new play; a repeat returns that play.
+    client_id: str | None = Field(default=None, min_length=36, max_length=36)
+
     participants: list[
         PlayParticipantCreate
     ] = Field(
@@ -76,6 +81,16 @@ class PlayCreate(BaseModel):
         min_length=36,
         max_length=36,
     )
+
+    @field_validator("client_id")
+    @classmethod
+    def canonical_client_id(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        try:
+            return str(UUID(value))
+        except ValueError as exc:
+            raise ValueError("client_id must be a UUID") from exc
 
 
 class PlayUpdate(BaseModel):

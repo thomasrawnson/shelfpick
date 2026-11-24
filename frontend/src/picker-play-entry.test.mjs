@@ -6,10 +6,12 @@ import { createServer } from "vite"
 
 let server
 let PickerPlayEntry
+let PlaySyncProvider
 
 before(async () => {
   server = await createServer({ server: { middlewareMode: true }, appType: "custom" })
   PickerPlayEntry = (await server.ssrLoadModule("/src/components/picker/PickerPlayEntry.tsx")).default
+  PlaySyncProvider = (await server.ssrLoadModule("/src/offline/PlaySyncProvider.tsx")).PlaySyncProvider
 })
 
 after(async () => { await server?.close() })
@@ -34,7 +36,7 @@ const game = {
 }
 
 function renderEntry(playerNames = []) {
-  return renderToStaticMarkup(React.createElement(PickerPlayEntry, {
+  return renderToStaticMarkup(React.createElement(PlaySyncProvider, { userId: 1 }, React.createElement(PickerPlayEntry, {
     match: {
       game,
       score: 92,
@@ -47,7 +49,7 @@ function renderEntry(playerNames = []) {
     pickerSessionId: "picker-session",
     onCancel: () => {},
     onSaved: async () => {},
-  }))
+  })))
 }
 
 test("Picker play entry is a sheet with Cancel and one Save, prefilled with tonight's players", () => {

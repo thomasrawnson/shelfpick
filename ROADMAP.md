@@ -30,6 +30,24 @@ and validate the work before asking Tom to resume beta. Internal testing
 continues. This instruction supersedes older immediate-beta and post-launch
 timing below; existing completed slices remain historical implementation facts.
 
+### SP-NATIVE-01c Offline play logging and shelf cache — LOCAL CANDIDATE, 22 November 2026
+
+Branch `sp-native-01c` from `origin/main` 506de60; draft PR for owner review, not
+merged, deployed or submitted. With no signal a player can log a play (including
+Rematch and a scoresheet play) and browse the shelf. Every new play carries a
+random `client_id`; `POST /plays` returns the existing play with 200 for a repeat
+`(user, client_id)` and creates nothing. A play that cannot reach the server waits
+in a durable on-device queue (iOS Preferences, localStorage on the web), shown as
+pending in Plays and the game's history, and is sent in order on reconnect, app
+resume and Sync now, with exponential backoff; a 4xx marks it failed with Retry and
+Discard. The shelf, game history, plays, players and every scoresheet version
+opened are saved with a "last updated" label; Tonight, Discover, Stats and Game
+Night say they need a connection. Migration `e5b8c2f1a7d4` is additive (nullable
+`plays.client_id`, unique per user) and must run before the app build. iOS build
+number is 25. Not in scope and not done: offline picking, voting or stats;
+two-device edit merging (last write wins); background sync; widgets. Evidence,
+owner gates and rollback: `docs/SP-NATIVE-01c-REPORT.md`.
+
 ### SP-UI-05 Game detail: calmer layout, safer destructive actions — LOCAL CANDIDATE, 23 November 2026
 
 Branch `sp-ui-05` from `main` 71ddd7c; draft PR for owner review, not deployed or submitted. Game detail only: cover, title, one
