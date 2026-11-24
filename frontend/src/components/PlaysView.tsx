@@ -19,10 +19,12 @@ import {
   type FeedFilters,
 } from "../plays-feed"
 import { rematchPrefill, type PlayPrefill } from "../play-results"
+import { useOnline } from "../offline/connectivity"
 import { usePlaySync } from "../offline/play-sync-context"
 import { queuedGamePlay } from "../offline/queued-plays"
 import PlayLogForm from "./collection/PlayLogForm"
 import PendingPlayControls from "./offline/PendingPlayControls"
+import NotSavedYet from "./offline/NotSavedYet"
 import SavedCopyNotice from "./offline/SavedCopyNotice"
 import ResilientGameArtwork from "./ResilientGameArtwork"
 import ChoiceGroup from "./ui/ChoiceGroup"
@@ -54,6 +56,7 @@ async function loadFeed(): Promise<{ games: Game[]; entries: FeedEntry[] }> {
 }
 
 function PlaysView({ onOpenGame }: Props) {
+  const online = useOnline()
   const [screen, setScreen] = useState<Screen>({ kind: "list" })
   const [games, setGames] = useState<Game[]>([])
   const [serverEntries, setEntries] = useState<FeedEntry[]>([])
@@ -129,7 +132,9 @@ function PlaysView({ onOpenGame }: Props) {
               </button>
             </li>
           ))}
-          {matches.length === 0 && <li className="plays-empty-note">No games match.</li>}
+          {matches.length === 0 && (games.length === 0 && !online
+            ? <li className="plays-empty-note"><NotSavedYet what="your shelf" /></li>
+            : <li className="plays-empty-note">No games match.</li>)}
         </ul>
       </section>
     )
