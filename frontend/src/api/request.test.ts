@@ -42,3 +42,14 @@ test('backend field validation is mapped without exposing submitted input', asyn
   assert.deepEqual(error.fields, { password: 'Use at least 8 characters' })
   assert.ok(!JSON.stringify(error).includes('secret'))
 })
+
+test('a native iOS HTTP failure (NSURLErrorDomain) is reported as a lost connection, like a fetch TypeError', async () => {
+  const original = globalThis.fetch
+  const native = Object.assign(new Error('The Internet connection appears to be offline.'), { code: 'NSURLErrorDomain' })
+  try {
+    globalThis.fetch = async () => { throw native }
+    const error = await request('http://fixture', { method: 'POST' }).catch((caught: unknown) => caught) as Error
+    assert.match(error.message, /Check your connection/)
+    assert.equal(error.cause, native)
+  } finally { globalThis.fetch = original }
+})

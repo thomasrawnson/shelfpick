@@ -10,3 +10,5 @@ class Play:
     played_at: datetime
     duration_minutes: int | None = None
     location: str | None = None
+    # False when a repeated client_id returned the play that already exists.
+    created: bool = True

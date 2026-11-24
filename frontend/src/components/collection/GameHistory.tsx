@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from "react";
 
 import {
   deletePlay,
+  historyCacheName,
   type Game,
   type GamePlay,
   type GameHistory as GameHistoryData,
@@ -10,6 +11,10 @@ import {
 import { createBGStatsHistoryUrl } from "../../utils/bgstats";
 import { minutesOrDash, playsLabel, winnersFirst } from "../../game-detail-format";
 import { outcomeLabel } from "../../play-results";
+import { usePlaySync } from "../../offline/play-sync-context";
+import { historyWithQueued } from "../../offline/queued-plays";
+import PendingPlayControls from "../offline/PendingPlayControls";
+import SavedCopyNotice from "../offline/SavedCopyNotice";
 
 import ConfirmSheet from "../ui/ConfirmSheet";
 import LoadingMessage from "../ui/LoadingMessage";
@@ -91,6 +96,8 @@ function PlayEntry({ game, play, deleteError, shareRef, onShare, onEdit, onRemat
       <div id={bodyId} hidden={!open}>
         {play.location && <p className="recent-play-location">At {play.location}</p>}
 
+        <PendingPlayControls play={play} />
+
         {typeLabel && (
           <p className="recent-play-type">
             {typeLabel}
@@ -126,12 +133,14 @@ function PlayEntry({ game, play, deleteError, shareRef, onShare, onEdit, onRemat
 
         <div className="recent-play-actions">
           <button type="button" className="rematch-action" onClick={onRematch}>Rematch</button>
-          <button type="button" ref={shareRef} className="text-action" onClick={onShare}>Share play</button>
+          {!play.pending && (
+            <button type="button" ref={shareRef} className="text-action" onClick={onShare}>Share play</button>
+          )}
           <button type="button" className="text-action" onClick={onEdit}>Edit</button>
           <OverflowMenu
             label={`More options for the ${date} play`}
             items={[
-              ...(play.source !== "bgstats"
+              ...(play.source !== "bgstats" && !play.pending
                 ? [{ key: "bgstats", label: "Send to BG Stats", href: createBGStatsHistoryUrl(game, play) }]
                 : []),
               { key: "delete", label: "Delete play", destructive: true, onSelect: onDelete },
@@ -147,12 +156,15 @@ function PlayEntry({ game, play, deleteError, shareRef, onShare, onEdit, onRemat
 
 function GameHistory({
   game,
-  history,
+  history: serverHistory,
   loading,
   onPlayDeleted,
   onPlayEdited,
   onRematch,
 }: Props) {
+  const { items, discardQueued } = usePlaySync();
+  // Plays logged on this device that have not synced yet appear with the ones the server knows.
+  const history = historyWithQueued(serverHistory, items, game.bgg_id);
   const [editingPlayId, setEditingPlayId] = useState<number | null>(null);
   const editingPlay = history?.recent_plays.find((play) => play.id === editingPlayId) ?? null;
   const [confirmingPlayId, setConfirmingPlayId] = useState<number | null>(null);
@@ -201,7 +213,14 @@ function GameHistory({
     setDeleteError("");
 
     try {
-      await deletePlay(playId);
+      const queued = history?.recent_plays.find((play) => play.id === playId);
+      if (queued?.pending && queued.client_id) {
+        // Not on the server yet: removing it from the queue is the whole delete.
+        const removed = await discardQueued(queued.client_id);
+        if (!removed.ok) throw new Error("This play just synced. Delete it again.");
+      } else {
+        await deletePlay(playId);
+      }
 
       await onPlayDeleted();
     } catch (err) {
@@ -217,6 +236,7 @@ function GameHistory({
   return (
     <div className="detail-block game-history">
       <h2 className="section-label">Your history</h2>
+      <SavedCopyNotice names={[historyCacheName(game.bgg_id)]} what="history" />
 
       {loading ? (
         <p className="history-empty">
@@ -297,7 +317,7 @@ function GameHistory({
           )}
         </>
       ) : (
-        <p className="history-empty">Play history unavailable.</p>
+        <p className="history-empty">Play history unavailable. It loads when you're back online.</p>
       )}
       {confirmingPlay && (
         <ConfirmSheet

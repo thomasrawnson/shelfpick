@@ -21,6 +21,14 @@ import { SessionExpiredError } from "./api/request";
 import RetryNotice from "./components/ui/RetryNotice";
 import BrandLogo from "./components/ui/BrandLogo";
 import { getMe, sendFeedback } from "./api/client";
+import { isUnreachableError } from "./offline/connectivity";
+import { clearAllSavedCopies } from "./offline/cache";
+import { clearPlayQueue } from "./offline/play-queue";
+import { PlaySyncProvider } from "./offline/PlaySyncProvider";
+import { clearSessionUser, saveSessionUser, savedSessionUser } from "./offline/session-user";
+import { createDeviceStore } from "./offline/store";
+import NeedsConnection from "./components/offline/NeedsConnection";
+import PendingBanner from "./components/offline/PendingBanner";
 import { clearQueuedFeedback, flushFeedbackOutbox } from "./feedback";
 
 import { clearToken, restoreToken, type AuthUser } from "./auth";
@@ -323,7 +331,14 @@ function App() {
 
         if (active) setUser(currentUser);
       } catch (err) {
-        if (active && !(err instanceof SessionExpiredError)) setRestoreError(err instanceof Error ? err.message : "Couldn't restore your session.");
+        // No connection: open with the profile saved on this device. The server still checks the
+        // session on the first request that reaches it.
+        const offlineUser = isUnreachableError(err) ? savedSessionUser() : null;
+        if (offlineUser) {
+          if (active) setUser(offlineUser);
+        } else if (active && !(err instanceof SessionExpiredError)) {
+          setRestoreError(err instanceof Error ? err.message : "Couldn't restore your session.");
+        }
       } finally {
         if (active) setCheckingAuth(false);
       }
@@ -332,6 +347,11 @@ function App() {
     void restoreSession();
     return () => { active = false; };
   }, [restoreAttempt]);
+
+  // Keep the profile for opening offline; it is removed on sign-out.
+  useEffect(() => {
+    if (user) saveSessionUser(user);
+  }, [user]);
 
   // Feedback written offline is sent once this account is signed in and online.
   const userId = user?.id;
@@ -352,6 +372,8 @@ function App() {
         : null;
 
       resetCollectionUiState();
+      clearSessionUser();
+      clearAllSavedCopies();
       setUser(null);
 
       navigate(APP_PATHS.login, {
@@ -390,11 +412,21 @@ function App() {
     navigate(intendedRoute ?? APP_PATHS.tonight, { replace: true });
   }
 
+  // Signing out removes the saved copies of the shelf and the saved profile. Plays that have not
+  // synced stay on the device for this account, so signing back in does not lose them.
   function finishLogout() {
     setSessionExpired(false);
     resetCollectionUiState();
+    clearSessionUser();
+    clearAllSavedCopies();
     setUser(null);
     navigate(APP_PATHS.login, { replace: true });
+  }
+
+  // Deleting the account deletes everything it left on the device, including unsynced plays.
+  function finishAccountDeletion(deletedUserId: number) {
+    void clearPlayQueue(createDeviceStore(), deletedUserId);
+    finishLogout();
   }
 
   async function handleLogout() {
@@ -522,7 +554,7 @@ function App() {
         />
         {isAccountOptionsRoute && <OnboardingAccountOptions
           onLogout={handleLogout}
-          onAccountDeleted={finishLogout}
+          onAccountDeleted={() => finishAccountDeletion(user.id)}
         />}
       </>,
     );
@@ -538,6 +570,7 @@ function App() {
   const view = appViewForPath(location.pathname);
 
   return (
+    <PlaySyncProvider userId={user.id}>
     <main className="app-shell">
       <EntitlementsProvider entitlements={user.entitlements}>
       <LiveTimerProvider enabled={user.entitlements.includes("live_play_enhancements")}>
@@ -550,11 +583,13 @@ function App() {
         />}
 
         <div className="app-content">
+          <PendingBanner />
           <div className="page-transition" key={view}>
           <Routes>
             <Route
               path={`${APP_PATHS.tonight}/*`}
               element={
+                <NeedsConnection feature="Tonight">
                 <TonightView
                   defaultPlayers={user.preferred_player_count}
                   defaultTime={user.preferred_play_time}
@@ -565,6 +600,7 @@ function App() {
                   onViewShelf={() => navigate(APP_PATHS.shelfOwned)}
                   onUnlockPro={() => navigate(APP_PATHS.settingsPro)}
                 />
+                </NeedsConnection>
               }
             />
 
@@ -593,6 +629,7 @@ function App() {
             <Route
               path={APP_PATHS.discover}
               element={
+                <NeedsConnection feature="Discover">
                 <DiscoverView
                   personalized={user.entitlements.includes("personalized_discover")}
                   onViewWishlist={() => {
@@ -601,17 +638,20 @@ function App() {
                   onUnlockPro={() => navigate(APP_PATHS.settingsPro)}
                   onPersonalize={() => navigate(APP_PATHS.settingsProfile)}
                 />
+                </NeedsConnection>
               }
             />
 
             <Route
               path={APP_PATHS.stats}
               element={
+                <NeedsConnection feature="Stats">
                 <InsightsView
                   onOpenGame={openOwnedCollectionGame}
                   onOpenCollection={() => navigate(APP_PATHS.shelfOwned)}
                   onOpenPicker={() => navigate(APP_PATHS.tonight)}
                 />
+                </NeedsConnection>
               }
             />
 
@@ -619,7 +659,7 @@ function App() {
             <Route
               path={APP_PATHS.settingsProfile}
               element={<SettingsSectionView section="profile" user={user} onUserChange={setUser}
-                onAccountDeleted={() => { clearQueuedFeedback(user.id); finishLogout(); }} onLogout={handleLogout} onLogoutAll={handleLogoutAll} />}
+                onAccountDeleted={() => { clearQueuedFeedback(user.id); finishAccountDeletion(user.id); }} onLogout={handleLogout} onLogoutAll={handleLogoutAll} />}
             />
             {([
               [APP_PATHS.settingsPreferences, "preferences"],
@@ -692,6 +732,7 @@ function App() {
       </LiveTimerProvider>
       </EntitlementsProvider>
     </main>
+    </PlaySyncProvider>
   );
 }
 

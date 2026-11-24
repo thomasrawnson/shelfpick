@@ -1,0 +1,65 @@
+/* Offline play logging and saved copies (SP-NATIVE-01c). Semantic tokens only, so dark mode follows. */
+.sync-banner {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 12px;
+  /* Right side clears the account avatar that floats in the top corner. */
+  padding: 10px 64px 10px 12px;
+  color: var(--color-text-primary);
+  background: var(--color-warning-soft);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  font-size: 0.875rem;
+}
+.sync-banner-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.sync-banner-failed { color: var(--color-danger); }
+.sync-banner-button {
+  flex: none;
+  min-height: var(--target-min);
+  padding: 0 12px;
+  color: var(--color-brand-primary);
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+.sync-banner-button:disabled { opacity: 0.6; cursor: default; }
+
+.pending-play { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 6px; font-size: 0.8125rem; }
+.pending-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  color: var(--color-warning);
+  background: var(--color-warning-soft);
+  border: 1px solid var(--color-warning);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+.pending-play-failed .pending-badge { color: var(--color-danger); background: var(--color-danger-soft); border-color: var(--color-danger); }
+.pending-reason { color: var(--color-text-support); }
+.pending-actions, .pending-confirm { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+
+.saved-copy-notice { margin: 0 0 10px; color: var(--color-text-support); font-size: 0.8125rem; }
+
+/* Top padding clears the account avatar that floats in the corner. */
+.needs-connection { display: grid; gap: 12px; justify-items: start; padding-top: 72px; }
+.needs-connection h1 { margin: 0; }
+.needs-connection p { margin: 0; color: var(--color-text-support); }
+.needs-connection-actions { display: grid; gap: 8px; width: 100%; max-width: 360px; }
+
+/* A pending play keeps the usual row and adds a second row for its badge and actions. */
+.plays-card.has-pending { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; row-gap: 0; }
+.plays-card.has-pending .pending-play { grid-column: 1 / -1; margin: 0 0 8px; }
+
+.pending-link {
+  min-height: var(--target-min);
+  padding: 0 8px;
+  color: var(--color-danger);
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}

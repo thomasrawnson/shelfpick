@@ -460,6 +460,24 @@ expiry time even if a notification is late. A deletion request for a user must
 also be raised with RevenueCat; the account deletion in the app removes only
 ShelfPick's own purchase row.
 
+### Offline plays: `plays.client_id` migration (SP-NATIVE-01c)
+
+Migration `e5b8c2f1a7d4` adds a nullable `plays.client_id` (a UUID string) and a
+unique constraint on `(user_id, client_id)`. It rewrites no row. Existing plays and
+imported plays keep a null id; nulls never collide.
+
+- **Order:** take a fresh backup, deploy the API (the pre-deploy command runs
+  `alembic upgrade head`), check `/health`, then release the app build. An app that
+  sends `client_id` to an API without the migration would fail every save.
+- **Older app builds** do not send `client_id` and are unaffected. An older API on the
+  migrated schema is compatible (the column is nullable).
+- **Smoke test:** `POST /plays` twice with the same `client_id` returns 201 then 200
+  with the same play `id`, and the game's history shows one play.
+- **Rollback:** prefer a forward fix. `alembic downgrade c4e7a9b2d6f1` is tested; it
+  drops the constraint and the column and loses only these ids. Afterwards the server
+  can no longer recognise a retried play, so a play whose reply was lost could be saved
+  twice. Avoid downgrading while phones may hold unsynced plays unless that is accepted.
+
 ## 6. Release log
 
 | Date | Commit | Deploy | Migration | Email | Backup/restore | Notes |

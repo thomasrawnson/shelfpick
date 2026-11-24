@@ -1,3 +1,5 @@
+import { isNativeTransportError, reportReachable, reportUnreachable, RequestTimeoutError } from "../offline/connectivity.ts"
+
 export class SessionExpiredError extends Error {
   constructor() { super("Your session has expired. Please log in again.") }
 }
@@ -26,13 +28,15 @@ export async function request(
       (async () => {
         const response = await fetch(url, { ...options, signal: controller.signal })
         const body = await response.arrayBuffer()
+        reportReachable()
         return new Response(response.status === 204 || response.status === 205 || response.status === 304 ? null : body, {
           status: response.status, statusText: response.statusText, headers: response.headers,
         })
       })(),
       new Promise<never>((_, reject) => {
         timer = setTimeout(() => {
-          reject(new Error(options.method && options.method !== "GET"
+          reportUnreachable()
+          reject(new RequestTimeoutError(options.method && options.method !== "GET"
             ? "This request took too long. It may have completed. Check the current state before trying again."
             : "This request took too long. Please try again."))
           controller.abort()
@@ -40,7 +44,8 @@ export async function request(
       }),
     ])
   } catch (error) {
-    if (error instanceof TypeError) {
+    if (error instanceof TypeError || isNativeTransportError(error)) {
+      reportUnreachable()
       throw new Error("Couldn't connect to ShelfPick. Check your connection and try again.", { cause: error })
     }
     throw error

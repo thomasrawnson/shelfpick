@@ -46,12 +46,20 @@ class PlayWriteRepository:
         scoresheet_id: int | None = None,
         scoresheet_version: int | None = None,
         result_overridden: bool = False,
+        client_id: str | None = None,
     ) -> DomainPlay | None:
         if self.user_id is None:
             raise ValueError(
                 "user_id is required "
                 "to record a play"
             )
+
+        # A repeat of a play the device already sent (a retry after a lost
+        # response) returns that play and creates nothing.
+        if client_id is not None:
+            repeated = self._play_by_client_id(client_id)
+            if repeated is not None:
+                return repeated
 
         if timer_session_id is not None:
             existing = (
@@ -119,6 +127,7 @@ class PlayWriteRepository:
             scoresheet_id=scoresheet_id,
             scoresheet_version=scoresheet_version,
             result_overridden=result_overridden,
+            client_id=client_id,
         )
 
         if played_at is not None:
@@ -129,6 +138,11 @@ class PlayWriteRepository:
             self.db.flush()
         except IntegrityError:
             self.db.rollback()
+            # Two requests with one client_id raced: the other one won.
+            if client_id is not None:
+                repeated = self._play_by_client_id(client_id)
+                if repeated is not None:
+                    return repeated
             if timer_session_id is None:
                 raise
             existing = (
@@ -181,6 +195,28 @@ class PlayWriteRepository:
             duration_minutes=database_play.duration_minutes,
             location=database_play.location,
         )
+    def _play_by_client_id(self, client_id: str) -> DomainPlay | None:
+        existing = (
+            self.db.query(DatabasePlay)
+            .filter(
+                DatabasePlay.user_id == self.user_id,
+                DatabasePlay.client_id == client_id,
+            )
+            .first()
+        )
+        if existing is None:
+            return None
+        game = self.db.get(DatabaseGame, existing.game_id)
+        return DomainPlay(
+            id=existing.id,
+            bgg_id=game.bgg_id,
+            player_count=existing.player_count,
+            played_at=existing.played_at,
+            duration_minutes=existing.duration_minutes,
+            location=existing.location,
+            created=False,
+        )
+
     @staticmethod
     def _build_participant(
         player: Player,
