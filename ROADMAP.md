@@ -48,6 +48,35 @@ number is 25. Not in scope and not done: offline picking, voting or stats;
 two-device edit merging (last write wins); background sync; widgets. Evidence,
 owner gates and rollback: `docs/SP-NATIVE-01c-REPORT.md`.
 
+### SP-UI-05 Game detail: calmer layout, safer destructive actions — LOCAL CANDIDATE, 23 November 2026
+
+Branch `sp-ui-05` from `main` 71ddd7c; draft PR for owner review, not deployed or submitted. Game detail only: cover, title, one
+meta line and Log a play on the first screen; flat facts with scales; six Mechanics with Show all; collapsible Recent plays with
+winners first (check plus "Won"); Rematch as the main action; Delete play and Remove from collection behind a "…" menu and a
+confirmation sheet that names the game. No backend change. Owner gate: a physical-phone check of the detail page in light and
+dark. Report: `docs/SP-UI-05-REPORT.md`.
+
+### SP-UI-04 Cross-tab consistency — LOCAL CANDIDATE, 23 November 2026
+
+Branch `sp-ui-04`, stacked on `sp-ui-03` (PR #60, still a draft); draft PR for owner review, not merged, deployed or
+submitted. One shared selected state (`ChoiceGroup`, replacing `SegmentedControl` and `FilterTabs`) and one accent (no
+gold on any tab) across Tonight, Shelf, Plays, Discover and Stats. Discover is a calm list (one Want to Play button, a "…"
+menu with Hide and an undo toast, no "Hot now" badge); Shelf has a count row with "Add game", one 40pt search/sort/layout
+row and square cover-fit thumbnails; Stats drops the duplicate heading, scrolls its tab row, and uses flat rows and left-aligned
+tiles; Plays has a compact filter row and "No result logged"; the five tabs share one title row. Owner gates: a
+physical-phone check of all five tabs in light and dark, and the decision on rolling Fraunces and DM Sans out to these tabs.
+Report: `docs/SP-UI-04-REPORT.md`.
+
+### SP-UI-03 Tonight: less templated, clearer hierarchy — LOCAL CANDIDATE, 23 November 2026
+
+Branch `sp-ui-03` from `origin/main` 506de60; draft PR for owner review, not merged, deployed or submitted. Tonight only:
+a hint under the disabled Find a game, a check on the chosen count and complexity (`aria-pressed`), one filled primary
+button with the group vote as a quiet text action, Forest as the only accent (no gold, neutral avatar), plain list rows
+for "Choose players by name" and Fine-tune, one section-label style, a 44pt avatar, a fading Recently played edge, choice
+grids that reflow at accessibility text sizes, and Fraunces (headline) with DM Sans (body), self-hosted. The old Tonight
+rules in five stylesheets were replaced by `styles/tonight.css`. No backend or logic change. Owner decision pending:
+roll the fonts out to the other tabs. Report: `docs/SP-UI-03-REPORT.md`.
+
 ### SP-SCORE-01 Scoresheets in the app — IMPLEMENTED; DRAFT PR (18 November 2026)
 
 Branch `codex/sp-score-01`; not merged, deployed or submitted. The Log play and

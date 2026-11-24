@@ -58,11 +58,12 @@ async function serverPlaysNamed(page: Page, name: string): Promise<number> {
   return history.recent_plays.filter((play) => play.participants.some((participant) => participant.name === name)).length
 }
 
+// Delete play lives in the play's "…" menu and always asks first.
 async function deletePlayWith(page: Page, name: string) {
-  const play = playWith(page, name)
-  await play.getByRole("button", { name: "Delete play" }).click()
-  await play.getByRole("button", { name: "Delete play" }).last().click()
-  await expect(page.getByText("Delete this play?")).toHaveCount(0)
+  await playWith(page, name).getByRole("button", { name: /More options for the .* play/ }).click()
+  await page.getByRole("menuitem", { name: "Delete play" }).click()
+  await page.getByRole("alertdialog", { name: "Delete this play?" }).getByRole("button", { name: "Delete play" }).click()
+  await expect(page.getByRole("alertdialog", { name: "Delete this play?" })).toHaveCount(0)
 }
 
 async function logThreePlayerSheetPlay(page: Page, ana: string, ben: string, cy: string) {
@@ -197,8 +198,7 @@ for (const scheme of ["light", "dark"] as const) {
       await expect(page.getByText("1 play waiting to sync")).toBeVisible()
 
       // Delete it: it never reaches the server.
-      await playWith(page, ana).getByRole("button", { name: "Delete play" }).click()
-      await playWith(page, ana).getByRole("button", { name: "Delete play" }).last().click()
+      await deletePlayWith(page, ana)
       await expect(playWith(page, ana)).toHaveCount(0)
       await expect(page.getByText(/waiting to sync/)).toHaveCount(0)
 

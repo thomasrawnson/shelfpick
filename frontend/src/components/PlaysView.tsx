@@ -11,10 +11,9 @@ import {
   filterFeed,
   groupFeedByMonth,
   NO_FILTERS,
-  playSummary,
+  playRowMeta,
   feedEntries,
   sortFeed,
-  winnersLabel,
   type DateRange,
   type FeedEntry,
   type FeedFilters,
@@ -26,6 +25,7 @@ import PlayLogForm from "./collection/PlayLogForm"
 import PendingPlayControls from "./offline/PendingPlayControls"
 import SavedCopyNotice from "./offline/SavedCopyNotice"
 import ResilientGameArtwork from "./ResilientGameArtwork"
+import ChoiceGroup from "./ui/ChoiceGroup"
 import PullIndicator from "./ui/PullIndicator"
 import Skeleton from "./ui/Skeleton"
 import { usePullToRefresh } from "../use-pull-to-refresh"
@@ -109,7 +109,7 @@ function PlaysView({ onOpenGame }: Props) {
   if (screen.kind === "choose") {
     const matches = games.filter(game => game.name.toLowerCase().includes(search.trim().toLowerCase()))
     return (
-      <section className="screen plays-screen">
+      <section className="screen tab-screen plays-screen">
         <button type="button" className="collection-back" onClick={() => setScreen({ kind: "list" })}>← Back to Plays</button>
         <header><h1>Log a play</h1><p className="subtitle">Which game did you play?</p></header>
         <input
@@ -136,7 +136,7 @@ function PlaysView({ onOpenGame }: Props) {
   }
 
   return (
-    <section className="screen plays-screen">
+    <section className="screen tab-screen plays-screen">
       <PullIndicator {...pull} />
       {screen.kind === "log" && (
         <PlayLogForm
@@ -161,7 +161,6 @@ function PlaysView({ onOpenGame }: Props) {
       )}
       <header>
         <h1>Plays</h1>
-        {!loading && entries.length > 0 && <p className="subtitle">{entries.length} {entries.length === 1 ? "play" : "plays"}</p>}
       </header>
 
       <SavedCopyNotice names={["games", "plays"]} what="your plays" />
@@ -189,33 +188,38 @@ function PlaysView({ onOpenGame }: Props) {
       {!loading && !error && entries.length > 0 && (
         <>
           <div className="plays-filters" role="group" aria-label="Filter plays">
-            <select
-              aria-label="Game"
-              value={filters.bggId ?? ""}
-              onChange={event => setFilters(current => ({ ...current, bggId: event.target.value ? Number(event.target.value) : null }))}
-            >
-              <option value="">All games</option>
-              {feedGames(entries).map(game => <option key={game.bgg_id} value={game.bgg_id}>{game.name}</option>)}
-            </select>
-            <select
-              aria-label="Player"
-              value={filters.player ?? ""}
-              onChange={event => setFilters(current => ({ ...current, player: event.target.value || null }))}
-            >
-              <option value="">All players</option>
-              {feedPlayers(entries).map(name => <option key={name} value={name}>{name}</option>)}
-            </select>
+            <div className="select-field">
+              <select
+                aria-label="Game"
+                value={filters.bggId ?? ""}
+                onChange={event => setFilters(current => ({ ...current, bggId: event.target.value ? Number(event.target.value) : null }))}
+              >
+                <option value="">All games</option>
+                {feedGames(entries).map(game => <option key={game.bgg_id} value={game.bgg_id}>{game.name}</option>)}
+              </select>
+            </div>
+            <div className="select-field">
+              <select
+                aria-label="Player"
+                value={filters.player ?? ""}
+                onChange={event => setFilters(current => ({ ...current, player: event.target.value || null }))}
+              >
+                <option value="">All players</option>
+                {feedPlayers(entries).map(name => <option key={name} value={name}>{name}</option>)}
+              </select>
+            </div>
           </div>
-          <div className="plays-range" role="group" aria-label="Date range">
-            {RANGES.map(range => (
-              <button
-                type="button"
-                key={range.value}
-                className={filters.range === range.value ? "active" : ""}
-                aria-pressed={filters.range === range.value}
-                onClick={() => setFilters(current => ({ ...current, range: range.value }))}
-              >{range.label}</button>
-            ))}
+          <div className="plays-range-row">
+            <ChoiceGroup
+              variant="chips"
+              value={filters.range}
+              ariaLabel="Date range"
+              options={RANGES}
+              onChange={range => setFilters(current => ({ ...current, range }))}
+            />
+            <p className="plays-count">
+              {visible.length === entries.length ? "" : `${visible.length} of `}{entries.length} {entries.length === 1 ? "play" : "plays"}
+            </p>
           </div>
 
           {visible.length === 0 && (
@@ -232,7 +236,6 @@ function PlaysView({ onOpenGame }: Props) {
                 {group.entries.map(entry => {
                   const { game, play } = entry
                   const date = new Date(play.played_at).toLocaleDateString(undefined, { day: "numeric", month: "short" })
-                  const result = winnersLabel(play)
                   return (
                     <li key={play.id} className={`${entry.onShelf ? "plays-card" : "plays-card off-shelf"}${play.pending ? " has-pending" : ""}`}>
                       {entry.onShelf ? (
@@ -242,7 +245,7 @@ function PlaysView({ onOpenGame }: Props) {
                           </button>
                           <button type="button" className="plays-card-main" onClick={() => setScreen({ kind: "edit", entry })} aria-label={`${game.name}, ${date}. Edit play`}>
                             <strong>{game.name}</strong>
-                            <span>{date} · {playSummary(play)}{result ? ` · ${result}` : ""}</span>
+                            <span>{playRowMeta(play, date)}</span>
                           </button>
                           <button type="button" className="plays-rematch" onClick={() => setScreen({ kind: "log", game, prefill: rematchPrefill(play), key: Date.now() })} aria-label={`Rematch ${game.name}`}>
                             Rematch
@@ -254,7 +257,7 @@ function PlaysView({ onOpenGame }: Props) {
                           <span className="plays-cover"><ResilientGameArtwork src={game.thumbnail_url ?? game.image_url} alt="" gameName={game.name} /></span>
                           <span className="plays-card-main">
                             <strong>{game.name}</strong>
-                            <span>{date} · {playSummary(play)}{result ? ` · ${result}` : ""}</span>
+                            <span>{playRowMeta(play, date)}</span>
                           </span>
                           <span className="plays-off-shelf">Not on shelf</span>
                         </>

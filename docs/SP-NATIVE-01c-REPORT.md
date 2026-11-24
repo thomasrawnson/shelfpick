@@ -1,6 +1,6 @@
 # SP-NATIVE-01c — Offline play logging and shelf cache
 
-Date: 22 November 2026 · Branch `sp-native-01c` from `origin/main` 506de60 (SP-HOTFIX-01 merged) · Track: Controlled
+Date: 22 November 2026 · Branch `sp-native-01c` from `origin/main` 506de60 (SP-HOTFIX-01 merged); merged with `origin/main` 9a890bd on 24 November 2026 (SP-UI-03/04/05) · Track: Controlled
 (migration, App Store build). Not merged, deployed, tagged or submitted. Draft PR for owner review.
 
 ## Outcome
@@ -44,6 +44,15 @@ queued play reaches the server exactly once.
 | Queue unit tests (`play-queue.test.ts`, 15) | persists across reload with breakdown and pinned version; ordered sync; 2xx-only removal; backoff and cap; **lost reply: server saved, client timed out, retry gives one play**, also across an app restart; 4xx failed + Retry + Discard; edit/delete while waiting and while being sent; expired session; overlapping triggers share one run; no token stored; unreadable storage kept aside |
 | Playwright `offline-plays.spec.ts`, 390×844 iPhone 15, light and dark, real local backend | 3-player Wingspan scoresheet play logged offline, pending badge, synced exactly once on reconnect (one POST, 201), nothing resent after reload; edit and delete a queued play; lost reply with the real server (`route.fetch` then abort) ends with one play; failed play with Retry and confirmed Discard; offline screens and the cached shelf. Screenshots `docs/screenshots/sp-native-01c/` |
 | **Simulator** (iPhone 17, iOS 27.0, Debug build, local API; **Simulator evidence, not a device**) | signed in, opened the shelf and a game, **stopped the API**, logged a 3-player play ("Saved on this device"), killed and relaunched the app (opened offline, 1 play still waiting), restarted the API, **Sync now**: one POST 201, one row with its `client_id`, banner gone. Screenshots `simulator-1` to `-4` |
+
+## Re-test after merging main (24 November 2026)
+
+`origin/main` 9a890bd (SP-UI-03/04/05, build 23 = 1.2.1) was merged in. Backend untouched by main, so the 710 backend tests and the
+migration chain (`c4e7a9b2d6f1` → `e5b8c2f1a7d4`, single head) stand. Frontend: ESLint, `tsc -b` and 327/327 unit tests pass.
+Playwright full suite: 212 passed, 8 failed; all 8 were `offline-plays.spec.ts` using the old inline Delete play button, since
+game detail now deletes through the "…" menu and a confirmation sheet. The spec helper was updated and all 10 offline tests pass
+(54 s). The pending-sync badge and Retry/Discard now sit inside the new play entry; Share and Send to BG Stats are hidden for
+unsynced plays. Not re-run: Simulator, physical device.
 
 ## Findings worth knowing
 

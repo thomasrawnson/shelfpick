@@ -1,84 +1,6 @@
 /* ShelfPick shared UI primitives and V7 simplification pass */
 
-.segmented-control {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px;
-  padding: 4px;
-  border: 0;
-  border-radius: var(--radius-md);
-  background: var(--color-surface-raised);
-}
-
-.segmented-control button {
-  min-height: var(--target-min);
-  border: 0;
-  border-radius: 9px;
-  background: transparent;
-  color: var(--sp-muted);
-  font: inherit;
-  font-weight: 700;
-}
-
-.segmented-control button.active {
-  background: var(--color-brand-primary-soft);
-  color: var(--color-brand-primary);
-}
-
-.filter-tabs {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  align-items: end;
-  gap: var(--space-2);
-  padding: 0 4px;
-}
-
-.filter-tabs button {
-  position: relative;
-  padding: 8px 4px 10px;
-  border: 0;
-  background: transparent;
-  color: var(--sp-muted);
-  font: inherit;
-  font-weight: 700;
-  text-align: center;
-}
-
-.filter-tabs button.active {
-  color: var(--color-brand-primary);
-}
-
-.filter-tabs button.active::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: 2px;
-  width: 18px;
-  height: 2px;
-  border-radius: 99px;
-  transform: translateX(-50%);
-  background: var(--color-brand-primary);
-}
-
 /* Enabled choices must remain clearly legible against dark raised surfaces. */
-:is(:root[data-theme="dark"], :root[data-theme="black"])
-  :is(
-    .segmented-control button:not(.active),
-    .filter-tabs button:not(.active),
-    .player-chip:not(.selected),
-    .picker-mode-option:not(.selected),
-    .preference-chip:not(.selected),
-    .complexity-option:not(.selected),
-    .collection-section-tabs button:not(.active),
-    .collection-filter-tabs button:not(.active),
-    .collection-sort,
-    .collection-back,
-    .discover-tab:not(.active),
-    .ranking-view-tabs button:not(.active),
-    .stats-section-tab:not(.active)
-  ):not(:disabled) {
-  color: var(--color-text-primary);
-}
 
 .ui-disclosure {
   border: 0;
@@ -125,17 +47,6 @@
 }
 
 /* Picker: fewer labels, lighter rows, and optional complexity detail. */
-.player-chip {
-  min-height: 64px !important;
-}
-
-.player-chip > strong {
-  font-size: 24px;
-}
-
-.player-chip:not(.solo) > span {
-  display: none;
-}
 
 .time-list {
   gap: 0 !important;
@@ -176,19 +87,6 @@
 .time-option-meta {
   color: var(--sp-muted) !important;
   font-size: var(--text-meta);
-}
-
-.fine-tune-screen .complexity-grid {
-  grid-template-columns: repeat(4, 1fr);
-}
-
-.fine-tune-screen .complexity-option {
-  min-height: var(--target-min) !important;
-  padding: 8px 6px !important;
-}
-
-.fine-tune-screen .complexity-option span {
-  display: none;
 }
 
 .advanced-play-style {
@@ -246,18 +144,6 @@
 }
 
 /* Collection now uses the same primitives as the picker. */
-.collection-section-tabs {
-  margin-bottom: 10px;
-}
-
-.collection-tools .filter-tabs {
-  margin-bottom: 10px;
-}
-
-.collection-tools .filter-tabs button {
-  min-height: var(--target-min);
-  white-space: nowrap;
-}
 
 /* Rankings remain discoverable from Insight without owning a permanent nav slot. */
 .rank-section-title-row {
@@ -332,21 +218,6 @@
 }
 
 /* Small personality touches */
-
-.player-chip {
-  transition:
-    transform 120ms ease,
-    background-color 140ms ease,
-    border-color 140ms ease;
-}
-
-.player-chip:active {
-  transform: translateY(2px);
-}
-
-.player-chip.selected {
-  transform: none;
-}
 
 /* Subtle settings-dice interaction */
 
@@ -435,13 +306,6 @@
 }
 
 /* Collection search/sort stays available while scrolling a long shelf. */
-.collection-search-sort-row {
-  position: sticky;
-  top: 0;
-  z-index: 6;
-  padding: 6px 0;
-  background: linear-gradient(180deg, var(--sp-bg) 72%, transparent);
-}
 
 /* V9.1 regression guard: picker actions keep the shared button treatment. */
 .fine-tune-screen .picker-step-actions {
@@ -496,24 +360,6 @@
 .picker-request-fields { border: 0; padding: 0; margin: 0; min-width: 0; }
 
 /* Pick: keep essentials prominent and optional refinements quiet. */
-.picker-essential-label {
-  margin: 0 0 var(--space-2);
-  color: var(--color-text-primary);
-  font-size: var(--text-support);
-  font-weight: 800;
-}
-
-.picker-first-step-advanced {
-  width: 100%;
-  max-width: 330px;
-  margin: 28px auto 0 !important;
-  border-top: 1px solid var(--color-border);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.picker-first-step-advanced > summary {
-  color: var(--color-text-support);
-}
 
 .fine-tune-status {
   min-height: var(--target-min);
@@ -577,13 +423,6 @@
 }
 
 /* The Forest outline follows the state-derived selected class only. */
-.player-step-screen .player-chip.solo:not(.selected) {
-  border-color: var(--sp-line);
-}
-
-.player-step-screen .player-chip.selected {
-  border-color: var(--color-brand-primary) !important;
-}
 
 @media (max-width: 480px) {
   .progress-dots {
@@ -591,69 +430,31 @@
     margin-bottom: 8px;
   }
 
-  .player-step-screen {
-    padding-top: 6px;
-    padding-bottom: 12px;
-  }
+  
 
-  .player-step-screen h1 {
-    margin-bottom: 4px;
-  }
+  
 
-  .player-step-screen .subtitle {
-    margin-bottom: 10px;
-  }
+  
 
-  .player-step-screen .picker-essential-label {
-    margin-bottom: 6px;
-  }
+  
 
-  .player-step-screen .picker-navigation-card {
-    min-height: 56px;
-    margin-bottom: 6px;
-    padding: 8px 12px;
-  }
+  
 
-  .player-step-screen .player-or {
-    margin: 5px 0;
-  }
+  
 
-  .player-step-screen .player-grid {
-    gap: 6px;
-  }
+  
 
-  .player-step-screen .player-chip {
-    min-height: 52px !important;
-    aspect-ratio: auto;
-    padding: 6px 8px !important;
-  }
+  
 
-  .player-complexity-section {
-    margin-top: 24px !important;
-  }
+  
 
-  .player-complexity-section .preference-label {
-    margin-bottom: 4px !important;
-  }
+  
 
-  .picker-first-step-advanced {
-    margin-top: 24px !important;
-    margin-bottom: 0;
-    padding-bottom: 0;
-  }
+  
 
-  .picker-first-step-advanced > summary {
-    min-height: var(--target-min);
-    padding: 6px 10px !important;
-  }
+  
 
-  .player-step-screen .picker-step-actions {
-    margin-top: 10px !important;
-  }
+  
 }
 
-/* Fine-tune chevron fix:
-   the Picker already supplies a gold +/- via .advanced-filters summary::after. */
-.picker-first-step-advanced .ui-disclosure-chevron {
-  display: none;
-}
+
