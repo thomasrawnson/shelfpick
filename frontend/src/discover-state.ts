@@ -45,7 +45,8 @@ export function discoverPersonalisationCopy(
   if (status === "popular_fallback") {
     return {
       title: "Popular picks to get you started",
-      body: "ShelfPick doesn’t have a matching shelf, play or preference signal yet, so these games come from BoardGameGeek Hot and ranked lists.",
+      body: "Log a few plays or set your preferences and these will start to fit you. Until then, they’re popular on BoardGameGeek.",
+      detail: [] as string[],
       actionLabel: "Set play preferences",
     }
   }
@@ -53,18 +54,28 @@ export function discoverPersonalisationCopy(
   if (status !== "personalised") return null
 
   const sources = [
-    signals.includes("collection") ? "games on your Owned shelf" : null,
-    signals.includes("play_history") ? "your recorded plays" : null,
-    signals.includes("preferences") ? "your saved play preferences" : null,
-    signals.includes("rankings") ? "your personal ShelfPick rankings" : null,
+    signals.includes("collection") ? "your shelf" : null,
+    signals.includes("play_history") ? "the games you’ve played" : null,
+    signals.includes("preferences") ? "your play preferences" : null,
+    signals.includes("rankings") ? "your rankings" : null,
   ].filter((source): source is string => source !== null)
 
-  let body = "These matches use your ShelfPick signals."
-  if (sources.length === 1) body = `These matches use ${sources[0]}.`
-  if (sources.length === 2) body = `These matches use ${sources[0]} and ${sources[1]}.`
+  let body = "Based on what ShelfPick knows about you."
+  if (sources.length === 1) body = `Based on ${sources[0]}.`
+  if (sources.length === 2) body = `Based on ${sources[0]} and ${sources[1]}.`
   if (sources.length > 2) {
-    body = `These matches use ${sources.slice(0, -1).join(", ")}, and ${sources[sources.length - 1]}.`
+    body = `Based on ${sources.slice(0, -1).join(", ")}, and ${sources[sources.length - 1]}.`
   }
 
-  return { title: "Picked for how you play", body, actionLabel: null }
+  const detail = [
+    signals.includes("collection")
+      ? signals.includes("play_history")
+        ? "Themes and mechanics of the games on your shelf, counting the ones you play most more"
+        : "Themes and mechanics of the games on your shelf"
+      : null,
+    signals.includes("rankings") ? "Games like the ones you rank highest" : null,
+    signals.includes("preferences") ? "Your usual player count and session length" : null,
+  ].filter((line): line is string => line !== null)
+
+  return { title: "Picked for you", body, detail, actionLabel: null }
 }
