@@ -1,13 +1,57 @@
 import type { Page } from "@playwright/test"
 
-// Synthetic sample data (generated SVG covers) so screens can be judged without
-// third-party artwork. The real app shows BGG covers.
+// Synthetic sample data (generated, illustrated SVG box covers with fictional titles) so screens can be
+// judged and photographed without third-party artwork. The real app shows BGG covers.
 const palette = ["#315C48", "#C28B37", "#356A7A", "#B7463C", "#6B4E9B", "#3F7655", "#A66D16", "#2F4858"]
+
+const MOTIFS: string[] = [
+  // Clockwork Market: gears
+  `<circle cx="150" cy="150" r="62" fill="none" stroke="#fff" stroke-opacity=".85" stroke-width="22" stroke-dasharray="15 15"/><circle cx="150" cy="150" r="48" fill="none" stroke="#fff" stroke-width="12"/><circle cx="150" cy="150" r="14" fill="#fff"/><circle cx="262" cy="214" r="42" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="16" stroke-dasharray="11 11"/><circle cx="262" cy="214" r="30" fill="none" stroke="#fff" stroke-opacity=".9" stroke-width="8"/>`,
+  // Lantern Grove: lantern and pines
+  `<polygon points="40,260 90,140 140,260" fill="#000" fill-opacity=".28"/><polygon points="250,260 310,120 370,260" fill="#000" fill-opacity=".28"/><rect x="170" y="92" width="60" height="96" rx="10" fill="#FFE2A0"/><circle cx="200" cy="140" r="86" fill="#FFE2A0" fill-opacity=".22"/><rect x="164" y="80" width="72" height="14" rx="5" fill="#fff"/><rect x="164" y="186" width="72" height="12" rx="5" fill="#fff"/><path d="M200 70 q0 -26 22 -34" stroke="#fff" stroke-width="6" fill="none"/>`,
+  // Harbour Council: boat and waves
+  `<polygon points="196,70 196,190 120,190" fill="#fff"/><polygon points="206,96 206,190 266,190" fill="#fff" fill-opacity=".8"/><path d="M100 196 h200 l-26 34 h-148 z" fill="#000" fill-opacity=".35"/><path d="M0 250 q50 -26 100 0 t100 0 t100 0 t100 0" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="10"/>`,
+  // Tiny Orchard: tree with fruit
+  `<rect x="188" y="170" width="24" height="96" fill="#000" fill-opacity=".35"/><circle cx="200" cy="120" r="82" fill="#fff" fill-opacity=".85"/><circle cx="165" cy="105" r="14" fill="#B7463C"/><circle cx="222" cy="95" r="14" fill="#B7463C"/><circle cx="205" cy="150" r="14" fill="#B7463C"/><circle cx="238" cy="140" r="12" fill="#B7463C"/>`,
+  // Night Courier: moon over rooftops
+  `<circle cx="280" cy="90" r="46" fill="#FFE9B8"/><circle cx="300" cy="78" r="40" fill="currentBg"/><polygon points="0,262 0,200 50,160 100,200 100,226 150,226 150,176 200,136 250,176 250,206 310,206 310,166 350,130 400,166 400,262" fill="#000" fill-opacity=".4"/><rect x="176" y="188" width="14" height="18" fill="#FFE2A0"/><rect x="330" y="176" width="14" height="18" fill="#FFE2A0"/>`,
+  // Salt and Sail: twin sails
+  `<polygon points="150,60 150,196 70,196" fill="#fff"/><polygon points="170,84 170,196 262,196" fill="#fff" fill-opacity=".8"/><rect x="146" y="196" width="4" height="22" fill="#fff"/><path d="M80 214 h190 l-30 30 h-130 z" fill="#000" fill-opacity=".35"/><circle cx="310" cy="80" r="26" fill="#fff" fill-opacity=".35"/>`,
+  // Ember Vale: mountains and flame
+  `<polygon points="0,262 110,100 210,262" fill="#000" fill-opacity=".3"/><polygon points="130,262 280,80 400,262" fill="#000" fill-opacity=".45"/><path d="M200 232 c-34 -34 -6 -62 -4 -86 c22 20 46 44 30 70 c-4 8 -12 14 -26 16z" fill="#FFB347"/><path d="M200 232 c-16 -14 -2 -30 0 -42 c12 10 22 22 12 36z" fill="#fff"/>`,
+  // Quiet Archive: stacked books
+  `<rect x="90" y="190" width="220" height="40" rx="5" fill="#fff" fill-opacity=".9"/><rect x="112" y="146" width="186" height="40" rx="5" fill="#fff" fill-opacity=".7"/><rect x="80" y="102" width="200" height="40" rx="5" fill="#fff" fill-opacity=".85"/><rect x="100" y="204" width="130" height="8" fill="#000" fill-opacity=".3"/><rect x="128" y="160" width="100" height="8" fill="#000" fill-opacity=".3"/><rect x="96" y="116" width="110" height="8" fill="#000" fill-opacity=".3"/>`,
+  // The Very Long Titled Expedition: compass
+  `<circle cx="200" cy="150" r="96" fill="none" stroke="#fff" stroke-width="10"/><polygon points="200,66 222,150 200,234 178,150" fill="#fff"/><polygon points="116,150 200,128 284,150 200,172" fill="#fff" fill-opacity=".6"/><circle cx="200" cy="150" r="10" fill="currentBg"/>`,
+]
+
+function titleLines(name: string): string[] {
+  const words = name.split(" ")
+  const lines: string[] = []
+  for (const word of words) {
+    const last = lines[lines.length - 1]
+    if (last && (last + " " + word).length <= 16) lines[lines.length - 1] = last + " " + word
+    else lines.push(word)
+  }
+  return lines.slice(0, 3)
+}
+
 export function cover(index: number): string {
   const color = palette[index % palette.length]
   // The last game has a tall box, to check awkward cover proportions.
   const tall = index === 8
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${tall ? 260 : 400}" height="${tall ? 480 : 400}"><rect width="100%" height="100%" fill="${color}"/><circle cx="300" cy="110" r="90" fill="#fff" opacity=".18"/></svg>`
+  const height = tall ? 480 : 400
+  const name = NAMES[index % NAMES.length]
+  const lines = titleLines(name)
+  const size = lines.length > 2 ? 28 : 33
+  const firstY = height - 20 - (lines.length - 1) * (size + 4)
+  const text = lines.map((line, n) => `<text x="200" y="${firstY + n * (size + 4)}" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="${size}" fill="#fff">${line.replace(/&/g, "&amp;")}</text>`).join("")
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${tall ? 260 : 400}" height="${height}" viewBox="${tall ? "70" : "0"} 0 ${tall ? 260 : 400} ${height}">`
+    + `<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${color}"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></linearGradient></defs>`
+    + `<rect width="400" height="${height}" fill="${color}"/><rect width="400" height="${height}" fill="url(#g)"/>`
+    + `<g>${MOTIFS[index % MOTIFS.length].replace(/currentBg/g, color)}</g>`
+    + `<rect x="14" y="14" width="372" height="${height - 28}" rx="10" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="3"/>`
+    + `<rect y="${firstY - size - 14}" width="400" height="${height - (firstY - size - 14)}" fill="#000" fill-opacity=".38"/>${text}</svg>`
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`
 }
 export const NAMES = ["Clockwork Market", "Lantern Grove", "Harbour Council", "Tiny Orchard", "Night Courier", "Salt and Sail", "Ember Vale", "Quiet Archive", "The Very Long Titled Expedition of the Northern Lights Cartographers"]
