@@ -73,30 +73,85 @@
 }
 
 .discover-personalisation-note {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  margin-top: var(--space-5);
-  padding: var(--space-4);
+  margin-top: var(--space-3);
+  padding: var(--space-2) var(--space-3);
   background: var(--color-surface-raised);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
+  font-size: 14px;
+  line-height: 1.4;
 }
 
-.discover-personalisation-note h2 {
-  margin: 0;
-  font-size: 18px;
+.discover-personalisation-note summary {
+  display: grid;
+  gap: 2px;
+  cursor: pointer;
+  list-style: none;
 }
 
-.discover-personalisation-note p {
-  max-width: 68ch;
-  margin: var(--space-1) 0 0;
+.discover-personalisation-note summary::-webkit-details-marker { display: none; }
+
+.discover-personalisation-lead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.discover-personalisation-lead strong { font-size: 15px; }
+
+.discover-personalisation-toggle {
+  color: var(--color-accent-text);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.discover-personalisation-toggle::after {
+  content: " ›";
+}
+
+.discover-personalisation-note[open] .discover-personalisation-toggle::after {
+  content: " ⌄";
+}
+
+.discover-personalisation-body,
+.discover-personalisation-note p,
+.discover-personalisation-note li {
   color: var(--color-text-support);
-  line-height: 1.5;
 }
 
-.discover-personalisation-note .secondary-button {
+.discover-personalisation-detail {
+  margin-top: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+}
+
+.discover-personalisation-detail p { margin: 0; }
+
+.discover-personalisation-detail ul {
+  margin: var(--space-1) 0;
+  padding-left: 1.25em;
+}
+
+.discover-personalisation-note.is-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.discover-personalisation-note.is-fallback h2 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.discover-personalisation-note.is-fallback p {
+  max-width: 68ch;
+  margin: 2px 0 0;
+}
+
+.discover-personalisation-note.is-fallback .secondary-button {
   width: auto;
   flex: 0 0 auto;
 }
@@ -109,13 +164,9 @@
 .discover-section .discover-list { margin-top: var(--space-3); }
 
 @media (max-width: 640px) {
-  .discover-personalisation-note {
+  .discover-personalisation-note.is-fallback {
     align-items: stretch;
     flex-direction: column;
-  }
-
-  .discover-personalisation-note .secondary-button {
-    width: 100%;
   }
 }
 

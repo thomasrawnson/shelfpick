@@ -334,13 +334,25 @@ function DiscoverView({ personalized, onViewWishlist, onUnlockPro, onPersonalize
           {error && <RetryNotice message={error} busy={loading} onRetry={retry} />}
           {actionError && <p className="error-message" role="alert">{actionError}</p>}
           {mode === "for_you" && recommendations.length > 0 && personalisationStatus === "personalised" && (
-            <section className="discover-personalisation-note" aria-labelledby="discover-personalised-heading">
-              <h2 id="discover-personalised-heading">{personalisationCopy?.title}</h2>
-              <p>{personalisationCopy?.body}</p>
-            </section>
+            <details className="discover-personalisation-note">
+              <summary>
+                <span className="discover-personalisation-lead">
+                  <strong>{personalisationCopy?.title}</strong>
+                  <span className="discover-personalisation-toggle">How are these picked?</span>
+                </span>
+                <span className="discover-personalisation-body">{personalisationCopy?.body}</span>
+              </summary>
+              <div className="discover-personalisation-detail">
+                <p>ShelfPick looks at:</p>
+                <ul>
+                  {personalisationCopy?.detail.map((line) => <li key={line}>{line}</li>)}
+                </ul>
+                <p>Open “Why this match?” on a game to see the reasons for that one.</p>
+              </div>
+            </details>
           )}
           {mode === "for_you" && recommendations.length > 0 && personalisationStatus === "popular_fallback" && (
-            <section className="discover-personalisation-note" aria-labelledby="discover-fallback-heading">
+            <section className="discover-personalisation-note is-fallback" aria-labelledby="discover-fallback-heading">
               <div>
                 <h2 id="discover-fallback-heading">{personalisationCopy?.title}</h2>
                 <p>{personalisationCopy?.body}</p>
