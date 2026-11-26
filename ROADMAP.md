@@ -30,6 +30,53 @@ and validate the work before asking Tom to resume beta. Internal testing
 continues. This instruction supersedes older immediate-beta and post-launch
 timing below; existing completed slices remain historical implementation facts.
 
+### SP-NATIVE-01c Offline play logging and shelf cache — LOCAL CANDIDATE, 22 November 2026
+
+Branch `sp-native-01c` from `origin/main` 506de60; draft PR for owner review, not
+merged, deployed or submitted. With no signal a player can log a play (including
+Rematch and a scoresheet play) and browse the shelf. Every new play carries a
+random `client_id`; `POST /plays` returns the existing play with 200 for a repeat
+`(user, client_id)` and creates nothing. A play that cannot reach the server waits
+in a durable on-device queue (iOS Preferences, localStorage on the web), shown as
+pending in Plays and the game's history, and is sent in order on reconnect, app
+resume and Sync now, with exponential backoff; a 4xx marks it failed with Retry and
+Discard. The shelf, game history, plays, players and every scoresheet version
+opened are saved with a "last updated" label; Tonight, Discover, Stats and Game
+Night say they need a connection. Migration `e5b8c2f1a7d4` is additive (nullable
+`plays.client_id`, unique per user) and must run before the app build. iOS build
+number is 25. Not in scope and not done: offline picking, voting or stats;
+two-device edit merging (last write wins); background sync; widgets. Evidence,
+owner gates and rollback: `docs/SP-NATIVE-01c-REPORT.md`.
+
+### SP-UI-05 Game detail: calmer layout, safer destructive actions — LOCAL CANDIDATE, 23 November 2026
+
+Branch `sp-ui-05` from `main` 71ddd7c; draft PR for owner review, not deployed or submitted. Game detail only: cover, title, one
+meta line and Log a play on the first screen; flat facts with scales; six Mechanics with Show all; collapsible Recent plays with
+winners first (check plus "Won"); Rematch as the main action; Delete play and Remove from collection behind a "…" menu and a
+confirmation sheet that names the game. No backend change. Owner gate: a physical-phone check of the detail page in light and
+dark. Report: `docs/SP-UI-05-REPORT.md`.
+
+### SP-UI-04 Cross-tab consistency — LOCAL CANDIDATE, 23 November 2026
+
+Branch `sp-ui-04`, stacked on `sp-ui-03` (PR #60, still a draft); draft PR for owner review, not merged, deployed or
+submitted. One shared selected state (`ChoiceGroup`, replacing `SegmentedControl` and `FilterTabs`) and one accent (no
+gold on any tab) across Tonight, Shelf, Plays, Discover and Stats. Discover is a calm list (one Want to Play button, a "…"
+menu with Hide and an undo toast, no "Hot now" badge); Shelf has a count row with "Add game", one 40pt search/sort/layout
+row and square cover-fit thumbnails; Stats drops the duplicate heading, scrolls its tab row, and uses flat rows and left-aligned
+tiles; Plays has a compact filter row and "No result logged"; the five tabs share one title row. Owner gates: a
+physical-phone check of all five tabs in light and dark, and the decision on rolling Fraunces and DM Sans out to these tabs.
+Report: `docs/SP-UI-04-REPORT.md`.
+
+### SP-UI-03 Tonight: less templated, clearer hierarchy — LOCAL CANDIDATE, 23 November 2026
+
+Branch `sp-ui-03` from `origin/main` 506de60; draft PR for owner review, not merged, deployed or submitted. Tonight only:
+a hint under the disabled Find a game, a check on the chosen count and complexity (`aria-pressed`), one filled primary
+button with the group vote as a quiet text action, Forest as the only accent (no gold, neutral avatar), plain list rows
+for "Choose players by name" and Fine-tune, one section-label style, a 44pt avatar, a fading Recently played edge, choice
+grids that reflow at accessibility text sizes, and Fraunces (headline) with DM Sans (body), self-hosted. The old Tonight
+rules in five stylesheets were replaced by `styles/tonight.css`. No backend or logic change. Owner decision pending:
+roll the fonts out to the other tabs. Report: `docs/SP-UI-03-REPORT.md`.
+
 ### SP-SCORE-01 Scoresheets in the app — IMPLEMENTED; DRAFT PR (18 November 2026)
 
 Branch `codex/sp-score-01`; not merged, deployed or submitted. The Log play and
@@ -68,8 +115,8 @@ App Store sandbox tester). Evidence, owner gates and rollback:
 
 Branch `sp-settings-01b` from `origin/main` 506de60 (SP-HOTFIX-01 merged); draft
 PR for owner review, not merged, deployed or submitted. The Settings Tip jar now
-sells three consumable tips (`com.plutonightlabs.shelfpick.tip.coffee`, `.pint`,
-`.gamenight`) through the existing RevenueCat layer: the sheet shows the store's
+sells three consumable tips (`tip.coffee`, `tip.pint`,
+`tip.gamenight`) through the existing RevenueCat layer: the sheet shows the store's
 localised prices, purchases run for the signed-in account only, and the row shows
 when purchases are on, a native store exists and the tips have loaded. Tips unlock
 nothing: the server ignores tip product IDs in `/billing/sync` and the webhook.

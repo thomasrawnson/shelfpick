@@ -229,18 +229,6 @@
     margin-bottom: 18px;
   }
 
-  .player-grid {
-    gap: 8px;
-  }
-
-  .player-chip {
-    border-radius: 13px;
-  }
-
-  .player-chip strong {
-    font-size: 23px;
-  }
-
   .preference-section {
     margin-bottom: 17px;
   }
@@ -249,9 +237,6 @@
     padding: 10px 12px;
   }
 
-  .complexity-option {
-    padding: 9px 7px;
-  }
 }
 .onboarding-step-label { color: var(--text-secondary); font-size: var(--text-meta); margin: 0 0 8px; }
 .onboarding-progress span { margin: 0 auto; }

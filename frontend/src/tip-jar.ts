@@ -5,9 +5,9 @@ import type { ProStore, StoreTip } from "./billing/store"
 // backend/services/billing_service.py); a backend test fails if the two lists differ. The store supplies
 // the price, so none is stored here.
 export const TIP_PRODUCTS = [
-  { id: "com.plutonightlabs.shelfpick.tip.coffee", name: "Coffee" },
-  { id: "com.plutonightlabs.shelfpick.tip.pint", name: "Pint" },
-  { id: "com.plutonightlabs.shelfpick.tip.gamenight", name: "Game night" },
+  { id: "tip.coffee", name: "Coffee" },
+  { id: "tip.pint", name: "Pint" },
+  { id: "tip.gamenight", name: "Game night" },
 ] as const
 
 export type TipProductId = typeof TIP_PRODUCTS[number]["id"]

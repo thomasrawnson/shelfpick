@@ -505,9 +505,9 @@ def test_malformed_expiry_never_becomes_a_lifetime_grant(billing_api):
 
 
 TIP_PRODUCTS = [
-    "com.plutonightlabs.shelfpick.tip.coffee",
-    "com.plutonightlabs.shelfpick.tip.pint",
-    "com.plutonightlabs.shelfpick.tip.gamenight",
+    "tip.coffee",
+    "tip.pint",
+    "tip.gamenight",
 ]
 
 

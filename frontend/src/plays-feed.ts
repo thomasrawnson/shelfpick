@@ -76,6 +76,11 @@ export function winnersLabel(play: GamePlay): string | null {
   return winners.length > 0 ? `Won by ${winners.join(", ")}` : null
 }
 
+// The second line of a Plays row: date, players, time and the result. A play with no winner or result says so.
+export function playRowMeta(play: GamePlay, date: string): string {
+  return [date, playSummary(play), winnersLabel(play) ?? "No result logged"].join(" · ")
+}
+
 export function playSummary(play: GamePlay): string {
   const players = `${play.player_count} ${play.player_count === 1 ? "player" : "players"}`
   const time = play.duration_minutes ? `${play.duration_minutes} min` : null

@@ -116,7 +116,7 @@ async function mockStats(page: Page): Promise<Seen> {
 async function openTrends(page: Page) {
   await page.goto("/stats")
   await expect(page.getByRole("heading", { level: 1, name: "Stats" })).toBeVisible()
-  await expect(page.getByRole("heading", { level: 2, name: "Trends" })).toBeVisible()
+  await expect(page.getByRole("region", { name: "Trends" })).toBeVisible()
   await expect(page.getByRole("heading", { name: "Play calendar" })).toBeVisible()
   await expect(page.getByRole("img", { name: /^Calendar of plays in \d{4}\./ })).toBeVisible()
   await page.waitForLoadState("networkidle")

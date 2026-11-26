@@ -42,12 +42,16 @@ import WishlistView
 import RankGamesView
   from "./RankGamesView"
 
-import SegmentedControl
-  from "./ui/SegmentedControl"
+import ChoiceGroup
+  from "./ui/ChoiceGroup"
 import { mergeGameIntoCollection } from "../collection-state"
 import PullIndicator from "./ui/PullIndicator"
 import Skeleton from "./ui/Skeleton"
 import { usePullToRefresh } from "../use-pull-to-refresh"
+import { useOnline } from "../offline/connectivity"
+import { usePlaySync } from "../offline/play-sync-context"
+import NotSavedYet from "./offline/NotSavedYet"
+import SavedCopyNotice from "./offline/SavedCopyNotice"
 import { readShelfLayout, saveShelfLayout } from "../shelf-layout"
 
 export type CollectionSection =
@@ -119,6 +123,7 @@ function CollectionView({
   onSectionChange,
   onBrowseDiscover,
 }: Props) {
+  const online = useOnline()
   const [layout, setLayout] = useState<ShelfLayout>(readShelfLayout)
 
   const {
@@ -335,10 +340,10 @@ function CollectionView({
   }
 
   const sectionTabs = (
-    <SegmentedControl
+    <ChoiceGroup
       value={section}
       ariaLabel="Collection section"
-      className="collection-section-tabs"
+      className="shelf-sections"
       options={[
         { value: "owned", label: "Owned" },
         { value: "wishlist", label: "Want to Play" },
@@ -352,6 +357,8 @@ function CollectionView({
 
 
   const [reloadKey, setReloadKey] = useState(0)
+  // Bumps when plays logged offline reach the server, so counts and history are refreshed.
+  const { syncedVersion } = usePlaySync()
   function retryCollection() { setLoading(true); setReloadKey(current => current + 1) }
   const pull = usePullToRefresh(() => { setReloadKey(current => current + 1) }, section === "owned" && !selectedGame)
   useEffect(() => {
@@ -389,7 +396,7 @@ function CollectionView({
 
     void loadGames()
     return () => { active = false }
-  }, [reloadKey])
+  }, [reloadKey, syncedVersion])
 
 
   useLayoutEffect(() => {
@@ -594,6 +601,7 @@ function CollectionView({
     }
   }, [
     selectedGame,
+    syncedVersion,
   ])
 
 
@@ -868,7 +876,7 @@ function CollectionView({
 
   if (section === "ranking") {
     return (
-      <section className="screen collection-screen">
+      <section className="screen tab-screen collection-screen">
         <header>
           <h1>Rank your games</h1>
           <p className="subtitle">
@@ -892,7 +900,7 @@ function CollectionView({
 
   if (section === "wishlist") {
     return (
-      <section className="screen collection-screen">
+      <section className="screen tab-screen collection-screen">
         <header>
           <h1>Shelf</h1>
         </header>
@@ -929,10 +937,8 @@ function CollectionView({
 
   if (loading && games.length === 0 && !error) {
     return (
-      <section className="screen collection-screen" aria-busy="true">
-        <div className="collection-heading-row">
-          <header><h1>Shelf</h1></header>
-        </div>
+      <section className="screen tab-screen collection-screen" aria-busy="true">
+        <header><h1>Shelf</h1></header>
         <Skeleton variant="tile" rows={6} label="Opening your shelf" />
       </section>
     )
@@ -941,11 +947,13 @@ function CollectionView({
 
   if (error && games.length === 0) {
     return (
-      <section className="screen collection-screen">
+      <section className="screen tab-screen collection-screen">
         <header><h1>Shelf</h1></header>
 
         {sectionTabs}
-        <RetryNotice message={error} busy={loading} onRetry={retryCollection} />
+        {online
+          ? <RetryNotice message={error} busy={loading} onRetry={retryCollection} />
+          : <NotSavedYet what="your shelf" busy={loading} onRetry={retryCollection} />}
       </section>
     )
   }
@@ -982,33 +990,32 @@ function CollectionView({
 
 
   return (
-    <section className="screen collection-screen">
+    <section className="screen tab-screen collection-screen">
       <PullIndicator {...pull} />
-      <div className="collection-heading-row">
-        <header>
-          <h1>
-            Shelf
-          </h1>
+      <header>
+        <h1>Shelf</h1>
+      </header>
 
-          <p className="subtitle">
-            {games.length} {games.length === 1 ? "game" : "games"}
-          </p>
-        </header>
+      <div className="shelf-count-row">
+        <p className="shelf-count">
+          {games.length} {games.length === 1 ? "game" : "games"}
+        </p>
 
         {games.length > 0 && !addingGame && <button
           ref={addGameButtonRef}
           type="button"
-          className="primary-button collection-add-button"
+          className="text-action"
           aria-expanded="false"
           aria-controls="add-game-panel"
           data-add-game-trigger
           onClick={openAddGame}
         >
-          + Add
+          Add game
         </button>}
       </div>
 
       {sectionTabs}
+      <SavedCopyNotice names={["games", "collection-stats"]} what="your shelf" />
       {error && <RetryNotice message={error} busy={loading} onRetry={retryCollection} />}
 
       {addingGame && (
@@ -1025,7 +1032,7 @@ function CollectionView({
         trailing={
           <button
             type="button"
-            className="shelf-view-toggle"
+            className="shelf-layout-toggle"
             aria-label={layout === "grid" ? "Show as list" : "Show as grid"}
             onClick={() => changeLayout(layout === "grid" ? "list" : "grid")}
           >

@@ -24,9 +24,9 @@ REVENUECAT_TIMEOUT_SECONDS = 8.0
 # Lifetime, so they are ignored by name. Keep in step with TIP_PRODUCTS in frontend/src/tip-jar.ts
 # (tests/test_billing_service.py fails if they differ).
 TIP_PRODUCT_IDS = frozenset({
-    "com.plutonightlabs.shelfpick.tip.coffee",
-    "com.plutonightlabs.shelfpick.tip.pint",
-    "com.plutonightlabs.shelfpick.tip.gamenight",
+    "tip.coffee",
+    "tip.pint",
+    "tip.gamenight",
 })
 
 # Webhook events that mean "this purchase may have been reversed".

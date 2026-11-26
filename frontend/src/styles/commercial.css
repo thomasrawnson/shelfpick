@@ -93,36 +93,6 @@ h1 {
   text-transform: none;
 }
 
-.player-grid {
-  margin-bottom: 0;
-}
-
-.player-chip {
-  background: var(--color-surface-raised);
-  border-color: var(--sp-line);
-}
-
-.player-chip:hover {
-  border-color: var(--color-border);
-}
-
-.player-chip span {
-  color: var(--sp-muted);
-  letter-spacing: 0;
-  text-transform: none;
-}
-
-.player-chip.selected {
-  color: var(--color-brand-primary);
-  background: var(--color-brand-primary-soft);
-  border-color: var(--color-border);
-  box-shadow: none;
-}
-
-.player-chip.selected span {
-  color: var(--color-brand-primary);
-}
-
 /* Picker result */
 .picker-result-stage {
   display: flex;
@@ -280,120 +250,11 @@ h1 {
 }
 
 /* Collection */
-.collection-screen {
-  padding-top: 22px;
-}
-
-.collection-heading-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 18px;
-}
-
-.collection-heading-row header {
-  text-align: left;
-}
-
-.collection-heading-row .subtitle {
-  margin-bottom: 0;
-  color: var(--sp-green);
-}
-
-.collection-add-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 auto;
-  min-height: var(--target-min);
-  width: auto;
-  margin-top: 4px;
-  padding-inline: var(--space-4);
-  white-space: nowrap;
-  cursor: pointer;
-}
-
-.collection-section-tabs {
-  gap: 4px;
-  margin: 16px 0 12px;
-  padding: 3px;
-  background: var(--color-surface);
-  border: 0;
-  border-radius: 10px;
-}
-
-.collection-section-tabs button {
-  min-height: var(--target-min);
-  color: var(--sp-green);
-  border-radius: 8px;
-  font-size: var(--text-support);
-  text-transform: none;
-}
-
-.collection-section-tabs button.active {
-  color: var(--color-brand-primary);
-  background: var(--color-brand-primary-soft);
-}
-
-.collection-tools {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.collection-filter-tabs {
-  display: flex;
-  padding: 0;
-  background: transparent;
-  border: 0;
-}
-
-.collection-filter-tabs button {
-  min-height: var(--target-min);
-  padding: 0;
-  color: var(--sp-muted);
-  background: transparent;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  border-radius: 0;
-  text-transform: none;
-}
-
-.collection-filter-tabs button.active {
-  color: var(--color-brand-primary);
-  background: transparent;
-  border-bottom-color: var(--color-brand-primary);
-}
-
-.collection-search {
-  width: 100%;
-  min-height: 40px;
-  padding: 10px 12px;
-  color: var(--sp-text);
-  background: var(--color-surface);
-  border: 0;
-  border-radius: 8px;
-}
-
-.collection-search::placeholder {
-  color: var(--sp-green);
-}
 
 .collection-toolbar-row {
   display: flex;
   justify-content: flex-end;
   margin-top: -2px;
-}
-
-.collection-sort {
-  min-height: var(--target-min);
-  padding: 4px 28px 4px 8px;
-  color: var(--sp-muted);
-  background: transparent;
-  border: 0;
-  border-radius: 6px;
-  font-size: var(--text-support);
 }
 
 .collection-list {
@@ -433,8 +294,9 @@ h1 {
   border-radius: 8px;
 }
 
+/* One square, cover-fit crop for every Shelf thumbnail (the grid tile uses the same). */
 .collection-thumb img {
-  object-fit: contain;
+  object-fit: cover;
   background: var(--color-surface-raised);
 }
 
@@ -467,17 +329,6 @@ h1 {
   font-size: var(--text-meta);
   line-height: 1.45;
   text-wrap: pretty;
-}
-
-.collection-play-count {
-  align-self: center;
-  padding: 5px 8px;
-  color: var(--color-accent-text);
-  background: var(--color-brand-accent-soft);
-  border-radius: 999px;
-  font-size: var(--text-meta);
-  font-weight: 700;
-  white-space: nowrap;
 }
 
 /* Rankings */
@@ -683,7 +534,6 @@ h1 {
   .app-phone-wide .ranking-game-image { aspect-ratio: auto; height: 260px; }
 }
 
-
 @media (max-width: 480px) {
   .phone.app-phone {
     width: 100%;
@@ -700,8 +550,7 @@ h1 {
 /* Collection, Discover, Rankings and Insight */
 
 /* Collection: align secondary filters with the main content and keep rows lean. */
-.collection-screen > header,
-.collection-heading-row {
+.collection-screen > header {
   padding-left: 2px;
   padding-right: 2px;
 }
@@ -733,10 +582,6 @@ h1 {
     width: 64px;
     height: 64px;
   }
-
-  .collection-play-count {
-    padding-inline: 6px;
-  }
 }
 
 .wishlist-status {
@@ -749,10 +594,6 @@ h1 {
 /* Discover: title is enough wayfinding. Saving is a compact heart action. */
 .discover-screen > header .subtitle {
   margin-bottom: 14px;
-}
-
-.discover-wishlist-link {
-  justify-content: flex-start;
 }
 
 /* Rankings: list length selector now filters the list as well as sharing. */
@@ -774,36 +615,9 @@ h1 {
 }
 
 /* Insight: remove duplicate wayfinding and excess vertical gaps. */
-.insights-screen {
-  padding-top: 22px;
-}
 
 .insights-screen > header .subtitle {
   margin-bottom: 14px;
-}
-
-.stats-section-tabs {
-  gap: 3px;
-  margin: 0 0 14px;
-  padding: 3px;
-  background: var(--color-surface);
-  border: 0;
-  border-radius: 10px;
-}
-
-.stats-section-tab {
-  min-height: var(--target-min);
-  padding: 7px 4px;
-  color: var(--sp-green);
-  border-radius: 7px;
-  font-size: var(--text-support);
-  letter-spacing: 0;
-  text-transform: none;
-}
-
-.stats-section-tab.active {
-  color: var(--color-brand-primary);
-  background: var(--color-brand-primary-soft);
 }
 
 .stats-section-heading {
@@ -856,7 +670,6 @@ h1 {
   margin-top: 6px;
 }
 
-
 /* Shared visual refinements */
 h1,
 h2,
@@ -867,30 +680,7 @@ h3,
   font-family: var(--font-display);
 }
 
-
 /* More compact player count picker: 1–5 plus a single 6+ option. */
-.player-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  max-width: 330px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.player-chip {
-  min-height: 78px !important;
-  padding: 10px 8px !important;
-  border-radius: 12px;
-}
-
-.player-chip strong {
-  font-size: 24px !important;
-}
-
-.player-chip span {
-  margin-top: 2px;
-  font-size: var(--text-support) !important;
-}
 
 /* Fine-tune: compact choices, one visual level, advanced options tucked away. */
 .preference-section {
@@ -928,13 +718,11 @@ h3,
   box-shadow: none;
 }
 
-.play-style-grid,
-.complexity-grid {
+.play-style-grid {
   gap: 7px;
 }
 
-.play-style-grid .preference-chip,
-.complexity-grid .complexity-option {
+.play-style-grid .preference-chip {
   min-height: var(--target-min);
   padding: 8px 6px;
   border-color: transparent;
@@ -942,34 +730,10 @@ h3,
   border-radius: 9px;
 }
 
-.play-style-grid .preference-chip.selected,
-.complexity-grid .complexity-option.selected {
+.play-style-grid .preference-chip.selected {
   color: var(--color-brand-primary);
   background: var(--color-brand-primary-soft);
   border-color: transparent;
-}
-
-.complexity-grid .complexity-option span {
-  display: none;
-}
-
-.advanced-filters {
-  margin-top: 16px !important;
-  border: 0 !important;
-  background: var(--color-surface-raised) !important;
-  border-radius: 10px !important;
-}
-
-.advanced-filters summary {
-  padding: 11px 12px !important;
-}
-
-.advanced-filters summary strong {
-  color: var(--sp-text);
-}
-
-.advanced-filters summary small {
-  color: var(--sp-muted);
 }
 
 .picker-step-actions {
@@ -977,36 +741,6 @@ h3,
 }
 
 /* Collection filters: centered filters and compact search/sort in one row. */
-.collection-filter-tabs {
-  justify-content: center;
-  gap: 26px;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-}
-
-.collection-search-sort-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 8px;
-}
-
-.collection-search-wrap {
-  min-width: 0;
-}
-
-.collection-sort-wrap {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.collection-sort {
-  width: auto;
-  min-width: 70px;
-  padding-right: 20px;
-  text-align: right;
-  text-align-last: right;
-}
 
 /* Discover: bookmark save action and compact score-first reasoning. */
 .wishlist-heart-button {
@@ -1122,20 +856,11 @@ h3,
 }
 
 /* Warmer selection surfaces across the app. */
-.collection-section-tabs button.active,
-.ranking-view-tabs button.active,
-.stats-section-tab.active {
+.ranking-view-tabs button.active {
   background-color: var(--color-brand-primary-soft);
 }
 
 @media (max-width: 480px) {
-  .collection-filter-tabs {
-    gap: 20px;
-  }
-
-  .collection-search-sort-row {
-    grid-template-columns: minmax(0, 1fr) 78px;
-  }
 
   .picker-mode-list.compact {
     grid-template-columns: 1fr;
@@ -1154,10 +879,6 @@ h3,
   min-height: auto !important;
 }
 
-.picker-step-screen .player-grid {
-  margin-bottom: 0 !important;
-}
-
 .picker-step-screen .picker-step-actions {
   margin-top: 22px !important;
 }
@@ -1173,18 +894,6 @@ h3,
 }
 
 /* Solo is a subtly distinct play mode. */
-.player-chip.solo {
-  border-color: var(--color-brand-primary);
-}
-
-.player-chip.solo span {
-  color: var(--color-text-support);
-}
-
-.player-chip.solo.selected {
-  border-color: var(--color-brand-primary);
-  background: var(--color-brand-primary-soft);
-}
 
 /* Fine tune: tighter rhythm and fewer visually competing blocks. */
 .fine-tune-screen .subtitle {
@@ -1200,20 +909,14 @@ h3,
 }
 
 .fine-tune-screen .picker-mode-list.compact,
-.fine-tune-screen .play-style-grid,
-.fine-tune-screen .complexity-grid {
+.fine-tune-screen .play-style-grid {
   gap: 5px;
 }
 
 .fine-tune-screen .picker-mode-list.compact .picker-mode-option,
-.fine-tune-screen .play-style-grid .preference-chip,
-.fine-tune-screen .complexity-grid .complexity-option {
+.fine-tune-screen .play-style-grid .preference-chip {
   min-height: var(--target-min);
   padding: 7px 5px;
-}
-
-.fine-tune-screen .advanced-filters {
-  margin-top: 13px !important;
 }
 
 .fine-tune-screen .picker-step-actions {
@@ -1221,27 +924,6 @@ h3,
 }
 
 /* Discover header has an obvious Wishlist action. */
-.discover-wishlist-link {
-  width: fit-content;
-  min-height: var(--target-min);
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  margin: -2px 0 0;
-  padding: 8px 12px;
-  color: var(--sp-text);
-  background: var(--color-surface-raised);
-  border: 0;
-  border-radius: 9px;
-  font: inherit;
-  font-size: var(--text-support);
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.discover-wishlist-link:hover {
-  background: var(--color-surface-raised);
-}
 
 /* Discover uses relative fit labels rather than pretending the raw score is a percentage. */
 .discover-match-score {

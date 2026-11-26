@@ -267,6 +267,92 @@ one ballot but cannot guarantee one real person across multiple browsers or
 devices. Invalid and expired links explain that the session is unavailable;
 closed links show final results.
 
+## SP-UI-05 Game detail: calmer layout, safer destructive actions — 23 November 2026
+
+- **First screen.** Back to shelf, a "…" menu and the avatar share one 44px nav row (one centre line). Under it: a capped
+  120px cover beside the year, the title and one meta line ("2 players · 30 min"; there is no separate Players section), then
+  Log a play, then flat facts. Everything is left-aligned. The cover keeps its cover-derived tint (`use-cover-accent`) and the
+  year takes the AA-adjusted cover accent; nothing else on the page is tinted and there is no gold.
+- **Flat facts.** Rating "8.1 / 10", Weight "2.2 / 5", Minutes and the history tiles are left-aligned primary-colour numbers
+  between hairlines, not boxes. A missing or zero duration is "—", never 0; one play reads "1 play".
+- **Mechanics and Categories** are plain secondary text, the first six, with "Show all N" (`aria-expanded`) beyond that. A literal
+  "Tags" entry from a BoardGameGeek import is hidden in the display layer only (`detail-terms.ts`); stored data is unchanged.
+- **Destructive-action pattern: overflow menu plus confirmation sheet.** A destructive action is never a visible button. It lives
+  in a "…" menu (`OverflowMenu`, danger colour) and always opens a confirmation sheet (`ConfirmSheet`, `role="alertdialog"`):
+  a title and one sentence that name what will go, Cancel first (and focused), and a danger-coloured confirm button. Escape and
+  a tap outside cancel; the page behind is inert; focus returns to the "…" button. Used by **Delete play** (in each Recent plays
+  entry) and **Remove from collection** (in the nav-row menu). Discover's **Hide** uses the same menu with an undo toast instead of
+  a sheet, because it is reversible.
+- **Recent plays.** Each entry has the date and facts with a 44pt chevron (`aria-expanded`, named "Collapse play on <date>")
+  that folds the entry. Players list winners first; a winner is marked by a Forest check and the word "Won", with no outline.
+  Rematch is the main action (a Forest outline pill with room around its label), Share play and Edit are quiet text, and
+  "Send to BG Stats" and Delete play sit in the "…" menu.
+- **Section labels** ("Categories", "Mechanics", "Your history", "Recent plays") use `.section-label` (small, uppercase, tracked,
+  secondary), the same spec as Tonight's `.tonight-label`.
+
+## SP-UI-04 Cross-tab consistency — 23 November 2026
+
+Every tab now uses one selected state and one accent. This section is the reference; where it disagrees with an older
+section below (for example "Filter tabs use a Forest label and short underline" or gold as a metadata colour), this wins.
+
+- **One accent colour.** Forest is the only interactive accent on all five tabs (Tonight, Shelf, Plays, Discover, Stats) and
+  in the tab bar and avatar. Gold is not used for text, numbers, fills, borders or badges there: the account avatar takes a
+  neutral `surface-raised` fill on every tab; the Pro tag is a quiet neutral outline; Shelf play counts and Stats numbers are
+  plain secondary and primary text. (The Year in Review story, the paywall and Pro screens keep their own treatment.)
+- **One selected-state pattern, one component.** `ChoiceGroup` (`components/ui/ChoiceGroup.tsx`, `styles/controls.css`) is
+  the only segmented control and chip row: variants `segmented` (a track of equal options) and `chips`, with an optional
+  `scroll` for a long row. Selected = Forest text on a Forest-soft fill with a 2px Forest edge and bold weight; unselected =
+  no fill and supporting text. The state is exposed as `aria-pressed` inside a labelled `role="group"`, so it is never
+  colour alone. Measured contrast (WCAG): the selected edge against the unselected surface is at least 3:1 (4.9 to 6.9) and
+  the selected text on its fill at least 4.5:1 (6.28 light, 4.53 dark; do not lighten the dark fill). A standalone toggle
+  (Discover's Want to Play) is `.choice.pill`, the same look.
+  Used by: Shelf (Owned / Want to Play / Ranking; All / Played / Unplayed), Discover (Hot / For You), Stats (the section row,
+  which scrolls sideways at large text, and the 12 / 24 month toggle), Plays (date range) and the Feedback sheet. Tonight's
+  count and complexity buttons (SP-UI-03) share the look and add a check; they are not yet on the component.
+- **Calm lists.** Discover cards: cover, title, facts, one labelled Want to Play button (44pt), and a "…" overflow menu
+  (`OverflowMenu`) that holds Why it's trending, View on BGG and Hide. Hide is the danger colour and shows an undo toast
+  (`UndoToast`). There is no "Hot now" badge; the header pill is a text link under the lists. Stats "Play these to reach N" is
+  flat rows between hairlines with a chevron, not boxes inside a card; stat tiles are left-aligned. A tab's title is never
+  repeated by a heading under the tab row.
+- **Shelf.** The count ("182 games", secondary text) and an "Add game" text button share one row; search (border, magnifier,
+  name), sort and layout are one 40pt row (`.select-field` is the shared compact menu, also used for the Plays filters);
+  thumbnails are one square cover-fit crop with the `ResilientGameArtwork` fallback. This supersedes "covers stay contained"
+  for Shelf thumbnails only; game detail, Discover and shared cards still contain the box art.
+- **Plays.** Game and Player menus share one row, date chips sit beneath, and every row ends with its result (a winner, a
+  co-op result or "No result logged").
+- **One title row.** The five tab screens (`.tab-screen`) share the same top, a 56px title row that centres the 1.5rem heading
+  on the avatar (a 44pt target at a fixed top-right spot), so the title baseline does not move between tabs. Tonight's small
+  label sits on the same top line.
+- **Targets.** 44pt effective targets everywhere; the Shelf search row is 40pt as specified, with a 44pt hit area on the layout
+  toggle, and the Shelf filter chips are 36pt with a 44pt hit area.
+
+## SP-UI-03 Tonight: less templated, clearer hierarchy — 23 November 2026
+
+Tonight (`PlayerStep`, class `tonight-screen`, rules in `styles/tonight.css`, loaded last) is the first screen on the
+new pattern. The rules below apply to it now and are the reference when other screens adopt them.
+
+- **One accent.** Forest is the only interactive accent on Tonight. Gold is not used for the eyebrow, the avatar or the
+  Fine-tune control, and the account avatar takes a neutral fill (`surface-raised`) on this screen only.
+- **Selected-state pattern.** A chosen option is never colour-only: `primary-soft` fill, a 2px Forest edge, Forest text
+  and a drawn check in the top-right corner (`.tonight-choice.selected` plus `.tonight-check`), with `aria-pressed`
+  on the button and the options inside a labelled `role="group"`. The player count and complexity use the same control.
+- **One primary action.** "Find a game" is the only filled button. "Start a group vote" is a quiet Forest text action
+  with a trailing chevron. When Find a game is off, "Choose how many are playing" sits under it and is linked with
+  `aria-describedby`; it goes once a count is chosen.
+- **Fewer boxes.** Only tappable options (choices, the primary button) keep a fill. "Choose players by name" and
+  Fine-tune are plain list rows between hairlines with the same trailing chevron (Fine-tune turns it down when open).
+- **One section label.** `.tonight-label`: 0.75rem, weight 700, 0.08em tracking, uppercase, `--color-text-support`. It is
+  used for Tonight, Who is playing, Complexity and Recently played.
+- **Dynamic Type.** Sizes are rem and em. The choice grids reflow by container width in em: six across, then two rows of
+  three (and complexity two by two, then one per row) at the accessibility sizes. The avatar is a 44pt target.
+- **Recently played** fades its right edge (a mask), so a cut-off title reads as "more", not as a fault.
+- **Typefaces (Tonight only).** `--font-tonight-display` is Fraunces (weight 600, the headline "What should we play?") and
+  `--font-tonight-body` is DM Sans (everything else on the screen). Both are variable Latin woff2 files in
+  `src/assets/fonts/`, bundled and precached, `font-display: swap`, with a system-font fallback stack, and no request
+  goes to a font host for them. The SIL OFL licence texts sit beside the files. The rest of the app still uses Lora and
+  Nunito Sans (loaded from Google Fonts); rolling the pair out repoints `--font-display` and `--font-ui` at these values
+  and removes the two Tonight tokens, and is an owner decision.
+
 ## Five-tab shell — SP-UI-01 (17 November 2026)
 
 Tabs are **Tonight · Shelf · Plays · Discover · Stats** (single words, one row).
@@ -290,7 +376,7 @@ redirect (`legacyRedirect` in `routes.ts`); guest voting links never change.
 
 **The Forest Means Action Rule.** Use Forest Green for primary actions, selected controls, active navigation, focus rings and interactive affordances that move the user forward.
 
-**The Gold Earns Attention Rule.** Reserve Warm Gold for restrained emphasis such as eyebrows, rankings, selected metadata and occasional supporting links; it is not the default action color.
+**The Gold Earns Attention Rule.** Warm Gold is brand colour for the logo, artwork and share cards. It is not an interface colour: none of the five tabs uses it (see SP-UI-03 and SP-UI-04), and it is never a button, link or selected state.
 
 **The Semantic Color Rule.** Success, warning, danger and info retain their functional hues and labels. Never substitute Forest or Gold where the user needs to understand status or risk.
 
@@ -308,7 +394,7 @@ and entitlement review. It does not change Black's current Free-and-Pro access.
 
 ## Typography
 
-**The Two-Voice Type Rule.** Lora provides a considered editorial voice for page headings, section titles, game names and meaningful numeric highlights; Nunito Sans carries controls, body copy, metadata and navigation.
+**The Two-Voice Type Rule.** (Tonight alone uses Fraunces and DM Sans through `--font-tonight-display` and `--font-tonight-body`; see SP-UI-03.) Lora provides a considered editorial voice for page headings, section titles, game names and meaningful numeric highlights; Nunito Sans carries controls, body copy, metadata and navigation.
 
 Keep the scale compact. The default page heading is 31px, screen headings commonly settle between 24px and 28px, and card titles sit near 18px. Body text is 16px; supporting text is 14px; metadata is 12px; overlines are 11px with generous tracking. Use weight and spacing before introducing a new size. Keep long titles to readable line lengths and allow wrapping instead of shrinking them into illegibility.
 
@@ -340,9 +426,9 @@ Borders are one pixel and use the semantic line token. Circular shapes belong to
 
 Inputs and search fields sit on `surface-raised`, use primary text and readable supporting placeholders, and switch their border to the active semantic color on focus. Error and retry states use danger text, border and a danger-soft surface; success states use the equivalent success tokens.
 
-Cards use tonal separation and a border before elevation. Recommendation cards give the cover, game title and fit explanation the clearest hierarchy. Compact badges and chips may use Forest-soft for selection or Gold-soft for earned emphasis, with text colors chosen for contrast.
+Cards use tonal separation and a border before elevation. Recommendation cards give the cover, game title and fit explanation the clearest hierarchy. Compact badges and chips may use Forest-soft for selection or a neutral outline for a quiet tag, with text colors chosen for contrast.
 
-Filter tabs use a Forest label and short underline for the active state. Segmented controls place the selected option on Forest-soft. The bottom navigation currently uses five equal targets with 24px icons, short labels and a Forest-soft active tile, including the usable host-led Game Night flow. Dialogs use the surface color, the established 16px–18px radius range, a clear close action and the stronger overlay shadow.
+Segmented controls and chip rows are one component (`ChoiceGroup`; see SP-UI-04): the selected option is Forest on Forest-soft with a 2px Forest edge. The bottom navigation currently uses five equal targets with 24px icons, short labels and a Forest-soft active tile, including the usable host-led Game Night flow. Dialogs use the surface color, the established 16px–18px radius range, a clear close action and the stronger overlay shadow.
 
 ### Picker participant modes — 28 September 2026
 
@@ -500,7 +586,7 @@ denominator and uses an unavailable state when no outcome is determinable.
 
 ### Don't:
 
-- **Don't** turn Warm Gold into a general-purpose button or selected-state color.
+- **Don't** use Warm Gold as an interface colour (buttons, links, selected states, numbers or badges).
 - **Don't** add ornamental gradients, shadows or glass effects to ordinary cards and controls.
 - **Don't** let branding compete with cover artwork or recommendation content.
 - **Don't** communicate success, warning, danger or info through brand color alone.

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useId, useState } from "react"
 import { formatPlayerCount } from "../../player-count"
 
 import type {
@@ -6,10 +6,14 @@ import type {
   GameHistory as GameHistoryData,
   GamePlay,
 } from "../../api/client"
+import { displayTerms, shownTerms, TERM_LIMIT } from "../../detail-terms"
+import { metaLine, minutesOrDash, scaled } from "../../game-detail-format"
 import { useCoverAccent } from "../../use-cover-accent"
 import { rematchPrefill, type PlayPrefill } from "../../play-results"
 
 import ResilientGameArtwork from "../ResilientGameArtwork"
+import ConfirmSheet from "../ui/ConfirmSheet"
+import OverflowMenu from "../ui/OverflowMenu"
 import GameHistory from "./GameHistory"
 import { LogPlayButton } from "./PlayLogForm"
 
@@ -22,6 +26,44 @@ type Props = {
   onRemove: () => Promise<void>
 }
 
+// Mechanics or categories: plain secondary text, the first six, and Show all when there are more.
+function Terms({ label, terms }: { label: string; terms: readonly string[] }) {
+  const [expanded, setExpanded] = useState(false)
+  const listId = useId()
+  const visible = displayTerms(terms)
+  if (visible.length === 0) return null
+  const shown = shownTerms(visible, expanded)
+
+  return (
+    <section className="detail-block" aria-label={label}>
+      <h2 className="section-label">{label}</h2>
+      <ul className="detail-terms" id={listId}>
+        {shown.map((term) => <li key={term}>{term}</li>)}
+      </ul>
+      {visible.length > TERM_LIMIT && (
+        <button
+          type="button"
+          className="text-action"
+          aria-expanded={expanded}
+          aria-controls={listId}
+          onClick={() => setExpanded((current) => !current)}
+        >
+          {expanded ? "Show fewer" : `Show all ${visible.length}`}
+        </button>
+      )}
+    </section>
+  )
+}
+
+function Metric({ label, value, scale }: { label: string; value: string; scale?: string | null }) {
+  return (
+    <div className="detail-metric">
+      <strong>{value}{scale && <span className="detail-scale">{scale}</span>}</strong>
+      <span>{label}</span>
+    </div>
+  )
+}
+
 function GameDetail({
   game,
   history,
@@ -31,26 +73,10 @@ function GameDetail({
   onRemove,
 }: Props) {
   const accentStyle = useCoverAccent(game.image_url ?? game.thumbnail_url, game.name)
-
-  const [
-    confirmingRemove,
-    setConfirmingRemove,
-  ] = useState(false)
-
-  const [rematch, setRematch] = useState<{
-    key: number
-    prefill: PlayPrefill
-  } | null>(null)
-
-  const [
-    removing,
-    setRemoving,
-  ] = useState(false)
-
-  const [
-    removeError,
-    setRemoveError,
-  ] = useState("")
+  const [confirmingRemove, setConfirmingRemove] = useState(false)
+  const [rematch, setRematch] = useState<{ key: number; prefill: PlayPrefill } | null>(null)
+  const [removing, setRemoving] = useState(false)
+  const [removeError, setRemoveError] = useState("")
 
   async function confirmRemove() {
     setRemoving(true)
@@ -60,72 +86,47 @@ function GameDetail({
       await onRemove()
     } catch (err) {
       console.error(err)
-
-      setRemoveError(
-        "Couldn't remove this game from your collection.",
-      )
-
+      setRemoveError("Couldn't remove this game from your collection.")
       setRemoving(false)
       setConfirmingRemove(false)
     }
   }
 
+  const rating = scaled(game.rating, 10)
+  const weight = scaled(game.complexity, 5)
+  const meta = metaLine(formatPlayerCount(game.min_players, game.max_players), game.max_play_time)
+
   return (
-    <section className="screen collection-screen">
-      <button
-        type="button"
-        className="collection-back"
-        onClick={onBack}
-      >
-        ← Back to shelf
-      </button>
+    <section className="screen tab-screen collection-screen game-detail-screen">
+      <div className="detail-nav">
+        <button type="button" className="text-action detail-back" onClick={onBack}>
+          <span aria-hidden="true">←</span> Back to shelf
+        </button>
+        <OverflowMenu
+          label={`More options for ${game.name}`}
+          items={[{
+            key: "remove",
+            label: "Remove from collection",
+            destructive: true,
+            onSelect: () => setConfirmingRemove(true),
+          }]}
+        />
+      </div>
 
-      <article className="collection-detail has-cover-accent" style={accentStyle}>
-        <div className="collection-detail-image">
-          <ResilientGameArtwork
-            src={game.image_url ?? game.thumbnail_url}
-            alt={`Cover of ${game.name}`}
-            gameName={game.name}
-          />
-        </div>
-
-        <div className="collection-detail-heading">
-          <p className="eyebrow">
-            {game.year_published ??
-              "Board game"}
-          </p>
-
-          <h1>{game.name}</h1>
-        </div>
-
-        <div className="detail-stats">
-          <div>
-            <strong>
-              {game.rating?.toFixed(
-                1,
-              ) ?? "—"}
-            </strong>
-
-            <span>Rating</span>
+      <article className="game-detail has-cover-accent" style={accentStyle}>
+        <div className="detail-hero">
+          <div className="detail-cover">
+            <ResilientGameArtwork
+              src={game.image_url ?? game.thumbnail_url}
+              alt={`Cover of ${game.name}`}
+              gameName={game.name}
+            />
           </div>
 
-          <div>
-            <strong>
-              {game.complexity?.toFixed(
-                1,
-              ) ?? "—"}
-            </strong>
-
-            <span>Weight</span>
-          </div>
-
-          <div>
-            <strong>
-              {game.max_play_time ??
-                "—"}
-            </strong>
-
-            <span>Minutes</span>
+          <div className="detail-title">
+            <p className="detail-year">{game.year_published ?? "Board game"}</p>
+            <h1>{game.name}</h1>
+            {meta && <p className="detail-meta">{meta}</p>}
           </div>
         </div>
 
@@ -141,70 +142,21 @@ function GameDetail({
           initialLocation={rematch?.prefill.location}
         />
 
-        <div className="detail-section">
-          <p className="preference-label">
-            Players
-          </p>
-
-          <p>
-            {formatPlayerCount(game.min_players, game.max_players) ?? "Unknown"}
-          </p>
+        <div className="detail-metrics">
+          <Metric label="Rating" value={rating.value} scale={rating.scale} />
+          <Metric label="Weight" value={weight.value} scale={weight.scale} />
+          <Metric label="Minutes" value={minutesOrDash(game.max_play_time)} />
         </div>
 
-        {game.categories.length >
-          0 && (
-          <div className="detail-section">
-            <p className="preference-label">
-              Categories
-            </p>
-
-            <div className="detail-tags">
-              {game.categories.map(
-                (category) => (
-                  <span
-                    key={category}
-                  >
-                    {category}
-                  </span>
-                ),
-              )}
-            </div>
-          </div>
-        )}
-
-        {game.mechanics.length >
-          0 && (
-          <div className="detail-section">
-            <p className="preference-label">
-              Mechanics
-            </p>
-
-            <div className="detail-tags">
-              {game.mechanics.map(
-                (mechanic) => (
-                  <span
-                    key={mechanic}
-                  >
-                    {mechanic}
-                  </span>
-                ),
-              )}
-            </div>
-          </div>
-        )}
+        <Terms label="Categories" terms={game.categories} />
+        <Terms label="Mechanics" terms={game.mechanics} />
 
         <GameHistory
           game={game}
           history={history}
-          loading={
-            historyLoading
-          }
-          onPlayDeleted={
-            onPlaySaved
-          }
-          onPlayEdited={
-            onPlaySaved
-          }
+          loading={historyLoading}
+          onPlayDeleted={onPlaySaved}
+          onPlayEdited={onPlaySaved}
           onRematch={(play: GamePlay) => {
             setRematch({
               key: (rematch?.key ?? 0) + 1,
@@ -214,63 +166,21 @@ function GameDetail({
           }}
         />
 
-        <div className="detail-section collection-danger-zone">
-          {confirmingRemove ? (
-            <div className="remove-collection-confirm">
-              <span>
-                Remove {game.name}{" "}
-                from your collection?
-              </span>
-
-              <div className="remove-collection-confirm-actions">
-                <button
-                  type="button"
-                  className="ghost-button"
-                  disabled={removing}
-                  onClick={() =>
-                    setConfirmingRemove(
-                      false,
-                    )
-                  }
-                >
-                  Cancel
-                </button>
-
-                <button
-                  type="button"
-                  className="remove-collection-button"
-                  disabled={removing}
-                  onClick={
-                    confirmRemove
-                  }
-                >
-                  {removing
-                    ? "Removing..."
-                    : "Remove from collection"}
-                </button>
-              </div>
-            </div>
-          ) : (
-            <button
-              type="button"
-              className="remove-collection-button"
-              onClick={() =>
-                setConfirmingRemove(
-                  true,
-                )
-              }
-            >
-              Remove from collection
-            </button>
-          )}
-
-          {removeError && (
-            <p className="error-message">
-              {removeError}
-            </p>
-          )}
-        </div>
+        {removeError && <p className="error-message" role="alert">{removeError}</p>}
       </article>
+
+      {confirmingRemove && (
+        <ConfirmSheet
+          title={`Remove ${game.name}?`}
+          confirmLabel="Remove from collection"
+          busyLabel="Removing…"
+          busy={removing}
+          onConfirm={() => { void confirmRemove() }}
+          onCancel={() => setConfirmingRemove(false)}
+        >
+          {game.name} leaves your shelf. Plays you logged for it stay in your history.
+        </ConfirmSheet>
+      )}
     </section>
   )
 }

@@ -102,6 +102,10 @@ The existing `--sp-*`, `--shelfpick-*`, `--text-primary/secondary/muted/accent`,
 tokens centrally. They are compatibility names, not separate palettes. Use
 `--color-*` for new work. In particular, `--card` means a surface, not heading text.
 
+Type tokens: `--font-display` (Lora) and `--font-ui` (Nunito Sans) are the app voices. SP-UI-03 adds
+`--font-tonight-display` (Fraunces) and `--font-tonight-body` (DM Sans), self-hosted from `src/assets/fonts/` under the
+SIL OFL (licence texts beside the files), used on Tonight only until the owner decides to roll them out.
+
 Spacing: `--space-1` through `--space-6` = 4, 8, 12, 16, 24, 32px.
 Radii: `--radius-sm/md/lg` = 8, 12, 16px. Existing bespoke geometry is retained
 where changing it would redesign the current layout. Typography and minimum
@@ -121,7 +125,15 @@ Keep existing shared buttons, `SegmentedControl`, `FilterTabs`, `Disclosure`,
 - Secondary: transparent/surface fill, primary text and border.
 - Accent: accent fill, on-accent text, accent-hover fill; reserve for emphasis.
 - Destructive: danger fill plus on-danger text, or danger text on a soft tint.
-- Selected controls/navigation: primary text and primary-soft fill or primary indicator.
+- Selected controls/navigation: primary text and primary-soft fill with a 2px primary edge. Every segmented control and chip row is
+  the shared `ChoiceGroup` (SP-UI-04) and exposes `aria-pressed`; Tonight's count buttons also draw a check (SP-UI-03), so
+  selection is never colour-only. Unselected options have no fill and supporting text.
+- One accent: on Tonight, Shelf, Plays, Discover and Stats gold is not used and Forest is the only interactive accent. The
+  account avatar is neutral, the Pro tag is a neutral outline, play counts and Stats numbers are plain text.
+- Destructive actions (SP-UI-05): never a visible button; they sit in a "…" menu and open `ConfirmSheet` (alertdialog, names the
+  thing, Cancel focused, danger confirm). `.section-label` is the one small uppercase heading style.
+- Menus and toasts: `OverflowMenu` holds secondary actions behind a "…" button (44pt items, destructive in the danger colour);
+  `UndoToast` offers Undo after a hide. `.select-field` is the compact 40pt menu.
 - Disabled: secondary text on a raised surface; preserve existing disabled interaction.
 - Forms: theme-aware surfaces, borders and focus rings; danger for invalid fields.
 - Cards/dialogs: surface or surface-raised; scrims use overlay rather than a surface.

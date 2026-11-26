@@ -358,7 +358,7 @@ def test_a_network_failure_on_delete_is_reported(monkeypatch):
 
 # --- Tips never grant Pro ---------------------------------------------------------
 
-TIP_COFFEE = "com.plutonightlabs.shelfpick.tip.coffee"
+TIP_COFFEE = "tip.coffee"
 
 
 def test_tip_product_ids_match_the_app():

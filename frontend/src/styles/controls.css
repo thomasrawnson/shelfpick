@@ -1,0 +1,272 @@
+/* SP-UI-04: shared controls. One selected state (ChoiceGroup), the overflow menu, the undo toast, text actions and the
+   Pro tag. Semantic tokens only. Forest is the only interactive accent; there is no gold in these controls. */
+
+/* ---- Selected state: Forest on Forest-soft with a 2px Forest edge, bold text. Unselected: no fill, supporting text. ---- */
+.choice {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: var(--target-min);
+  padding: 0 14px;
+  color: var(--color-text-support);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 140ms ease, color 140ms ease, box-shadow 140ms ease;
+}
+.choice.selected {
+  color: var(--color-brand-primary);
+  font-weight: 700;
+  background: var(--color-brand-primary-soft);
+  box-shadow: inset 0 0 0 2px var(--color-brand-primary);
+}
+.choice:disabled { opacity: 0.6; cursor: default; }
+
+/* A standalone pill (a toggle such as Want to Play): same states, a hairline edge while unselected. */
+.choice.pill {
+  padding: 0 14px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--color-border);
+  font-size: var(--text-support);
+}
+.choice.pill.selected { box-shadow: inset 0 0 0 2px var(--color-brand-primary); }
+
+/* ---- Groups ---- */
+.choice-group { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+.choice-group.segmented {
+  gap: 4px;
+  padding: 3px;
+  background: var(--color-surface-raised);
+  border-radius: calc(var(--radius-md) + 3px);
+}
+/* Options share the row and wrap to their own line when large text no longer fits. */
+.choice-group.segmented .choice { flex: 1 1 max-content; }
+.choice-group.chips .choice {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--color-border);
+  font-size: var(--text-support);
+}
+.choice-group.chips .choice.selected { box-shadow: inset 0 0 0 2px var(--color-brand-primary); }
+.choice-group.chips .choice::before { position: absolute; inset: -4px 0; content: ""; }
+
+/* A long row scrolls sideways; its options keep their width and no label is clipped. */
+.choice-group.scrolls { flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; }
+.choice-group.scrolls::-webkit-scrollbar { display: none; }
+.choice-group.scrolls .choice { flex: 0 0 auto; white-space: nowrap; }
+
+/* ---- Select field: a compact 40pt menu with a chevron (Shelf sort, Plays filters). ---- */
+.select-field { position: relative; min-width: 0; }
+.select-field select {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-height: 40px;
+  padding: 0.4em 32px 0.4em 12px;
+  color: var(--color-text-primary);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-size: 1rem;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.select-field::after {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  width: 7px;
+  height: 7px;
+  color: var(--color-text-support);
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  content: "";
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+
+/* ---- Section label: the one small uppercase heading style (also .tonight-label on Tonight). ---- */
+.section-label {
+  margin: 0;
+  color: var(--color-text-support);
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ---- Confirmation sheet: a small bottom sheet that names what will be removed. ---- */
+.confirm-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: var(--color-overlay);
+}
+.confirm-sheet {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 480px;
+  padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -18px 38px var(--color-shadow);
+}
+.confirm-sheet h2 { margin: 0 0 8px; font-size: 1.25rem; line-height: 1.2; overflow-wrap: anywhere; }
+.confirm-sheet p { margin: 0 0 20px; color: var(--color-text-support); line-height: 1.45; overflow-wrap: anywhere; }
+.confirm-actions { display: grid; gap: 10px; }
+.confirm-actions .secondary-button,
+.confirm-actions .confirm-danger { width: 100%; min-height: 48px; }
+.confirm-danger {
+  padding: 0 16px;
+  color: var(--color-on-danger);
+  background: var(--color-danger);
+  border: 0;
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.confirm-danger:hover { background: var(--color-danger-hover); }
+.confirm-danger:disabled { opacity: 0.6; cursor: default; }
+
+/* ---- Text action: quiet Forest text, optional trailing chevron, a 44pt target. ---- */
+.text-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--target-min);
+  padding: 0;
+  color: var(--color-brand-primary);
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-size: var(--text-support);
+  font-weight: 700;
+  cursor: pointer;
+}
+.text-action:hover { color: var(--color-brand-primary-hover); }
+
+/* ---- Pro tag: a quiet neutral outline (no gold). ---- */
+.pro-tag {
+  padding: 1px 7px;
+  color: var(--color-text-support);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  font-size: var(--text-meta);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* ---- Overflow menu ---- */
+.overflow-menu { position: relative; }
+.overflow-trigger {
+  display: grid;
+  place-items: center;
+  width: var(--target-min);
+  height: var(--target-min);
+  padding: 0;
+  color: var(--color-text-support);
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.overflow-trigger[aria-expanded="true"] { color: var(--color-brand-primary); background: var(--color-brand-primary-soft); }
+.overflow-list {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 20;
+  display: grid;
+  min-width: 13rem;
+  padding: 4px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 18px 38px var(--color-shadow);
+}
+.overflow-list.flipped { top: auto; bottom: 100%; }
+.overflow-item {
+  display: flex;
+  align-items: center;
+  min-height: var(--target-min);
+  padding: 0 12px;
+  color: var(--color-text-primary);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+.overflow-item:hover,
+.overflow-item:focus-visible { background: var(--color-surface-raised); }
+.overflow-item.destructive { color: var(--color-danger); }
+
+/* ---- Undo toast, above the tab bar ---- */
+.undo-toast {
+  position: fixed;
+  right: 16px;
+  bottom: calc(var(--shelfpick-nav-height) + var(--shelfpick-nav-bottom) + 12px);
+  left: 16px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 358px;
+  margin-inline: auto;
+  padding: 4px 4px 4px 16px;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 18px 38px var(--color-shadow);
+  font-size: var(--text-support);
+  font-weight: 600;
+}
+.undo-toast button {
+  min-width: var(--target-min);
+  min-height: var(--target-min);
+  padding: 0 12px;
+  color: var(--color-brand-primary);
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .choice { transition: none; }
+}
+
+/* Tab rows that sit under a screen title keep a little air below. */
+.shelf-sections { margin-bottom: var(--space-3); }
+.discover-modes { margin-bottom: var(--space-1); }
+
+/* Five Stats tabs fit the phone width at the default text size; larger text scrolls the row instead. */
+.stats-sections { margin-bottom: var(--space-4); }
+.stats-sections .choice { padding-inline: 8px; font-size: 0.875rem; }

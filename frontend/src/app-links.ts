@@ -11,5 +11,5 @@ export const CONTACT_URL = "mailto:hello@plutonightlabs.com"
 
 // Version and build of the next App Store candidate. These must match the
 // values set in Xcode at archive time.
-export const APP_VERSION = "1.2.1"
-export const APP_BUILD = "24"
+export const APP_VERSION = "1.3.2"
+export const APP_BUILD = "28"

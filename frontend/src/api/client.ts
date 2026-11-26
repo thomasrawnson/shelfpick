@@ -1,6 +1,9 @@
 import type { Breakdown, ScoresheetSchema } from "../scoresheets/engine"
 import { request, responseError, SessionExpiredError } from "./request"
 import { FeedbackOfflineError, type FeedbackPayload } from "../feedback"
+import { isConnectionFailure, isUnreachableError } from "../offline/connectivity"
+import { readThrough, saveCopy } from "../offline/cache"
+import type { PlayPayload } from "../offline/play-queue"
 import { resetConfirmationBody } from "../reset-link"
 import {
   clearToken,
@@ -235,6 +238,10 @@ export interface GamePlay extends PlayResult {
   scoresheet_version?: number | null
   result_overridden?: boolean
   participants: GamePlayParticipant[]
+  // A play logged without a connection that has not reached the server yet (SP-NATIVE-01c).
+  pending?: boolean
+  client_id?: string
+  sync_error?: string | null
 }
 
 
@@ -924,18 +931,20 @@ export async function recordPickerEvent(
 
 export async function getGames():
 Promise<Game[]> {
-  const response =
-    await apiFetch(
-      "/games",
-    )
+  return readThrough("games", async () => {
+    const response =
+      await apiFetch(
+        "/games",
+      )
 
-  if (!response.ok) {
-    throw new Error(
-      `Games request failed: ${response.status}`,
-    )
-  }
+    if (!response.ok) {
+      throw new Error(
+        `Games request failed: ${response.status}`,
+      )
+    }
 
-  return response.json()
+    return response.json() as Promise<Game[]>
+  })
 }
 
 
@@ -1059,17 +1068,21 @@ export async function restoreRankingGame(
 
 
 const PLAYS_PAGE_SIZE = 200
+const SAVED_PLAYS = 400
 
 // Every play on the shelf, newest first, fetched a page at a time.
 export async function getPlays(): Promise<ListedPlay[]> {
-  const plays: ListedPlay[] = []
-  for (;;) {
-    const response = await apiFetch(`/plays?limit=${PLAYS_PAGE_SIZE}&offset=${plays.length}`)
-    if (!response.ok) throw new Error(`Plays request failed: ${response.status}`)
-    const page = await response.json() as { total: number; plays: ListedPlay[] }
-    plays.push(...page.plays)
-    if (page.plays.length === 0 || plays.length >= page.total) return plays
-  }
+  // Offline the Plays tab shows the newest SAVED_PLAYS plays that were on the device.
+  return readThrough("plays", async () => {
+    const plays: ListedPlay[] = []
+    for (;;) {
+      const response = await apiFetch(`/plays?limit=${PLAYS_PAGE_SIZE}&offset=${plays.length}`)
+      if (!response.ok) throw new Error(`Plays request failed: ${response.status}`)
+      const page = await response.json() as { total: number; plays: ListedPlay[] }
+      plays.push(...page.plays)
+      if (page.plays.length === 0 || plays.length >= page.total) return plays
+    }
+  }, (plays) => plays.slice(0, SAVED_PLAYS))
 }
 
 
@@ -1091,7 +1104,7 @@ export async function sendFeedback(payload: FeedbackPayload): Promise<void> {
       body: JSON.stringify(payload),
     })
   } catch (error) {
-    if (error instanceof Error && error.cause instanceof TypeError) throw new FeedbackOfflineError()
+    if (isConnectionFailure(error)) throw new FeedbackOfflineError()
     throw error
   }
   if (!response.ok) throw await responseError(response, "Couldn't send your message. Try again.")
@@ -1102,70 +1115,70 @@ export async function getGameHistory(
   bggId: number,
   limit?: number,
 ): Promise<GameHistory> {
-  const response =
-    await apiFetch(
-      limit ? `/games/${bggId}/plays?limit=${limit}` : `/games/${bggId}/plays`,
-    )
+  return readThrough(historyCacheName(bggId, limit), async () => {
+    const response =
+      await apiFetch(
+        limit ? `/games/${bggId}/plays?limit=${limit}` : `/games/${bggId}/plays`,
+      )
 
-  if (!response.ok) {
-    throw new Error(
-      `Game history request failed: ${response.status}`,
-    )
+    if (!response.ok) {
+      throw new Error(
+        `Game history request failed: ${response.status}`,
+      )
+    }
+
+    return response.json() as Promise<GameHistory>
+  })
+}
+
+// A light request to find out whether ShelfPick can be reached. The answer also updates the app's
+// connectivity state (see offline/connectivity.ts).
+export async function probeApi(): Promise<boolean> {
+  try {
+    const response = await request(`${API_BASE_URL}/health`, {}, 5_000)
+    return response.ok
+  } catch {
+    return false
   }
+}
 
-  return response.json()
+export function historyCacheName(bggId: number, limit?: number): string {
+  return `history.${bggId}.${limit ?? "all"}`
 }
 
 
-export async function recordPlay(
-  bggId: number,
-  playedAt: string,
-  durationMinutes:
-    number | null,
-  participants:
-    PlayParticipant[],
-  pickerSessionId?: string | null,
-  location?: string | null,
-  timerSessionId?: string | null,
-  result: PlayResult = {
-    outcome_type: "competitive",
-    coop_result: null,
-  },
-  scoresheet?: PlayScoresheet,
-): Promise<Play> {
-  const response =
-    await apiFetch(
-      "/plays",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type":
-            "application/json",
-        },
-        body: JSON.stringify({
-          bgg_id: bggId,
-          played_at:
-            playedAt,
-          duration_minutes:
-            durationMinutes,
-          participants,
-          location,
-          timer_session_id: timerSessionId,
-          picker_session_id:
-            pickerSessionId,
-          ...result,
-          ...scoresheet,
-        }),
-      },
-    )
+// How the server answered a play. "ok" is any 2xx, including 200 for a play it already had. A reply
+// that never came (no connection, a timeout, a 5xx, 408 or 429) is "retry": the same client_id can be
+// sent again safely. Any other 4xx is "rejected" and will not succeed unchanged. An expired session
+// is "auth".
+export type PlayPostResult =
+  | { kind: "ok"; play: Play; existing: boolean }
+  | { kind: "retry"; message: string }
+  | { kind: "rejected"; message: string; status: number }
+  | { kind: "auth" }
 
-  if (!response.ok) {
-    throw new Error(
-      `Play request failed: ${response.status}`,
-    )
+export async function postPlay(payload: PlayPayload): Promise<PlayPostResult> {
+  let response: Response
+  try {
+    response = await apiFetch("/plays", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    })
+  } catch (error) {
+    if (error instanceof SessionExpiredError) return { kind: "auth" }
+    if (isUnreachableError(error)) return { kind: "retry", message: "You're offline." }
+    throw error
   }
-
-  return response.json()
+  if (response.ok) return { kind: "ok", play: await response.json() as Play, existing: response.status === 200 }
+  if (response.status === 408 || response.status === 425 || response.status === 429 || response.status >= 500) {
+    return { kind: "retry", message: `ShelfPick couldn't save this yet (${response.status}).` }
+  }
+  return {
+    kind: "rejected",
+    status: response.status,
+    message: await readError(response, "ShelfPick couldn't accept this play."),
+  }
 }
 
 
@@ -1178,17 +1191,28 @@ export interface PlayEdit extends PlayResult, Partial<PlayScoresheet> {
 
 
 export async function getScoresheets(bggId: number): Promise<Scoresheet[]> {
-  const response = await apiFetch(`/scoresheets?bgg_id=${encodeURIComponent(bggId)}`)
-  if (!response.ok) throw new Error(`Scoresheet request failed: ${response.status}`)
-  return response.json()
+  return readThrough(`sheets.${bggId}`, async () => {
+    const response = await apiFetch(`/scoresheets?bgg_id=${encodeURIComponent(bggId)}`)
+    if (!response.ok) throw new Error(`Scoresheet request failed: ${response.status}`)
+    const sheets = await response.json() as Scoresheet[]
+    // Each sheet in the list is a version that was opened, so it can be edited on a play offline too.
+    for (const sheet of sheets) saveCopy(`sheet.${sheet.id}.${sheet.version}`, sheet)
+    return sheets
+  })
 }
 
 
+// Every version that is opened is kept, under the number it was asked for and under the number it
+// turned out to be, so a play logged on version 2 can be logged again offline.
 export async function getScoresheet(id: number, version?: number | null): Promise<Scoresheet> {
-  const query = version ? `?version=${encodeURIComponent(version)}` : ""
-  const response = await apiFetch(`/scoresheets/${id}${query}`)
-  if (!response.ok) throw new Error(`Scoresheet request failed: ${response.status}`)
-  return response.json()
+  return readThrough(`sheet.${id}.${version ?? "current"}`, async () => {
+    const query = version ? `?version=${encodeURIComponent(version)}` : ""
+    const response = await apiFetch(`/scoresheets/${id}${query}`)
+    if (!response.ok) throw new Error(`Scoresheet request failed: ${response.status}`)
+    const sheet = await response.json() as Scoresheet
+    saveCopy(`sheet.${id}.${sheet.version}`, sheet)
+    return sheet
+  })
 }
 
 
@@ -1422,18 +1446,20 @@ if (!response.ok) {
 
 export async function getCollectionStats():
 Promise<CollectionGameStats[]> {
-  const response =
-    await apiFetch(
-      "/collection/stats",
-    )
+  return readThrough("collection-stats", async () => {
+    const response =
+      await apiFetch(
+        "/collection/stats",
+      )
 
-  if (!response.ok) {
-    throw new Error(
-      `Collection stats failed: ${response.status}`,
-    )
-  }
+    if (!response.ok) {
+      throw new Error(
+        `Collection stats failed: ${response.status}`,
+      )
+    }
 
-  return response.json()
+    return response.json() as Promise<CollectionGameStats[]>
+  })
 }
 
 
@@ -1457,18 +1483,20 @@ export async function removeFromCollection(
 
 export async function getPlayers():
 Promise<Player[]> {
-  const response =
-    await apiFetch(
-      "/players",
-    )
+  return readThrough("players", async () => {
+    const response =
+      await apiFetch(
+        "/players",
+      )
 
-  if (!response.ok) {
-    throw new Error(
-      `Players request failed: ${response.status}`,
-    )
-  }
+    if (!response.ok) {
+      throw new Error(
+        `Players request failed: ${response.status}`,
+      )
+    }
 
-  return response.json()
+    return response.json() as Promise<Player[]>
+  })
 }
 
 export async function createPlayer(
@@ -1690,20 +1718,22 @@ Promise<DiscoverRecommendationResult> {
 
 export async function getWishlist():
 Promise<Game[]> {
-  const response = await apiFetch(
-    "/wishlist",
-  )
-
-  if (!response.ok) {
-    throw new Error(
-      await readError(
-        response,
-        "Couldn't load your Wishlist.",
-      ),
+  return readThrough("wishlist", async () => {
+    const response = await apiFetch(
+      "/wishlist",
     )
-  }
 
-  return response.json()
+    if (!response.ok) {
+      throw new Error(
+        await readError(
+          response,
+          "Couldn't load your Wishlist.",
+        ),
+      )
+    }
+
+    return response.json() as Promise<Game[]>
+  })
 }
 
 

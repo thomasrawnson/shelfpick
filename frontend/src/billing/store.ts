@@ -209,9 +209,9 @@ async function loadRevenueCat(): Promise<Sdk> {
 // in a browser. A "purchase" here still has to be confirmed by the server,
 // which only trusts RevenueCat, so it never unlocks Pro by itself.
 const DEV_TIP_PRICES: Record<(typeof TIP_PRODUCT_IDS)[number], string> = {
-  "com.plutonightlabs.shelfpick.tip.coffee": "£1.99",
-  "com.plutonightlabs.shelfpick.tip.pint": "£4.99",
-  "com.plutonightlabs.shelfpick.tip.gamenight": "£9.99",
+  "tip.coffee": "£1.99",
+  "tip.pint": "£4.99",
+  "tip.gamenight": "£9.99",
 }
 
 const developmentStore: ProStore = {

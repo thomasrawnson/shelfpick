@@ -13,35 +13,6 @@
 
 /* Collection browser */
 
-.collection-section-tabs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-  margin: 14px 0;
-  padding: 4px;
-  background: var(--color-surface-raised);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-}
-
-.collection-section-tabs button {
-  min-height: var(--target-min);
-  color: var(--text-secondary);
-  background: transparent;
-  border: 0;
-  border-radius: 9px;
-  font: inherit;
-  font-size: var(--text-support);
-  font-weight: 700;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-.collection-section-tabs button.active {
-  color: var(--color-brand-primary);
-  background: var(--color-brand-primary-soft);
-}
-
 .wishlist-list {
   display: grid;
   gap: 0;
@@ -190,40 +161,6 @@
   min-height: 0;
 }
 
-.collection-tools {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.collection-search,
-.collection-sort {
-  min-width: 0;
-  padding: 11px 12px;
-
-  color: var(--color-text-primary);
-  background: var(--color-surface-raised);
-
-  border: 1px solid var(--line);
-  border-radius: 12px;
-
-  font: inherit;
-  font-size: var(--text-support);
-}
-
-.collection-search::placeholder {
-  color: var(--color-text-support);
-}
-
-.collection-sort {
-  max-width: 110px;
-}
-
-.collection-sort option {
-  color: var(--ink);
-}
-
 .collection-count {
   margin: 0 0 10px;
 
@@ -258,9 +195,6 @@
 .collection-thumb img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-
-  background: var(--color-surface-raised);
 }
 
 .collection-chevron {
@@ -300,19 +234,6 @@
   align-items: center;
   justify-content: center;
   text-decoration: none;
-}
-
-@media (max-width: 380px) {
-  .collection-heading-row {
-    align-items: stretch;
-    flex-direction: column;
-    gap: var(--space-3);
-  }
-
-  .collection-add-button {
-    align-self: flex-start;
-    margin-top: 0;
-  }
 }
 
 .collection-back {
@@ -573,77 +494,6 @@
 
 /* Play history (game detail) */
 
-.game-history {
-  padding-top: 18px;
-
-  border-top: 1px solid
-    var(--color-border);
-}
-
-.history-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-
-  gap: 8px;
-
-  margin: 12px 0 14px;
-}
-
-.history-stats div {
-  padding: 10px 6px;
-
-  background: var(--color-surface-raised);
-
-  border: 1px solid var(--line);
-  border-radius: 10px;
-
-  text-align: center;
-}
-
-.history-stats strong {
-  display: block;
-
-  color: var(--color-accent-text);
-
-  font-family: var(--font-display);
-  font-size: 16px;
-}
-
-.history-stats span {
-  display: block;
-  margin-top: 2px;
-
-  color: var(--text-muted);
-
-  font-size: var(--text-meta);
-  text-transform: uppercase;
-}
-
-.history-last-played {
-  margin: 0 0 14px;
-
-  color: var(--text-secondary);
-
-  font-size: var(--text-meta);
-}
-
-.history-empty {
-  margin: 8px 0 0;
-
-  color: var(--text-muted);
-
-  font-size: var(--text-support);
-  font-style: italic;
-}
-
-.recent-plays {
-  margin-top: 16px;
-  padding-top: 14px;
-
-  border-top: 1px solid
-    var(--color-border);
-}
-
 /* =========================================================
    Collection browser
    ========================================================= */
@@ -655,45 +505,7 @@
 
 /* Sticky search / sort controls */
 
-.collection-tools {
-  position: sticky;
-  top: 0;
-  z-index: 5;
-
-  padding: 4px 0 10px;
-
-  background: linear-gradient(
-      180deg,
-      var(--color-surface) 0%,
-      var(--color-surface) 80%,
-      transparent 100%
-    );
-}
-
 /* Search and sort readability */
-
-.collection-search,
-.collection-sort {
-  color: var(--text-primary);
-
-  background: var(--color-surface-raised);
-
-  border-color: var(--color-border);
-}
-
-.collection-search::placeholder {
-  color: var(--text-muted);
-}
-
-.collection-search:focus,
-.collection-sort:focus {
-  border-color: var(--color-brand-accent);
-}
-
-.collection-sort option {
-  color: var(--ink);
-  background: var(--color-surface);
-}
 
 /* Collection count */
 
@@ -803,338 +615,12 @@
   background: var(--color-brand-accent-soft);
 }
 
-.recent-play-detail {
-  padding: 11px 0;
-
-  border-bottom: 1px solid
-    var(--color-border);
-}
-
-.recent-play-detail:last-child {
-  border-bottom: 0;
-}
-
-.recent-play-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.recent-play-header > div {
-  display: flex;
-  flex-direction: column;
-
-  gap: 2px;
-}
-
-.recent-play-header strong {
-  color: var(--color-text-primary);
-
-  font-size: var(--text-support);
-}
-
-.recent-play-header span {
-  color: var(--text-secondary);
-
-  font-size: var(--text-meta);
-}
-
-.play-participants {
-  display: flex;
-  flex-direction: column;
-
-  gap: 4px;
-
-  margin-top: 9px;
-}
-
-.history-player {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  padding: 6px 8px;
-
-  background: var(--color-surface-raised);
-
-  border-radius: 7px;
-}
-
-.history-player span {
-  color: var(--text-secondary);
-
-  font-size: var(--text-meta);
-}
-
-.history-player strong {
-  color: var(--color-text-primary);
-
-  font-size: var(--text-meta);
-}
-
-.history-player.winner {
-  background: var(--color-brand-accent-soft);
-
-  border: 1px solid
-    var(--color-brand-accent);
-}
-
-.history-player.winner span,
-.history-player.winner strong {
-  color: var(--color-accent-text);
-}
-
-.bgstats-history-link {
-  display: inline-block;
-  margin-top: 8px;
-
-  color: var(--color-accent-text);
-
-  border-bottom: 1px solid
-    var(--color-brand-accent);
-
-  font-size: var(--text-support);
-  font-weight: 700;
-
-  letter-spacing: 0.04em;
-  text-decoration: none;
-  text-transform: uppercase;
-
-  transition: border-color 160ms ease;
-}
-
-.bgstats-history-link:hover {
-  border-bottom-color: var(--gold);
-}
-
-.collection-danger-zone {
-  margin-top: 22px;
-  padding-top: 18px;
-
-  border-top: 1px solid
-    var(--color-danger);
-}
-
-.remove-collection-button {
-  width: 100%;
-
-  padding: 11px 14px;
-
-  color: var(--color-danger);
-  background: transparent;
-
-  border: 1px solid
-    var(--color-danger);
-
-  border-radius: 10px;
-
-  font-size: var(--text-support);
-  font-weight: 600;
-
-  cursor: pointer;
-}
-
-.remove-collection-button:hover {
-  background: var(--color-danger-soft);
-
-  border-color: var(--color-danger);
-}
-
-.remove-collection-confirm {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
-  padding: 12px 14px;
-
-  background: var(--color-danger-soft);
-
-  border: 1px solid
-    var(--color-danger);
-  border-radius: 10px;
-
-  color: var(--text-secondary);
-
-  font-size: var(--text-support);
-}
-
-.remove-collection-confirm-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.remove-collection-confirm-actions
-  .ghost-button {
-  flex: 1;
-}
-
-.remove-collection-confirm-actions
-  .remove-collection-button {
-  flex: 1;
-  width: auto;
-}
-
-.remove-collection-button:disabled,
-.remove-collection-confirm-actions
-  .ghost-button:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-
-.collection-filter-tabs {
-  display: grid;
-  grid-template-columns:
-    repeat(3, 1fr);
-
-  gap: 6px;
-
-  margin: 10px 0;
-}
-
-.collection-filter-tabs button {
-  padding: 8px 6px;
-
-  color: var(--text-secondary);
-  background: var(--color-surface-raised);
-
-  border: 1px solid
-    var(--color-border);
-
-  border-radius: 999px;
-
-  font-size: var(--text-support);
-  font-weight: 600;
-
-  cursor: pointer;
-}
-
-.collection-filter-tabs button.active {
-  color: var(--color-brand-primary);
-  background: var(--color-brand-primary-soft);
-  border-color: var(--color-brand-primary);
-}
-
 .collection-play-meta {
   display: block;
 
   margin-top: 4px;
 
   color: var(--color-accent-text) !important;
-}
-
-.delete-play-button {
-  min-height: 44px;
-
-  display: inline-flex;
-  align-items: center;
-
-  margin-top: 6px;
-  padding: 8px 10px;
-
-  color: var(--color-danger);
-  background: var(--color-danger-soft);
-
-  border: 1px solid
-    var(--color-danger);
-
-  border-radius: 8px;
-
-  font: inherit;
-  font-size: var(--text-support);
-
-  cursor: pointer;
-}
-
-.delete-play-button:hover {
-  text-decoration: none;
-}
-
-.delete-play-confirm {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-
-  margin-top: 10px;
-  padding: 8px 10px;
-
-  background: var(--color-danger-soft);
-
-  border: 1px solid var(--color-danger);
-  border-radius: 8px;
-
-  color: var(--text-secondary);
-
-  font-size: var(--text-support);
-}
-
-.delete-play-confirm-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.delete-play-confirm-actions
-  .ghost-button {
-  width: auto;
-  padding: 6px 12px;
-
-  font-size: var(--text-support);
-}
-
-.delete-play-confirm-button {
-  padding: 6px 12px;
-
-  color: var(--color-on-danger);
-  background: var(--color-danger);
-
-  border: 0;
-  border-radius: 6px;
-
-  font: inherit;
-  font-size: var(--text-support);
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition: background 160ms ease;
-}
-
-.delete-play-confirm-button:hover {
-  background: var(--color-danger-hover);
-}
-
-.delete-play-confirm-button:disabled,
-.delete-play-confirm-actions
-  .ghost-button:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-
-.collection-tools {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.collection-filter-tabs {
-  display: grid;
-  grid-template-columns:
-    repeat(3, 1fr);
-
-  gap: 6px;
-}
-
-.collection-filter-tabs button {
-  min-height: var(--target-min);
-}
-
-.collection-search-wrap {
-  display: block;
-}
-
-.collection-search {
-  width: 100%;
 }
 
 .collection-toolbar-row {
@@ -1153,36 +639,10 @@
   font-size: var(--text-meta);
 }
 
-.collection-sort-wrap {
-  flex-shrink: 0;
-}
-
-.collection-sort {
-  min-height: var(--target-min);
-  max-width: 150px;
-}
-
 @media (max-width: 480px) {
-  .collection-tools {
-    gap: 10px;
-  }
-
-  .collection-filter-tabs {
-    gap: 5px;
-  }
-
-  .collection-filter-tabs button {
-    padding: 9px 6px;
-
-    font-size: var(--text-support);
-  }
 
   .collection-toolbar-row {
     margin-bottom: 2px;
-  }
-
-  .collection-sort {
-    max-width: 135px;
   }
 }
 /* =========================================================
@@ -1210,29 +670,12 @@
 }
 
 .add-player-button,
-.delete-play-button,
-.remove-collection-button,
-.bgstats-history-link,
 .bgstats-button {
   min-height: 44px;
 }
 
-.add-player-button,
-.delete-play-button,
-.remove-collection-button {
+.add-player-button {
   touch-action: manipulation;
-}
-
-.recent-play-detail {
-  min-width: 0;
-}
-
-.recent-play-header {
-  gap: 10px;
-}
-
-.play-participants {
-  min-width: 0;
 }
 
 
@@ -1300,52 +743,8 @@
 
   /* History */
 
-  .history-stats {
-    gap: 5px;
-  }
-
-  .history-stats div {
-    padding:
-      9px 3px;
-  }
-
-  .recent-play-detail {
-    padding:
-      12px;
-  }
-
-  .recent-play-header {
-    align-items:
-      flex-start;
-  }
-
-  .history-player {
-    gap: 8px;
-  }
-
-  .delete-play-button {
-    padding:
-      10px 0;
-  }
-
 
   /* Removal confirmation */
-
-  .remove-collection-confirm-actions {
-    display: flex;
-    flex-direction: column;
-
-    gap: 8px;
-  }
-
-  .remove-collection-confirm-actions
-    .ghost-button {
-    margin-top: 0;
-  }
-
-  .remove-collection-button {
-    width: 100%;
-  }
 }
 
 /* =========================================================
@@ -1373,29 +772,12 @@
 }
 
 .add-player-button,
-.delete-play-button,
-.remove-collection-button,
-.bgstats-history-link,
 .bgstats-button {
   min-height: 44px;
 }
 
-.add-player-button,
-.delete-play-button,
-.remove-collection-button {
+.add-player-button {
   touch-action: manipulation;
-}
-
-.recent-play-detail {
-  min-width: 0;
-}
-
-.recent-play-header {
-  gap: 10px;
-}
-
-.play-participants {
-  min-width: 0;
 }
 
 /* Mobile game detail */
@@ -1480,9 +862,6 @@
 }
 
 /* Collection ranking tab v2 */
-.collection-section-tabs {
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-}
 
 .live-timer-clock,
 .live-timer-indicator-time {
@@ -1493,12 +872,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-}
-
-.recent-play-location {
-  margin: 8px 0 0;
-  color: var(--color-text-support);
-  font-size: var(--text-support);
 }
 
 .live-timer-screen {
@@ -1564,24 +937,6 @@
   background: var(--color-success-soft);
   border-radius: var(--radius-md);
   font-weight: 800;
-}
-
-.recent-play-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.recent-play-actions .secondary-button {
-  width: auto;
-  min-height: var(--target-min);
-  padding: 8px 14px;
-}
-
-.recent-play-actions .bgstats-history-link {
-  margin-top: 0;
 }
 
 .play-share-dialog {
@@ -1766,14 +1121,6 @@
 
 /* SP-PLAY-01 play results */
 
-
-.recent-play-type {
-  margin: 4px 0 0;
-  color: var(--color-text-support);
-  font-size: var(--text-support);
-  font-weight: 700;
-}
-
 /* SP-UI-01: Shelf cover grid and layout toggle. */
 .collection-screen { display: flex; flex-direction: column; }
 .collection-grid {
@@ -1812,17 +1159,6 @@
   display: block;
 }
 .collection-tile-cover .game-artwork-placeholder { width: 100%; height: 100%; }
-.collection-tile-plays {
-  position: absolute;
-  left: 8px;
-  bottom: 8px;
-  padding: 3px 9px;
-  color: #fff;
-  background: rgb(0 0 0 / 68%);
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 700;
-}
 .collection-tile strong {
   font-size: 0.9375rem;
   line-height: 1.25;

@@ -13,9 +13,9 @@ export type TipJarPhase =
   | { kind: "thanks"; count: number }
 
 const TIP_ICONS: Record<TipProductId, SettingsIconName> = {
-  "com.plutonightlabs.shelfpick.tip.coffee": "coffee",
-  "com.plutonightlabs.shelfpick.tip.pint": "pint",
-  "com.plutonightlabs.shelfpick.tip.gamenight": "dice",
+  "tip.coffee": "coffee",
+  "tip.pint": "pint",
+  "tip.gamenight": "dice",
 }
 
 export function TipJarContent({ phase, products, onBuy, onRetry }: {

@@ -1,6 +1,7 @@
 import { mkdirSync } from "node:fs"
 
 import { expect, test, type Page } from "@playwright/test"
+import { APP_BUILD, APP_VERSION } from "../src/app-links"
 
 import { logIn } from "./support"
 import { mockShelf } from "./ui-fixtures"
@@ -102,7 +103,7 @@ test("Feedback validates, sends and confirms", async ({ page }) => {
   await sheet.getByRole("button", { name: "Send" }).click()
   await expect(sheet.getByRole("status")).toContainText("Thanks, we've got it")
   expect(posts).toEqual([expect.objectContaining({
-    type: "problem", message: "Stats froze after logging a co-op play.", wants_reply: true, app_version: "1.1", build: "11",
+    type: "problem", message: "Stats froze after logging a co-op play.", wants_reply: true, app_version: APP_VERSION, build: APP_BUILD,
   })])
 })
 

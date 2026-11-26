@@ -15,7 +15,6 @@ import {
   getPlayers,
   getScoresheet,
   getScoresheets,
-  recordPlay,
   updatePlay,
   type CoopResult,
   type Game,
@@ -58,6 +57,7 @@ import {
 } from "../../play-results"
 import { createBGStatsPlayUrl } from "../../utils/bgstats"
 import { useLiveTimer } from "../../live-timer"
+import { usePlaySync } from "../../offline/play-sync-context"
 import { elapsedSeconds, formatElapsed } from "../../live-timer-utils"
 import PlayerAvatar from "../ui/PlayerAvatar"
 import Sheet from "../ui/Sheet"
@@ -161,6 +161,7 @@ function PlayLogForm({
   const titleId = `${ids}-title`
   const detailsId = `${ids}-details`
   const liveTimer = useLiveTimer()
+  const sync = usePlaySync()
   const isEditing = editingPlay !== null
   const canBuildSheets = useEntitlement("custom_scoresheets")
   const editingSheetId = editingPlay?.scoresheet_id ?? null
@@ -205,6 +206,8 @@ function PlayLogForm({
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")
   const [saved, setSaved] = useState(false)
+  // Saved on this device only: there was no connection, so the play waits in the sync queue.
+  const [savedOffline, setSavedOffline] = useState(false)
   const [bgStatsUrl, setBGStatsUrl] = useState<string | null>(null)
   const savePending = useRef(false)
   const lastSaved = useRef<PlayPrefill | null>(null)
@@ -377,6 +380,7 @@ function PlayLogForm({
     setWinnersOverridden(false)
     setError("")
     setSaved(false)
+    setSavedOffline(false)
     setBGStatsUrl(null)
   }
 
@@ -513,32 +517,40 @@ function PlayLogForm({
     setError("")
     let url: string | null = null
     let succeeded = false
+    let queued = false
     try {
       const playedAt = editingPlay && playDate === dateValue(new Date(editingPlay.played_at))
         ? editingPlay.played_at
         : new Date(`${playDate}T12:00:00`).toISOString()
-      if (editingPlay) {
-        await updatePlay(editingPlay.id, {
+      const edits = {
+        played_at: playedAt,
+        duration_minutes: durationMinutes,
+        location: location.trim() === "" ? null : location.trim(),
+        participants,
+        ...result,
+        ...scoresheet,
+      }
+      if (editingPlay?.pending && editingPlay.client_id) {
+        // Not on the server yet: change what will be sent.
+        const updated = await sync.updateQueued(editingPlay.client_id, edits)
+        if (!updated.ok) throw new Error("This play just synced. Close this and edit it again.")
+      } else if (editingPlay) {
+        await updatePlay(editingPlay.id, edits)
+      } else {
+        const submitted = await sync.submitPlay({
+          bgg_id: game.bgg_id,
           played_at: playedAt,
           duration_minutes: durationMinutes,
-          location: location.trim() === "" ? null : location.trim(),
           participants,
+          picker_session_id: pickerSessionId,
+          location,
+          timer_session_id: timerSessionId ?? (matchingTimer?.status === "finished" ? matchingTimer.public_id : null),
           ...result,
           ...scoresheet,
         })
-      } else {
-        const savedPlay = await recordPlay(
-          game.bgg_id,
-          playedAt,
-          durationMinutes,
-          participants,
-          pickerSessionId,
-          location,
-          timerSessionId ?? (matchingTimer?.status === "finished" ? matchingTimer.public_id : null),
-          result,
-          scoresheet,
-        )
-        url = createBGStatsPlayUrl(game, savedPlay, participants, durationMinutes, result)
+        queued = submitted.status === "queued"
+        // The BG Stats link needs the server's play id, so a queued play gets none.
+        if (submitted.status === "synced") url = createBGStatsPlayUrl(game, submitted.play, participants, durationMinutes, result)
       }
       succeeded = true
     } catch (err) {
@@ -568,19 +580,20 @@ function PlayLogForm({
       teams: drafts.map((player) => player.team.trim()),
     }
     setBGStatsUrl(url)
+    setSavedOffline(queued)
     setSaved(true)
     Analytics.track("play_logged", {
       source: "play_log_form",
       player_count: Math.min(participants.length, 999),
       has_scores: participants.some((participant) => participant.score !== null),
     })
-    void requestReviewAfterPlaySaved()
+    if (!queued) void requestReviewAfterPlaySaved()
     try {
       await onSaved({ bgStatsUrl: url })
     } catch (err) {
       console.error(err)
     }
-    void liveTimer.refresh()
+    if (!queued) void liveTimer.refresh()
   }
 
   const timerText = matchingTimer && matchingTimer.status !== "finished"
@@ -661,7 +674,8 @@ function PlayLogForm({
 
       {saved ? (
         <div className="play-saved" role="status">
-          <strong>Play saved</strong>
+          <strong>{savedOffline ? "Saved on this device" : "Play saved"}</strong>
+          {savedOffline && <p className="play-saved-note">You're offline. It will sync when you're back online.</p>}
           <div className="play-saved-actions">
             <button type="button" className="secondary-button" onClick={() => { void lightImpact(); startRematch() }}>Rematch</button>
             {bgStatsUrl && <a className="bgstats-button" href={bgStatsUrl} target="_blank" rel="noopener noreferrer">Send to BG Stats</a>}

@@ -109,9 +109,9 @@ test("V1 Discover and plan comparison omit Top 100 without changing Hot or For Y
     personalized: false, onViewWishlist: () => {}, onUnlockPro: () => {}, onPersonalize: () => {},
   }))
   const comparison = render(ProComparisonView, { user })
-  assert.doesNotMatch(discover, /role="tab"[^>]*>Top 100<\/button>/)
-  assert.match(discover, /role="tab"[^>]*>Hot<\/button>/)
-  assert.match(discover, /role="tab"[^>]*>For You/)
+  assert.doesNotMatch(discover, />Top 100</)
+  assert.match(discover, /aria-pressed="true"[^>]*>Hot<\/button>/)
+  assert.match(discover, /aria-pressed="false"[^>]*>For You/)
   assert.doesNotMatch(comparison, /Discover Top 100/)
 })
 

@@ -37,16 +37,33 @@ test("For You distinguishes truthful personalised and popular fallback copy", ()
   assert.deepEqual(
     discoverPersonalisationCopy("personalised", ["collection", "preferences"]),
     {
-      title: "Picked for how you play",
-      body: "These matches use games on your Owned shelf and your saved play preferences.",
+      title: "Picked for you",
+      body: "Based on your shelf and your play preferences.",
+      detail: [
+        "Themes and mechanics of the games on your shelf",
+        "Your usual player count and session length",
+      ],
+      actionLabel: null,
+    },
+  )
+  assert.deepEqual(
+    discoverPersonalisationCopy("personalised", ["collection", "play_history", "rankings"]),
+    {
+      title: "Picked for you",
+      body: "Based on your shelf, the games you’ve played, and your rankings.",
+      detail: [
+        "Themes and mechanics of the games on your shelf, counting the ones you play most more",
+        "Games like the ones you rank highest",
+      ],
       actionLabel: null,
     },
   )
   assert.deepEqual(
     discoverPersonalisationCopy("personalised", ["rankings"]),
     {
-      title: "Picked for how you play",
-      body: "These matches use your personal ShelfPick rankings.",
+      title: "Picked for you",
+      body: "Based on your rankings.",
+      detail: ["Games like the ones you rank highest"],
       actionLabel: null,
     },
   )
@@ -54,7 +71,8 @@ test("For You distinguishes truthful personalised and popular fallback copy", ()
     discoverPersonalisationCopy("popular_fallback", []),
     {
       title: "Popular picks to get you started",
-      body: "ShelfPick doesn’t have a matching shelf, play or preference signal yet, so these games come from BoardGameGeek Hot and ranked lists.",
+      body: "Log a few plays or set your preferences and these will start to fit you. Until then, they’re popular on BoardGameGeek.",
+      detail: [],
       actionLabel: "Set play preferences",
     },
   )

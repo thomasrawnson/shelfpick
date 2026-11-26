@@ -344,9 +344,9 @@ test("a store that is not available reports no plans without signing in", async 
 // --- Store: RevenueCat SDK handling -----------------------------------------------
 
 const TIP_IDS = [
-  "com.plutonightlabs.shelfpick.tip.coffee",
-  "com.plutonightlabs.shelfpick.tip.pint",
-  "com.plutonightlabs.shelfpick.tip.gamenight",
+  "tip.coffee",
+  "tip.pint",
+  "tip.gamenight",
 ]
 const tipProducts = [
   { identifier: TIP_IDS[0], priceString: "$2.49" },

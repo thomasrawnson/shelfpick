@@ -26,7 +26,7 @@ function memoryStorage() {
   }
 }
 
-const GBP = { "com.plutonightlabs.shelfpick.tip.coffee": "£1.99", "com.plutonightlabs.shelfpick.tip.pint": "£4.99", "com.plutonightlabs.shelfpick.tip.gamenight": "£9.99" }
+const GBP = { "tip.coffee": "£1.99", "tip.pint": "£4.99", "tip.gamenight": "£9.99" }
 const withPrices = (prices) => tipJar.TIP_PRODUCTS.map((product) => ({ ...product, price: prices[product.id] }))
 
 // A purchase layer that answers every purchase with the given result.
@@ -59,7 +59,7 @@ function settings(purchases) {
 
 test("tip product IDs live in one config, with no prices in it", () => {
   assert.deepEqual(tipJar.TIP_PRODUCTS.map((product) => [product.id, product.name]), [
-    ["com.plutonightlabs.shelfpick.tip.coffee", "Coffee"], ["com.plutonightlabs.shelfpick.tip.pint", "Pint"], ["com.plutonightlabs.shelfpick.tip.gamenight", "Game night"],
+    ["tip.coffee", "Coffee"], ["tip.pint", "Pint"], ["tip.gamenight", "Game night"],
   ])
   assert.deepEqual([...tipJar.TIP_PRODUCT_IDS], tipJar.TIP_PRODUCTS.map((product) => product.id))
   assert.ok(tipJar.TIP_PRODUCTS.every((product) => !("price" in product)))
@@ -67,8 +67,8 @@ test("tip product IDs live in one config, with no prices in it", () => {
 
 test("a completed tip increments the count and shows the Supporter badge", async () => {
   assert.doesNotMatch(settings(mockLayer({ status: "purchased" })), /Supporter/)
-  assert.deepEqual(await tipJar.purchaseTip(mockLayer({ status: "purchased" }), "com.plutonightlabs.shelfpick.tip.coffee"), { kind: "thanks", count: 1 })
-  assert.deepEqual(await tipJar.purchaseTip(mockLayer({ status: "purchased" }), "com.plutonightlabs.shelfpick.tip.pint"), { kind: "thanks", count: 2 })
+  assert.deepEqual(await tipJar.purchaseTip(mockLayer({ status: "purchased" }), "tip.coffee"), { kind: "thanks", count: 1 })
+  assert.deepEqual(await tipJar.purchaseTip(mockLayer({ status: "purchased" }), "tip.pint"), { kind: "thanks", count: 2 })
   assert.equal(tipJar.tipCount(), 2)
 
   const markup = settings(mockLayer({ status: "purchased" }))
@@ -85,12 +85,12 @@ test("a completed tip increments the count and shows the Supporter badge", async
 
 test("cancelled and failed tips leave the count unchanged", async () => {
   localStorage.setItem("shelfpick-tip-count", "1")
-  assert.deepEqual(await tipJar.purchaseTip(mockLayer({ status: "cancelled" }), "com.plutonightlabs.shelfpick.tip.coffee"), { kind: "cancelled" })
+  assert.deepEqual(await tipJar.purchaseTip(mockLayer({ status: "cancelled" }), "tip.coffee"), { kind: "cancelled" })
   assert.equal(tipJar.tipCount(), 1)
-  const failed = await tipJar.purchaseTip(mockLayer({ status: "failed" }), "com.plutonightlabs.shelfpick.tip.coffee")
+  const failed = await tipJar.purchaseTip(mockLayer({ status: "failed" }), "tip.coffee")
   assert.equal(failed.kind, "failed")
   assert.match(failed.message, /haven't been charged/)
-  const thrown = await tipJar.purchaseTip(mockLayer(new Error("StoreKit unavailable")), "com.plutonightlabs.shelfpick.tip.coffee")
+  const thrown = await tipJar.purchaseTip(mockLayer(new Error("StoreKit unavailable")), "tip.coffee")
   assert.equal(thrown.kind, "failed")
   assert.equal(tipJar.tipCount(), 1)
 
@@ -101,7 +101,7 @@ test("cancelled and failed tips leave the count unchanged", async () => {
 })
 
 test("a pending tip shows a pending message and does not count yet", async () => {
-  assert.deepEqual(await tipJar.purchaseTip(mockLayer({ status: "pending" }), "com.plutonightlabs.shelfpick.tip.gamenight"), { kind: "pending" })
+  assert.deepEqual(await tipJar.purchaseTip(mockLayer({ status: "pending" }), "tip.gamenight"), { kind: "pending" })
   assert.equal(tipJar.tipCount(), 0)
   const markup = renderToStaticMarkup(React.createElement(TipJarContent,
     { phase: { kind: "pending" }, products: [], onBuy() {}, onRetry() {} }))
@@ -117,7 +117,7 @@ test("the tip sheet says tips unlock nothing and names each option with its pric
     assert.match(ready, new RegExp(`aria-label="${label}"`))
   }
   const purchasing = renderToStaticMarkup(React.createElement(TipJarContent,
-    { phase: { kind: "purchasing", id: "com.plutonightlabs.shelfpick.tip.pint" }, products: withPrices(GBP), onBuy() {}, onRetry() {} }))
+    { phase: { kind: "purchasing", id: "tip.pint" }, products: withPrices(GBP), onBuy() {}, onRetry() {} }))
   assert.equal((purchasing.match(/disabled=""/g) ?? []).length, 3)
   assert.match(purchasing, /Purchasing…/)
   const loading = renderToStaticMarkup(React.createElement(TipJarContent,
@@ -135,9 +135,9 @@ test("the Tip jar row is hidden when there is no purchase layer", () => {
 
 // --- The RevenueCat layer, against a mocked store ---------------------------------
 
-const COFFEE = "com.plutonightlabs.shelfpick.tip.coffee"
-const PINT = "com.plutonightlabs.shelfpick.tip.pint"
-const GAMENIGHT = "com.plutonightlabs.shelfpick.tip.gamenight"
+const COFFEE = "tip.coffee"
+const PINT = "tip.pint"
+const GAMENIGHT = "tip.gamenight"
 
 function fakeStore({ prices = { [COFFEE]: "$2.49", [PINT]: "4,99 €", [GAMENIGHT]: "¥1,500" }, outcome = "purchased" } = {}) {
   const calls = []

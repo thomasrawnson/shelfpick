@@ -1,0 +1,146 @@
+/* Game detail (SP-UI-05): the game, its key facts and Log a play on the first screen; plain flat facts; destructive
+   actions behind a menu and a confirmation sheet. One accent (Forest); the cover frame keeps its cover-derived tint. */
+
+/* The nav row is as tall as the avatar (44px) and starts where it starts, so Back to shelf and the avatar share one
+   centre line. */
+.tab-screen.game-detail-screen { padding-top: 4px; }
+.detail-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: var(--target-min);
+  margin-bottom: var(--space-3);
+  padding-right: 56px;
+}
+.detail-back { padding: 0; }
+
+.game-detail {
+  width: 100%;
+  max-width: 680px;
+  margin-inline: auto;
+  text-align: left;
+  container-type: inline-size;
+}
+
+/* Hero: a capped cover, then the year, title and one meta line, all left-aligned. */
+.detail-hero {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+.detail-cover {
+  width: 120px;
+  height: 120px;
+  overflow: hidden;
+  background: var(--color-surface-raised);
+  border-radius: 14px;
+}
+.detail-cover img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.detail-cover .game-artwork-placeholder { width: 100%; height: 100%; }
+.game-detail.has-cover-accent .detail-cover {
+  background: color-mix(in srgb, var(--cover-accent) 26%, var(--color-surface-raised));
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--cover-accent) 28%, transparent);
+}
+.game-detail.has-cover-accent .detail-cover img { background: transparent; }
+.detail-title { min-width: 0; }
+.detail-title h1 { margin: 0; font-size: 1.5rem; line-height: 1.15; overflow-wrap: anywhere; text-wrap: balance; }
+.detail-year { margin: 0 0 4px; color: var(--cover-accent-text, var(--color-text-support)); font-size: 0.8125rem; font-weight: 700; }
+.detail-meta { margin: 6px 0 0; color: var(--color-text-support); font-size: var(--text-support); }
+
+/* Flat facts: left-aligned, primary-colour numbers with their scale, hairlines above and below. */
+.detail-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: var(--space-4) 0 0;
+  padding: var(--space-3) 0;
+  border-block: 1px solid var(--color-border);
+}
+.detail-metric { display: grid; align-content: start; gap: 2px; min-width: 0; text-align: left; }
+.detail-metric strong { color: var(--color-text-primary); font-family: var(--font-display); font-size: 1.5rem; font-weight: 600; line-height: 1.1; overflow-wrap: anywhere; }
+.detail-scale { color: var(--color-text-support); font-family: var(--font-ui); font-size: 0.875rem; font-weight: 600; }
+.detail-metric > span { color: var(--color-text-support); font-size: var(--text-meta); }
+.game-history > .detail-metrics { margin-top: 0; }
+
+/* Categories and Mechanics: plain secondary text, six at first. */
+.detail-block { display: grid; justify-items: start; gap: var(--space-2); margin-top: var(--space-5); }
+.detail-terms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 0;
+  margin: 0;
+  padding: 0;
+  color: var(--color-text-support);
+  font-size: var(--text-support);
+  list-style: none;
+}
+.detail-terms li:not(:last-child)::after { margin-inline: 8px; content: "·"; }
+
+/* History */
+.game-history { justify-items: stretch; margin-top: var(--space-5); }
+.history-last-played,
+.history-empty { margin: 0; color: var(--color-text-support); font-size: var(--text-support); }
+.recent-plays { display: grid; justify-items: stretch; gap: 0; margin-top: var(--space-2); }
+.recent-plays > .section-label { padding-bottom: var(--space-2); }
+.recent-play-detail { padding: var(--space-2) 0 var(--space-3); border-top: 1px solid var(--color-border); }
+.recent-play-detail:last-child { border-bottom: 1px solid var(--color-border); }
+.recent-play-header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.recent-play-when { display: grid; gap: 2px; min-width: 0; }
+.recent-play-when strong { font-size: 1rem; }
+.recent-play-when span { color: var(--color-text-support); font-size: var(--text-support); }
+.entry-toggle {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--target-min);
+  height: var(--target-min);
+  padding: 0;
+  color: var(--color-text-support);
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.entry-toggle svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 140ms ease; }
+.entry-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+.recent-play-location,
+.recent-play-type { margin: 6px 0 0; color: var(--color-text-support); font-size: var(--text-support); }
+
+.play-participants { display: grid; gap: 0; margin: var(--space-2) 0 0; padding: 0; list-style: none; }
+.history-player { display: flex; align-items: center; gap: var(--space-2); min-height: 32px; padding: 4px 0; font-size: var(--text-support); }
+.history-player-name { flex: 1 1 auto; min-width: 0; color: var(--color-text-support); overflow-wrap: anywhere; }
+.history-player.winner .history-player-name { color: var(--color-text-primary); font-weight: 700; }
+.history-player strong { min-width: 2ch; font-variant-numeric: tabular-nums; text-align: right; }
+.won { display: inline-flex; align-items: center; gap: 4px; color: var(--color-brand-primary); font-weight: 700; white-space: nowrap; }
+.won-check { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Rematch is the main action (a Forest outline pill with room around its label); Share and Edit are quiet text. */
+.recent-play-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 4px var(--space-3); margin-top: var(--space-2); }
+.rematch-action {
+  min-height: var(--target-min);
+  padding: 0 var(--space-4);
+  color: var(--color-brand-primary);
+  background: transparent;
+  border: 1.5px solid var(--color-brand-primary);
+  border-radius: 999px;
+  font: inherit;
+  font-size: var(--text-support);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.recent-play-actions .text-action { white-space: nowrap; }
+.recent-play-actions .overflow-menu { margin-left: auto; }
+
+/* At large text the hero and facts stack. */
+@container (max-width: 20em) {
+  .detail-hero { grid-template-columns: minmax(0, 1fr); }
+  .detail-metrics { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .entry-toggle svg { transition: none; }
+}

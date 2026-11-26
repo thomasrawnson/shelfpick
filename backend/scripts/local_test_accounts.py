@@ -354,7 +354,7 @@ def main() -> None:
         )
     )
     parser.add_argument(
-        "command", choices=("setup", "status", "remove", "verification-token")
+        "command", choices=("setup", "status", "remove", "verification-token", "reset-rate-limits")
     )
     parser.add_argument(
         "email", nargs="?",
@@ -398,6 +398,10 @@ def main() -> None:
             )
         elif arguments.command == "verification-token":
             print(issue_disposable_verification_token(db, arguments.email))
+        elif arguments.command == "reset-rate-limits":
+            # A long browser-test run signs in more often than one address is allowed in a window.
+            reset_loopback_rate_limits(db)
+            print("Loopback auth rate limits cleared.")
         elif arguments.command == "remove":
             remove_accounts(db)
             print("Dedicated local test accounts and unreferenced synthetic games removed.")

@@ -44,5 +44,6 @@ test("missing and legacy play-style values use the neutral fallback", () => {
 
   assert.match(missing, /aria-pressed="true"[^>]*>Either</)
   assert.match(legacy, /aria-pressed="true"[^>]*>Either</)
-  assert.doesNotMatch(missing, /class="player-chip selected"/)
+  // No saved group size: no count chip is selected (complexity "Any" always is).
+  assert.doesNotMatch(missing, /class="tonight-choice[^"]*selected" aria-label=/)
 })

@@ -108,8 +108,9 @@ for (const scheme of ["light", "dark"] as const) {
     // Tidy: delete the two plays this run created.
     for (let index = 0; index < 2; index += 1) {
       const play = page.locator(".recent-play-detail").first()
-      await play.getByRole("button", { name: "Delete play" }).click()
-      await play.getByRole("button", { name: "Delete play" }).last().click()
+      await play.getByRole("button", { name: /More options for the .* play/ }).click()
+      await page.getByRole("menuitem", { name: "Delete play" }).click()
+      await page.getByRole("alertdialog", { name: "Delete this play?" }).getByRole("button", { name: "Delete play" }).click()
       await expect(page.getByText("Delete this play?")).toHaveCount(0)
     }
   })

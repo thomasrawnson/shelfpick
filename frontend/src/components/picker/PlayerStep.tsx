@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import { useId, type ReactNode } from "react"
 import type {
   PickerComplexityBand,
   PickerMode,
@@ -47,6 +47,23 @@ type Props = {
 
 
 const playerOptions = [1, 2, 3, 4, 5, 6]
+
+// Selected choices carry a drawn check as well as the fill, so the state is not colour-only.
+function CheckMark() {
+  return (
+    <svg className="tonight-check" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="m5 12.5 4.5 4.5L19 7.5" />
+    </svg>
+  )
+}
+
+function Chevron() {
+  return (
+    <svg className="tonight-chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="m9 6 6 6-6 6" />
+    </svg>
+  )
+}
 
 const complexityOptions: Array<{
   label: string
@@ -128,6 +145,10 @@ function PlayerStep({
   onGroupVote,
   footer,
 }: Props) {
+  const ids = useId()
+  const countLabelId = `${ids}-count`
+  const complexityLabelId = `${ids}-complexity`
+  const findHintId = `${ids}-find-hint`
   const canHelpHIndex = useEntitlement("advanced_stats")
   const activeFineTuneCount = [
     mode !== "best_match",
@@ -143,14 +164,15 @@ function PlayerStep({
     : undefined
 
   return (
-    <section className="screen picker-step-screen player-step-screen">
+    <section className="screen tab-screen picker-step-screen player-step-screen tonight-screen">
       <header className="tonight-header">
-        <p className="tonight-eyebrow">Tonight</p>
+        <p className="tonight-label">Tonight</p>
         <h1>What should we play?</h1>
       </header>
 
-      <div className="picker-step-centered">
-        <p className="picker-essential-label">Who is playing?</p>
+      <div className="tonight-body">
+        <div className="tonight-group">
+        <p className="tonight-label" id={countLabelId}>Who is playing?</p>
 
         {selectedPlayerIds.length > 0 ? (
           <div className="picker-named-player-selection">
@@ -177,20 +199,16 @@ function PlayerStep({
           </div>
         ) : (
           <>
-            <div className="player-grid">
+            <div className="tonight-count-grid" role="group" aria-labelledby={countLabelId}>
               {playerOptions.map((option) => (
                 <button
                   key={option}
                   type="button"
-                  className={
-                    players === option
-                      ? option === 1
-                        ? "player-chip solo selected"
-                        : "player-chip selected"
-                      : option === 1
-                        ? "player-chip solo"
-                        : "player-chip"
-                  }
+                  className={[
+                    "tonight-choice",
+                    option === 1 ? "solo" : "",
+                    players === option ? "selected" : "",
+                  ].filter(Boolean).join(" ")}
                   aria-label={
                     option === 1
                       ? "Solo"
@@ -199,6 +217,7 @@ function PlayerStep({
                   aria-pressed={players === option}
                   onClick={() => onSelectCount(option)}
                 >
+                  {players === option && <CheckMark />}
                   <strong>
                     {option === 1 ? "Solo" : option === 6 ? "6+" : option}
                   </strong>
@@ -207,32 +226,30 @@ function PlayerStep({
             </div>
             <button
               type="button"
-              className="tonight-choose-players"
+              className="tonight-row"
               onClick={onChoosePlayers}
             >
               <span>Choose players by name</span>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+              <Chevron />
             </button>
           </>
         )}
+        </div>
 
-        <div className="preference-section player-complexity-section">
-          <p className="preference-label">Complexity</p>
-          <div className="complexity-grid">
+        <div className="tonight-complexity tonight-group">
+          <p className="tonight-label" id={complexityLabelId}>Complexity</p>
+          <div className="tonight-segments" role="group" aria-labelledby={complexityLabelId}>
             {complexityOptions.map((option) => {
               const selected = complexityBand === option.value
               return (
                 <button
                   key={option.label}
                   type="button"
-                  className={
-                    selected
-                      ? "complexity-option selected"
-                      : "complexity-option"
-                  }
+                  className={selected ? "tonight-choice selected" : "tonight-choice"}
                   aria-pressed={selected}
                   onClick={() => onComplexityChange(option.value)}
                 >
+                  {selected && <CheckMark />}
                   <strong>{option.label}</strong>
                 </button>
               )
@@ -243,7 +260,7 @@ function PlayerStep({
         <Disclosure
           label="Fine-tune"
           hint={fineTuneHint}
-          className="advanced-filters picker-first-step-advanced"
+          className="tonight-fine-tune"
         >
           {activeFineTuneCount > 0 && (
             <div className="fine-tune-status">
@@ -361,22 +378,27 @@ function PlayerStep({
           </div>
         </Disclosure>
 
-        <div className="picker-step-actions">
+        <div className="tonight-actions">
           <button
             type="button"
             className="primary-button"
             disabled={players === null}
+            aria-describedby={players === null ? findHintId : undefined}
             onClick={onContinue}
           >
             Find a game
           </button>
+          {players === null && (
+            <p className="tonight-hint" id={findHintId}>Choose how many are playing</p>
+          )}
           {onGroupVote && (
             <button
               type="button"
-              className="secondary-button"
+              className="tonight-text-action"
               onClick={onGroupVote}
             >
-              Start a group vote
+              <span>Start a group vote</span>
+              <Chevron />
             </button>
           )}
         </div>

@@ -1,3 +1,4 @@
+import ChoiceGroup from "./ui/ChoiceGroup"
 import {
   useEffect,
   useState,
@@ -202,7 +203,7 @@ function InsightsView({
 
   if (loading) {
     return (
-      <section className="screen insights-screen">
+      <section className="screen tab-screen insights-screen">
         <h1>Stats</h1>
         <p className="subtitle" role="status">Crunching the numbers...</p>
       </section>
@@ -215,7 +216,7 @@ function InsightsView({
     || !insights
   ) {
     return (
-      <section className="screen insights-screen">
+      <section className="screen tab-screen insights-screen">
         <h1>Stats</h1>
 
         <p className="error-message">
@@ -244,43 +245,20 @@ function InsightsView({
 
 
   return (
-    <section className="screen insights-screen">
+    <section className="screen tab-screen insights-screen">
       <header>
         <h1>Stats</h1>
       </header>
 
 
-      <div
-        className="stats-section-tabs"
-        role="group"
-        aria-label="Stats sections"
-      >
-        {statsSections.map(
-          (section) => (
-            <button
-              type="button"
-              aria-pressed={
-                activeSection
-                === section.id
-              }
-              className={
-                activeSection
-                === section.id
-                  ? "stats-section-tab active"
-                  : "stats-section-tab"
-              }
-              key={section.id}
-              onClick={() =>
-                setActiveSection(
-                  section.id
-                )
-              }
-            >
-              {section.label}
-            </button>
-          ),
-        )}
-      </div>
+      <ChoiceGroup
+        value={activeSection}
+        ariaLabel="Stats sections"
+        className="stats-sections"
+        scroll
+        options={statsSections.map((section) => ({ value: section.id, label: section.label }))}
+        onChange={setActiveSection}
+      />
 
 
       {activeSection === "trends" && (
