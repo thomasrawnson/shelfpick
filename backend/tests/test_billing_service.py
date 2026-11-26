@@ -366,7 +366,7 @@ def test_tip_product_ids_match_the_app():
     from pathlib import Path
 
     source = (Path(__file__).resolve().parents[2] / "frontend/src/tip-jar.ts").read_text()
-    app_ids = set(re.findall(r'id: "(com\.plutonightlabs\.shelfpick\.tip\.[a-z]+)"', source))
+    app_ids = set(re.findall(r'id: "(tip\.[a-z]+)"', source))
     assert app_ids == set(TIP_PRODUCT_IDS) and len(app_ids) == 3
 
 
