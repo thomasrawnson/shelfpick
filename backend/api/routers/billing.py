@@ -12,6 +12,7 @@ from database.models import User
 from repositories.billing_repository import BillingRepository
 from services.billing_service import (
     REVERSAL_CANCEL_REASONS,
+    TIP_PRODUCT_IDS,
     BillingService,
     RevenueCatClient,
     RevenueCatUnavailableError,
@@ -139,6 +140,10 @@ async def revenuecat_webhook(
         raise HTTPException(status_code=400, detail="Invalid body")
 
     if event.get("type") == "TEST":
+        return {"ok": True, "checked": 0}
+
+    # A tip unlocks nothing, so its notifications need no purchase check.
+    if event.get("product_id") in TIP_PRODUCT_IDS:
         return {"ok": True, "checked": 0}
 
     service = _billing_service(db, client)

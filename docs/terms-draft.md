@@ -13,6 +13,8 @@
 
 ShelfPick is a web app for managing a board-game collection, choosing games, recording plays and running optional Game Night voting. The initial public release is Free-only. ShelfPick Pro purchase, pricing and checkout are unavailable; existing test entitlements do not represent a purchasable offer.
 
+**Tips.** Where the app offers them, the Tip jar sells optional one-time tips (Coffee, Pint, Game night) through the App Store. A tip is a voluntary gift to support development and hosting. It unlocks nothing, does not give access to ShelfPick Pro or any other feature, is separate from Pro, and does not renew. Tips are charged to the Apple Account and refunds are handled by Apple. **[QUALIFIED LEGAL REVIEW: gift versus purchase wording and consumer-rights treatment.]**
+
 BoardGameGeek data and availability are third-party dependencies. ShelfPick is not affiliated with or endorsed by BoardGameGeek. Users are responsible for entering an appropriate public BGG username. Linked BGG attribution and underlying cover-image rights remain separate operational gates.
 
 ShelfPick's commercial XML API application is approved. Linked attribution remains required, and underlying game-cover image rights remain separate. Exported play cards and recaps may include BGG-hosted cover images.

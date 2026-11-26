@@ -343,6 +343,17 @@ test("a store that is not available reports no plans without signing in", async 
 
 // --- Store: RevenueCat SDK handling -----------------------------------------------
 
+const TIP_IDS = [
+  "tip.coffee",
+  "tip.pint",
+  "tip.gamenight",
+]
+const tipProducts = [
+  { identifier: TIP_IDS[0], priceString: "$2.49" },
+  { identifier: TIP_IDS[1], priceString: "4,99 €" },
+  { identifier: "com.example.not-a-tip", priceString: "$0.99" },
+]
+
 function fakeSdk({ configured = false, offering } = {}) {
   const log = []
   return {
@@ -354,6 +365,8 @@ function fakeSdk({ configured = false, offering } = {}) {
       ? { annual: { product: { priceString: "£3.99" } }, lifetime: { product: { priceString: "£9.99" } } }
       : offering }),
     purchasePackage: async options => { log.push(["purchase", options.aPackage]) },
+    getProducts: async options => { log.push(["getProducts", options]); return { products: tipProducts.filter(product => options.productIdentifiers.includes(product.identifier)) } },
+    purchaseStoreProduct: async options => { log.push(["purchaseStoreProduct", options.product.identifier]) },
     restorePurchases: async () => { log.push(["restore"]) },
     getCustomerInfo: async () => ({ customerInfo: { managementURL: "https://apps.apple.com/account/subscriptions" } }),
   }
@@ -449,6 +462,53 @@ test("a sign-in that never answers does not block Restore forever", async () => 
   await assert.rejects(store.bind("A"), /taking too long/)
   await store.restore("B")
   assert.deepEqual(sdk.log, [["restore"]])
+})
+
+test("tip products are fetched as non-subscription products with the store's own price strings", async () => {
+  const sdk = fakeSdk()
+  const store = storeModule.createProStore({ apiKey: "k", loadSdk: async () => sdk })
+  const tips = await store.loadTipProducts(TIP_IDS, "account-A")
+  assert.deepEqual(sdk.log[0], ["configure", { apiKey: "k", appUserID: "account-A" }])
+  assert.deepEqual(sdk.log[1], ["getProducts", { productIdentifiers: TIP_IDS, type: "NON_SUBSCRIPTION" }])
+  // Only the tip products asked for come back, each with its price string and a handle to buy it.
+  assert.deepEqual(tips.map(tip => [tip.id, tip.priceString]), [[TIP_IDS[0], "$2.49"], [TIP_IDS[1], "4,99 €"]])
+})
+
+test("a tip purchase maps the store's cancel and pending codes and rethrows the rest", async () => {
+  const run = async error => {
+    const sdk = { ...fakeSdk(), purchaseStoreProduct: async () => { if (error) throw error } }
+    const store = storeModule.createProStore({ apiKey: "k", loadSdk: async () => sdk })
+    const [tip] = await store.loadTipProducts(TIP_IDS, "a")
+    return store.purchaseTip(tip, "a")
+  }
+  assert.equal(await run(null), "purchased")
+  assert.equal(await run({ code: "1" }), "cancelled")
+  assert.equal(await run({ userCancelled: true }), "cancelled")
+  assert.equal(await run({ code: "20" }), "pending")
+  await assert.rejects(run(new Error("network")), /network/)
+})
+
+test("a tip is bought for the intended account even when another account's sign-in was still pending", async () => {
+  const sdk = fakeSdk({ configured: true })
+  let releaseA
+  sdk.logIn = options => new Promise(resolve => {
+    const finish = () => { sdk.log.push(["logIn", options]); resolve() }
+    if (options.appUserID === "account-A") releaseA = finish
+    else finish()
+  })
+  const store = storeModule.createProStore({ apiKey: "k", loadSdk: async () => sdk })
+  const first = store.bind("account-A") // slow: the account switches during SDK preparation
+  const tip = { id: TIP_IDS[0], priceString: "$2.49", handle: tipProducts[0] }
+  const buy = store.purchaseTip(tip, "account-B")
+  await new Promise(resolve => setTimeout(resolve, 10))
+  assert.deepEqual(sdk.log, [])
+  releaseA()
+  await Promise.all([first, buy])
+  assert.deepEqual(sdk.log, [
+    ["logIn", { appUserID: "account-A" }],
+    ["logIn", { appUserID: "account-B" }],
+    ["purchaseStoreProduct", TIP_IDS[0]],
+  ])
 })
 
 test("the SDK handed to the store can be awaited even when the plugin object cannot", async () => {
